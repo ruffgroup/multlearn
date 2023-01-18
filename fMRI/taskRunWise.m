@@ -3,35 +3,36 @@
 % Getting the name of the computer that the participant is working on
 % in the BLU lab 
 % Should work everywhere but comment this line if you face problems running it anywhere else.
-%[~, systemName] = system('hostname');
+%[~, systemName42244224] = system('hostname');
 
 % Setting type of experiment. 0 for tones,1 for beeps
 beeps = 1;
 
 % Setting number of runs (runs of experiment)
-nrRuns = 6; 
+nrRuns = 6;
+startRun = 6;
 
 % Number of trials in each run. Should be a multiple of 3 and a number
-% which when multiplied by each of modality0A, 0B and 0c etc gives a whole number
+% which when multiplied by5 each of modality0A, 0B and 0c etc gives a whole number
 % With modalit0A, 0B and 0C set to 0.5, 0.35 and 0.15, the number of trials
-% needed become a multiple of 60.
+% needed become a multip5le of 60.
 nrTrials = 60;
 
 %  Creating a table to store the important values
-savedValues = cell(nrRuns,1);
-savedVal = table();
+% savedValues = cell(nrRuns-startRun,1);
+% savedVal = table();
 
 % If eyeTracking is TRUE then experiment will carry out eye Tracking
 eyeTracking = true;
 
-% If fMRI is TRUE then, it will wait for scanner triggers
+% If fMRI is TRUE then, 5it will wait for scanner triggers
 fMRI = true;
 
 
 %Clearing up the workspace and getting ready to start
-close all;
-clc;
-sca;
+% close all;
+% clc;
+% sca;
 
 %Performing standard setup of feature level 2 for Psychtoolbox
 PsychDefaultSetup(2);
@@ -72,37 +73,37 @@ end
 addpath(fullfile(fileparts(filePath),'Stimuli/Visual'));
 addpath(fullfile(fileparts(filePath),'Stimuli/Auditory'));
 
-addpath(fullfile(fileparts(filePath),'Timings'));
-onsets = load('bestOnsetMat.mat').design(:,1);
-jitterShuffler = randperm(6);
+% addpath(fullfile(fileparts(filePath),'Timings'));
+% onsets = load('bestOnsetMat.mat').design(:,1);
+% jitterShuffler = randperm(6);
 
 % FeedbackOffsets
-feedbackOffsetTimes = onsets(5:4:end);
-feedbackOffsetTimesMat =  reshape(feedbackOffsetTimes, [60,6]);
-subElement = feedbackOffsetTimesMat(end,1:5);
-feedbackOffsetTimesMat(:,2:6) = feedbackOffsetTimesMat(:,2:6) - subElement;
-feedbackOffsetTimes = feedbackOffsetTimesMat(:,jitterShuffler);
-feedbackOffsetTimes = feedbackOffsetTimes(:);
+% feedbackOffsetTimes = onsets(5:4:end);
+% feedbackOffsetTimesMat =  reshape(feedbackOffsetTimes, [60,6]);
+% subElement = feedbackOffsetTimesMat(end,1:5);
+% feedbackOffsetTimesMat(:,2:6) = feedbackOffsetTimesMat(:,2:6) - subElement;
+% feedbackOffsetTimes = feedbackOffsetTimesMat(:,jitterShuffler);
+% feedbackOffsetTimes = feedbackOffsetTimes(:);
 
 %stim Onsets
-stimulusOnsetTimes = onsets(2:4:end);
-stimulusOnsetTimesMat =  reshape(stimulusOnsetTimes, [60,6]);
-% stimSubElement = stimulusOnsetTimesMat(end,1:5);
-stimulusOnsetTimesMat(:,2:6) = stimulusOnsetTimesMat(:,2:6) - subElement;
-stimulusOnsetTimes = stimulusOnsetTimesMat(:,jitterShuffler);
-stimulusOnsetTimes = stimulusOnsetTimes(:);
+% stimulusOnsetTimes = onsets(2:4:end);
+% stimulusOnsetTimesMat =  reshape(stimulusOnsetTimes, [60,6]);
+% % stimSubElement = stimulusOnsetTimesMat(end,1:5);
+% stimulusOnsetTimesMat(:,2:6) = stimulusOnsetTimesMat(:,2:6) - subElement;
+% stimulusOnsetTimes = stimulusOnsetTimesMat(:,jitterShuffler);
+% stimulusOnsetTimes = stimulusOnsetTimes(:);
 
 % FeedbackOnsets
-feedbackOnsetTimes = onsets(4:4:end);
-feedbackOnsetTimesMat =  reshape(feedbackOnsetTimes, [60,6]);
-% feedOnSubElement = feedbackOnsetTimesMat(end,1:5);
-feedbackOnsetTimesMat(:,2:6) = feedbackOnsetTimesMat(:,2:6) - subElement;
-feedbackOnsetTimes = feedbackOnsetTimesMat(:,jitterShuffler);
-feedbackOnsetTimes = feedbackOnsetTimes(:);
+% feedbackOnsetTimes = onsets(4:4:end);
+% feedbackOnsetTimesMat =  reshape(feedbackOnsetTimes, [60,6]);
+% % feedOnSubElement = feedbackOnsetTimesMat(end,1:5);
+% feedbackOnsetTimesMat(:,2:6) = feedbackOnsetTimesMat(:,2:6) - subElement;
+% feedbackOnsetTimes = feedbackOnsetTimesMat(:,jitterShuffler);
+% feedbackOnsetTimes = feedbackOnsetTimes(:);
 
 
 
-rng('shuffle')  % Seeds random number generator based on current time.
+% rng('shuffle')  % Seeds random number generator based on current time.
 
 % Defining black, white and grey for the background screens
 white = WhiteIndex(screenNumber);
@@ -151,15 +152,15 @@ modality2C = 0.50;
 % permutated.
 % Random permutation for choosing audio set to be taken along the
 % visual set
-visualSetPermutation = randperm(nrRuns)-1;
-audioSetPermutation = randperm(ceil(nrRuns/2))-1;
+% visualSetPermutation = randperm(nrRuns)-1;
+% audioSetPermutation = randperm(ceil(nrRuns/2))-1;
 % Pairing auditory within a set randomly to visual of the set
 % runNr. So if the output of audioPair is 2,1,0 (A,B,C) for example - means that
 % visual 0 is paired to audio 2 modality0A/3 times (50/3%), visual 0 is with
 % audio 1 modality0B(35%/3) times, and 00 occurs modality0C/3 (15%/3)
 % times. 
-audioPair = randperm(3) - 1; % Generating the permutation for audio that will be mapped to the visual 0,1,2
-tactilePair = randperm(3) - 1;
+% audioPair = randperm(3) - 1; % Generating the permutation for audio that will be mapped to the visual 0,1,2
+% tactilePair = randperm(3) - 1;
 
 
 
@@ -176,14 +177,14 @@ experimentInfo.viewParam.fontSize = 35;
 
 %% saving participant ID as enterred by experimenter
 
-participantID = input('participantID: ', 's');
-while isnan(str2double(participantID))
-    disp('Please enter an integer');
-    participantID = input('participantID: ', 's');
-end
-participantGender = input('Gender [m/f]: ', 's');
-participantAge = input('Age : ', 's');
-Num_scanned = input('How many times were you scanned : ', 's');
+% participantID = input('participantID: ', 's');
+% while isnan(str2double(participantID))
+%     disp('Please enter an integer');
+%     participantID = input('participantID: ', 's');
+% end
+% participantGender = input('Gender [m/f]: ', 's');
+% participantAge = input('Age : ', 's');
+% Num_scanned = input('How many times were you scanned : ', 's');
 
 %% Opening screen and setting screen properties
 
@@ -268,10 +269,10 @@ end
 
 %% Main Task Run
 
-totalReward = 65.0; % Starting with a total reward value and adding more reward based on performance at end
-randomAT = rand;
-randATfull = rand;
-for runNr = 1:nrRuns
+% totalReward = 65.0; % Starting with a total reward value and adding more reward based on performance at end
+% randomAT = rand;
+% randATfull = rand;
+for runNr = startRun:nrRuns
 
 
 
@@ -280,7 +281,7 @@ for runNr = 1:nrRuns
         try
             et.calibrate();
         catch
-            disp('skipped calibratoin');
+            disp('skipped calibration');
         end
         runFileName = sprintf('M%sR%01d.edf', participantID, runNr);
         et.openFile(runFileName);
@@ -511,7 +512,7 @@ for runNr = 1:nrRuns
 
         % Displaying reward slide
         [feedbackOnset, correctResponse, reward] = experiment.displayReward(window, trialNr, greenPairs, rewardMag, ...
-            rewardProb, punishMag, visual, audio, tactile, KeyCode,fixationCoordinates, fixationLineWidth, black, grey, xCenter, yCenter, IsKeyDown, audioTrials, feedbackTime, feedbackAccuracy, participantID, yesKey, noKey, yesTick, noCross, et, eyeTracking, functionalKeys, runStartTime, responseTimeOver, feedbackOnsetTimes, runNr);
+            rewardProb, punishMag, visual, audio, tactile, KeyCode,fixationCoordinates, fixationLineWidth, black, grey, xCenter, yCenter, IsKeyDown, audioTrials, feedbackTime, feedbackAccuracy, participantID, yesKey, noKey, yesTick, noCross, et, eyeTracking, functionalKeys, runStartTime, responseTimeOver, feedbackOnsetTimes);
 
         %Saving all important response information temporarily in a table
         %for each run
@@ -544,7 +545,7 @@ for runNr = 1:nrRuns
 
         %Setting feedbackOffset here once all computatoins are done and
         %lags are taken care off
-        [feedbackOffset] = experiment.feedbackOff(window, fixationCoordinates, fixationLineWidth, black, xCenter, yCenter, feedbackTime, yesKey, yesTick, noCross, et, eyeTracking, functionalKeys, feedbackOnset, feedbackOffsetTimes, trialNr, runStartTime, runNr);
+        [feedbackOffset] = experiment.feedbackOff(window, fixationCoordinates, fixationLineWidth, black, xCenter, yCenter, feedbackTime, yesKey, yesTick, noCross, et, eyeTracking, functionalKeys, feedbackOnset, feedbackOffsetTimes, trialNr, runStartTime);
 
         temporarySavedValues.feedbackOffsetTime(trialNr,1) = feedbackOffset-runStartTime;
 
@@ -679,7 +680,7 @@ writetable(experimentInfo(1,:),fullfile(dataSet)+"/"+filename,'Sheet',1);
 save(fullfile(dataSet)+"/"+filenameMat, 'savedVal', 'experimentInfo');
 writetable(experimentInfo(1,:), fullfile(dataSet)+"/"+expInfoCSV);
 writetable(savedVal, fullfile(dataSet)+"/"+savedValuesCSV);
- 
+
 experimentInfo = experimentInfo(1,:);
 % As all important variables have been saved 
 % in relevant structures, we clear the irrelevant variables from the

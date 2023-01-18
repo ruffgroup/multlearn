@@ -1,4 +1,4 @@
-function[feedbackOnset, correctResponse, reward] = displayReward(window, trialNr, greenPairs, rewardMag, rewardProb, punishMag, visual, audio, tactile, KeyCode, fixationCoordinates, fixationLineWidth, black, grey, xCenter, yCenter, IsKeyDown, audioTrials, feedbackTime, feedbackAccuracy, participantID, yesKey, noKey, yesTick, noCross, et, eyeTracking, functionalKeys, runStartTime, responseTimeOver, feedbackOnsetTimes)
+function[feedbackOnset, correctResponse, reward] = displayReward(window, trialNr, greenPairs, rewardMag, rewardProb, punishMag, visual, audio, tactile, KeyCode, fixationCoordinates, fixationLineWidth, black, grey, xCenter, yCenter, IsKeyDown, audioTrials, feedbackTime, feedbackAccuracy, participantID, yesKey, noKey, yesTick, noCross, et, eyeTracking, functionalKeys, runStartTime, responseTimeOver, feedbackOnsetTimes, runNr)
  
     
     rewardSlide = '+1';    
@@ -107,7 +107,7 @@ function[feedbackOnset, correctResponse, reward] = displayReward(window, trialNr
 
     end
 
-    feedbackOnset = runStartTime + feedbackOnsetTimes(trialNr);
+    feedbackOnset = runStartTime + feedbackOnsetTimes(trialNr+(runNr-1)*60);
     WaitSecs('UntilTime', feedbackOnset)
 
     % start of result screen presentation

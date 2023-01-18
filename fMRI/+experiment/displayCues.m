@@ -17,7 +17,7 @@ function [stimulusOnsetTime, visual, audio, tactile, combinationProb] = displayC
     Screen('DrawTexture', window, image, [], [xCenter-300, yCenter-300, xCenter+300, yCenter+300]);
     Screen('DrawLines', window, fixationCoordinates,fixationLineWidth, grey, [xCenter yCenter], 2); 
 
-    stimulusOnsetTime = runStartTime + stimulusOnsetTimes(trialNr);
+    stimulusOnsetTime = runStartTime + stimulusOnsetTimes(trialNr+(runNr-1)*60);
     WaitSecs('UntilTime', stimulusOnsetTime)
 
     % Visual cue shown

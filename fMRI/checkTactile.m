@@ -1,4 +1,3 @@
-
 %% Setting up tactile stimulator
 d = daqlist;
 % Create data acquisition
