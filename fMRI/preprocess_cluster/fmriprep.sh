@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=fmriprep
-#SBATCH --output=/home/ecasim/logs/res_fmriprep_%A-%a.txt
+#SBATCH --output=/home/$USER/logs/res_fmriprep_%A-%a.txt
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
