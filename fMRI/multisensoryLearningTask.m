@@ -289,7 +289,7 @@ for runNr = 1:nrRuns
 
     
     %% Setting up tactile frequencies used later
-    %Defining tactile stimulation parameters
+    %Defining tactile stimulation pa2ameters
     % Creating output tactile
     [tactileSeq, tactile0, tactile1, tactile2, practiceTactile0, practiceTactile1] = experiment.createTouch(runNr, dq, stimulusThreshold);
 
