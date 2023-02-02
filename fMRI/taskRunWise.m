@@ -10,7 +10,7 @@ beeps = 1;
 
 % Setting number of runs (runs of experiment)
 nrRuns = 6;
-startRun = 6;
+startRun = 2;
 
 % Number of trials in each run. Should be a multiple of 3 and a number
 % which when multiplied by5 each of modality0A, 0B and 0c etc gives a whole number
