@@ -4,87 +4,73 @@ import argparse
 import pandas as pd
 import numpy as np
 from nilearn import image
+import numpy as np
 
 
-def main(subject, bids_folder='/data', max_rt=1.0):
+def main(subject, bids_folder='T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data'):
     sourcedata = op.join(bids_folder, 'sourcedata')
 
-    target_dir = op.join(bids_folder, 'ds-mlearn', f'sub-{subject}', 'func')
+    if int(subject) < 10:
+        target_dir = op.join("C:/Users/ellac/ds-mlearn/derivatives/fmriprep", f'sub-0{subject}', 'func')
+    else:
+        target_dir = op.join("C:/Users/ellac/ds-mlearn/derivatives/fmriprep", f'sub-{subject}', 'func')
     if not op.exists(target_dir):
         os.makedirs(target_dir)
 
+    behavior = pd.read_table(op.join(sourcedata,
+                                         f'behavior/{subject}/participant{subject}_savedValues.csv'), sep=",")
+    
+
     for run in range(1, 7):
         print(subject, run)
-        nii = op.join(target_dir, f'sub-{subject}_task-learn_run-{run}_bold.nii')
+        if int(subject) < 10:
+            nii = op.join(target_dir, f'sub-0{subject}_task-learn_run-{run}_bold.nii')
+           
+        else:
+            nii = op.join(target_dir, f'sub-{subject}_task-learn_run-{run}_bold.nii')
         print(nii)
-
+        
         if op.exists(nii):
             n_volumes = image.load_img(nii).shape[-1]
         else:
             n_volumes = 135
 
-        behavior = pd.read_table(op.join(sourcedata,
-                                         f'behavior/{subject}/sub-{subject}_task-task_run-{run}_events.tsv'))
-        behavior['trial_nr'] = behavior['trial_nr'].astype(np.int)
+        run_behavior = behavior[behavior.runNumber == run].reset_index()
+        run_behavior['trial_nr'] = run_behavior['trialNumber'].astype(int)
+        runType = "tactile" if ~np.isnan(run_behavior['tactile'][0]) else "audio"
 
-        print(behavior)
+        #print(run_behavior)
 
-        pulses = behavior[behavior.event_type == 'pulse'][['trial_nr', 'onset']]
+        stim = pd.DataFrame()
+        feedback = pd.DataFrame()
 
-        pulses['ipi'] = pulses['onset'].diff()
-        pulses = pulses[((pulses['ipi'] > 1.) & (pulses['ipi'] < 5.)) | pulses.ipi.isnull()]
-        print(pulses.sort_values('ipi'))
+        stim['onset'] = run_behavior.stimulusOnsetTime
+        stim['trial_type'] = 'stimulus'
+        stim['duration'] = run_behavior.stimulusOffsetTime - run_behavior.stimulusOnsetTime
+        stim['trial_nr'] = run_behavior['trial_nr']
+        stim["runType"] = runType
 
-        if n_volumes != pulses.shape[0]:
-            pulses = pulses.set_index(np.arange(1, pulses.shape[0] + 1))[['trial_nr', 'onset']]
-            t0 = pulses.loc[1, 'onset'] - (n_volumes - pulses.shape[0]) * 2.3
-            print(f'Pulse missing: {pulses.loc[1, "onset"]}, {t0}')
-        else:
-            pulses = pulses.set_index(np.arange(1, n_volumes + 1))[['trial_nr', 'onset']]
-            t0 = pulses.loc[1, 'onset']
+        feedback['onset'] = run_behavior.feedbackOnsetTime
+        feedback['trial_type'] = 'choice'
+        feedback['duration'] = run_behavior.feedbackOffsetTime - run_behavior.feedbackOnsetTime
 
-        stim1 = behavior[(behavior['event_type'] == 'stim') & (behavior['phase'] == 4)]
-        stim1['n'] = stim1['n1']
-        stim1['onset'] -= t0
-        stim1['trial_type'] = 'stimulus 1'
-
-        stim2 = behavior[(behavior['event_type'] == 'stim') & (behavior['phase'] == 8)]
-        stim2['n'] = stim2['n2']
-        stim2['onset'] -= t0
-        stim2['trial_type'] = 'stimulus 2'
-
-        choice = behavior[(behavior['event_type'] == 'choice')]
-        choice['onset'] -= t0
-        choice['trial_type'] = 'choice'
-
-        events = pd.concat((stim1, stim2, choice)).sort_index().reset_index(drop=True)
+        events = pd.concat((stim, feedback)).sort_index().reset_index(drop=True)
         # result['choice'] = result['choice'].astype(int)
-        events = events[['trial_nr', 'onset', 'trial_type', 'prob1', 'prob2', 'n1', 'n2', 'choice']]
+        events = events[['trial_nr','runType','onset', 'duration', 'trial_type']]
 
-        fn = op.join(target_dir, f'sub-{subject}_task-task_run-{run}_events.tsv')
+
+        if int(subject) < 10:
+            fn = op.join(target_dir, f'sub-0{subject}_task-learn_run-{run}_events.tsv')
+        else:
+            fn = op.join(target_dir, f'sub-0{subject}_task-learn_run-{run}_events.tsv')
         events.to_csv(fn, index=False, sep='\t')
-
-
-def get_hazard(x, s=1.0, loc=0.0, scale=10, cut=30, use_cut=False):
-    import scipy.stats as ss
-
-    x = x / .7
-
-    dist = ss.lognorm(s, loc, scale)
-
-    if use_cut:
-        sf = lambda x: 1 - (dist.cdf(x) / dist.cdf(cut))
-    else:
-        sf = dist.sf
-
-    return np.clip(dist.pdf(x) / sf(x), 0, np.inf)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('subject', default=None)
     parser.add_argument(
-        '--bids_folder', default='/data')
+        '--bids_folder', default='T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data')
     args = parser.parse_args()
 
     main(args.subject, args.bids_folder)

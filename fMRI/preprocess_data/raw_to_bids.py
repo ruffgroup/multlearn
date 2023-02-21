@@ -2,6 +2,7 @@ import re
 import os
 import os.path as op
 import shutil
+import gzip
 import argparse
 import pandas as pd
 import glob
@@ -47,7 +48,6 @@ def main(subject, bids_folder='/data'):
 
     reg = re.compile('.*run(?P<run>[0-9]+).*')
     funcs = glob.glob(op.join(sourcedata_root, '*run*.nii'))
-
     runs = [int(reg.match(fn).group(1)) for fn in funcs]
 
     target_dir = op.join(bids_folder, 'ds-mlearn', f'sub-{subject:02d}', 'func')
