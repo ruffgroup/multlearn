@@ -1,0 +1,1 @@
+Payment = 9.611111e+01, rounded payment = 96
