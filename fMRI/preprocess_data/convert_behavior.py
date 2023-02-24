@@ -11,9 +11,9 @@ def main(subject, bids_folder='T:/projects/2022/bedi_casimiro_ruff_multisensoryl
     sourcedata = op.join(bids_folder, 'sourcedata')
 
     if int(subject) < 10:
-        target_dir = op.join("C:/Users/ellac/ds-mlearn/derivatives/fmriprep", f'sub-0{subject}', 'func')
+        target_dir = op.join("/shares/zne.uzh/ds-mlearn/derivatives/fmriprep", f'sub-0{subject}', 'func')
     else:
-        target_dir = op.join("C:/Users/ellac/ds-mlearn/derivatives/fmriprep", f'sub-{subject}', 'func')
+        target_dir = op.join("/shares/zne.uzh/ds-mlearn/derivatives/fmriprep", f'sub-{subject}', 'func')
     if not op.exists(target_dir):
         os.makedirs(target_dir)
 
