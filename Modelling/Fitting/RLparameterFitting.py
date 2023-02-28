@@ -22,11 +22,6 @@ sys.path.append(sys.path[0] + '/..')
 from TaskDesign import task_Design
 
 
-def ma(interval, window_size, method, fill_value=None):
-    convolved = convolve(interval, Box1DKernel(window_size), method, fill_value)
-    return convolved[convolved < 1.1]
-
-
 class Fitting:
 
     def __init__(self, mainTrials, additionalTrials, gridCount, IDs=None):
@@ -49,16 +44,18 @@ class Fitting:
         self.statLearnPar = None
 
         if platform.system() == 'Windows':
-            dir_file = pathlib.Path().absolute().parent.parent.resolve()
-            wanted_dir = os.path.join(dir_file, 'Data/Pilot/beepStimuli')
+            dir_file =   '/Volumes/g_econ_department$/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri'
+            #pathlib.Path().absolute().parent.parent.resolve()
+            wanted_dir = os.path.join(dir_file, 'data/sourcedata/behavior/modified_files')
         else:
-            dir_file = os.path.dirname(os.path.dirname(os.getcwd()))
-            wanted_dir = os.path.join(dir_file, 'Data/Pilot/beepStimuli')
+            dir_file = '/Volumes/g_econ_department$/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri'
+            #os.path.dirname(os.path.dirname(os.getcwd()))
+            wanted_dir = os.path.join(dir_file, 'data/sourcedata/behavior/')
         # Get all expInfo and savedVals files
-        self.savedValsFiles = [(str(re.findall(r'\d+', os.path.join(root, name))[0]), os.path.join(root, name)) for
+        self.savedValsFiles = [(str(re.findall(r'\d+', os.path.join(root, name))[-1]), os.path.join(root, name)) for
                                root, dirs, files in os.walk(wanted_dir + '/modified_files') for name in files if
                                name.endswith('savedValues.csv')]
-        self.expInfoFiles = [(str(re.findall(r'\d+', os.path.join(root, name))[2]), os.path.join(root, name)) for
+        self.expInfoFiles = [(str(re.findall(r'\d+', os.path.join(root, name))[-1]), os.path.join(root, name)) for
                              root, dirs, files in os.walk(wanted_dir) for name in files if name.endswith('expInfo.csv')]
 
         if not self.IDs:
@@ -262,27 +259,31 @@ class Fitting:
 
     def simplestFitting(self):
 
-        self.all_alphas = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_betas = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_LLs = np.empty((len(np.unique(self.IDs)), 4))
-        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 4, self.gridCount, 3))
-        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials))
-        self.all_V0 = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1))
-        self.all_V1 = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1))
+        self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_betas = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_LLs = np.empty((len(np.unique(self.IDs)), 6))
+        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 6, self.gridCount, 3))
+        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
+        self.all_V0 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
+        self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
 
         count = 0
         for ID in np.unique(self.IDs):
-
+            for file in self.savedValsFiles:
+                print(ID)
+                if file[0] == ID:
+                    print(file)
+            # print([file for file in self.savedValsFiles if file[0] == ID])
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
             subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
             # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
-            fitted_alphas = np.empty((1, 4))
-            fitted_betas = np.empty((1, 4))
-            best_LLs = np.empty((1, 4))
+            fitted_alphas = np.empty((1, 6))
+            fitted_betas = np.empty((1, 6))
+            best_LLs = np.empty((1, 6))
 
-            ID_RPE = np.empty((1, 4, self.mainTrials + self.additionalTrials))
-            ID_V0 = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1))
-            ID_V1 = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1))
+            ID_RPE = np.empty((1, 6, self.mainTrials + self.additionalTrials))
+            ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
+            ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
 
             for run in range(0, max(subjectData.runNumber)):
 
@@ -608,15 +609,15 @@ class Fitting:
 
     def valFitting(self):
 
-        self.all_alphas = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_betas = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_LLs = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_V_option0Inits = np.empty((len(np.unique(self.IDs)), 4, 3, 3))
-        self.all_V_option1Inits = np.empty((len(np.unique(self.IDs)), 4, 3, 3))
-        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 4, self.gridCount, 5))
-        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials))
-        self.all_V0 = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1))
-        self.all_V1 = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1))
+        self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_betas = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_LLs = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_V_option0Inits = np.empty((len(np.unique(self.IDs)), 6, 3, 3))
+        self.all_V_option1Inits = np.empty((len(np.unique(self.IDs)), 6, 3, 3))
+        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 6, self.gridCount, 5))
+        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
+        self.all_V0 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
+        self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
 
         count = 0
         for ID in np.unique(self.IDs):
@@ -624,15 +625,15 @@ class Fitting:
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
             subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
             # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
-            fitted_alphas = np.empty((1, 4))
-            fitted_betas = np.empty((1, 4))
-            best_LLs = np.empty((1, 4))
-            fitted_V_option0Inits = np.empty((1, 4, 3, 3))
-            fitted_V_option1Inits = np.empty((1, 4, 3, 3))
+            fitted_alphas = np.empty((1, 6))
+            fitted_betas = np.empty((1, 6))
+            best_LLs = np.empty((1, 6))
+            fitted_V_option0Inits = np.empty((1, 6, 3, 3))
+            fitted_V_option1Inits = np.empty((1, 6, 3, 3))
 
-            ID_RPE = np.empty((1, 4, self.mainTrials + self.additionalTrials))
-            ID_V0 = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1))
-            ID_V1 = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1))
+            ID_RPE = np.empty((1, 6, self.mainTrials + self.additionalTrials))
+            ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
+            ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
 
             for run in range(0, max(subjectData.runNumber)):
 
@@ -1020,20 +1021,20 @@ class Fitting:
 
     def updateFitting(self, version=None):
 
-        self.all_alphas = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_betas = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_alphas2 = np.empty((len(np.unique(self.IDs)), 4))
+        self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_betas = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_alphas2 = np.empty((len(np.unique(self.IDs)), 6))
         if version == "two":
-            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 4))
+            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 6))
         elif version == "four":
-            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 4))
-            self.all_alphas4 = np.empty((len(np.unique(self.IDs)), 4))
-            self.all_alphas5 = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_LLs = np.empty((len(np.unique(self.IDs)), 4))
-        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 4, self.gridCount, 7))
-        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials))
-        self.all_V0 = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1))
-        self.all_V1 = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1))
+            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 6))
+            self.all_alphas6 = np.empty((len(np.unique(self.IDs)), 6))
+            self.all_alphas5 = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_LLs = np.empty((len(np.unique(self.IDs)), 6))
+        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 6, self.gridCount, 7))
+        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
+        self.all_V0 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
+        self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
 
         count = 0
         for ID in np.unique(self.IDs):
@@ -1041,19 +1042,19 @@ class Fitting:
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
             subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
             # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
-            fitted_alphas = np.empty((1, 4))
-            fitted_betas = np.empty((1, 4))
-            fitted_alphas2 = np.empty((1, 4))
+            fitted_alphas = np.empty((1, 6))
+            fitted_betas = np.empty((1, 6))
+            fitted_alphas2 = np.empty((1, 6))
             if version == "two":
-                fitted_alphas3 = np.empty((1, 4))
+                fitted_alphas3 = np.empty((1, 6))
             elif version == "four":
-                fitted_alphas3 = np.empty((1, 4))
-                fitted_alphas4 = np.empty((1, 4))
-                fitted_alphas5 = np.empty((1, 4))
-            best_LLs = np.empty((1, 4))
-            ID_RPE = np.empty((1, 4, self.mainTrials + self.additionalTrials))
-            ID_V0 = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1))
-            ID_V1 = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1))
+                fitted_alphas3 = np.empty((1, 6))
+                fitted_alphas4 = np.empty((1, 6))
+                fitted_alphas5 = np.empty((1, 6))
+            best_LLs = np.empty((1, 6))
+            ID_RPE = np.empty((1, 6, self.mainTrials + self.additionalTrials))
+            ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
+            ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
 
             for run in range(0, max(subjectData.runNumber)):
 
@@ -1514,22 +1515,22 @@ class Fitting:
 
     def updateInitFitting(self, version=None):
 
-        self.all_alphas = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_betas = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_V_option0Inits = np.empty((len(np.unique(self.IDs)), 4, 3, 3))
-        self.all_V_option1Inits = np.empty((len(np.unique(self.IDs)), 4, 3, 3))
-        self.all_alphas2 = np.empty((len(np.unique(self.IDs)), 4))
+        self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_betas = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_V_option0Inits = np.empty((len(np.unique(self.IDs)), 6, 3, 3))
+        self.all_V_option1Inits = np.empty((len(np.unique(self.IDs)), 6, 3, 3))
+        self.all_alphas2 = np.empty((len(np.unique(self.IDs)), 6))
         if version == "two":
-            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 4))
+            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 6))
         elif version == "four":
-            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 4))
-            self.all_alphas4 = np.empty((len(np.unique(self.IDs)), 4))
-            self.all_alphas5 = np.empty((len(np.unique(self.IDs)), 4))
-        self.all_LLs = np.empty((len(np.unique(self.IDs)), 4))
-        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 4, self.gridCount, 9))
-        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials))
-        self.all_V0 = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1))
-        self.all_V1 = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1))
+            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 6))
+            self.all_alphas6 = np.empty((len(np.unique(self.IDs)), 6))
+            self.all_alphas5 = np.empty((len(np.unique(self.IDs)), 6))
+        self.all_LLs = np.empty((len(np.unique(self.IDs)), 6))
+        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 6, self.gridCount, 9))
+        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
+        self.all_V0 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
+        self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
 
         count = 0
         for ID in np.unique(self.IDs):
@@ -1537,21 +1538,21 @@ class Fitting:
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
             subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
             # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
-            fitted_alphas = np.empty((1, 4))
-            fitted_betas = np.empty((1, 4))
-            fitted_alphas2 = np.empty((1, 4))
+            fitted_alphas = np.empty((1, 6))
+            fitted_betas = np.empty((1, 6))
+            fitted_alphas2 = np.empty((1, 6))
             if version == "two":
-                fitted_alphas3 = np.empty((1, 4))
+                fitted_alphas3 = np.empty((1, 6))
             elif version == "four":
-                fitted_alphas3 = np.empty((1, 4))
-                fitted_alphas4 = np.empty((1, 4))
-                fitted_alphas5 = np.empty((1, 4))
-            fitted_V_option0Inits = np.empty((1, 4, 3, 3))
-            fitted_V_option1Inits = np.empty((1, 4, 3, 3))
-            best_LLs = np.empty((1, 4))
-            ID_RPE = np.empty((1, 4, self.mainTrials + self.additionalTrials))
-            ID_V0 = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1))
-            ID_V1 = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1))
+                fitted_alphas3 = np.empty((1, 6))
+                fitted_alphas6 = np.empty((1, 6))
+                fitted_alphas5 = np.empty((1, 6))
+            fitted_V_option0Inits = np.empty((1, 6, 3, 3))
+            fitted_V_option1Inits = np.empty((1, 6, 3, 3))
+            best_LLs = np.empty((1, 6))
+            ID_RPE = np.empty((1, 6, self.mainTrials + self.additionalTrials))
+            ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
+            ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
 
             for run in range(0, max(subjectData.runNumber)):
 
@@ -1748,15 +1749,15 @@ class Fitting:
     def statisticalLearning(self, statLearnPar=1):
 
         self.statLearnPar = statLearnPar
-        self.all_beliefs = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials + 1, 3, 3))
-        self.all_surprise = np.empty((len(np.unique(self.IDs)), 4, self.mainTrials + self.additionalTrials))
+        self.all_beliefs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1, 3, 3))
+        self.all_surprise = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
         count = 0
         for ID in np.unique(self.IDs):
 
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
             subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
-            ID_beliefs = np.empty((1, 4, self.mainTrials + self.additionalTrials + 1, 3, 3))
-            ID_surprise = np.empty((1, 4, self.mainTrials + self.additionalTrials))
+            ID_beliefs = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1, 3, 3))
+            ID_surprise = np.empty((1, 6, self.mainTrials + self.additionalTrials))
             for run in range(0, max(subjectData.runNumber)):
 
                 rowBeliefs = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
@@ -1898,15 +1899,19 @@ class Fitting:
                 plt.show()
 
 
+def ma(interval, window_size, method, fill_value=None):
+    convolved = convolve(interval, Box1DKernel(window_size), method, fill_value)
+    return convolved[convolved < 1.1]
+
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
 # ALWAYS run one of these; either without IDs (all in directory), or for specific IDs
 #fitted = Fitting(60, 0, 5000)
-fitted = Fitting(60, 0, 5000, IDs=['46','47','48','50','51','52'])
+fitted = Fitting(60, 0, 5000, IDs=['15','16'])
 
 # Run the simplest RL model
-#fitted.simplestFitting()
+fitted.simplestFitting()
 #fitted.plots_simplestFitting(ww=11, method="fill", reps=50, fill_value=999)
 
 # Run the RL model including initial V0 and V1 as free parameters
@@ -1921,7 +1926,7 @@ fitted = Fitting(60, 0, 5000, IDs=['46','47','48','50','51','52'])
 
 # Run the RL model with extra learning rates for the other pairs AND initial V0 and V1 as free parameters
 # Same options as above; 1) Do not add anything to the call 2) Add version="two" 3) Add version="four"
-fitted.updateInitFitting(version="four")
+# fitted.updateInitFitting(version="four")
 #fitted.plots_updateInitFitting(ww=11, method="fill", reps=50, fill_value=999, version="four")
 
 # You can always include statistical learning; necessary to get surprise values
