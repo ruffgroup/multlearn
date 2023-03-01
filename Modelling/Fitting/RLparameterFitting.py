@@ -46,7 +46,7 @@ class Fitting:
         if platform.system() == 'Windows':
             dir_file =   'T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri'
             #pathlib.Path().absolute().parent.parent.resolve()
-            wanted_dir = os.path.join(dir_file, 'data/sourcedata/behavior/modified_files')
+            wanted_dir = os.path.join(dir_file, 'data/sourcedata/behavior/')
         else:
             dir_file = '/Volumes/g_econ_department$/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri'
             #os.path.dirname(os.path.dirname(os.getcwd()))
