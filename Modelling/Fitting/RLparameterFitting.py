@@ -66,9 +66,10 @@ class Fitting:
 
     ## Simple fitting
 
-    def plots_simplestFitting(self, ww, method, reps=50, fill_value=None):
+    def plots_simplestFitting(self, ww, method, reps=50):
 
         count = 0
+        saving_folder = "simple"
         for ID in self.IDs:
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
 
@@ -118,17 +119,17 @@ class Fitting:
                 avgAccCorrReward = np.nanmean(accCorrReward)
                 avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
 
-                A_line = pd.DataFrame(ma(attracts, ww, method, fill_value)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method, fill_value)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method, fill_value)).fillna(method='ffill')
+                A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
+                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
+                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
 
                 MoA_Line = pd.DataFrame(MostAcc)
                 MiA_Line = pd.DataFrame(MiddleAcc)
                 LA_line = pd.DataFrame(LeastAcc)
 
-                simA_lines = np.empty((reps, int(self.mainTrials / 2) - ww + 1))
-                simNA_lines = np.empty((reps, int(self.mainTrials / 2) - ww + 1))
-                simAcc_lines = np.empty((reps, int(self.mainTrials) - ww + 1))
+                simA_lines = np.empty((reps, int(self.mainTrials / 2)))
+                simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
+                simAcc_lines = np.empty((reps, int(self.mainTrials)))
 
                 taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
@@ -172,9 +173,9 @@ class Fitting:
                     simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
                     simC = simulation.accurate
                     if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, ww, method, fill_value)
-                        simNA_lines[i, :] = ma(simNotAttracts, ww, method, fill_value)
-                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method, fill_value)
+                        simA_lines[i, :] = ma(simAttracts, ww, method)
+                        simNA_lines[i, :] = ma(simNotAttracts, ww, method)
+                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
 
                 if simA_lines.size:
                     simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
@@ -248,7 +249,12 @@ class Fitting:
                     plt.ylabel('NLL', fontweight='bold')
                     plt.title("Participant {0}, run {1}: NLL and beta scatter plot".format(ID, run + 1))
 
-                    pdf = matplotlib.backends.backend_pdf.PdfPages("{0}_{1}_simplePlots.pdf".format(ID, run))
+
+                    os.makedirs(saving_folder, exist_ok=True)
+                    save_name = "{0}_{1}_simplePlots.pdf".format(ID, run)
+                    file_path = os.path.join(saving_folder, save_name)
+
+                    pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
                     for fig in range(1, plt.gcf().number + 1):
                         pdf.savefig(fig)
                     pdf.close()
@@ -270,7 +276,7 @@ class Fitting:
         count = 0
         for ID in np.unique(self.IDs):
             for file in self.savedValsFiles:
-                print(ID)
+                print(file[0])
                 if file[0] == ID:
                     print(file)
             # print([file for file in self.savedValsFiles if file[0] == ID])
@@ -397,9 +403,10 @@ class Fitting:
 
     ## Value fitting
 
-    def plots_valueFitting(self, ww, method, reps=50, fill_value=None):
+    def plots_valueFitting(self, ww, method, reps=50):
 
         count = 0
+        saving_folder = "valFits"
         for ID in self.IDs:
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
 
@@ -448,17 +455,17 @@ class Fitting:
                 avgAccCorrReward = np.nanmean(accCorrReward)
                 avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
 
-                A_line = pd.DataFrame(ma(attracts, ww, method, fill_value)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method, fill_value)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method, fill_value)).fillna(method='ffill')
+                A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
+                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
+                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
 
                 MoA_Line = pd.DataFrame(MostAcc)
                 MiA_Line = pd.DataFrame(MiddleAcc)
                 LA_line = pd.DataFrame(LeastAcc)
 
-                simA_lines = np.empty((reps, int(self.mainTrials / 2) - ww + 1))
-                simNA_lines = np.empty((reps, int(self.mainTrials / 2) - ww + 1))
-                simAcc_lines = np.empty((reps, int(self.mainTrials) - ww + 1))
+                simA_lines = np.empty((reps, int(self.mainTrials / 2)))
+                simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
+                simAcc_lines = np.empty((reps, int(self.mainTrials)))
 
                 taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
                 green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
@@ -505,9 +512,9 @@ class Fitting:
                     simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
                     simC = simulation.accurate
                     if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, ww, method, fill_value)
-                        simNA_lines[i, :] = ma(simNotAttracts, ww, method, fill_value)
-                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method, fill_value)
+                        simA_lines[i, :] = ma(simAttracts, ww, method)
+                        simNA_lines[i, :] = ma(simNotAttracts, ww, method)
+                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
 
                 if simA_lines.size:
                     simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
@@ -595,7 +602,11 @@ class Fitting:
                     plt.ylabel('NLL', fontweight='bold')
                     plt.title("Participant {0}, run {1}: NLL and Init V1 scatter plot".format(ID, run + 1))
 
-                    pdf = matplotlib.backends.backend_pdf.PdfPages("{0}_{1}_valPlots.pdf".format(ID, run))
+                    os.makedirs(saving_folder, exist_ok=True)
+                    save_name = "{0}_{1}_valPlots.pdf".format(ID, run)
+                    file_path = os.path.join(saving_folder, save_name)
+
+                    pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
                     for fig in range(1, plt.gcf().number + 1):
                         pdf.savefig(fig)
                     pdf.close()
@@ -620,6 +631,7 @@ class Fitting:
         self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
 
         count = 0
+        saving_folder = "val"
         for ID in np.unique(self.IDs):
 
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
@@ -763,7 +775,7 @@ class Fitting:
 
     # Extra update rule multiple versions
 
-    def plots_updateFitting(self, ww, method, reps=50, fill_value=None, version=None):
+    def plots_updateFitting(self, ww, method, reps=50, version=None):
 
         count = 0
         for ID in self.IDs:
@@ -822,9 +834,9 @@ class Fitting:
                 avgAccCorrReward = np.nanmean(accCorrReward)
                 avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
 
-                A_line = pd.DataFrame(ma(attracts, ww, method, fill_value)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method, fill_value)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method, fill_value)).fillna(method='ffill')
+                A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
+                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
+                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
 
                 MoA_Line = pd.DataFrame(MostAcc)
                 MiA_Line = pd.DataFrame(MiddleAcc)
@@ -883,9 +895,9 @@ class Fitting:
                     simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
                     simC = simulation.accurate
                     if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, ww, method, fill_value)
-                        simNA_lines[i, :] = ma(simNotAttracts, ww, method, fill_value)
-                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method, fill_value)
+                        simA_lines[i, :] = ma(simAttracts, ww, method)
+                        simNA_lines[i, :] = ma(simNotAttracts, ww, method)
+                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
 
                 if simA_lines.size:
                     simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
@@ -1238,7 +1250,7 @@ class Fitting:
 
 # Update and Init V0 and V1
 
-    def plots_updateInitFitting(self, ww, method, reps=50, fill_value=None, version=None):
+    def plots_updateInitFitting(self, ww, method, reps=50, version=None):
 
         count = 0
         for ID in self.IDs:
@@ -1299,9 +1311,9 @@ class Fitting:
                 avgAccCorrReward = np.nanmean(accCorrReward)
                 avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
 
-                A_line = pd.DataFrame(ma(attracts, ww, method, fill_value)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method, fill_value)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method, fill_value)).fillna(method='ffill')
+                A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
+                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
+                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
 
                 MoA_Line = pd.DataFrame(MostAcc)
                 MiA_Line = pd.DataFrame(MiddleAcc)
@@ -1361,9 +1373,9 @@ class Fitting:
                     simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
                     simC = simulation.accurate
                     if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, ww, method, fill_value)
-                        simNA_lines[i, :] = ma(simNotAttracts, ww, method, fill_value)
-                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method, fill_value)
+                        simA_lines[i, :] = ma(simAttracts, ww, method)
+                        simNA_lines[i, :] = ma(simNotAttracts, ww, method)
+                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
 
                 if simA_lines.size:
                     simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
@@ -1545,7 +1557,7 @@ class Fitting:
                 fitted_alphas3 = np.empty((1, 6))
             elif version == "four":
                 fitted_alphas3 = np.empty((1, 6))
-                fitted_alphas6 = np.empty((1, 6))
+                fitted_alphas4 = np.empty((1, 6))
                 fitted_alphas5 = np.empty((1, 6))
             fitted_V_option0Inits = np.empty((1, 6, 3, 3))
             fitted_V_option1Inits = np.empty((1, 6, 3, 3))
@@ -1899,24 +1911,24 @@ class Fitting:
                 plt.show()
 
 
-def ma(interval, window_size, method, fill_value=None):
-    convolved = convolve(interval, Box1DKernel(window_size), method, fill_value)
-    return convolved[convolved < 1.1]
+def ma(interval, window_size = 10, method = 'same'):
+    window = np.ones(int(window_size))/float(window_size)
+    return np.convolve(interval, window, method)
 
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
 # ALWAYS run one of these; either without IDs (all in directory), or for specific IDs
 #fitted = Fitting(60, 0, 5000)
-fitted = Fitting(60, 0, 5000, IDs=['15','16'])
+fitted = Fitting(60, 0, 5000, IDs=['15'])
 
 # Run the simplest RL model
-fitted.simplestFitting()
-#fitted.plots_simplestFitting(ww=11, method="fill", reps=50, fill_value=999)
+# fitted.simplestFitting()
+# fitted.plots_simplestFitting(ww = 10, method = 'same', reps=50)
 
 # Run the RL model including initial V0 and V1 as free parameters
-#fitted.valFitting()
-#fitted.plots_valueFitting(ww=11, method="fill", reps=50, fill_value=999)
+fitted.valFitting()
+fitted.plots_valueFitting(ww=10, method="same", reps=50)
 
 # Run the RL model with extra learning rates for the other pairs
 # (if you see pair image0 and audio0, also update other image0 and audio0 pairs)
