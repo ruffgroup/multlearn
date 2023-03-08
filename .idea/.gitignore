@@ -6,5 +6,8 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-# Ignore pdf files
+# Ignore pdf files, png, pycache, matlab
 *.pdf
+*.png
+*.pyc
+*.mat
