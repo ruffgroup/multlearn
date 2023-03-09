@@ -53,7 +53,7 @@ class Fitting:
             wanted_dir = os.path.join(dir_file, 'data/sourcedata/behavior/')
         # Get all expInfo and savedVals files
         self.savedValsFiles = [(str(re.findall(r'\d+', os.path.join(root, name))[-1]), os.path.join(root, name)) for
-                               root, dirs, files in os.walk(wanted_dir + '/modified_files') for name in files if
+                               root, dirs, files in os.walk(wanted_dir + 'modified_files') for name in files if
                                name.endswith('savedValues.csv')]
         self.expInfoFiles = [(str(re.findall(r'\d+', os.path.join(root, name))[-1]), os.path.join(root, name)) for
                              root, dirs, files in os.walk(wanted_dir) for name in files if name.endswith('expInfo.csv')]
@@ -69,8 +69,10 @@ class Fitting:
     def plots_simplestFitting(self, ww, method, reps=50):
 
         count = 0
-        saving_folder = "simple"
         for ID in self.IDs:
+            print(ID)
+            print("simple")
+            saving_folder = "simple"
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
 
             for run in range(0, max(subjectData.runNumber)):
@@ -263,7 +265,7 @@ class Fitting:
 
             count += 1
 
-    def simplestFitting(self):
+    def simplestFitting(self): 
 
         self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
         self.all_betas = np.empty((len(np.unique(self.IDs)), 6))
@@ -276,7 +278,6 @@ class Fitting:
         count = 0
         for ID in np.unique(self.IDs):
             for file in self.savedValsFiles:
-                print(file[0])
                 if file[0] == ID:
                     print(file)
             # print([file for file in self.savedValsFiles if file[0] == ID])
@@ -406,8 +407,10 @@ class Fitting:
     def plots_valueFitting(self, ww, method, reps=50):
 
         count = 0
-        saving_folder = "valFits"
+
         for ID in self.IDs:
+            print("now")
+            saving_folder = "initVal"
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
 
             for run in range(0, max(subjectData.runNumber)):
@@ -603,7 +606,7 @@ class Fitting:
                     plt.title("Participant {0}, run {1}: NLL and Init V1 scatter plot".format(ID, run + 1))
 
                     os.makedirs(saving_folder, exist_ok=True)
-                    save_name = "{0}_{1}_valPlots.pdf".format(ID, run)
+                    save_name = "{0}_{1}_initValPlots.pdf".format(ID, run)
                     file_path = os.path.join(saving_folder, save_name)
 
                     pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
@@ -631,9 +634,10 @@ class Fitting:
         self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
 
         count = 0
-        saving_folder = "val"
         for ID in np.unique(self.IDs):
 
+            print(ID)
+            print("val")
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
             subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
             # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
@@ -779,6 +783,17 @@ class Fitting:
 
         count = 0
         for ID in self.IDs:
+            print(ID)
+            print("update")
+            if version == None:
+                saving_folder = "updateSimple"
+            elif version == "two":
+                print("action")
+                saving_folder = "updateAction"
+            elif version == "four":
+                print("actionReward")
+                saving_folder = "updateActionReward"
+
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
 
             for run in range(0, max(subjectData.runNumber)):
@@ -842,9 +857,9 @@ class Fitting:
                 MiA_Line = pd.DataFrame(MiddleAcc)
                 LA_line = pd.DataFrame(LeastAcc)
 
-                simA_lines = np.empty((reps, int(self.mainTrials / 2) - ww + 1))
-                simNA_lines = np.empty((reps, int(self.mainTrials / 2) - ww + 1))
-                simAcc_lines = np.empty((reps, int(self.mainTrials) - ww + 1))
+                simA_lines = np.empty((reps, int(self.mainTrials / 2)))
+                simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
+                simAcc_lines = np.empty((reps, int(self.mainTrials)))
 
                 taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
@@ -1017,20 +1032,35 @@ class Fitting:
                         plt.ylabel('NLL', fontweight='bold')
                         plt.title("Participant {0}, run {1}: NLL and alpha5 scatter plot".format(ID, run + 1))
 
+
+                    os.makedirs(saving_folder, exist_ok=True)
+
                     if version is None:
-                        pdf = matplotlib.backends.backend_pdf.PdfPages("{0}_{1}_UpdatePlots.pdf".format(ID, run))
+                        save_name = "{0}_{1}_simpleUpdatePlots.pdf".format(ID, run)
+                        file_path = os.path.join(saving_folder, save_name)
+                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
                     elif version == "two":
-                        pdf = matplotlib.backends.backend_pdf.PdfPages("{0}_{1}_TwoUpdatePlots.pdf".format(ID, run))
+                        save_name = "{0}_{1}_actionUpdatePlots.pdf".format(ID, run)
+                        file_path = os.path.join(saving_folder, save_name)
+                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
                     else:
-                        pdf = matplotlib.backends.backend_pdf.PdfPages("{0}_{1}_FourUpdatePlots.pdf".format(ID, run))
+                        save_name = "{0}_{1}_actionRewardUpdatePlots.pdf".format(ID, run)
+                        file_path = os.path.join(saving_folder, save_name)
+                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
+                    
                     for fig in range(1, plt.gcf().number + 1):
                         pdf.savefig(fig)
                     pdf.close()
 
                     plt.close('all')
 
+
             count += 1
 
+# In update fitting model, when version is None, this means that the pairs corresponding to the same
+# visual or audio/tactile stimulus gets updated as well in the opposite direction with some 
+# different learning rate alpha2
+# Meanwhile when version is "two", then there is action dependance, ACTION AND REWARD (4)
     def updateFitting(self, version=None):
 
         self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
@@ -1040,7 +1070,7 @@ class Fitting:
             self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 6))
         elif version == "four":
             self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 6))
-            self.all_alphas6 = np.empty((len(np.unique(self.IDs)), 6))
+            self.all_alphas4 = np.empty((len(np.unique(self.IDs)), 6))
             self.all_alphas5 = np.empty((len(np.unique(self.IDs)), 6))
         self.all_LLs = np.empty((len(np.unique(self.IDs)), 6))
         self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 6, self.gridCount, 7))
@@ -1050,7 +1080,7 @@ class Fitting:
 
         count = 0
         for ID in np.unique(self.IDs):
-
+            print(ID)
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
             subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
             # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
@@ -1254,6 +1284,15 @@ class Fitting:
 
         count = 0
         for ID in self.IDs:
+            print(ID)
+            print("initUpdate")
+            if version == None:
+                saving_folder = "initValUpdateSimple"
+            elif version == "two":
+                saving_folder = "initValUpdateAction"
+            elif version == "four":
+                saving_folder = "initValUpdateActionReward"
+
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
 
             for run in range(0, max(subjectData.runNumber)):
@@ -1319,9 +1358,9 @@ class Fitting:
                 MiA_Line = pd.DataFrame(MiddleAcc)
                 LA_line = pd.DataFrame(LeastAcc)
 
-                simA_lines = np.empty((reps, int(self.mainTrials / 2) - ww + 1))
-                simNA_lines = np.empty((reps, int(self.mainTrials / 2) - ww + 1))
-                simAcc_lines = np.empty((reps, int(self.mainTrials) - ww + 1))
+                simA_lines = np.empty((reps, int(self.mainTrials / 2)))
+                simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
+                simAcc_lines = np.empty((reps, int(self.mainTrials)))
 
                 taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
@@ -1511,12 +1550,22 @@ class Fitting:
                         plt.ylabel('NLL', fontweight='bold')
                         plt.title("Participant {0}, run {1}: NLL and alpha5 scatter plot".format(ID, run + 1))
 
+
+                    os.makedirs(saving_folder, exist_ok=True)
+
                     if version is None:
-                        pdf = matplotlib.backends.backend_pdf.PdfPages("{0}_{1}_UpdateInitPlots.pdf".format(ID, run))
+                        save_name = "{0}_{1}_initValSimpleUpdatePlots.pdf".format(ID, run)
+                        file_path = os.path.join(saving_folder, save_name)
+                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
                     elif version == "two":
-                        pdf = matplotlib.backends.backend_pdf.PdfPages("{0}_{1}_TwoUpdateInitPlots.pdf".format(ID, run))
+                        save_name = "{0}_{1}_initValActionUpdatePlots.pdf".format(ID, run)
+                        file_path = os.path.join(saving_folder, save_name)
+                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
                     else:
-                        pdf = matplotlib.backends.backend_pdf.PdfPages("{0}_{1}_FourUpdateInitPlots.pdf".format(ID, run))
+                        save_name = "{0}_{1}_initValActionRewardUpdatePlots.pdf".format(ID, run)
+                        file_path = os.path.join(saving_folder, save_name)
+                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
+                    
                     for fig in range(1, plt.gcf().number + 1):
                         pdf.savefig(fig)
                     pdf.close()
@@ -1758,6 +1807,7 @@ class Fitting:
             self.all_LLs[count, :] = best_LLs
             count += 1
 
+# Statistical learning
     def statisticalLearning(self, statLearnPar=1):
 
         self.statLearnPar = statLearnPar
@@ -1920,29 +1970,39 @@ def ma(interval, window_size = 10, method = 'same'):
 
 # ALWAYS run one of these; either without IDs (all in directory), or for specific IDs
 #fitted = Fitting(60, 0, 5000)
-fitted = Fitting(60, 0, 5000, IDs=['15'])
+IDs = ['21','22']#['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60']
+fitted = Fitting(60, 0, 5000, IDs=IDs)
 
-# Run the simplest RL model
-# fitted.simplestFitting()
-# fitted.plots_simplestFitting(ww = 10, method = 'same', reps=50)
+# # Run the simplest RL model
+fitted.simplestFitting()
+fitted.plots_simplestFitting(ww = 10, method = 'same', reps=50)
 
-# Run the RL model including initial V0 and V1 as free parameters
+# # # Run the RL model including initial V0 and V1 as free parameters
 fitted.valFitting()
-fitted.plots_valueFitting(ww=10, method="same", reps=50)
+fitted.plots_valueFitting(ww=10, method='same', reps=50)
 
 # Run the RL model with extra learning rates for the other pairs
 # (if you see pair image0 and audio0, also update other image0 and audio0 pairs)
 # Options: 1) Do not add anything to the call 2) Add version="two" 3) Add version="four"
-#fitted.updateFitting(version="four")
-#fitted.plots_updateFitting(ww=11, method="fill", reps=50, fill_value=999)
+fitted.updateFitting()
+fitted.plots_updateFitting(ww=10, method='same', reps=50)
+fitted.updateFitting(version="two")
+fitted.plots_updateFitting(ww=10, method='same', reps=50, version="two")
+fitted.updateFitting(version="four")
+fitted.plots_updateFitting(ww=10, method='same', reps=50, version="four")
 
-# Run the RL model with extra learning rates for the other pairs AND initial V0 and V1 as free parameters
+# Run the RL model with extra learning rates for sthe other pairs AND initial V0 and V1 as free parameters
 # Same options as above; 1) Do not add anything to the call 2) Add version="two" 3) Add version="four"
-# fitted.updateInitFitting(version="four")
-#fitted.plots_updateInitFitting(ww=11, method="fill", reps=50, fill_value=999, version="four")
+fitted.updateInitFitting()
+fitted.plots_updateInitFitting(ww=10, method="same", reps=50)
+fitted.updateInitFitting(version="two")
+fitted.plots_updateInitFitting(ww=10, method="same", reps=50, version="two")
+fitted.updateInitFitting(version="four")
+fitted.plots_updateInitFitting(ww=10, method="same", reps=50, version="four")
+
 
 # You can always include statistical learning; necessary to get surprise values
-fitted.statisticalLearning(statLearnPar=1)
+# fitted.statisticalLearning(statLearnPar=1)
 # fitted.plots_stats()
 
 # Run to save RPE and surprise values; rename .mat files yourself (e.g. based on model)
@@ -1958,5 +2018,5 @@ fitted.statisticalLearning(statLearnPar=1)
 # scipy.io.savemat('v1.mat', mdict={'V1_arr': V1_arr})
 
 # Save max log likelihood values if you want to do model comparison later; rename np array yourself (e.g. based on model)
-with open('BIC_new_upInit4.npy', 'wb') as f:
-    np.save(f, fitted.all_LLs)
+# with open('BIC_new_upInit4.npy', 'wb') as f:
+#     np.save(f, fitted.all_LLs)
