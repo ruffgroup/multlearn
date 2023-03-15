@@ -14,7 +14,6 @@ import pathlib
 import re
 import platform
 import ast
-from astropy.convolution import convolve, Box1DKernel
 import matplotlib.backends.backend_pdf
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -24,383 +23,239 @@ from TaskDesign import task_Design
 
 class Fitting:
 
-    def __init__(self, mainTrials, additionalTrials, gridCount, IDs=None):
-
-        self.all_LLs = None
-        self.all_V1 = None
-        self.all_V0 = None
-        self.all_surprise = None
-        self.all_beliefs = None
-        self.all_RPEs = None
-        self.NLL_arrays = None
-        self.all_betas = None
-        self.all_alphas = None
-        self.all_alphas2 = None
-        self.all_alphas3 = None
+    def __init__(self, mainTrials, additionalTrials, gridCount, ID):
+        
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
         self.gridCount = gridCount
-        self.IDs = IDs
-        self.statLearnPar = None
+        self.ID = ID
+        self.statLearnPar = 1
 
         if platform.system() == 'Windows':
-            dir_file =   'T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri'
-            #pathlib.Path().absolute().parent.parent.resolve()
-            wanted_dir = os.path.join(dir_file, 'data/sourcedata/behavior/')
+            wanted_dir = 'T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data/sourcedata/behavior/modified_files'
         else:
-            dir_file = '/Volumes/g_econ_department$/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri'
-            #os.path.dirname(os.path.dirname(os.getcwd()))
-            wanted_dir = os.path.join(dir_file, 'data/sourcedata/behavior/')
-        # Get all expInfo and savedVals files
-        self.savedValsFiles = [(str(re.findall(r'\d+', os.path.join(root, name))[-1]), os.path.join(root, name)) for
-                               root, dirs, files in os.walk(wanted_dir + 'modified_files') for name in files if
-                               name.endswith('savedValues.csv')]
-        self.expInfoFiles = [(str(re.findall(r'\d+', os.path.join(root, name))[-1]), os.path.join(root, name)) for
-                             root, dirs, files in os.walk(wanted_dir) for name in files if name.endswith('expInfo.csv')]
-
-        if not self.IDs:
-            self.IDs = [file[0] for file in self.savedValsFiles]
-
-        else:
-            self.IDs = IDs
-
+            wanted_dir = '/Volumes/g_econ_department$/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data/sourcedata/behavior/modified_files'
+        # Get savedVals file
+        self.savedValsFile = glob.glob(os.path.abspath(wanted_dir)+"/*{}_savedValues.csv".format(self.ID))[0]
+    
     ## Simple fitting
 
-    def plots_simplestFitting(self, ww, method, reps=50):
+    def plots_simplestFitting(self, ww, NLL_array, alphas, betas, method, reps=50):
+        
+        print("simple")
+        saving_folder = "simple"
+        subjectData = pd.read_csv(self.savedValsFile)
 
-        count = 0
-        for ID in self.IDs:
-            print(ID)
-            print("simple")
-            saving_folder = "simple"
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
+        for run in range(0, max(subjectData.runNumber)):
+            NLL_run = NLL_array[run]
+            alpha = alphas[run]
+            beta = betas[run]
 
-            for run in range(0, max(subjectData.runNumber)):
-                NLL_array = self.NLL_arrays[count, run, :, :]
-                alpha = self.all_alphas[count, run]
-                beta = self.all_betas[count, run]
+            runData = subjectData[subjectData.runNumber == run + 1].reset_index()
+            green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
+            green = [ast.literal_eval(green[0]), ast.literal_eval(green[1]), ast.literal_eval(green[2])]
 
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
-                green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
-                green = [ast.literal_eval(green[0]), ast.literal_eval(green[1]), ast.literal_eval(green[2])]
+            attracts = runData.accurate[runData.correctResponse == 0]
+            notAttracts = runData.accurate[runData.correctResponse == 1]
 
-                attracts = runData.accurate[runData.correctResponse == 0]
-                notAttracts = runData.accurate[runData.correctResponse == 1]
-
-                MostAcc = runData.accurate[runData.combinationConditionalProbability == 0.5]
-                MiddleAcc = runData.accurate[runData.combinationConditionalProbability == 0.35]
-                LeastAcc = runData.accurate[runData.combinationConditionalProbability == 0.15]
-
-                oppositeReward = np.where(runData.reward != runData.correctResponse)[0]
-                oppositeRewardNext = oppositeReward + 1
-                oppositeRewardNext = oppositeRewardNext[oppositeRewardNext < 60]
-                accOppReward = runData.accurate.loc[oppositeRewardNext]
-                oppositeRewardPairs = runData.stimulusPair[oppositeReward]
-                nextOppPairAcc = list()
-                for pair, idx in zip(oppositeRewardPairs, oppositeReward):
-                    subset = runData.loc[idx+1:,['stimulusPair', 'accurate']]
-                    temp = subset[subset.stimulusPair == pair].reset_index()
-                    if not temp.empty:
-                        nextOppPairAcc.append(temp.accurate[0])
-
-                avgAccOppReward = np.nanmean(accOppReward)
-                avgNextOppPairAcc = np.nanmean(nextOppPairAcc)
-
-                correctReward = np.where(runData.reward == runData.correctResponse)[0]
-                correctRewardNext = correctReward + 1
-                correctRewardNext = correctRewardNext[correctRewardNext < 60]
-                accCorrReward = runData.accurate.loc[correctRewardNext]
-                correctRewardPairs = runData.stimulusPair[correctReward]
-                nextCorrPairAcc = list()
-                for pair, idx in zip(correctRewardPairs, correctReward):
-                    subset = runData.loc[idx + 1:, ['stimulusPair', 'accurate']]
-                    temp = subset[subset.stimulusPair == pair].reset_index()
-                    if not temp.empty:
-                        nextCorrPairAcc.append(temp.accurate[0])
-
-                avgAccCorrReward = np.nanmean(accCorrReward)
-                avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
-
-                A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
-
-                MoA_Line = pd.DataFrame(MostAcc)
-                MiA_Line = pd.DataFrame(MiddleAcc)
-                LA_line = pd.DataFrame(LeastAcc)
-
-                simA_lines = np.empty((reps, int(self.mainTrials / 2)))
-                simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
-                simAcc_lines = np.empty((reps, int(self.mainTrials)))
-
-                taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
-
-                if 'feedbackAccuracy' in runData.columns:
-                    feedbackAcc = runData.feedbackAccuracy.astype(int)
-                else:
-                    feedbackAcc = np.array(runData.accurate == runData.reward).astype(int)
-
-                    if len(np.where(feedbackAcc[0:10] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[0:10] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[0:10]))[0][:toFlip]
-                        feedbackAcc[idx] = 1
-                    if len(np.where(feedbackAcc[10:20] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[10:20] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[10:20]))[0][:toFlip]
-                        feedbackAcc[idx + 10] = 1
-                    if len(np.where(feedbackAcc[20:30] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[20:30] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[20:30]))[0][:toFlip]
-                        feedbackAcc[idx + 20] = 1
-                    if len(np.where(feedbackAcc[30:40] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[30:40] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[30:40]))[0][:toFlip]
-                        feedbackAcc[idx + 30] = 1
-                    if len(np.where(feedbackAcc[40:50] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[40:50] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[40:50]))[0][:toFlip]
-                        feedbackAcc[idx + 40] = 1
-                    if len(np.where(feedbackAcc[50:60] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[50:60] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[50:60]))[0][:toFlip]
-                        feedbackAcc[idx + 50] = 1
-
-                for i in range(reps):
-                    simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta)
-                    simulation.taskStructure(taskStruct, green, feedbackAcc)
-                    # simulation.taskStructure()
-                    simulation.RLloops()
-
-                    simAttracts = simulation.accurate[simulation.correctResponse == 0]
-                    simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
-                    simC = simulation.accurate
-                    if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, ww, method)
-                        simNA_lines[i, :] = ma(simNotAttracts, ww, method)
-                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
-
-                if simA_lines.size:
-                    simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
-                    simNA_line = pd.DataFrame(np.mean(simNA_lines, axis=0))
-                    simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
-
-                    fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-                    fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, beta {3}"
-                                 .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2)))
-
-                    ax[0].plot(A_line, label='Real data')
-                    ax[0].plot(simA_line, label='Simulated data')
-                    ax[0].set_title("Accurate for 'attracts'")
-                    ax[0].set_ylim(0, 1.1)
-                    ax[0].set_ylabel("Accurate")
-                    ax[0].legend()
-
-                    ax[1].plot(NA_line, label='Real data')
-                    ax[1].plot(simNA_line, label='Simulated data')
-                    ax[1].set_title("Accurate for 'does not attract'")
-                    ax[1].set_ylim(0, 1.1)
-                    ax[1].set_ylabel("Accurate")
-                    ax[1].legend()
-
-                    ax[2].plot(Acc_line, label='Real data')
-                    ax[2].plot(simAcc_line, label='Simulated data')
-                    ax[2].set_title("Accurate overall")
-                    ax[2].set_ylim(0, 1.1)
-                    ax[2].set_ylabel("Accurate")
-                    ax[2].legend()
-
-                    fig2, ax2 = plt.subplots(3, 1, figsize=(12, 12))
-                    bars = [np.nanmean(LA_line), np.nanmean(MoA_Line), np.nanmean(MiA_Line)]
-                    x = ['0.15', '0.35', '0.5']
-                    ax2[0].bar(x, bars)
-                    ax2[0].set_title("Accuracy per Conditional Probability")
-                    ax2[0].set_ylim(0, 1.1)
-                    ax2[0].set_ylabel("Average Accurate")
-
-                    x = ['Wrong reward', 'True reward']
-                    ax2[1].bar(x, [avgAccOppReward, avgAccCorrReward])
-                    ax2[1].set_title("Accuracy on trial after wrong or true reward")
-                    ax2[1].set_ylim(0, 1.1)
-                    ax2[1].set_ylabel("Average Accurate")
-
-                    x = ['Wrong reward', 'True reward']
-                    ax2[2].bar(x, [avgNextOppPairAcc, avgNextCorrPairAcc])
-                    ax2[2].set_title("Accuracy on next occurrence same pair after wrong or true reward")
-                    ax2[2].set_ylim(0, 1.1)
-                    ax2[2].set_ylabel("Average Accurate")
-
-                    # Creating figure
-                    fig = plt.figure(3)
-                    ax = fig.add_subplot(111, projection='3d')
-                    NLL_array[NLL_array[:, -1] > min(NLL_array[:, -1]) + 10] = np.nan
-                    ax.scatter(NLL_array[:, 0], NLL_array[:, 1], NLL_array[:, -1], color="green")
-                    ax.set_xlabel('alpha', fontweight='bold')
-                    ax.set_ylabel('beta', fontweight='bold')
-                    ax.set_zlabel('NLL', fontweight='bold')
-                    ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(ID, run + 1))
-
-                    plt.figure(4)
-                    plt.scatter(NLL_array[:, 0], NLL_array[:, -1])
-                    plt.xlabel('alpha', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and alpha scatter plot".format(ID, run + 1))
-
-                    plt.figure(5)
-                    plt.scatter(NLL_array[:, 1], NLL_array[:, -1])
-                    plt.xlabel('beta', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and beta scatter plot".format(ID, run + 1))
+            
+            A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
+            NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
+            Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
 
 
-                    os.makedirs(saving_folder, exist_ok=True)
-                    save_name = "{0}_{1}_simplePlots.pdf".format(ID, run)
-                    file_path = os.path.join(saving_folder, save_name)
+            simA_lines = np.empty((reps, int(self.mainTrials / 2)))
+            simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
+            simAcc_lines = np.empty((reps, int(self.mainTrials)))
 
-                    pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    for fig in range(1, plt.gcf().number + 1):
-                        pdf.savefig(fig)
-                    pdf.close()
+            taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
-                    plt.close('all')
+            feedbackAcc = runData.feedbackAccuracy.astype(int)
 
-            count += 1
+            for i in range(reps):
+                simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta)
+                simulation.taskStructure(taskStruct, green, feedbackAcc)
+                simulation.RLloops()
 
-    def simplestFitting(self): 
+                simAttracts = simulation.accurate[simulation.correctResponse == 0]
+                simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
+                simC = simulation.accurate
+                if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
+                    simA_lines[i, :] = ma(simAttracts, ww, method)
+                    simNA_lines[i, :] = ma(simNotAttracts, ww, method)
+                    simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
 
-        self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
-        self.all_betas = np.empty((len(np.unique(self.IDs)), 6))
-        self.all_LLs = np.empty((len(np.unique(self.IDs)), 6))
-        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 6, self.gridCount, 3))
-        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
-        self.all_V0 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
-        self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
+            if simA_lines.size:
+                simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
+                simNA_line = pd.DataFrame(np.mean(simNA_lines, axis=0))
+                simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
 
-        count = 0
-        for ID in np.unique(self.IDs):
-            for file in self.savedValsFiles:
-                if file[0] == ID:
-                    print(file)
-            # print([file for file in self.savedValsFiles if file[0] == ID])
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-            subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
-            # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
-            fitted_alphas = np.empty((1, 6))
-            fitted_betas = np.empty((1, 6))
-            best_LLs = np.empty((1, 6))
+                fig, ax = plt.subplots(3, 1, figsize=(12, 12))
+                fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, beta {3}"
+                                .format(self.ID, run + 1, np.round(alpha, 2), np.round(beta, 2)))
 
-            ID_RPE = np.empty((1, 6, self.mainTrials + self.additionalTrials))
-            ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
-            ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
+                ax[0].plot(A_line, label='Real data')
+                ax[0].plot(simA_line, label='Simulated data')
+                ax[0].set_title("Accurate for 'attracts'")
+                ax[0].set_ylim(0, 1.1)
+                ax[0].set_ylabel("Accurate")
+                ax[0].legend()
 
-            for run in range(0, max(subjectData.runNumber)):
+                ax[1].plot(NA_line, label='Real data')
+                ax[1].plot(simNA_line, label='Simulated data')
+                ax[1].set_title("Accurate for 'does not attract'")
+                ax[1].set_ylim(0, 1.1)
+                ax[1].set_ylabel("Accurate")
+                ax[1].legend()
 
-                alphaGrid = np.random.rand(self.gridCount, 1)
-                betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
-                NLL_array = np.empty((self.gridCount, 3))
-                NLL_array[:] = np.nan
-                LL_array = np.empty((self.gridCount, 1))
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
-                run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
-                run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
-                run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
-                # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
-                for j in range(0, self.gridCount):
-                    # For each point on the grid we instantiate the arrays for the time steps-
-                    """Instantiating for the fitting"""
+                ax[2].plot(Acc_line, label='Real data')
+                ax[2].plot(simAcc_line, label='Simulated data')
+                ax[2].set_title("Accurate overall")
+                ax[2].set_ylim(0, 1.1)
+                ax[2].set_ylabel("Accurate")
+                ax[2].legend()
 
-                    self.choiceProb = np.empty((max(runData.trialNumber), 2))
-                    self.choiceProb[:] = np.nan
-                    self.actionProb = np.empty((max(runData.trialNumber), 1))
-                    self.actionProb[:] = np.nan
-                    self.V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                    self.V_option0[:] = np.nan
-                    self.V_option0[0, :] = 0.5
-                    self.V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                    self.V_option1[:] = np.nan
-                    self.V_option1[0, :] = 0.5
-                    self.rewardPE = np.empty((max(runData.trialNumber), 3, 3))
-                    self.rewardPE[:] = np.nan
+                # Creating figure
+                fig = plt.figure(2)
+                ax = fig.add_subplot(111, projection='3d')
+                NLL_run[NLL_run[:, -1] > min(NLL_run[:, -1]) + 10] = np.nan
+                ax.scatter(NLL_run[:, 0], NLL_run[:, 1], NLL_run[:, -1], color="green")
+                ax.set_xlabel('alpha', fontweight='bold')
+                ax.set_ylabel('beta', fontweight='bold')
+                ax.set_zlabel('NLL', fontweight='bold')
+                ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(self.ID, run + 1))
 
-                    # Checking parameters from the grid
-                    alphaCheck = alphaGrid[j]
-                    betaCheck = betaGrid[j]
-                    trials_RPE = np.empty((max(runData.trialNumber)))
-                    trials_V0 = np.empty((max(runData.trialNumber) + 1))
-                    trials_V1 = np.empty((max(runData.trialNumber) + 1))
-                    trials_V0[0] = self.V_option0[0, 0, 0]
-                    trials_V1[0] = self.V_option1[0, 0, 0]
-                    for t in range(0, max(runData.trialNumber)):
-                        # Prob of choosing the 0th and 1st option respectively
-                        self.choiceProb[t, 0] = np.exp(betaCheck * self.V_option0[
-                            ((t,) + runData.stimulusPair[t])]) / ((np.exp(
-                            betaCheck * self.V_option0[
-                                ((t,) + runData.stimulusPair[t])])) + (np.exp(
-                            betaCheck * self.V_option1[
-                                ((t,) + runData.stimulusPair[t])])))
-                        self.choiceProb[t, 1] = 1 - self.choiceProb[t, 0]
+                plt.figure(3)
+                plt.scatter(NLL_run[:, 0], NLL_run[:, -1])
+                plt.xlabel('alpha', fontweight='bold')
+                plt.ylabel('NLL', fontweight='bold')
+                plt.title("Participant {0}, run {1}: NLL and alpha scatter plot".format(self.ID, run + 1))
 
-                        self.actionProb[t, :] = self.choiceProb[t, int(runData.action[t])] if ~np.isnan(
-                            runData.action[t]) else np.nan
+                plt.figure(4)
+                plt.scatter(NLL_run[:, 1], NLL_run[:, -1])
+                plt.xlabel('beta', fontweight='bold')
+                plt.ylabel('NLL', fontweight='bold')
+                plt.title("Participant {0}, run {1}: NLL and beta scatter plot".format(self.ID, run + 1))
 
-                        if runData.action[t] == 0:
-                            self.rewardPE[(t,) + runData.stimulusPair[t]] = \
-                                runData.reward[t] - self.V_option0[(t,) + runData.stimulusPair[t]]
 
-                            self.V_option0[t + 1, :] = self.V_option0[t, :]
-                            self.V_option0[(t + 1,) + runData.stimulusPair[t]] = \
-                                self.V_option0[(t,) + runData.stimulusPair[t]] + \
-                                alphaCheck * (self.rewardPE[(t,) + runData.stimulusPair[t]])
+                os.makedirs(saving_folder, exist_ok=True)
+                save_name = "{0}_{1}_simplePlots.pdf".format(self.ID, run)
+                file_path = os.path.join(saving_folder, save_name)
 
-                            self.V_option1[t + 1, :] = self.V_option1[t, :]
+                pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
+                for fig in range(1, plt.gcf().number + 1):
+                    pdf.savefig(fig)
+                pdf.close()
 
-                        elif runData.action[t] == 1:
-                            self.rewardPE[(t,) + runData.stimulusPair[t]] = \
-                                runData.reward[t] - self.V_option1[(t,) + runData.stimulusPair[t]]
+                plt.close('all')
 
-                            self.V_option1[t + 1, :] = self.V_option1[t, :]
-                            self.V_option1[(t + 1,) + runData.stimulusPair[t]] = \
-                                self.V_option1[(t,) + runData.stimulusPair[t]] + \
-                                alphaCheck * (self.rewardPE[(t,) + runData.stimulusPair[t]])
-                            self.V_option0[t + 1, :] = self.V_option0[t, :]
-                        else:
-                            self.V_option1[t + 1, :] = self.V_option1[t, :]
-                            self.V_option0[t + 1, :] = self.V_option0[t, :]
+    def simplestFitting(self):
+              
+        subjectData = pd.read_csv(self.savedValsFile)
+        subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
+        fitted_alphas = np.empty((max(subjectData.runNumber)))
+        fitted_betas = np.empty((max(subjectData.runNumber)))
+        best_LLs = np.empty((max(subjectData.runNumber)))
+        NLL_array = np.empty((max(subjectData.runNumber), self.gridCount, 3))
+        NLL_array[:] = np.nan
 
-                        trials_RPE[t] = self.rewardPE[(t,) + runData.stimulusPair[t]]
-                        trials_V0[t + 1] = self.V_option0[(t + 1,) + runData.stimulusPair[t]]
-                        trials_V1[t + 1] = self.V_option1[(t + 1,) + runData.stimulusPair[t]]
-                    negativeLogLikelihood = -np.sum(np.log(self.actionProb[~np.isnan(self.actionProb)]))
-                    Likelihood = np.prod(self.actionProb[~np.isnan(self.actionProb)])
-                    NLL_array[j, 0] = alphaCheck
-                    NLL_array[j, 1] = betaCheck
-                    NLL_array[j, 2] = negativeLogLikelihood
-                    LL_array[j, 0] = Likelihood
+        RPE = np.empty((max(subjectData.runNumber), self.mainTrials + self.additionalTrials))
+        V0 = np.empty((max(subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
+        V1 = np.empty((max(subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
 
-                    run_RPEs[j] = trials_RPE
-                    run_V0[j] = trials_V0
-                    run_V1[j] = trials_V1
+        for run in range(0, max(subjectData.runNumber)):
 
-                minIndex = np.argmin(NLL_array[:, 2])
-                maxIndex = np.nanargmax(LL_array[:, 0])
-                fittedAlpha = NLL_array[minIndex, 0]
-                fittedBeta = NLL_array[minIndex, 1]
+            alphaGrid = np.random.rand(self.gridCount, 1)
+            betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
+            LL_array = np.empty((self.gridCount, 1))
+            runData = subjectData[subjectData.runNumber == run + 1].reset_index()
+            run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
+            run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
+            run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
+            # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
+            for j in range(0, self.gridCount):
+                # For each point on the grid we instantiate the arrays for the time steps-
+                """Instantiating for the fitting"""
 
-                self.NLL_arrays[count, run, :, :] = NLL_array
-                fitted_alphas[0, run] = fittedAlpha
-                fitted_betas[0, run] = fittedBeta
-                best_LLs[0, run] = LL_array[maxIndex]
-                ID_RPE[0, run] = run_RPEs[minIndex]
-                ID_V0[0, run] = run_V0[minIndex]
-                ID_V1[0, run] = run_V1[minIndex]
+                choiceProb = np.empty((max(runData.trialNumber), 2))
+                choiceProb[:] = np.nan
+                actionProb = np.empty((max(runData.trialNumber), 1))
+                actionProb[:] = np.nan
+                V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
+                V_option0[:] = np.nan
+                V_option0[0, :] = 0.5
+                V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
+                V_option1[:] = np.nan
+                V_option1[0, :] = 0.5
+                rewardPE = np.empty((max(runData.trialNumber), 3, 3))
+                rewardPE[:] = np.nan
 
-            self.all_alphas[count, :] = fitted_alphas
-            self.all_betas[count, :] = fitted_betas
-            self.all_LLs[count, :] = best_LLs
-            self.all_RPEs[count] = ID_RPE
-            self.all_V0[count] = ID_V0
-            self.all_V1[count] = ID_V1
+                # Checking parameters from the grid
+                alphaCheck = alphaGrid[j]
+                betaCheck = betaGrid[j]
+                run_V0[j, 0] = V_option0[0, 0, 0]
+                run_V1[j, 0] = V_option1[0, 0, 0]
+                for t in range(0, max(runData.trialNumber)):
+                    # Prob of choosing the 0th and 1st option respectively
+                    choiceProb[t, 0] = np.exp(betaCheck * V_option0[
+                        ((t,) + runData.stimulusPair[t])]) / ((np.exp(
+                        betaCheck * V_option0[
+                            ((t,) + runData.stimulusPair[t])])) + (np.exp(
+                        betaCheck * V_option1[
+                            ((t,) + runData.stimulusPair[t])])))
+                    choiceProb[t, 1] = 1 - choiceProb[t, 0]
 
-            count += 1
+                    actionProb[t, :] = choiceProb[t, int(runData.action[t])] if ~np.isnan(
+                        runData.action[t]) else np.nan
+
+                    if runData.action[t] == 0:
+                        rewardPE[(t,) + runData.stimulusPair[t]] = \
+                            runData.reward[t] - V_option0[(t,) + runData.stimulusPair[t]]
+
+                        V_option0[t + 1, :] = V_option0[t, :]
+                        V_option0[(t + 1,) + runData.stimulusPair[t]] = \
+                            V_option0[(t,) + runData.stimulusPair[t]] + \
+                            alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                        V_option1[t + 1, :] = V_option1[t, :]
+
+                    elif runData.action[t] == 1:
+                        rewardPE[(t,) + runData.stimulusPair[t]] = \
+                            runData.reward[t] - V_option1[(t,) + runData.stimulusPair[t]]
+
+                        V_option1[t + 1, :] = V_option1[t, :]
+                        V_option1[(t + 1,) + runData.stimulusPair[t]] = \
+                            V_option1[(t,) + runData.stimulusPair[t]] + \
+                            alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                        V_option0[t + 1, :] = V_option0[t, :]
+                    else:
+                        V_option1[t + 1, :] = V_option1[t, :]
+                        V_option0[t + 1, :] = V_option0[t, :]
+
+                    run_RPEs[j,t] = rewardPE[(t,) + runData.stimulusPair[t]]
+                    run_V0[j, t + 1] = V_option0[(t + 1,) + runData.stimulusPair[t]]
+                    run_V1[j, t + 1] = V_option1[(t + 1,) + runData.stimulusPair[t]]
+                negativeLogLikelihood = -np.sum(np.log(actionProb[~np.isnan(actionProb)]))
+                Likelihood = np.prod(actionProb[~np.isnan(actionProb)])
+                NLL_array[run, j, 0] = alphaCheck
+                NLL_array[run, j, 1] = betaCheck
+                NLL_array[run, j, 2] = negativeLogLikelihood
+                LL_array[j, 0] = Likelihood
+
+            minIndex = np.argmin(NLL_array[run, :, 2])
+            maxIndex = np.nanargmax(LL_array[:, 0])
+            fittedAlpha = NLL_array[run, minIndex, 0]
+            fittedBeta = NLL_array[run, minIndex, 1]
+
+            fitted_alphas[run] = fittedAlpha
+            fitted_betas[run] = fittedBeta
+            best_LLs[run] = LL_array[maxIndex]
+            RPE[run] = run_RPEs[minIndex]
+            V0[run] = run_V0[minIndex]
+            V1[run] = run_V1[minIndex]
+
+        return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
+
 
     ## Value fitting
 
@@ -1968,37 +1823,35 @@ def ma(interval, window_size = 10, method = 'same'):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-# ALWAYS run one of these; either without IDs (all in directory), or for specific IDs
-#fitted = Fitting(60, 0, 5000)
-IDs = ['21','22']#['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60']
-fitted = Fitting(60, 0, 5000, IDs=IDs)
+fitted = Fitting(60, 0, 5000, ID="01")
 
 # # Run the simplest RL model
-fitted.simplestFitting()
-fitted.plots_simplestFitting(ww = 10, method = 'same', reps=50)
+fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
+
+fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method = 'same', reps=50)
 
 # # # Run the RL model including initial V0 and V1 as free parameters
-fitted.valFitting()
-fitted.plots_valueFitting(ww=10, method='same', reps=50)
+#fitted.valFitting()
+#fitted.plots_valueFitting(ww=10, method='same', reps=50)
 
 # Run the RL model with extra learning rates for the other pairs
 # (if you see pair image0 and audio0, also update other image0 and audio0 pairs)
 # Options: 1) Do not add anything to the call 2) Add version="two" 3) Add version="four"
-fitted.updateFitting()
-fitted.plots_updateFitting(ww=10, method='same', reps=50)
-fitted.updateFitting(version="two")
-fitted.plots_updateFitting(ww=10, method='same', reps=50, version="two")
-fitted.updateFitting(version="four")
-fitted.plots_updateFitting(ww=10, method='same', reps=50, version="four")
+#fitted.updateFitting()
+#fitted.plots_updateFitting(ww=10, method='same', reps=50)
+#fitted.updateFitting(version="two")
+#fitted.plots_updateFitting(ww=10, method='same', reps=50, version="two")
+#fitted.updateFitting(version="four")
+#fitted.plots_updateFitting(ww=10, method='same', reps=50, version="four")
 
 # Run the RL model with extra learning rates for sthe other pairs AND initial V0 and V1 as free parameters
 # Same options as above; 1) Do not add anything to the call 2) Add version="two" 3) Add version="four"
-fitted.updateInitFitting()
-fitted.plots_updateInitFitting(ww=10, method="same", reps=50)
-fitted.updateInitFitting(version="two")
-fitted.plots_updateInitFitting(ww=10, method="same", reps=50, version="two")
-fitted.updateInitFitting(version="four")
-fitted.plots_updateInitFitting(ww=10, method="same", reps=50, version="four")
+#fitted.updateInitFitting()
+#fitted.plots_updateInitFitting(ww=10, method="same", reps=50)
+#fitted.updateInitFitting(version="two")
+#fitted.plots_updateInitFitting(ww=10, method="same", reps=50, version="two")
+#fitted.updateInitFitting(version="four")
+#fitted.plots_updateInitFitting(ww=10, method="same", reps=50, version="four")
 
 
 # You can always include statistical learning; necessary to get surprise values

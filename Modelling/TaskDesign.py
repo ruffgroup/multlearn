@@ -11,7 +11,7 @@ import seaborn as sns
 class task_Design:
 
     def __init__(self, mainTrials, additionalTrials, alpha=None, beta=None, alpha2=None, alpha3=None,
-                 alpha4=None, alpha5=None, V_option0Init=None, V_option1Init=None):
+                 alpha4=None, alpha5=None, V_option0Init=None, V_option1Init=None, pearce=0, omega=None):
 
         """ How task is conducted """
 
@@ -48,10 +48,20 @@ class task_Design:
                 axis=0)
 
         """ How participants learn : Recoverable parameters """
-        if alpha is None:
-            self.alpha = np.random.uniform(0, 1)
-        else:
-            self.alpha = alpha
+        self.pearce = pearce
+        if self.pearce == 0:
+            if alpha is None:
+                self.alpha = np.random.uniform(0, 1)
+            else:
+                self.alpha = alpha
+        elif self.pearce == 1:
+            if omega is None:
+                self.alpha = 1
+                self.omega = np.random.uniform(0, 1)
+            else:
+                self.alpha = 1
+                self.omega = omega
+
         if beta is None:
             self.beta = 0 + 15.0 * random()
         else:
@@ -213,6 +223,8 @@ class task_Design:
                                                                                                        i + self.additionalTrials,
                                                                                                        :])]
                 self.V_option0[i + 1, :] = self.V_option0[i, :]
+                if self.pearce == 1:
+                    self.alpha = self.alpha + (abs(self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]) - self.alpha) * self.omega
                 self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = self.V_option0[
                                                                                                         (i,) +
                                                                                                         tuple(
@@ -262,6 +274,7 @@ class task_Design:
                                                                                                        i + self.additionalTrials,
                                                                                                        :])]
                 self.V_option1[i + 1, :] = self.V_option1[i, :]
+                self.alpha = self.alpha + (abs(self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]) - self.alpha) * self.omega
                 self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = self.V_option1[
                                                                                                         (i,) +
                                                                                                         tuple(
