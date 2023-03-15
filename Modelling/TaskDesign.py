@@ -274,7 +274,8 @@ class task_Design:
                                                                                                        i + self.additionalTrials,
                                                                                                        :])]
                 self.V_option1[i + 1, :] = self.V_option1[i, :]
-                self.alpha = self.alpha + (abs(self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]) - self.alpha) * self.omega
+                if self.pearce == 1:
+                    self.alpha = self.alpha + (abs(self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]) - self.alpha) * self.omega
                 self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = self.V_option1[
                                                                                                         (i,) +
                                                                                                         tuple(
