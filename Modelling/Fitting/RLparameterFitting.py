@@ -59,14 +59,14 @@ class Fitting:
             notAttracts = runData.accurate[runData.correctResponse == 1]
 
             
-            A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
-            NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
-            Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
+            A_line = pd.DataFrame(ma(attracts, ww, method)).astype(float).interpolate(option='spline', order=1)
+            NA_line = pd.DataFrame(ma(notAttracts, ww, method)).astype(float).interpolate(option='spline', order=1)
+            Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).astype(float).interpolate(option='spline', order=1)
 
 
-            simA_lines = np.empty((reps, int(self.mainTrials / 2)))
-            simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
-            simAcc_lines = np.empty((reps, int(self.mainTrials)))
+            simA_lines = np.empty((reps, int(self.mainTrials / 2)-ww+1))
+            simNA_lines = np.empty((reps, int(self.mainTrials / 2)-ww+1))
+            simAcc_lines = np.empty((reps, int(self.mainTrials)-ww+1))
 
             taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
@@ -313,9 +313,9 @@ class Fitting:
                 avgAccCorrReward = np.nanmean(accCorrReward)
                 avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
 
-                A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
+                A_line = pd.DataFrame(ma(attracts, ww, method)).astype(float).interpolate(option='spline', order=1)
+                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).astype(float).interpolate(option='spline', order=1)
+                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).astype(float).interpolate(option='spline', order=1)
 
                 MoA_Line = pd.DataFrame(MostAcc)
                 MiA_Line = pd.DataFrame(MiddleAcc)
@@ -1823,12 +1823,12 @@ def ma(interval, window_size = 10, method = 'same'):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-fitted = Fitting(60, 0, 5000, ID="01")
+fitted = Fitting(60, 0, 5000, ID="02")
 
 # # Run the simplest RL model
 fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
 
-fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method = 'same', reps=50)
+fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
 # # # Run the RL model including initial V0 and V1 as free parameters
 #fitted.valFitting()
