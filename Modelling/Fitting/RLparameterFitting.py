@@ -1760,56 +1760,54 @@ class Fitting:
         return ID_beliefs, ID_surprise
         
 
-    def plots_stats(self):
+    def plots_stats(self, beliefs, surprise):
 
-        count = 0
-        for ID in np.unique(self.IDs):
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-            subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
-            # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
+        subjectData = pd.read_csv(self.savedValsFile)
+        subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
+        # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
 
-            for run in range(0, max(subjectData.runNumber)):
-                beliefsStat = self.all_beliefs[count, run]
-                statSurprise = self.all_surprise[count, run]
+        for run in range(0, max(subjectData.runNumber)):
+            beliefsStat = beliefs[run]
+            statSurprise = surprise[run]
 
-                plt.figure(1)
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 0, 0], label="1A")
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 0, 1], label="1B")
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 0, 2], label="1C")
-                plt.title("Learning of statistical structure (beliefs) by Bayesian observer")
+            plt.figure(1)
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 0, 0], label="1A")
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 0, 1], label="1B")
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 0, 2], label="1C")
+            plt.title("Learning of statistical structure (beliefs) by Bayesian observer")
 
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 1, 0], label="2A")
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 1, 1], label="2B")
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 1, 2], label="2C")
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 1, 0], label="2A")
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 1, 1], label="2B")
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 1, 2], label="2C")
 
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 2, 0], label="3A")
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 2, 1], label="3B")
-                plt.plot(range(0, self.mainTrials + 1),
-                         beliefsStat[:, 2, 2], label="3C")
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 2, 0], label="3A")
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 2, 1], label="3B")
+            plt.plot(range(0, self.mainTrials + 1),
+                        beliefsStat[:, 2, 2], label="3C")
 
-                plt.xlabel("trials")
-                plt.ylabel("Beliefs of probabilities co-occurence")
-                plt.legend(bbox_to_anchor=(0.99, 0.65))
-                plt.axhline(y=0.15 * 0.33, color='r', linestyle='-')
-                plt.axhline(y=0.35 * 0.33, color='g', linestyle='-')
-                plt.axhline(y=0.5 * 0.33, color='b', linestyle='-')
+            plt.xlabel("trials")
+            plt.ylabel("Beliefs of probabilities co-occurence")
+            plt.legend(bbox_to_anchor=(0.99, 0.65))
+            plt.axhline(y=0.15 * 0.33, color='r', linestyle='-')
+            plt.axhline(y=0.35 * 0.33, color='g', linestyle='-')
+            plt.axhline(y=0.5 * 0.33, color='b', linestyle='-')
 
-                plt.figure(2)
-                plt.plot(statSurprise[~np.isnan(statSurprise)])
-                plt.xlabel("trials")
-                plt.ylabel("Total surprise")
-                # plt.legend(bbox_to_anchor=(0.98, 0.9))
-                plt.title("Total statistical surprise signal")
+            plt.figure(2)
+            plt.plot(statSurprise[~np.isnan(statSurprise)])
+            plt.xlabel("trials")
+            plt.ylabel("Total surprise")
+            # plt.legend(bbox_to_anchor=(0.98, 0.9))
+            plt.title("Total statistical surprise signal")
 
-                plt.show()
+            plt.show()
 
 
 def ma(interval, window_size = 10, method = 'same'):
@@ -1853,7 +1851,7 @@ fitted = Fitting(60, 0, 5000, ID="02")
 # You can always include statistical learning; necessary to get surprise values
 beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
 print(surprise)
-# fitted.plots_stats()
+fitted.plots_stats(beliefs, surprise)
 
 # Run to save RPE and surprise values; rename .mat files yourself (e.g. based on model)
 #RPE_arr = fitted.all_RPEs
