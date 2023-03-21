@@ -11,6 +11,7 @@ import pickle
 import seaborn as sns
 import sys
 import pathlib
+from pathlib import Path
 import re
 import platform
 import ast
@@ -1757,6 +1758,10 @@ class Fitting:
                     np.log(beliefsStat[(i,) + runData.stimulusPair[i]])
                 trial_surprise[i] = statSurprise[(i,) + runData.stimulusPair[i]]
             ID_surprise[run] = trial_surprise
+
+        newPath = os.path.join(pathlib.Path(__file__).parent.resolve(), "fittedParameters/sub-{}".format(self.ID))
+        Path(newPath).mkdir(parents=True, exist_ok=True)
+        scipy.io.savemat(newPath+'/spe.mat'.format(self.ID), mdict={'spe': ID_surprise})
         return ID_beliefs, ID_surprise
         
 
@@ -1817,7 +1822,7 @@ def ma(interval, window_size = 10, method = 'same'):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-fitted = Fitting(60, 0, 5000, ID="02")
+fitted = Fitting(60, 0, 5000, ID="58")
 
 # # Run the simplest RL model
 #fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
@@ -1850,8 +1855,7 @@ fitted = Fitting(60, 0, 5000, ID="02")
 
 # You can always include statistical learning; necessary to get surprise values
 beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
-print(surprise)
-fitted.plots_stats(beliefs, surprise)
+#fitted.plots_stats(beliefs, surprise)
 
 # Run to save RPE and surprise values; rename .mat files yourself (e.g. based on model)
 #RPE_arr = fitted.all_RPEs
