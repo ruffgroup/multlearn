@@ -1666,103 +1666,99 @@ class Fitting:
     def statisticalLearning(self, statLearnPar=1):
 
         self.statLearnPar = statLearnPar
-        self.all_beliefs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1, 3, 3))
-        self.all_surprise = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
-        count = 0
-        for ID in np.unique(self.IDs):
+        
 
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-            subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
-            ID_beliefs = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1, 3, 3))
-            ID_surprise = np.empty((1, 6, self.mainTrials + self.additionalTrials))
-            for run in range(0, max(subjectData.runNumber)):
+        subjectData = pd.read_csv(self.savedValsFile)
+        subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
+        ID_beliefs = np.empty((6, self.mainTrials + self.additionalTrials + 1, 3, 3))
+        ID_surprise = np.empty((6, self.mainTrials + self.additionalTrials))
+        for run in range(0, max(subjectData.runNumber)):
 
-                rowBeliefs = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
-                rowBeliefs[:] = np.nan
-                columnBeliefs = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
-                columnBeliefs[:] = np.nan
-                beliefsStat = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
-                beliefsStat[:] = np.nan
-                statCount = np.zeros((self.mainTrials + self.additionalTrials + 1, 3, 3))
-                statSurprise = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
-                statSurprise[:] = np.nan
-                statSurpriseRow = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
-                statSurpriseRow[:] = np.nan
-                statSurpriseColumn = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
-                statSurpriseColumn[:] = np.nan
+            rowBeliefs = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
+            rowBeliefs[:] = np.nan
+            columnBeliefs = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
+            columnBeliefs[:] = np.nan
+            beliefsStat = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
+            beliefsStat[:] = np.nan
+            statCount = np.zeros((self.mainTrials + self.additionalTrials + 1, 3, 3))
+            statSurprise = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
+            statSurprise[:] = np.nan
+            statSurpriseRow = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
+            statSurpriseRow[:] = np.nan
+            statSurpriseColumn = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
+            statSurpriseColumn[:] = np.nan
 
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
-                rowDen0 = 3 * self.statLearnPar
-                rowDen1 = 3 * self.statLearnPar
-                rowDen2 = 3 * self.statLearnPar
-                columnDen0 = 3 * self.statLearnPar
-                columnDen1 = 3 * self.statLearnPar
-                columnDen2 = 3 * self.statLearnPar
+            runData = subjectData[subjectData.runNumber == run + 1].reset_index()
+            rowDen0 = 3 * self.statLearnPar
+            rowDen1 = 3 * self.statLearnPar
+            rowDen2 = 3 * self.statLearnPar
+            columnDen0 = 3 * self.statLearnPar
+            columnDen1 = 3 * self.statLearnPar
+            columnDen2 = 3 * self.statLearnPar
 
-                for i in range(0, self.mainTrials + self.additionalTrials):
-                    statCount[i + 1, :] = statCount[i, :]
-                    statCount[i + 1, runData.stimulusPair[i][0], runData.stimulusPair[i][1]] += 1
+            for i in range(0, self.mainTrials + self.additionalTrials):
+                statCount[i + 1, :] = statCount[i, :]
+                statCount[i + 1, runData.stimulusPair[i][0], runData.stimulusPair[i][1]] += 1
 
-                rowBeliefs[0, :] = (self.statLearnPar + statCount[0, :]) / 3 * self.statLearnPar
-                columnBeliefs[0, :] = (self.statLearnPar + statCount[0, :]) / 3 * self.statLearnPar
-                num = self.statLearnPar + statCount[0, :]
-                den = 9 * self.statLearnPar
+            rowBeliefs[0, :] = (self.statLearnPar + statCount[0, :]) / 3 * self.statLearnPar
+            columnBeliefs[0, :] = (self.statLearnPar + statCount[0, :]) / 3 * self.statLearnPar
+            num = self.statLearnPar + statCount[0, :]
+            den = 9 * self.statLearnPar
+            # Total statistical beliefs irrespective of rows and columns.
+            beliefsStat[0, :] = num / den
+
+            for i in range(1, self.mainTrials + self.additionalTrials + 1):
+
+                rowBeliefs[i, :] = rowBeliefs[i - 1, :]
+                # Row beliefs
+                if runData.stimulusPair[i - 1][0] == 0:
+                    rowDen0 = rowDen0 + 1
+                    rowBeliefs[i, 0, :] = (
+                                                    self.statLearnPar + statCount[i, 0, :]) / rowDen0
+                elif runData.stimulusPair[i - 1][0] == 1:
+                    rowDen1 = rowDen1 + 1
+                    rowBeliefs[i, 1, :] = (
+                                                    self.statLearnPar + statCount[i, 1, :]) / rowDen1
+                else:
+                    rowDen2 = rowDen2 + 1
+                    rowBeliefs[i, 2, :] = (
+                                                    self.statLearnPar + statCount[i, 2, :]) / rowDen2
+                # column beliefs
+                columnBeliefs[i, :] = columnBeliefs[i - 1, :]
+                if runData.stimulusPair[i - 1][1] == 0:
+                    columnDen0 = columnDen0 + 1
+                    columnBeliefs[i, 0, :] = (
+                                                        self.statLearnPar + statCount[i, 0, :]) / columnDen0
+                elif runData.stimulusPair[i - 1][1] == 1:
+                    columnDen1 = columnDen1 + 1
+                    columnBeliefs[i, 1, :] = (
+                                                        self.statLearnPar + statCount[i, 1, :]) / columnDen1
+                else:
+                    columnDen2 = columnDen2 + 1
+                    columnBeliefs[i, 2, :] = (
+                                                        self.statLearnPar + statCount[i, 2, :]) / columnDen2
+                num = self.statLearnPar + statCount[i, :]
+                den += 1
                 # Total statistical beliefs irrespective of rows and columns.
-                beliefsStat[0, :] = num / den
+                beliefsStat[i, :] = num / den
 
-                for i in range(1, self.mainTrials + self.additionalTrials + 1):
-
-                    rowBeliefs[i, :] = rowBeliefs[i - 1, :]
-                    # Row beliefs
-                    if runData.stimulusPair[i - 1][0] == 0:
-                        rowDen0 = rowDen0 + 1
-                        rowBeliefs[i, 0, :] = (
-                                                      self.statLearnPar + statCount[i, 0, :]) / rowDen0
-                    elif runData.stimulusPair[i - 1][0] == 1:
-                        rowDen1 = rowDen1 + 1
-                        rowBeliefs[i, 1, :] = (
-                                                      self.statLearnPar + statCount[i, 1, :]) / rowDen1
-                    else:
-                        rowDen2 = rowDen2 + 1
-                        rowBeliefs[i, 2, :] = (
-                                                      self.statLearnPar + statCount[i, 2, :]) / rowDen2
-                    # column beliefs
-                    columnBeliefs[i, :] = columnBeliefs[i - 1, :]
-                    if runData.stimulusPair[i - 1][1] == 0:
-                        columnDen0 = columnDen0 + 1
-                        columnBeliefs[i, 0, :] = (
-                                                         self.statLearnPar + statCount[i, 0, :]) / columnDen0
-                    elif runData.stimulusPair[i - 1][1] == 1:
-                        columnDen1 = columnDen1 + 1
-                        columnBeliefs[i, 1, :] = (
-                                                         self.statLearnPar + statCount[i, 1, :]) / columnDen1
-                    else:
-                        columnDen2 = columnDen2 + 1
-                        columnBeliefs[i, 2, :] = (
-                                                         self.statLearnPar + statCount[i, 2, :]) / columnDen2
-                    num = self.statLearnPar + statCount[i, :]
-                    den += 1
-                    # Total statistical beliefs irrespective of rows and columns.
-                    beliefsStat[i, :] = num / den
-
-                ID_beliefs[0, run, :, :] = beliefsStat
-                trial_surprise = np.empty((self.mainTrials + self.additionalTrials))
-                # Surprises calculated from beliefs update
-                for i in range(0, self.mainTrials + self.additionalTrials):
-                    statSurpriseRow[i, :] = np.nan
-                    statSurpriseRow[(i,) + runData.stimulusPair[i]] = - \
-                        np.log(rowBeliefs[(i,) + runData.stimulusPair[i]])
-                    statSurpriseColumn[i, :] = np.nan
-                    statSurpriseColumn[(i,) + runData.stimulusPair[i]] = - \
-                        np.log(columnBeliefs[(i,) + runData.stimulusPair[i]])
-                    statSurprise[i, :] = np.nan
-                    statSurprise[(i,) + runData.stimulusPair[i]] = - \
-                        np.log(beliefsStat[(i,) + runData.stimulusPair[i]])
-                    trial_surprise[i] = statSurprise[(i,) + runData.stimulusPair[i]]
-                ID_surprise[0, run] = trial_surprise
-            self.all_beliefs[count] = ID_beliefs
-            self.all_surprise[count] = ID_surprise
-            count += 1
+            ID_beliefs[run, :, :] = beliefsStat
+            trial_surprise = np.empty((self.mainTrials + self.additionalTrials))
+            # Surprises calculated from beliefs update
+            for i in range(0, self.mainTrials + self.additionalTrials):
+                statSurpriseRow[i, :] = np.nan
+                statSurpriseRow[(i,) + runData.stimulusPair[i]] = - \
+                    np.log(rowBeliefs[(i,) + runData.stimulusPair[i]])
+                statSurpriseColumn[i, :] = np.nan
+                statSurpriseColumn[(i,) + runData.stimulusPair[i]] = - \
+                    np.log(columnBeliefs[(i,) + runData.stimulusPair[i]])
+                statSurprise[i, :] = np.nan
+                statSurprise[(i,) + runData.stimulusPair[i]] = - \
+                    np.log(beliefsStat[(i,) + runData.stimulusPair[i]])
+                trial_surprise[i] = statSurprise[(i,) + runData.stimulusPair[i]]
+            ID_surprise[run] = trial_surprise
+        return ID_beliefs, ID_surprise
+        
 
     def plots_stats(self):
 
@@ -1826,9 +1822,9 @@ def ma(interval, window_size = 10, method = 'same'):
 fitted = Fitting(60, 0, 5000, ID="02")
 
 # # Run the simplest RL model
-fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
+#fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
 
-fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
+#fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
 # # # Run the RL model including initial V0 and V1 as free parameters
 #fitted.valFitting()
@@ -1855,7 +1851,8 @@ fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, b
 
 
 # You can always include statistical learning; necessary to get surprise values
-# fitted.statisticalLearning(statLearnPar=1)
+beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
+print(surprise)
 # fitted.plots_stats()
 
 # Run to save RPE and surprise values; rename .mat files yourself (e.g. based on model)
