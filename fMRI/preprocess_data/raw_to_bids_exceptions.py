@@ -48,7 +48,7 @@ def main(subject, bids_folder='/data'):
 
     reg = re.compile('.*run(?P<run>[0-9]+).*')
     funcs = glob.glob(op.join(sourcedata_root, '*run*.nii'))
-    print(funcs)
+    funcs = funcs.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00005_01\\sn_07122022_140326_6_1_fmri_run3sense.nii')
     runs = [int(reg.match(fn).group(1)) for fn in funcs]
 
     target_dir = op.join(bids_folder, 'ds-mlearn', f'sub-{subject:02d}', 'func')
