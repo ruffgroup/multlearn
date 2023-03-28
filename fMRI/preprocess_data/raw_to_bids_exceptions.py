@@ -18,7 +18,8 @@ def main(subject, bids_folder='/data'):
     # *** ANATOMICAL DATA ***
     # So not vt1w, which are reconstructed at different angle
     t1w = glob.glob(op.join(sourcedata_root, '*_t1w*.nii'))
-    print(op.join(sourcedata_root, '*_t1w*.nii'))
+    #t1w.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00047_01\\sn_08022023_172636_12_1_t1w3danat1mmsen.nii')
+    #print(op.join(sourcedata_root, '*_t1w*.nii'))
     assert (len(t1w) != 0), "No T1w {t1w}"
 
     # Not present
@@ -48,7 +49,11 @@ def main(subject, bids_folder='/data'):
 
     reg = re.compile('.*run(?P<run>[0-9]+).*')
     funcs = glob.glob(op.join(sourcedata_root, '*run*.nii'))
-    funcs = funcs.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00005_01\\sn_07122022_140326_6_1_fmri_run3sense.nii')
+    #print(funcs)
+    #funcs.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00060_01\\sn_22022023_141914_7_1_fmri_run4sense.nii')
+    #funcs.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00060_01\\sn_22022023_142002_8_1_fmri_run4sense.nii')
+    #funcs.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00038_01\\sn_03022023_142810_8_1_fmri_run3sense.nii')
+    print(funcs)
     runs = [int(reg.match(fn).group(1)) for fn in funcs]
 
     target_dir = op.join(bids_folder, 'ds-mlearn', f'sub-{subject:02d}', 'func')
@@ -98,14 +103,19 @@ def main(subject, bids_folder='/data'):
         elif run == 2:
             json_sidecar[
                 'IntendedFor'] = [f'func/sub-{subject:02d}_task-learn_run-2_bold.nii',
-                                  f'func/sub-{subject:02d}_task-learn_run-3_bold.nii']
+                                  f'func/sub-{subject:02d}_task-learn_run-3_bold.nii',
+                                  f'func/sub-{subject:02d}_task-learn_run-4_bold.nii'
+                                  ]
         elif run == 3:
             json_sidecar[
-                'IntendedFor'] = [f'func/sub-{subject:02d}_task-learn_run-4_bold.nii',
-                                  f'func/sub-{subject:02d}_task-learn_run-5_bold.nii']
+                'IntendedFor'] = [
+                
+                f'func/sub-{subject:02d}_task-learn_run-5_bold.nii'
+                                  ]
         elif run == 4:
             json_sidecar[
-                'IntendedFor'] = [f'func/sub-{subject:02d}_task-learn_run-6_bold.nii']
+                'IntendedFor'] = [
+                f'func/sub-{subject:02d}_task-learn_run-6_bold.nii']
         else:
             raise Exception("Run not between 1 and 4")
 
