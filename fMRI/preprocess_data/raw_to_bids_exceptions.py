@@ -12,13 +12,25 @@ import json
 
 
 def main(subject, bids_folder='/data'):
-    sourcedata_root = op.join(bids_folder, 'sourcedata', 'fmri',
-                              f'SNS_MRI_MLEARN_S{subject:05d}_01')
+    #sourcedata_root = op.join(bids_folder, 'sourcedata', 'fmri',
+    #                          f'SNS_MRI_MLEARN_S{subject:05d}_01')
+    sourcedata_folder1 = '//idnas32.uzh.ch/g_econ_rawdata$/rawdata/2022'
+    sourcedata_folder2 = '//idnas32.uzh.ch/g_econ_rawdata$/rawdata/2023'
+
+    sourcedata_root1 = [os.path.join(root, dir) for root, dirs, files in os.walk(sourcedata_folder1) for dir in dirs if dir == f'SNS_MRI_MLEARN_S{subject:05d}_01']
+    sourcedata_root2 = [os.path.join(root, dir) for root, dirs, files in os.walk(sourcedata_folder2) for dir in dirs if dir == f'SNS_MRI_MLEARN_S{subject:05d}_01']
+
+    if sourcedata_root1:
+        sourcedata_root = sourcedata_root1[0]
+    elif sourcedata_root2:
+        sourcedata_root = sourcedata_root2[0]
+    else:
+        print("folder not found")
 
     # *** ANATOMICAL DATA ***
     # So not vt1w, which are reconstructed at different angle
     t1w = glob.glob(op.join(sourcedata_root, '*_t1w*.nii'))
-    #t1w.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00047_01\\sn_08022023_172636_12_1_t1w3danat1mmsen.nii')
+    #t1w.remove(op.join(sourcedata_root, 'sn_08022023_172636_12_1_t1w3danat1mmsen.nii'))
     #print(op.join(sourcedata_root, '*_t1w*.nii'))
     assert (len(t1w) != 0), "No T1w {t1w}"
 
@@ -50,9 +62,9 @@ def main(subject, bids_folder='/data'):
     reg = re.compile('.*run(?P<run>[0-9]+).*')
     funcs = glob.glob(op.join(sourcedata_root, '*run*.nii'))
     #print(funcs)
-    #funcs.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00060_01\\sn_22022023_141914_7_1_fmri_run4sense.nii')
-    #funcs.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00060_01\\sn_22022023_142002_8_1_fmri_run4sense.nii')
-    #funcs.remove('T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data\\sourcedata\\fmri\\SNS_MRI_MLEARN_S00038_01\\sn_03022023_142810_8_1_fmri_run3sense.nii')
+    #funcs.remove(op.join(sourcedata_root, 'sn_22022023_141914_7_1_fmri_run4sense.nii'))
+    #funcs.remove(op.join(sourcedata_root, 'sn_22022023_142002_8_1_fmri_run4sense.nii'))
+    #funcs.remove(op.join(sourcedata_root, 'sn_03022023_142810_8_1_fmri_run3sense.nii'))
     print(funcs)
     runs = [int(reg.match(fn).group(1)) for fn in funcs]
 
@@ -102,19 +114,22 @@ def main(subject, bids_folder='/data'):
                 'IntendedFor'] = [f'func/sub-{subject:02d}_task-learn_run-1_bold.nii']
         elif run == 2:
             json_sidecar[
-                'IntendedFor'] = [f'func/sub-{subject:02d}_task-learn_run-2_bold.nii',
-                                  f'func/sub-{subject:02d}_task-learn_run-3_bold.nii',
-                                  f'func/sub-{subject:02d}_task-learn_run-4_bold.nii'
+                'IntendedFor'] = [
+                f'func/sub-{subject:02d}_task-learn_run-2_bold.nii',
+                        f'func/sub-{subject:02d}_task-learn_run-3_bold.nii',
+                            f'func/sub-{subject:02d}_task-learn_run-4_bold.nii'      
                                   ]
         elif run == 3:
             json_sidecar[
                 'IntendedFor'] = [
                 
                 f'func/sub-{subject:02d}_task-learn_run-5_bold.nii'
+
                                   ]
         elif run == 4:
             json_sidecar[
                 'IntendedFor'] = [
+                
                 f'func/sub-{subject:02d}_task-learn_run-6_bold.nii']
         else:
             raise Exception("Run not between 1 and 4")
@@ -176,7 +191,7 @@ def main(subject, bids_folder='/data'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('subject', type=int)
-    parser.add_argument('--bids_folder', default='T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data')
+    parser.add_argument('--bids_folder', default='D:/data')
     args = parser.parse_args()
 
     main(args.subject, bids_folder=args.bids_folder)

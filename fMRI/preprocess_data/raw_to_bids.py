@@ -12,8 +12,21 @@ import json
 
 
 def main(subject, bids_folder='/data'):
-    sourcedata_root = op.join(bids_folder, 'sourcedata', 'fmri',
-                              f'SNS_MRI_MLEARN_S{subject:05d}_01')
+    #sourcedata_root = op.join(bids_folder, 'sourcedata', 'fmri',
+    #                          f'SNS_MRI_MLEARN_S{subject:05d}_01')
+    
+    sourcedata_folder1 = '//idnas32.uzh.ch/g_econ_rawdata$/rawdata/2022'
+    sourcedata_folder2 = '//idnas32.uzh.ch/g_econ_rawdata$/rawdata/2023'
+
+    sourcedata_root1 = [os.path.join(root, dir) for root, dirs, files in os.walk(sourcedata_folder1) for dir in dirs if dir == f'SNS_MRI_MLEARN_S{subject:05d}_01']
+    sourcedata_root2 = [os.path.join(root, dir) for root, dirs, files in os.walk(sourcedata_folder2) for dir in dirs if dir == f'SNS_MRI_MLEARN_S{subject:05d}_01']
+
+    if sourcedata_root1:
+        sourcedata_root = sourcedata_root1[0]
+    elif sourcedata_root2:
+        sourcedata_root = sourcedata_root2[0]
+    else:
+        print("folder not found")
 
     # *** ANATOMICAL DATA ***
     # So not vt1w, which are reconstructed at different angle
@@ -165,7 +178,7 @@ def main(subject, bids_folder='/data'):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('subject', type=int)
-    parser.add_argument('--bids_folder', default='T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data')
+    parser.add_argument('--bids_folder', default='D:/data')
     args = parser.parse_args()
 
     main(args.subject, bids_folder=args.bids_folder)
