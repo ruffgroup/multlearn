@@ -1822,7 +1822,7 @@ def ma(interval, window_size = 10, method = 'same'):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-fitted = Fitting(60, 0, 5000, ID="58")
+fitted = Fitting(60, 0, 5000, ID="64")
 
 # # Run the simplest RL model
 #fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
