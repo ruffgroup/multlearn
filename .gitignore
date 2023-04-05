@@ -6,6 +6,9 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+# Ignore data and spm results folder
+data/
+SPM/results/
 # Ignore pdf files, png, pycache, matlab, npy
 *.pdf
 *.png
