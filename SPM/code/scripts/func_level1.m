@@ -1,4 +1,4 @@
-function func_level1(folder_processed, bids_folder, sub , model_version)
+function func_level1(folder_processed, bids_folder, SPM_folder, sub , model_version)
 
 spm('defaults', 'fMRI');
 
@@ -8,11 +8,10 @@ param_smoothing = 6; % what was the smoothing parameter?
 
 % % all times are in seconds
 % path of data
-mask_file = {'D:/multlearn/SPM/mask_ICV.nii,1'};
+mask_file = {fullfile(SPM_folder,'/mask_ICV.nii,1')};
 
 %path of results
-master_folder = ['D:/multlearn'];
-data.destination = fullfile(master_folder, 'SPM/results', model_version, sub);
+data.destination = fullfile(SPM_folder,'/results', model_version, sub);
 
 %% start spm 1stLvL model
 if ~exist(data.destination,'dir')

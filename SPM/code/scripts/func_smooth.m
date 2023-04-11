@@ -30,7 +30,6 @@ for ii = 1:numel(files)
 
     if ~exist(fullfile(files(ii).folder, [ 's' num2str(fhwm) '.' files(ii).name ]))
 
-        WaitSecs(3)
         matlabbatch{1}.spm.spatial.smooth.data = cellstr([spm_select('expand',[fullfile(files(ii).folder, files(ii).name)])]);
 
         matlabbatch{1}.spm.spatial.smooth.fwhm = [fhwm fhwm fhwm];

@@ -5,19 +5,25 @@ clear all
 ISrun_level1 = 1;
 del_old_con = 0; % delete old contrasts if you re-run only second level analyses
 
-master_folder = ['D:/multlearn'];
-
-path.folder_processed = dir(fullfile(master_folder, 'data/ds-mlearn/derivatives/fmriprep'));
+path.folder_processed = dir(fullfile('../../../data/ds-mlearn/derivatives/fmriprep'));
 path.folder_processed = [path.folder_processed(1).folder '/'];
-path.bids_folder = dir(fullfile(master_folder, 'data/ds-mlearn'));
+path.bids_folder = dir(fullfile('../../../data/ds-mlearn'));
 path.bids_folder = [path.bids_folder(1).folder '/'];
+path.SPM_folder = dir(fullfile('../../SPM'));
+path.SPM_folder = [path.SPM_folder(1).folder '/'];
 
 
 subs = dir(fullfile(path.folder_processed, 'sub-*'));
 subs = subs([subs.isdir]');
+subs = subs(~contains({subs.name},{'sub-08', 'sub-13', 'sub-44'}));
 
-addpath(fullfile(master_folder, 'SPM/code/scripts'));
+addpath(fullfile('scripts'));
 
+%% Create conditions file
+for i = ["SPE"] % SPE, RPE, ALL
+    model_version = i;
+    conditions(i)
+end
 
 %% 1. run tapas
 
@@ -31,12 +37,12 @@ addpath(fullfile(master_folder, 'SPM/code/scripts'));
 
 %%
 % 2. Smooth
-
-TotalNumRuns = 6;
-parfor (ii=1:numel(subs),4)
-    ii
-    func_smooth(subs(ii).folder, subs(ii).name, TotalNumRuns);
-end
+% 
+% TotalNumRuns = 6;
+% parfor (ii=1:numel(subs),4)
+%     ii
+%     func_smooth(subs(ii).folder, subs(ii).name, TotalNumRuns);
+% end
 
 %% 3. run estimation
 % level 1 analysis
@@ -49,7 +55,7 @@ for i = ["SPE"] % SPE, RPE, ALL
     model_version = i;
     if ISrun_level1 == 1
         parfor (sub = 1:numSubs,M)
-            func_level1(path.folder_processed, path.bids_folder, subs(sub).name , model_version)
+            func_level1(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name , model_version)
         end
 
     end
