@@ -33,9 +33,9 @@ class Fitting:
         self.statLearnPar = 1
 
         if platform.system() == 'Windows':
-            wanted_dir = 'T:/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data/sourcedata/behavior/modified_files'
+            wanted_dir = '/data/sourcedata/behavior/modified_files'
         else:
-            wanted_dir = '/Volumes/g_econ_department$/projects/2022/bedi_casimiro_ruff_multisensorylearningfmri/data/sourcedata/behavior/modified_files'
+            wanted_dir = '/data/sourcedata/behavior/modified_files'
         # Get savedVals file
         self.savedValsFile = glob.glob(os.path.abspath(wanted_dir)+"/*{}_savedValues.csv".format(self.ID))[0]
     
@@ -254,6 +254,10 @@ class Fitting:
             RPE[run] = run_RPEs[minIndex]
             V0[run] = run_V0[minIndex]
             V1[run] = run_V1[minIndex]
+
+        newPath = os.path.join(pathlib.Path(__file__).parents[3].resolve(), "data/fittedParameters/sub-{}".format(self.ID))
+        Path(newPath).mkdir(parents=True, exist_ok=True)
+        scipy.io.savemat(newPath+'/rpeSimple.mat'.format(self.ID), mdict={'rpe': RPE})
 
         return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
 
@@ -1759,7 +1763,7 @@ class Fitting:
                 trial_surprise[i] = statSurprise[(i,) + runData.stimulusPair[i]]
             ID_surprise[run] = trial_surprise
 
-        newPath = os.path.join(pathlib.Path(__file__).parent.resolve(), "fittedParameters/sub-{}".format(self.ID))
+        newPath = os.path.join(pathlib.Path(__file__).parents[3].resolve(), "fittedParameters/sub-{}".format(self.ID))
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath+'/spe.mat'.format(self.ID), mdict={'spe': ID_surprise})
         return ID_beliefs, ID_surprise
@@ -1825,7 +1829,7 @@ def ma(interval, window_size = 10, method = 'same'):
 fitted = Fitting(60, 0, 5000, ID="64")
 
 # # Run the simplest RL model
-#fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
+fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
 
 #fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
@@ -1854,7 +1858,7 @@ fitted = Fitting(60, 0, 5000, ID="64")
 
 
 # You can always include statistical learning; necessary to get surprise values
-beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
+#beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
 #fitted.plots_stats(beliefs, surprise)
 
 # Run to save RPE and surprise values; rename .mat files yourself (e.g. based on model)
