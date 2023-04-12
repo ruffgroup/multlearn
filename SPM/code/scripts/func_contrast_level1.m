@@ -69,14 +69,6 @@ matlabbatch{1}.spm.stats.con.consess{7}.tcon.name = 'audio-tactile';
 matlabbatch{1}.spm.stats.con.consess{7}.tcon.weights = contrasts_audio - contrasts_tactile;
 matlabbatch{1}.spm.stats.con.consess{7}.tcon.sessrep = 'none';
 
-matlabbatch{1}.spm.stats.con.consess{8}.tcon.name = 'audio';
-matlabbatch{1}.spm.stats.con.consess{8}.tcon.weights = contrasts_audio;
-matlabbatch{1}.spm.stats.con.consess{8}.tcon.sessrep = 'none';
-
-matlabbatch{1}.spm.stats.con.consess{9}.tcon.name = 'tactile';
-matlabbatch{1}.spm.stats.con.consess{9}.tcon.weights = contrasts_tactile;
-matlabbatch{1}.spm.stats.con.consess{9}.tcon.sessrep = 'none';
-
 
 matlabbatch{1}.spm.stats.con.delete = del_old_con;
 %%
