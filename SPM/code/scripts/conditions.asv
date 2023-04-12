@@ -19,20 +19,18 @@ feedbackIdx = find(events.trial_type == "feedback");
 
 spe = load(['/data/fittedParameters/sub-' subject '/spe.mat']).spe;
 if runType == "tactile"
-    names{1} = 'ChoiceTactile';
-    names{2} = 'FeedbackTactile';
-    pmod = struct('name', {}, 'param', {}, 'poly', {});
-    pmod(1).name{1}  = 'StatisticalTactile';
-elseif runType == "audio"
-    names{1} = 'ChoiceAudio';
-    names{2} = 'FeedbackAudio';
-    pmod = struct('name', {}, 'param', {}, 'poly', {});
-    pmod(1).name{1} = 'StatisticalAudio';
-end
+names{1} = 'Choice';
 onsets{1} = events.onset(choiceIdx);
 durations{1} = events.duration(choiceIdx);
+names{2} = 'Feedback';
 onsets{2} = events.onset(feedbackIdx);
 durations{2} = events.duration(feedbackIdx);
+pmod = struct('name', {}, 'param', {}, 'poly', {});
+
+pmod(1).name{1}  = 'StatisticalTactile';
+elseif runType == "audio"
+pmod(1).name{1} = 'StatisticalAudio';
+end
 pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
 pmod(1).poly{1}  = 1;
 orth{1} = false;

@@ -2,7 +2,7 @@
 clear all
 
 % SETTINGS:
-ISrun_level1 = 1;
+ISrun_level1 = 0;
 del_old_con = 0; % delete old contrasts if you re-run only second level analyses
 
 path.folder_processed = dir(fullfile('../../../data/ds-mlearn/derivatives/fmriprep'));
@@ -66,7 +66,7 @@ for i = ["SPE"] % SPE, RPE, ALL
 
 
 
-    num_contasts = 1; % number set in func_contrast_level1
+    num_contasts = 9; % number set in func_contrast_level1
 
     parfor (k = 1:num_contasts,M)
         func_level2(path,subs, model_version, k);

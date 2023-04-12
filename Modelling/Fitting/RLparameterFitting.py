@@ -32,35 +32,32 @@ class Fitting:
         self.ID = ID
         self.statLearnPar = 1
 
-        if platform.system() == 'Windows':
-            wanted_dir = '/data/sourcedata/behavior/modified_files'
-        else:
-            wanted_dir = '/data/sourcedata/behavior/modified_files'
+
+        wanted_dir = '/data/sourcedata/behavior/modified_files'
         # Get savedVals file
         self.savedValsFile = glob.glob(os.path.abspath(wanted_dir)+"/*{}_savedValues.csv".format(self.ID))[0]
-    
+        self.subjectData = pd.read_csv(self.savedValsFile)
+        self.subjectData['stimulusPair'] = self.subjectData['stimulusPair'].apply(ast.literal_eval)
     ## Simple fitting
 
     def simplestFitting(self):
               
-        subjectData = pd.read_csv(self.savedValsFile)
-        subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
-        fitted_alphas = np.empty((max(subjectData.runNumber)))
-        fitted_betas = np.empty((max(subjectData.runNumber)))
-        best_LLs = np.empty((max(subjectData.runNumber)))
-        NLL_array = np.empty((max(subjectData.runNumber), self.gridCount, 3))
+        fitted_alphas = np.empty((max(self.subjectData.runNumber)))
+        fitted_betas = np.empty((max(self.subjectData.runNumber)))
+        best_LLs = np.empty((max(self.subjectData.runNumber)))
+        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 3))
         NLL_array[:] = np.nan
 
-        RPE = np.empty((max(subjectData.runNumber), self.mainTrials + self.additionalTrials))
-        V0 = np.empty((max(subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
-        V1 = np.empty((max(subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
+        RPE = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials))
+        V0 = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
+        V1 = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
 
-        for run in range(0, max(subjectData.runNumber)):
+        for run in range(0, max(self.subjectData.runNumber)):
 
             alphaGrid = np.random.rand(self.gridCount, 1)
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
-            runData = subjectData[subjectData.runNumber == run + 1].reset_index()
+            runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
             run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
             run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
@@ -156,160 +153,133 @@ class Fitting:
     ## Value fitting
 
     def valFitting(self):
+        
+        fitted_alphas = np.empty((max(self.subjectData.runNumber)))
+        fitted_betas = np.empty((max(self.subjectData.runNumber)))
+        best_LLs = np.empty((max(self.subjectData.runNumber)))
+        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 5))
+        NLL_array[:] = np.nan
 
-        self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
-        self.all_betas = np.empty((len(np.unique(self.IDs)), 6))
-        self.all_LLs = np.empty((len(np.unique(self.IDs)), 6))
-        self.all_V_option0Inits = np.empty((len(np.unique(self.IDs)), 6, 3, 3))
-        self.all_V_option1Inits = np.empty((len(np.unique(self.IDs)), 6, 3, 3))
-        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 6, self.gridCount, 5))
-        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
-        self.all_V0 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
-        self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
+        RPE = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials))
+        V0 = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
+        V1 = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
 
-        count = 0
-        for ID in np.unique(self.IDs):
 
-            print(ID)
-            print("val")
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-            subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
-            # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
-            fitted_alphas = np.empty((1, 6))
-            fitted_betas = np.empty((1, 6))
-            best_LLs = np.empty((1, 6))
-            fitted_V_option0Inits = np.empty((1, 6, 3, 3))
-            fitted_V_option1Inits = np.empty((1, 6, 3, 3))
+        fitted_V_option0Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
+        fitted_V_option1Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
 
-            ID_RPE = np.empty((1, 6, self.mainTrials + self.additionalTrials))
-            ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
-            ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
+        for run in range(0, max(self.subjectData.runNumber)):
 
-            for run in range(0, max(subjectData.runNumber)):
+            runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
+            alphaGrid = np.random.rand(self.gridCount, 1)
+            betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
+            LL_array = np.empty((self.gridCount, 1))
+            # V_option0Init_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
+            V_option0_rand = np.random.rand(self.gridCount, 1)
+            V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
+            # V_option1Init_Grid = np.random.uniform(0, 1, (self.gridCount, 3, 3))
+            V_option1_rand = np.random.rand(self.gridCount, 1)
+            V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
-                alphaGrid = np.random.rand(self.gridCount, 1)
-                betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
-                # V_option0Init_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
-                V_option0_rand = np.random.rand(self.gridCount, 1)
-                V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
-                # V_option1Init_Grid = np.random.uniform(0, 1, (self.gridCount, 3, 3))
-                V_option1_rand = np.random.rand(self.gridCount, 1)
-                V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
-                NLL_array = np.empty((self.gridCount, 5))
-                NLL_array[:] = np.nan
-                LL_array = np.empty((self.gridCount, 1))
+            run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
+            run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
+            run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
 
-                run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
-                run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
-                run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
+            # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
+            for j in range(0, self.gridCount):
+                # For each point on the grid we instantiate the arrays for the time steps-
+                """Instantiating for the fitting"""
 
-                # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
-                for j in range(0, self.gridCount):
-                    # For each point on the grid we instantiate the arrays for the time steps-
-                    """Instantiating for the fitting"""
+                choiceProb = np.empty((max(runData.trialNumber), 2))
+                choiceProb[:] = np.nan
+                actionProb = np.empty((max(runData.trialNumber), 1))
+                actionProb[:] = np.nan
+                V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
+                V_option0[:] = np.nan
+                V_option0[0, :] = V_option0Init_Grid[j]
+                V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
+                V_option1[:] = np.nan
+                V_option1[0, :] = V_option1Init_Grid[j]
+                rewardPE = np.empty((max(runData.trialNumber), 3, 3))
+                rewardPE[:] = np.nan
 
-                    choiceProb = np.empty((max(runData.trialNumber), 2))
-                    choiceProb[:] = np.nan
-                    actionProb = np.empty((max(runData.trialNumber), 1))
-                    actionProb[:] = np.nan
-                    V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                    V_option0[:] = np.nan
-                    V_option0[0, :] = V_option0Init_Grid[j]
-                    V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                    V_option1[:] = np.nan
-                    V_option1[0, :] = V_option1Init_Grid[j]
-                    rewardPE = np.empty((max(runData.trialNumber), 3, 3))
-                    rewardPE[:] = np.nan
+                # Checking parameters from the grid
+                alphaCheck = alphaGrid[j]
+                betaCheck = betaGrid[j]
+                run_V0[j, 0] = V_option0[0, 0, 0]
+                run_V1[j, 0] = V_option1[0, 0, 0]
 
-                    # Checking parameters from the grid
-                    alphaCheck = alphaGrid[j]
-                    betaCheck = betaGrid[j]
-                    trials_RPE = np.empty((max(runData.trialNumber)))
-                    trials_V0 = np.empty((max(runData.trialNumber) + 1))
-                    trials_V1 = np.empty((max(runData.trialNumber) + 1))
-                    trials_V0[0] = V_option0[0, 0, 0]
-                    trials_V1[0] = V_option1[0, 0, 0]
+                for t in range(0, max(runData.trialNumber)):
+                    # Prob of choosing the 0th and 1st option respectively
+                    choiceProb[t, 0] = np.exp(betaCheck * V_option0[
+                        ((t,) + runData.stimulusPair[t])]) / ((np.exp(
+                        betaCheck * V_option0[
+                            ((t,) + runData.stimulusPair[t])])) + (np.exp(
+                        betaCheck * V_option1[
+                            ((t,) + runData.stimulusPair[t])])))
+                    choiceProb[t, 1] = 1 - choiceProb[t, 0]
 
-                    for t in range(0, max(runData.trialNumber)):
-                        # Prob of choosing the 0th and 1st option respectively
-                        choiceProb[t, 0] = np.exp(betaCheck * V_option0[
-                            ((t,) + runData.stimulusPair[t])]) / ((np.exp(
-                            betaCheck * V_option0[
-                                ((t,) + runData.stimulusPair[t])])) + (np.exp(
-                            betaCheck * V_option1[
-                                ((t,) + runData.stimulusPair[t])])))
-                        choiceProb[t, 1] = 1 - choiceProb[t, 0]
+                    actionProb[t, :] = choiceProb[t, int(runData.action[t])] if ~np.isnan(
+                        runData.action[t]) else np.nan
 
-                        actionProb[t, :] = choiceProb[t, int(runData.action[t])] if ~np.isnan(
-                            runData.action[t]) else np.nan
+                    if runData.action[t] == 0:
+                        rewardPE[(t,) + runData.stimulusPair[t]] = \
+                            runData.reward[t] - V_option0[(t,) + runData.stimulusPair[t]]
 
-                        if runData.action[t] == 0:
-                            rewardPE[(t,) + runData.stimulusPair[t]] = \
-                                runData.reward[t] - V_option0[(t,) + runData.stimulusPair[t]]
+                        V_option0[t + 1, :] = V_option0[t, :]
+                        V_option0[(t + 1,) + runData.stimulusPair[t]] = \
+                            V_option0[(t,) + runData.stimulusPair[t]] + \
+                            alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
 
-                            V_option0[t + 1, :] = V_option0[t, :]
-                            V_option0[(t + 1,) + runData.stimulusPair[t]] = \
-                                V_option0[(t,) + runData.stimulusPair[t]] + \
-                                alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                        V_option1[t + 1, :] = V_option1[t, :]
 
-                            V_option1[t + 1, :] = V_option1[t, :]
+                    elif runData.action[t] == 1:
+                        rewardPE[(t,) + runData.stimulusPair[t]] = \
+                            runData.reward[t] - V_option1[(t,) + runData.stimulusPair[t]]
 
-                        elif runData.action[t] == 1:
-                            rewardPE[(t,) + runData.stimulusPair[t]] = \
-                                runData.reward[t] - V_option1[(t,) + runData.stimulusPair[t]]
+                        V_option1[t + 1, :] = V_option1[t, :]
+                        V_option1[(t + 1,) + runData.stimulusPair[t]] = \
+                            V_option1[(t,) + runData.stimulusPair[t]] + \
+                            alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                        V_option0[t + 1, :] = V_option0[t, :]
+                    else:
+                        V_option1[t + 1, :] = V_option1[t, :]
+                        V_option0[t + 1, :] = V_option0[t, :]
 
-                            V_option1[t + 1, :] = V_option1[t, :]
-                            V_option1[(t + 1,) + runData.stimulusPair[t]] = \
-                                V_option1[(t,) + runData.stimulusPair[t]] + \
-                                alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
-                            V_option0[t + 1, :] = V_option0[t, :]
-                        else:
-                            V_option1[t + 1, :] = V_option1[t, :]
-                            V_option0[t + 1, :] = V_option0[t, :]
+                    run_RPEs[j, t] = rewardPE[(t,) + runData.stimulusPair[t]]
+                    run_V0[j, t + 1] = V_option0[(t + 1,) + runData.stimulusPair[t]]
+                    run_V1[j, t + 1] = V_option1[(t + 1,) + runData.stimulusPair[t]]
 
-                        trials_RPE[t] = rewardPE[(t,) + runData.stimulusPair[t]]
-                        trials_V0[t + 1] = V_option0[(t + 1,) + runData.stimulusPair[t]]
-                        trials_V1[t + 1] = V_option1[(t + 1,) + runData.stimulusPair[t]]
+                negativeLogLikelihood = -np.sum(np.log(actionProb[~np.isnan(actionProb)]))
+                Likelihood = np.prod(actionProb[~np.isnan(actionProb)])
 
-                    negativeLogLikelihood = -np.sum(np.log(actionProb[~np.isnan(actionProb)]))
-                    Likelihood = np.prod(actionProb[~np.isnan(actionProb)])
-                    NLL_array[j, 0] = alphaCheck
-                    NLL_array[j, 1] = betaCheck
-                    NLL_array[j, 2] = negativeLogLikelihood
-                    NLL_array[j, 3] = V_option0Init_Grid[j][0][0]
-                    NLL_array[j, 4] = V_option1Init_Grid[j][0][0]
-                    LL_array[j, 0] = Likelihood
+                NLL_array[run, j, 0] = alphaCheck
+                NLL_array[run, j, 1] = betaCheck
+                NLL_array[run, j, 2] = negativeLogLikelihood
+                NLL_array[run, j, 3] = V_option0Init_Grid[j][0][0]
+                NLL_array[run, j, 4] = V_option1Init_Grid[j][0][0]
+                LL_array[j, 0] = Likelihood
 
-                    run_RPEs[j] = trials_RPE
-                    run_V0[j] = trials_V0
-                    run_V1[j] = trials_V1
+            minIndex = np.argmin(NLL_array[run, :, 2])
+            maxIndex = np.nanargmax(LL_array[:, 0])
+            fittedAlpha = NLL_array[run, minIndex, 0]
+            fittedBeta = NLL_array[run, minIndex, 1]
 
-                minIndex = np.argmin(NLL_array[:, 2])
-                maxIndex = np.nanargmax(LL_array[:, 0])
-                fittedAlpha = NLL_array[minIndex, 0]
-                fittedBeta = NLL_array[minIndex, 1]
+            fitted_alphas[run] = fittedAlpha
+            fitted_betas[run] = fittedBeta
+            best_LLs[run] = LL_array[maxIndex]
+            fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
+            fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
+            RPE[run] = run_RPEs[minIndex]
+            V0[run] = run_V0[minIndex]
+            V1[run] = run_V1[minIndex]
 
-                self.NLL_arrays[count, run, :, :] = NLL_array
-                fitted_alphas[0, run] = fittedAlpha
-                fitted_betas[0, run] = fittedBeta
-                best_LLs[0, run] = LL_array[maxIndex]
-                fitted_V_option0Inits[0, run] = V_option0Init_Grid[minIndex]
-                fitted_V_option1Inits[0, run] = V_option1Init_Grid[minIndex]
-                ID_RPE[0, run] = run_RPEs[minIndex]
-                ID_V0[0, run] = run_V0[minIndex]
-                ID_V1[0, run] = run_V1[minIndex]
+        newPath = os.path.join(pathlib.Path(__file__).parents[3].resolve(), "data/fittedParameters/sub-{}".format(self.ID))
+        Path(newPath).mkdir(parents=True, exist_ok=True)
+        scipy.io.savemat(newPath+'/rpeVal.mat'.format(self.ID), mdict={'rpe': RPE})
 
-            self.all_alphas[count, :] = fitted_alphas
-            self.all_betas[count, :] = fitted_betas
-            self.all_LLs[count, :] = best_LLs
-            self.all_V_option0Inits[count, :] = fitted_V_option0Inits
-            self.all_V_option1Inits[count, :] = fitted_V_option1Inits
-            self.all_RPEs[count] = ID_RPE
-            self.all_V0[count] = ID_V0
-            self.all_V1[count] = ID_V1
+        return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
 
-            count += 1
 
     # Extra update rule multiple versions
 
@@ -337,8 +307,8 @@ class Fitting:
         count = 0
         for ID in np.unique(self.IDs):
             print(ID)
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-            subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
+            self.subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
+            self.subjectData['stimulusPair'] = self.subjectData['stimulusPair'].apply(ast.literal_eval)
             # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
             fitted_alphas = np.empty((1, 6))
             fitted_betas = np.empty((1, 6))
@@ -354,7 +324,7 @@ class Fitting:
             ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
             ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
 
-            for run in range(0, max(subjectData.runNumber)):
+            for run in range(0, max(self.subjectData.runNumber)):
 
                 alphaGrid = np.random.rand(self.gridCount, 1)
                 alpha2Grid = np.random.rand(self.gridCount, 1)
@@ -368,7 +338,7 @@ class Fitting:
                 NLL_array = np.empty((self.gridCount, 7))
                 NLL_array[:] = np.nan
                 LL_array = np.empty((self.gridCount, 1))
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
+                runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
                 run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
                 run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
                 run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
@@ -558,8 +528,8 @@ class Fitting:
         count = 0
         for ID in np.unique(self.IDs):
 
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-            subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
+            self.subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
+            self.subjectData['stimulusPair'] = self.subjectData['stimulusPair'].apply(ast.literal_eval)
             # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
             fitted_alphas = np.empty((1, 6))
             fitted_betas = np.empty((1, 6))
@@ -577,7 +547,7 @@ class Fitting:
             ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
             ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
 
-            for run in range(0, max(subjectData.runNumber)):
+            for run in range(0, max(self.subjectData.runNumber)):
 
                 alphaGrid = np.random.rand(self.gridCount, 1)
                 alpha2Grid = np.random.rand(self.gridCount, 1)
@@ -597,7 +567,7 @@ class Fitting:
                 NLL_array = np.empty((self.gridCount, 9))
                 NLL_array[:] = np.nan
                 LL_array = np.empty((self.gridCount, 1))
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
+                runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
                 run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
                 run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
                 run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
@@ -775,11 +745,11 @@ class Fitting:
         self.statLearnPar = statLearnPar
         
 
-        subjectData = pd.read_csv(self.savedValsFile)
-        subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
+        self.subjectData = pd.read_csv(self.savedValsFile)
+        self.subjectData['stimulusPair'] = self.subjectData['stimulusPair'].apply(ast.literal_eval)
         ID_beliefs = np.empty((6, self.mainTrials + self.additionalTrials + 1, 3, 3))
         ID_surprise = np.empty((6, self.mainTrials + self.additionalTrials))
-        for run in range(0, max(subjectData.runNumber)):
+        for run in range(0, max(self.subjectData.runNumber)):
 
             rowBeliefs = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
             rowBeliefs[:] = np.nan
@@ -795,7 +765,7 @@ class Fitting:
             statSurpriseColumn = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
             statSurpriseColumn[:] = np.nan
 
-            runData = subjectData[subjectData.runNumber == run + 1].reset_index()
+            runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             rowDen0 = 3 * self.statLearnPar
             rowDen1 = 3 * self.statLearnPar
             rowDen2 = 3 * self.statLearnPar
@@ -878,7 +848,7 @@ def ma(interval, window_size = 10, method = 'same'):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-fitted = Fitting(60, 0, 5000, ID="62")
+fitted = Fitting(60, 0, 5000, ID="18")
 
 # # Run the simplest RL model
 fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
@@ -912,18 +882,6 @@ fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestF
 # You can always include statistical learning; necessary to get surprise values
 #beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
 #fitted.plots_stats(beliefs, surprise)
-
-# Run to save RPE and surprise values; rename .mat files yourself (e.g. based on model)
-#RPE_arr = fitted.all_RPEs
-#scipy.io.savemat('rpe_upInit4.mat', mdict={'RPE_arr': RPE_arr})
-#SPE_arr = fitted.all_surprise
-#scipy.io.savemat('spe_upInit4.mat', mdict={'SPE_arr': SPE_arr})
-
-#Run to save V0 and V1 values; rename .mat files yourself (e.g. based on model)
-# V0_arr = fitted.all_V0
-# scipy.io.savemat('v0.mat', mdict={'V0_arr': V0_arr})
-# V1_arr = fitted.all_V1
-# scipy.io.savemat('v1.mat', mdict={'V1_arr': V1_arr})
 
 # Save max log likelihood values if you want to do model comparison later; rename np array yourself (e.g. based on model)
 # with open('BIC_new_upInit4.npy', 'wb') as f:
