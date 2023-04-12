@@ -133,11 +133,9 @@ class Fitting:
 
             minIndex = np.argmin(NLL_array[run, :, 2])
             maxIndex = np.nanargmax(LL_array[:, 0])
-            fittedAlpha = NLL_array[run, minIndex, 0]
-            fittedBeta = NLL_array[run, minIndex, 1]
-
-            fitted_alphas[run] = fittedAlpha
-            fitted_betas[run] = fittedBeta
+            
+            fitted_alphas[run] = NLL_array[run, minIndex, 0]
+            fitted_betas[run] = NLL_array[run, minIndex, 1]
             best_LLs[run] = LL_array[maxIndex]
             RPE[run] = run_RPEs[minIndex]
             V0[run] = run_V0[minIndex]
@@ -262,11 +260,9 @@ class Fitting:
 
             minIndex = np.argmin(NLL_array[run, :, 2])
             maxIndex = np.nanargmax(LL_array[:, 0])
-            fittedAlpha = NLL_array[run, minIndex, 0]
-            fittedBeta = NLL_array[run, minIndex, 1]
 
-            fitted_alphas[run] = fittedAlpha
-            fitted_betas[run] = fittedBeta
+            fitted_alphas[run] = NLL_array[run, minIndex, 0]
+            fitted_betas[run] = NLL_array[run, minIndex, 1]
             best_LLs[run] = LL_array[maxIndex]
             fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
             fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
@@ -278,7 +274,7 @@ class Fitting:
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath+'/rpeVal.mat'.format(self.ID), mdict={'rpe': RPE})
 
-        return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
+        return fitted_alphas, fitted_betas, best_LLs, fitted_V_option0Inits, fitted_V_option1Inits, RPE, V0, V1, NLL_array
 
 
     # Extra update rule multiple versions
@@ -289,221 +285,197 @@ class Fitting:
 # Meanwhile when version is "two", then there is action dependance, ACTION AND REWARD (4)
     def updateFitting(self, version=None):
 
-        self.all_alphas = np.empty((len(np.unique(self.IDs)), 6))
-        self.all_betas = np.empty((len(np.unique(self.IDs)), 6))
-        self.all_alphas2 = np.empty((len(np.unique(self.IDs)), 6))
+        fitted_alphas = np.empty((max(self.subjectData.runNumber)))
+        fitted_alphas2 = np.empty((max(self.subjectData.runNumber)))
         if version == "two":
-            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 6))
+            fitted_alphas3 = np.empty((max(self.subjectData.runNumber)))
         elif version == "four":
-            self.all_alphas3 = np.empty((len(np.unique(self.IDs)), 6))
-            self.all_alphas4 = np.empty((len(np.unique(self.IDs)), 6))
-            self.all_alphas5 = np.empty((len(np.unique(self.IDs)), 6))
-        self.all_LLs = np.empty((len(np.unique(self.IDs)), 6))
-        self.NLL_arrays = np.empty((len(np.unique(self.IDs)), 6, self.gridCount, 7))
-        self.all_RPEs = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials))
-        self.all_V0 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
-        self.all_V1 = np.empty((len(np.unique(self.IDs)), 6, self.mainTrials + self.additionalTrials + 1))
+            fitted_alphas3 = np.empty((max(self.subjectData.runNumber)))
+            fitted_alphas4 = np.empty((max(self.subjectData.runNumber)))
+            fitted_alphas5 = np.empty((max(self.subjectData.runNumber)))
 
-        count = 0
-        for ID in np.unique(self.IDs):
-            print(ID)
-            self.subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-            self.subjectData['stimulusPair'] = self.subjectData['stimulusPair'].apply(ast.literal_eval)
-            # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
-            fitted_alphas = np.empty((1, 6))
-            fitted_betas = np.empty((1, 6))
-            fitted_alphas2 = np.empty((1, 6))
+        fitted_betas = np.empty((max(self.subjectData.runNumber)))
+        best_LLs = np.empty((max(self.subjectData.runNumber)))
+        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 5))
+        NLL_array[:] = np.nan
+
+        RPE = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials))
+        V0 = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
+        V1 = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials + 1))
+
+        for run in range(0, max(self.subjectData.runNumber)):
+
+            alphaGrid = np.random.rand(self.gridCount, 1)
+            alpha2Grid = np.random.rand(self.gridCount, 1)
             if version == "two":
-                fitted_alphas3 = np.empty((1, 6))
+                alpha3Grid = np.random.rand(self.gridCount, 1)
             elif version == "four":
-                fitted_alphas3 = np.empty((1, 6))
-                fitted_alphas4 = np.empty((1, 6))
-                fitted_alphas5 = np.empty((1, 6))
-            best_LLs = np.empty((1, 6))
-            ID_RPE = np.empty((1, 6, self.mainTrials + self.additionalTrials))
-            ID_V0 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
-            ID_V1 = np.empty((1, 6, self.mainTrials + self.additionalTrials + 1))
+                alpha3Grid = np.random.rand(self.gridCount, 1)
+                alpha4Grid = np.random.rand(self.gridCount, 1)
+                alpha5Grid = np.random.rand(self.gridCount, 1)
+            betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
+            LL_array = np.empty((self.gridCount, 1))
+            runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
+            run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
+            run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
+            run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
+            # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
+            for j in range(0, self.gridCount):
+                # For each point on the grid we instantiate the arrays for the time steps-
+                """Instantiating for the fitting"""
 
-            for run in range(0, max(self.subjectData.runNumber)):
+                self.choiceProb = np.empty((max(runData.trialNumber), 2))
+                self.choiceProb[:] = np.nan
+                self.actionProb = np.empty((max(runData.trialNumber), 1))
+                self.actionProb[:] = np.nan
+                self.V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
+                self.V_option0[:] = np.nan
+                self.V_option0[0, :] = 0.5
+                self.V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
+                self.V_option1[:] = np.nan
+                self.V_option1[0, :] = 0.5
+                self.rewardPE = np.empty((max(runData.trialNumber), 3, 3))
+                self.rewardPE[:] = np.nan
 
-                alphaGrid = np.random.rand(self.gridCount, 1)
-                alpha2Grid = np.random.rand(self.gridCount, 1)
+                # Checking parameters from the grid
+                alphaCheck = alphaGrid[j]
+                alpha2Check = alpha2Grid[j]
                 if version == "two":
-                    alpha3Grid = np.random.rand(self.gridCount, 1)
+                    alpha3Check = alpha3Grid[j]
                 elif version == "four":
-                    alpha3Grid = np.random.rand(self.gridCount, 1)
-                    alpha4Grid = np.random.rand(self.gridCount, 1)
-                    alpha5Grid = np.random.rand(self.gridCount, 1)
-                betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
-                NLL_array = np.empty((self.gridCount, 7))
-                NLL_array[:] = np.nan
-                LL_array = np.empty((self.gridCount, 1))
-                runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
-                run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
-                run_V0 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
-                run_V1 = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
-                # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
-                for j in range(0, self.gridCount):
-                    # For each point on the grid we instantiate the arrays for the time steps-
-                    """Instantiating for the fitting"""
+                    alpha3Check = alpha3Grid[j]
+                    alpha4Check = alpha4Grid[j]
+                    alpha5Check = alpha5Grid[j]
+                betaCheck = betaGrid[j]
+                
+                run_V0[j, 0] = self.V_option0[0, 0, 0]
+                run_V1[j, 0] = self.V_option1[0, 0, 0]
+                for t in range(0, max(runData.trialNumber)):
+                    otherPairs = [p for p in list(runData.stimulusPair.unique())
+                                    if bool(p[0] == runData.stimulusPair[t][0]) ^
+                                    bool(p[1] == runData.stimulusPair[t][1])]
 
-                    self.choiceProb = np.empty((max(runData.trialNumber), 2))
-                    self.choiceProb[:] = np.nan
-                    self.actionProb = np.empty((max(runData.trialNumber), 1))
-                    self.actionProb[:] = np.nan
-                    self.V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                    self.V_option0[:] = np.nan
-                    self.V_option0[0, :] = 0.5
-                    self.V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                    self.V_option1[:] = np.nan
-                    self.V_option1[0, :] = 0.5
-                    self.rewardPE = np.empty((max(runData.trialNumber), 3, 3))
-                    self.rewardPE[:] = np.nan
+                    # Prob of choosing the 0th and 1st option respectively
+                    self.choiceProb[t, 0] = np.exp(betaCheck * self.V_option0[
+                        ((t,) + runData.stimulusPair[t])]) / ((np.exp(
+                        betaCheck * self.V_option0[
+                            ((t,) + runData.stimulusPair[t])])) + (np.exp(
+                        betaCheck * self.V_option1[
+                            ((t,) + runData.stimulusPair[t])])))
+                    self.choiceProb[t, 1] = 1 - self.choiceProb[t, 0]
 
-                    # Checking parameters from the grid
-                    alphaCheck = alphaGrid[j]
-                    alpha2Check = alpha2Grid[j]
-                    if version == "two":
-                        alpha3Check = alpha3Grid[j]
-                    elif version == "four":
-                        alpha3Check = alpha3Grid[j]
-                        alpha4Check = alpha4Grid[j]
-                        alpha5Check = alpha5Grid[j]
-                    betaCheck = betaGrid[j]
-                    trials_RPE = np.empty((max(runData.trialNumber)))
-                    trials_V0 = np.empty((max(runData.trialNumber) + 1))
-                    trials_V1 = np.empty((max(runData.trialNumber) + 1))
-                    trials_V0[0] = self.V_option0[0, 0, 0]
-                    trials_V1[0] = self.V_option1[0, 0, 0]
-                    for t in range(0, max(runData.trialNumber)):
-                        otherPairs = [p for p in list(runData.stimulusPair.unique())
-                                      if bool(p[0] == runData.stimulusPair[t][0]) ^
-                                      bool(p[1] == runData.stimulusPair[t][1])]
+                    self.actionProb[t, :] = self.choiceProb[t, int(runData.action[t])] if ~np.isnan(
+                        runData.action[t]) else np.nan
 
-                        # Prob of choosing the 0th and 1st option respectively
-                        self.choiceProb[t, 0] = np.exp(betaCheck * self.V_option0[
-                            ((t,) + runData.stimulusPair[t])]) / ((np.exp(
-                            betaCheck * self.V_option0[
-                                ((t,) + runData.stimulusPair[t])])) + (np.exp(
-                            betaCheck * self.V_option1[
-                                ((t,) + runData.stimulusPair[t])])))
-                        self.choiceProb[t, 1] = 1 - self.choiceProb[t, 0]
+                    if runData.action[t] == 0:
+                        self.rewardPE[(t,) + runData.stimulusPair[t]] = \
+                            runData.reward[t] - self.V_option0[(t,) + runData.stimulusPair[t]]
 
-                        self.actionProb[t, :] = self.choiceProb[t, int(runData.action[t])] if ~np.isnan(
-                            runData.action[t]) else np.nan
+                        self.V_option0[t + 1, :] = self.V_option0[t, :]
+                        self.V_option0[(t + 1,) + runData.stimulusPair[t]] = \
+                            self.V_option0[(t,) + runData.stimulusPair[t]] + \
+                            alphaCheck * (self.rewardPE[(t,) + runData.stimulusPair[t]])
 
-                        if runData.action[t] == 0:
-                            self.rewardPE[(t,) + runData.stimulusPair[t]] = \
-                                runData.reward[t] - self.V_option0[(t,) + runData.stimulusPair[t]]
-
-                            self.V_option0[t + 1, :] = self.V_option0[t, :]
-                            self.V_option0[(t + 1,) + runData.stimulusPair[t]] = \
-                                self.V_option0[(t,) + runData.stimulusPair[t]] + \
-                                alphaCheck * (self.rewardPE[(t,) + runData.stimulusPair[t]])
-
-                            if version is None or version == "two" or (version == "four" and runData.reward[t] == 1):
-                                for pair in otherPairs:
-                                    self.V_option0[(t + 1,) + pair] = \
-                                        self.V_option0[(t,) + pair] + \
-                                        alpha2Check * (1 - runData.reward[t] - self.V_option0[(t,) + pair])
-                            else:
-                                for pair in otherPairs:
-                                    self.V_option0[(t + 1,) + pair] = \
-                                            self.V_option0[(t,) + pair] + \
-                                            alpha3Check * (1 - runData.reward[t] - self.V_option0[(t,) + pair])
-                            self.V_option1[t + 1, :] = self.V_option1[t, :]
-
-                        elif runData.action[t] == 1:
-                            self.rewardPE[(t,) + runData.stimulusPair[t]] = \
-                                runData.reward[t] - self.V_option1[(t,) + runData.stimulusPair[t]]
-
-                            self.V_option1[t + 1, :] = self.V_option1[t, :]
-                            self.V_option1[(t + 1,) + runData.stimulusPair[t]] = \
-                                self.V_option1[(t,) + runData.stimulusPair[t]] + \
-                                alphaCheck * (self.rewardPE[(t,) + runData.stimulusPair[t]])
-
-                            if version is None:
-                                for pair in otherPairs:
-                                    self.V_option1[(t + 1,) + pair] = \
-                                        self.V_option1[(t,) + pair] + \
-                                        (alpha2Check * (1 - runData.reward[t] - self.V_option1[(t,) + pair]))
-                            elif version == "two":
-                                for pair in otherPairs:
-                                    self.V_option1[(t + 1,) + pair] = \
-                                        self.V_option1[(t,) + pair] + \
-                                        (alpha3Check * (1 - runData.reward[t] - self.V_option1[(t,) + pair]))
-                            else:
-                                if runData.reward[t] == 1:
-                                    for pair in otherPairs:
-                                        self.V_option1[(t + 1,) + pair] = \
-                                            self.V_option1[(t,) + pair] + \
-                                            (alpha4Check * (1 - runData.reward[t] - self.V_option1[(t,) + pair]))
-                                else:
-                                    for pair in otherPairs:
-                                        self.V_option1[(t + 1,) + pair] = \
-                                            self.V_option1[(t,) + pair] + \
-                                            (alpha5Check * (1 - runData.reward[t] - self.V_option1[(t,) + pair]))
-
-                            self.V_option0[t + 1, :] = self.V_option0[t, :]
-
+                        if version is None or version == "two" or (version == "four" and runData.reward[t] == 1):
+                            for pair in otherPairs:
+                                self.V_option0[(t + 1,) + pair] = \
+                                    self.V_option0[(t,) + pair] + \
+                                    alpha2Check * (1 - runData.reward[t] - self.V_option0[(t,) + pair])
                         else:
-                            self.V_option0[t + 1, :] = self.V_option0[t, :]
-                            self.V_option1[t + 1, :] = self.V_option1[t, :]
+                            for pair in otherPairs:
+                                self.V_option0[(t + 1,) + pair] = \
+                                        self.V_option0[(t,) + pair] + \
+                                        alpha3Check * (1 - runData.reward[t] - self.V_option0[(t,) + pair])
+                        self.V_option1[t + 1, :] = self.V_option1[t, :]
 
-                        trials_RPE[t] = self.rewardPE[(t,) + runData.stimulusPair[t]]
-                        trials_V0[t + 1] = self.V_option0[(t + 1,) + runData.stimulusPair[t]]
-                        trials_V1[t + 1] = self.V_option1[(t + 1,) + runData.stimulusPair[t]]
-                    negativeLogLikelihood = -np.sum(np.log(self.actionProb[~np.isnan(self.actionProb)]))
-                    Likelihood = np.prod(self.actionProb[~np.isnan(self.actionProb)])
-                    NLL_array[j, 0] = alphaCheck
-                    NLL_array[j, 1] = betaCheck
-                    NLL_array[j, 2] = negativeLogLikelihood
-                    NLL_array[j, 3] = alpha2Check
-                    if version == "two":
-                        NLL_array[j, 4] = alpha3Check
-                    elif version == "four":
-                        NLL_array[j, 4] = alpha3Check
-                        NLL_array[j, 5] = alpha4Check
-                        NLL_array[j, 6] = alpha5Check
-                    LL_array[j] = Likelihood
-                    run_RPEs[j, :] = trials_RPE
-                    run_V0[j, :] = trials_V0
-                    run_V1[j, :] = trials_V1
+                    elif runData.action[t] == 1:
+                        self.rewardPE[(t,) + runData.stimulusPair[t]] = \
+                            runData.reward[t] - self.V_option1[(t,) + runData.stimulusPair[t]]
 
-                minIndex = np.argmin(NLL_array[:, 2])
-                maxIndex = np.nanargmax(LL_array[:, 0])
+                        self.V_option1[t + 1, :] = self.V_option1[t, :]
+                        self.V_option1[(t + 1,) + runData.stimulusPair[t]] = \
+                            self.V_option1[(t,) + runData.stimulusPair[t]] + \
+                            alphaCheck * (self.rewardPE[(t,) + runData.stimulusPair[t]])
 
-                self.NLL_arrays[count, run, :, :] = NLL_array
-                fitted_alphas[0, run] = NLL_array[minIndex, 0]
-                fitted_betas[0, run] = NLL_array[minIndex, 1]
-                fitted_alphas2[0, run] = NLL_array[minIndex, 3]
+                        if version is None:
+                            for pair in otherPairs:
+                                self.V_option1[(t + 1,) + pair] = \
+                                    self.V_option1[(t,) + pair] + \
+                                    (alpha2Check * (1 - runData.reward[t] - self.V_option1[(t,) + pair]))
+                        elif version == "two":
+                            for pair in otherPairs:
+                                self.V_option1[(t + 1,) + pair] = \
+                                    self.V_option1[(t,) + pair] + \
+                                    (alpha3Check * (1 - runData.reward[t] - self.V_option1[(t,) + pair]))
+                        else:
+                            if runData.reward[t] == 1:
+                                for pair in otherPairs:
+                                    self.V_option1[(t + 1,) + pair] = \
+                                        self.V_option1[(t,) + pair] + \
+                                        (alpha4Check * (1 - runData.reward[t] - self.V_option1[(t,) + pair]))
+                            else:
+                                for pair in otherPairs:
+                                    self.V_option1[(t + 1,) + pair] = \
+                                        self.V_option1[(t,) + pair] + \
+                                        (alpha5Check * (1 - runData.reward[t] - self.V_option1[(t,) + pair]))
+
+                        self.V_option0[t + 1, :] = self.V_option0[t, :]
+
+                    else:
+                        self.V_option0[t + 1, :] = self.V_option0[t, :]
+                        self.V_option1[t + 1, :] = self.V_option1[t, :]
+
+                    run_RPEs[j, t] = self.rewardPE[(t,) + runData.stimulusPair[t]]
+                    run_V0[j, t + 1] = self.V_option0[(t + 1,) + runData.stimulusPair[t]]
+                    run_V1[j, t + 1] = self.V_option1[(t + 1,) + runData.stimulusPair[t]]
+                negativeLogLikelihood = -np.sum(np.log(self.actionProb[~np.isnan(self.actionProb)]))
+                Likelihood = np.prod(self.actionProb[~np.isnan(self.actionProb)])
+
+                NLL_array[run, j, 0] = alphaCheck
+                NLL_array[run, j, 1] = betaCheck
+                NLL_array[run, j, 2] = negativeLogLikelihood
+                NLL_array[run, j, 3] = alpha2Check
                 if version == "two":
-                    fitted_alphas3[0, run] = NLL_array[minIndex, 4]
+                    NLL_array[run, j, 4] = alpha3Check
                 elif version == "four":
-                    fitted_alphas3[0, run] = NLL_array[minIndex, 4]
-                    fitted_alphas4[0, run] = NLL_array[minIndex, 5]
-                    fitted_alphas5[0, run] = NLL_array[minIndex, 6]
-                best_LLs[0, run] = LL_array[maxIndex]
-                ID_RPE[0, run] = run_RPEs[minIndex, :]
-                ID_V0[0, run] = run_V0[minIndex, :]
-                ID_V1[0, run] = run_V1[minIndex, :]
+                    NLL_array[run, j, 4] = alpha3Check
+                    NLL_array[run, j, 5] = alpha4Check
+                    NLL_array[run, j, 6] = alpha5Check
 
-            self.all_alphas[count, :] = fitted_alphas
-            self.all_betas[count, :] = fitted_betas
-            self.all_alphas2[count, :] = fitted_alphas2
+                LL_array[j, 0] = Likelihood
+
+            minIndex = np.argmin(NLL_array[run, :, 2])
+            maxIndex = np.nanargmax(LL_array[run, :, 0])
+
+            fitted_alphas[run] = NLL_array[run, minIndex, 0]
+            fitted_betas[run] = NLL_array[run, minIndex, 1]
+            fitted_alphas2[run] = NLL_array[run, minIndex, 2]
+
             if version == "two":
-                self.all_alphas3[count, :] = fitted_alphas3
+                fitted_alphas3[run] = NLL_array[minIndex, 4]
             elif version == "four":
-                self.all_alphas3[count, :] = fitted_alphas3
-                self.all_alphas4[count, :] = fitted_alphas4
-                self.all_alphas5[count, :] = fitted_alphas5
-            self.all_RPEs[count] = ID_RPE
-            self.all_V0[count] = ID_V0
-            self.all_V1[count] = ID_V1
-            self.all_LLs[count, :] = best_LLs
+                fitted_alphas3[run] = NLL_array[minIndex, 4]
+                fitted_alphas4[run] = NLL_array[minIndex, 5]
+                fitted_alphas5[run] = NLL_array[minIndex, 6]
+            
+            best_LLs[run] = LL_array[maxIndex] 
+            RPE[run] = run_RPEs[minIndex]
+            V0[run] = run_V0[minIndex]
+            V1[run] = run_V1[minIndex]
 
-            count += 1
+        newPath = os.path.join(pathlib.Path(__file__).parents[3].resolve(), "data/fittedParameters/sub-{}".format(self.ID))
+        Path(newPath).mkdir(parents=True, exist_ok=True)
 
+        if version == "two":
+            scipy.io.savemat(newPath+'/rpeInit2.mat'.format(self.ID), mdict={'rpe': RPE})
+            return fitted_alphas, fitted_alphas2, fitted_alphas3, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
+        elif version == "four":
+            scipy.io.savemat(newPath+'/rpeInit4.mat'.format(self.ID), mdict={'rpe': RPE})
+            return fitted_alphas, fitted_alphas2, fitted_alphas3, fitted_alphas4, fitted_alphas5, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
+        else:
+            scipy.io.savemat(newPath+'/rpeInit.mat'.format(self.ID), mdict={'rpe': RPE})
+            return fitted_alphas, fitted_alphas2, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
+        
 # Update and init V0 and V1
 
     def updateInitFitting(self, version=None):
@@ -848,7 +820,7 @@ def ma(interval, window_size = 10, method = 'same'):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-fitted = Fitting(60, 0, 5000, ID="18")
+fitted = Fitting(60, 0, 5000, ID="10")
 
 # # Run the simplest RL model
 fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
