@@ -13,7 +13,7 @@ if numel(input_log) ~= 0
     TR = info_scan.RepetitionTime;
     Ndummies = 5; % default from Karl
     Nscans = info_scan.MaxDynamics;
-    onset_slice = 20; %NOTE: after pre-processing this is the middle slice
+    onset_slice = round(n_slices/2); %NOTE: after pre-processing this is the middle slice
 
 
     %% Create default parameter structure with all fields
@@ -33,7 +33,7 @@ if numel(input_log) ~= 0
     physio.scan_timing.sqpar.TR = TR;
     physio.scan_timing.sqpar.Ndummies = Ndummies;
     physio.scan_timing.sqpar.Nscans = Nscans;
-    physio.scan_timing.sqpar.onset_slice = 20;
+    physio.scan_timing.sqpar.onset_slice = onset_slice;
     physio.scan_timing.sqpar.time_slice_to_slice = [];
     physio.scan_timing.sqpar.Nprep = [];
     physio.scan_timing.sync.method = 'nominal';

@@ -17,24 +17,53 @@ runType = events.runType(1,:);
 choiceIdx = find(events.trial_type == "choice");
 feedbackIdx = find(events.trial_type == "feedback");
 
-spe = load(['/data/fittedParameters/sub-' subject '/spe.mat']).spe;
+if contains(model_version, "spe") && ~contains(model_version, "rpe") 
+    spe = load(['/data/fittedParameters/sub-' subject '/' model_version '.mat']).spe;
+
+elseif contains(model_version, "rpe")  && ~contains(model_version, "spe") 
+    rpe = load(['/data/fittedParameters/sub-' subject '/' model_version '.mat']).rpe;
+
+else
+    model = split(model_version, '_');
+    spe = load(['/data/fittedParameters/sub-' subject '/' model(1,1) '.mat']).spe;
+    rpe = load(['/data/fittedParameters/sub-' subject '/' model(2,1) '.mat']).rpe;
+end
+
+
 if runType == "tactile"
     names{1} = 'ChoiceTactile';
     names{2} = 'FeedbackTactile';
     pmod = struct('name', {}, 'param', {}, 'poly', {});
-    pmod(1).name{1}  = 'StatisticalTactile';
+    if contains(model_version, "spe")
+        pmod(1).name{1}  = 'StatisticalTactile';
+        pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
+        pmod(1).poly{1}  = 1;
+    end
+    if contains(model_version, "rpe")
+        pmod(2).name{1} = 'ReinforcementTactile';
+        pmod(2).param{1} = rpe(run,:) - nanmean(rpe(run,:));
+        pmod(2).poly{1}  = 1;
+    end
 elseif runType == "audio"
     names{1} = 'ChoiceAudio';
     names{2} = 'FeedbackAudio';
     pmod = struct('name', {}, 'param', {}, 'poly', {});
-    pmod(1).name{1} = 'StatisticalAudio';
+    if contains(model_version, "spe")
+        pmod(1).name{1} = 'StatisticalAudio';
+        pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
+        pmod(1).poly{1}  = 1;
+    end
+    if contains(model_version, "rpe")
+        pmod(2).name{1} = 'ReinforcementAudio';
+        pmod(2).param{1} = rpe(run,:) - nanmean(rpe(run,:));
+        pmod(2).poly{1}  = 1;
+    end
 end
 onsets{1} = events.onset(choiceIdx);
 durations{1} = events.duration(choiceIdx);
 onsets{2} = events.onset(feedbackIdx);
 durations{2} = events.duration(feedbackIdx);
-pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
-pmod(1).poly{1}  = 1;
+
 orth{1} = false;
 orth{2} = false;
 
