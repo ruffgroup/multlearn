@@ -65,14 +65,7 @@ elseif runType == "audio"
         pmod(2).param{1} = rpe(run,:) - nanmean(rpe(run,:));
         pmod(2).poly{1}  = 1;
     else
-        model = split(model_version, '_');
-        pmod(1).name{1}  = strcat([model(1,1) 'Tactile']);
-        pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
-        pmod(1).poly{1}  = 1;
-
-        pmod(2).name{1} = strcat([model(2,1) 'Tactile']);
-        pmod(2).param{1} = rpe(run,:) - nanmean(rpe(run,:));
-        pmod(2).poly{1}  = 1;
+        
     end
 end
 onsets{1} = events.onset(choiceIdx);
