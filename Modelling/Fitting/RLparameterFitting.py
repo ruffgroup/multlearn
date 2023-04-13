@@ -133,7 +133,7 @@ class Fitting:
 
             minIndex = np.argmin(NLL_array[run, :, 2])
             maxIndex = np.nanargmax(LL_array[:, 0])
-            
+
             fitted_alphas[run] = NLL_array[run, minIndex, 0]
             fitted_betas[run] = NLL_array[run, minIndex, 1]
             best_LLs[run] = LL_array[maxIndex]
@@ -141,7 +141,7 @@ class Fitting:
             V0[run] = run_V0[minIndex]
             V1[run] = run_V1[minIndex]
 
-        newPath = os.path.join(pathlib.Path(__file__).parents[3].resolve(), "data/fittedParameters/sub-{}".format(self.ID))
+        newPath = os.path.join(pathlib.Path(__file__).resolve().parents[3], "/data/fittedParameters/sub-{}".format(self.ID))
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath+'/rpeSimple.mat'.format(self.ID), mdict={'rpe': RPE})
 
@@ -270,7 +270,7 @@ class Fitting:
             V0[run] = run_V0[minIndex]
             V1[run] = run_V1[minIndex]
 
-        newPath = os.path.join(pathlib.Path(__file__).parents[3].resolve(), "data/fittedParameters/sub-{}".format(self.ID))
+        newPath = os.path.join(pathlib.Path(__file__).resolve().parents[3], "/data/fittedParameters/sub-{}".format(self.ID))
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath+'/rpeVal.mat'.format(self.ID), mdict={'rpe': RPE})
 
@@ -463,7 +463,7 @@ class Fitting:
             V0[run] = run_V0[minIndex]
             V1[run] = run_V1[minIndex]
 
-        newPath = os.path.join(pathlib.Path(__file__).parents[3].resolve(), "data/fittedParameters/sub-{}".format(self.ID))
+        newPath = os.path.join(pathlib.Path(__file__).resolve().parents[3], "/data/fittedParameters/sub-{}".format(self.ID))
         Path(newPath).mkdir(parents=True, exist_ok=True)
 
         if version == "two":
@@ -807,7 +807,7 @@ class Fitting:
                 trial_surprise[i] = statSurprise[(i,) + runData.stimulusPair[i]]
             ID_surprise[run] = trial_surprise
 
-        newPath = os.path.join(pathlib.Path(__file__).parents[3].resolve(), "fittedParameters/sub-{}".format(self.ID))
+        newPath = os.path.join(pathlib.Path(__file__).resolve().parents[3], "/data/fittedParameters/sub-{}".format(self.ID))
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath+'/spe.mat'.format(self.ID), mdict={'spe': ID_surprise})
         return ID_beliefs, ID_surprise
@@ -820,10 +820,18 @@ def ma(interval, window_size = 10, method = 'same'):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-fitted = Fitting(60, 0, 5000, ID="10")
+IDs = ["01", "02", "03", "04", "05", "06", "07", "09", "10", "11", "12", "14", "15", "17", "18", "19", "20",
+       "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "33", "34", "35", "36", "37", "38", "39",
+       "40", "41", "42", "43", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57",
+       "58", "59", "60", "61", "62", "63", "64"]
+
+for IDnr in IDs:
+    fitted = Fitting(60, 0, 5000, ID=IDnr)
 
 # # Run the simplest RL model
-fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
+    fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
+## Run stat learning
+    beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
 
 #fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
