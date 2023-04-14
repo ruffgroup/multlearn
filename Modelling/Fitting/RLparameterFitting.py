@@ -17,7 +17,7 @@ import platform
 import ast
 import matplotlib.backends.backend_pdf
 from mpl_toolkits.mplot3d import Axes3D
-from RLparameterPlotting import plots_simplestFitting
+from RLparameterPlotting import Plotting
 
 sys.path.append(sys.path[0] + '/..')
 from TaskDesign import task_Design
@@ -25,13 +25,17 @@ from TaskDesign import task_Design
 
 class Fitting:
 
-    def __init__(self, mainTrials, additionalTrials, gridCount, ID):
+    def __init__(self, mainTrials, additionalTrials, gridCount, ID, plotting=False, ww=None):
         
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
         self.gridCount = gridCount
         self.ID = ID
         self.statLearnPar = 1
+        self.plotting = plotting
+
+        if self.plotting:
+            self.Plot = Plotting(self.mainTrials, self.additionalTrials, self.gridCount, self.ID, ww)
 
 
         wanted_dir = '/data/sourcedata/behavior/modified_files'
@@ -145,6 +149,9 @@ class Fitting:
         newPath = os.path.join(pathlib.Path(__file__).resolve().parents[3], "/data/fittedParameters/sub-{}".format(self.ID))
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath+'/rpeSimple.mat'.format(self.ID), mdict={'rpe': RPE})
+
+        if self.plotting:
+            self.Plot.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
         return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
 
@@ -804,26 +811,28 @@ IDs = ["01", "02", "03", "04", "05", "06", "07", "09", "10", "11", "12", "14", "
 for IDnr in IDs:
     fitted = Fitting(60, 0, 5000, ID=IDnr)
 
+# # Run stat learning
+    #beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
+
+
 # # Run the simplest RL model
-    fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
-## Run stat learning
-    beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
+    #fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
 
-#fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
+    #fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
-# # # Run the RL model including initial V0 and V1 as free parameters
-#fitted.valFitting()
-#fitted.plots_valueFitting(ww=10, method='same', reps=50)
+# # Run the RL model including initial V0 and V1 as free parameters
+    fitted_alphas, fitted_betas, best_LLs, fitted_V_option0Inits, fitted_V_option1Inits, RPE, V0, V1, NLL_array = fitted.valFitting()
+    #fitted.plots_valueFitting(ww=10, method='same', reps=50)
 
-# Run the RL model with extra learning rates for the other pairs
-# (if you see pair image0 and audio0, also update other image0 and audio0 pairs)
-# Options: 1) Do not add anything to the call 2) Add version="two" 3) Add version="four"
-#fitted.updateFitting()
-#fitted.plots_updateFitting(ww=10, method='same', reps=50)
-#fitted.updateFitting(version="two")
-#fitted.plots_updateFitting(ww=10, method='same', reps=50, version="two")
-#fitted.updateFitting(version="four")
-#fitted.plots_updateFitting(ww=10, method='same', reps=50, version="four")
+# # Run the RL model with extra learning rates for the other pairs
+# # (if you see pair image0 and audio0, also update other image0 and audio0 pairs)
+# # Options: 1) Do not add anything to the call 2) Add version="two" 3) Add version="four"
+    #fitted.updateFitting()
+    #fitted.plots_updateFitting(ww=10, method='same', reps=50)
+    #fitted.updateFitting(version="two")
+    #fitted.plots_updateFitting(ww=10, method='same', reps=50, version="two")
+    #fitted.updateFitting(version="four")
+    #fitted.plots_updateFitting(ww=10, method='same', reps=50, version="four")
 
 # Run the RL model with extra learning rates for sthe other pairs AND initial V0 and V1 as free parameters
 # Same options as above; 1) Do not add anything to the call 2) Add version="two" 3) Add version="four"
