@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 ## Have to be multiples of 60
 mainTrials = 60
 additionalTrials = 0
-taskSimulation = task_Design(mainTrials,  additionalTrials, pearce=1, omega=0)
+taskSimulation = task_Design(mainTrials,  additionalTrials, pearce=1, omega=0.3)
 
 # filehandler = open(
 #     '/Users/sbedi/Desktop/multisensory-project-rl/Human task design/filename', 'wb')
@@ -178,23 +178,30 @@ taskSimulation.statisticalLearning()
 # """Reinforcement Learning Plots"""
 
 
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 0, 0], label="1A")
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 0, 1], label="1B")
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 0, 2], label="1C")
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 1, 0], label="2A")
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 1, 1], label="2B")
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 1, 2], label="2C")
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 2, 0], label="3A")
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 2, 1], label="3B")
-plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 2, 2], label="3C")
-plt.legend(bbox_to_anchor=(1.15, 0.65))
-plt.xlabel("Trials")
-plt.ylabel("Successful action value")
-plt.title("Reinforcement Learning, alpha = {:.2f}, beta = {:.2f}".format(taskSimulation.omega, taskSimulation.beta))
-fig1 = plt.gcf()
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 0, 0], label="1A")
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 0, 1], label="1B")
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 0, 2], label="1C")
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 1, 0], label="2A")
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 1, 1], label="2B")
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 1, 2], label="2C")
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 2, 0], label="3A")
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 2, 1], label="3B")
+# plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option0[:, 2, 2], label="3C")
+# plt.legend(bbox_to_anchor=(1.15, 0.65))
+# plt.xlabel("Trials")
+# plt.ylabel("Successful action value")
+# plt.title("Reinforcement Learning, omega = {:.2f}, beta = {:.2f}".format(taskSimulation.omega, taskSimulation.beta))
+# fig1 = plt.gcf()
+# plt.show()
+# plt.draw()
+# fig1.savefig('RL.png', dpi=300, bbox_inches='tight')
+
+
+# print(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)])
+# print(np.diff(taskSimulation.alphaPearce))
+
+plt.scatter(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)][1:], np.diff(taskSimulation.alphaPearce))
 plt.show()
-plt.draw()
-fig1.savefig('RL.png', dpi=300, bbox_inches='tight')
 
 
 # plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option1[:, 0, 0], label="1A")

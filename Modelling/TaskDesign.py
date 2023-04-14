@@ -35,6 +35,9 @@ class task_Design:
         self.punishProb = 0.0
         self.punishMag = 0.0
 
+        if pearce:
+            self.alphaPearce = np.empty(self.mainTrials)
+
         ## Making vectors of reward with 0.8 probability
         tempFeedbackAccuracy = np.repeat(np.array([1, 0]),
                                          np.array([round(self.rewardProb * 10), round((1 - self.rewardProb) * 10)]))
@@ -324,6 +327,9 @@ class task_Design:
             self.simulatedData[i + self.additionalTrials, 2] = self.rewardPE[(
                                                                                  i,) + tuple(
                 self.stimulusPair[i + self.additionalTrials, :])]
+            
+            if self.pearce:
+                self.alphaPearce[i] = self.alpha
 
         self.errorPercentage = (error / self.mainTrials) * 100
 
