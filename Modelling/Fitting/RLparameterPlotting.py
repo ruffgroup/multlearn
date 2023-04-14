@@ -22,16 +22,17 @@ sys.path.append(sys.path[0] + '/..')
 from TaskDesign import task_Design
 
 
-class Fitting:
+class Plotting:
 
-    def __init__(self, mainTrials, additionalTrials, gridCount, ID):
+    def __init__(self, mainTrials, additionalTrials, gridCount, ID, ww, method):
         
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
         self.gridCount = gridCount
         self.ID = ID
         self.statLearnPar = 1
-
+        self.ww = ww
+        self.method = method
         if platform.system() == 'Windows':
             wanted_dir = '/data/sourcedata/behavior/modified_files'
         else:
@@ -42,7 +43,7 @@ class Fitting:
 
     # Simple plots
 
-    def plots_simplestFitting(self, ww, NLL_array, alphas, betas, method, reps=50):
+    def plots_simplestFitting(self, ww, NLL_array, alphas, betas, reps=50):
         
         print("simple")
         saving_folder = "simple"

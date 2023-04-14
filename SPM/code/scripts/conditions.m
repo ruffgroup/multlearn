@@ -20,13 +20,13 @@ feedbackIdx = find(events.trial_type == "feedback");
 if contains(model_version, "spe") && ~contains(model_version, "rpe") 
     spe = load(['/data/fittedParameters/sub-' subject '/' model_version '.mat']).spe;
 
-elseif contains(model_version, "rpe") && ~contains(model_version, "spe") 
+elseif contains(model_version, "rpe") && ~contains(model_version, "spe")
     rpe = load(['/data/fittedParameters/sub-' subject '/' model_version '.mat']).rpe;
 
-else
+elseif contains(model_version, "_")
     model = split(model_version, '_');
-    spe = load(['/data/fittedParameters/sub-' subject '/' model(1,1) '.mat']).spe;
-    rpe = load(['/data/fittedParameters/sub-' subject '/' model(2,1) '.mat']).rpe;
+    spe = load(['/data/fittedParameters/sub-' subject '/' char(model(1,1)) '.mat']).spe;
+    rpe = load(['/data/fittedParameters/sub-' subject '/' char(model(2,1)) '.mat']).rpe;
 end
 
 
@@ -35,21 +35,21 @@ if runType == "tactile"
     names{2} = 'FeedbackTactile';
     pmod = struct('name', {}, 'param', {}, 'poly', {});
     if contains(model_version, "spe") && ~contains(model_version, "rpe")
-        pmod(1).name{1}  = strcat([model_version 'Tactile']);
-        pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
+        pmod(1).name{1}  = strcat(model_version, 'Tactile');
+        pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
         pmod(1).poly{1}  = 1;
     elseif contains(model_version, "rpe") && ~contains(model_version, "spe") 
-        pmod(2).name{1} = strcat([model_version 'Tactile']);
-        pmod(2).param{1} = rpe(run,:) - nanmean(rpe(run,:));
+        pmod(2).name{1} = strcat(model_version, 'Tactile');
+        pmod(2).param{1} = fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0);
         pmod(2).poly{1}  = 1;
-    else
+    elseif contains(model_version, "_")
         model = split(model_version, '_');
-        pmod(1).name{1}  = strcat([model(1,1) 'Tactile']);
-        pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
+        pmod(1).name{1}  = strcat(string(model(1,1)), 'Tactile');
+        pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
         pmod(1).poly{1}  = 1;
 
-        pmod(2).name{1} = strcat([model(2,1) 'Tactile']);
-        pmod(2).param{1} = rpe(run,:) - nanmean(rpe(run,:));
+        pmod(2).name{1} = strcat(string(model(2,1)), 'Tactile');
+        pmod(2).param{1} = fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0);
         pmod(2).poly{1}  = 1;
     end
 elseif runType == "audio"
@@ -57,21 +57,21 @@ elseif runType == "audio"
     names{2} = 'FeedbackAudio';
     pmod = struct('name', {}, 'param', {}, 'poly', {});
     if contains(model_version, "spe") && ~contains(model_version, "rpe")
-        pmod(1).name{1}  = strcat([model_version 'Audio']);
-        pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
+        pmod(1).name{1}  = strcat(model_version, 'Audio');
+        pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
         pmod(1).poly{1}  = 1;
     elseif contains(model_version, "rpe") && ~contains(model_version, "spe") 
-        pmod(2).name{1} = strcat([model_version 'Audio']);
-        pmod(2).param{1} = rpe(run,:) - nanmean(rpe(run,:));
+        pmod(2).name{1} = strcat(model_version, 'Audio');
+        pmod(2).param{1} = fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0);
         pmod(2).poly{1}  = 1;
-    else
+    elseif contains(model_version, "_")
         model = split(model_version, '_');
-        pmod(1).name{1}  = strcat([model(1,1) 'Tactile']);
-        pmod(1).param{1} = spe(run,:) - nanmean(spe(run,:));
+        pmod(1).name{1}  = strcat(string(model(1,1)), 'Tactile');
+        pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
         pmod(1).poly{1}  = 1;
 
-        pmod(2).name{1} = strcat([model(2,1) 'Tactile']);
-        pmod(2).param{1} = rpe(run,:) - nanmean(rpe(run,:));
+        pmod(2).name{1} = strcat(string(model(2,1)), 'Tactile');
+        pmod(2).param{1} = fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0);
         pmod(2).poly{1}  = 1;
     end
 end

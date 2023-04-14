@@ -18,8 +18,7 @@ path.SPM_folder = [path.SPM_folder(1).folder '/'];
 subs = dir(fullfile(path.folder_processed, 'sub-*'));
 subs = subs([subs.isdir]');
 subs = subs(~contains({subs.name},{'sub-08', 'sub-13', 'sub-44'}));
-models = ["other", "spe", "rpeSimple", "spe_rpeSimple"];
-tVals = [2.3, 2.6, 3.1];
+models = ["spe_rpeSimple"];
 
 addpath(fullfile('scripts'));
 
@@ -75,15 +74,13 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 % 
      parfor (sub = 1:numSubs,M)
          if model_version == "other"
-            func_contrast_level1(path, subs(sub).name, del_old_con);
+            func_contrast_level1(path, subs(sub).name, model_version, del_old_con);
          elseif ~contains(model_version, "_") && model_version ~= "other"
              splitting = false;
-             func_contrast_level1(path, subs(sub).name, del_old_con);
              func_contrast_level1_Pmod(path, subs(sub).name, model_version, del_old_con, splitting);
          else
              splitting = model_version;
              model = split(model_version, "_");
-             func_contrast_level1(path, subs(sub).name, del_old_con);
              func_contrast_level1_Pmod(path, subs(sub).name, char(model(1,1)), del_old_con, splitting);
              func_contrast_level1_Pmod(path, subs(sub).name, char(model(2,1)), del_old_con, splitting);
              func_contrast_level1_BothPmods(path, subs(sub).name, model_version, del_old_con);
@@ -93,16 +90,14 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 
     if model_version == "other"
         splitting = false;
-        num_contrasts = 2; % number set in func_contrast_level1
+        num_contasts = 2; % number set in func_contrast_level1
         
-        parfor (k = 1:num_contrasts,M)
+        parfor (k = 1:num_contasts,M)
             if ISrun_level2SPM == 1
                 func_level2(path,subs, model_version, k, splitting);
             end
             if ISrun_level2SnPM == 1
-                for tVal = tVals
-                func_level2_SnPM(path,subs, model_version, k, splitting, tVal);
-                end
+                func_SnPM(path,subs, model_version, k, splitting);
             end
         end
 
@@ -114,9 +109,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                 func_level2(path,subs, model_version, k, splitting);
             end
             if ISrun_level2SnPM == 1
-                for tVal = tVals
-                func_level2_SnPM(path,subs, model_version, k, splitting, tVal);
-                end
+                func_SnPM(path,subs, model_version, k, splitting);
             end
         end
     
@@ -132,9 +125,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                 func_level2(path,subs, char(model(1,1)), k, splitting);
             end
             if ISrun_level2SnPM == 1
-                for tVal = tVals
-                func_level2_SnPM(path,subs, char(model(1,1)), k, splitting);
-                end
+                func_SnPM(path,subs, char(model(1,1)), k, splitting);
             end
         end
 
@@ -143,9 +134,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                 func_level2(path,subs, char(model(2,1)), k, splitting);
             end
             if ISrun_level2SnPM == 1
-                for tVal = tVals
-                func_level2_SnPM(path,subs, char(model(2,1)), k, splitting, tVal);
-                end
+                func_SnPM(path,subs, char(model(2,1)), k, splitting);
             end
         end
 
@@ -154,9 +143,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                 func_level2(path,subs, model_version, k, splitting);
             end
             if ISrun_level2SnPM == 1
-                for tVal = tVals
-                func_level2_SnPM(path,subs, model_version, k, splitting, tVal);
-                end
+                func_SnPM(path,subs, model_version, k, splitting);
             end
         end
 
@@ -172,3 +159,16 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 end
 
 %%
+
+
+
+
+
+
+
+
+
+
+
+
+
