@@ -281,7 +281,7 @@ class task_Design:
                                                                                                         tuple(
                                                                                                             self.stimulusPair[
                                                                                                             i + self.additionalTrials,
-                                                                                                            :])] + self.alpha * (
+                                                                                                            :])]* + self.alpha * (
                                                                                                     self.rewardPE[
                                                                                                         (i,) + tuple(
                                                                                                             self.stimulusPair[
