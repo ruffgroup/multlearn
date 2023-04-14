@@ -89,7 +89,11 @@ destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subj
 if ~exist(destination,'dir')
     mkdir(destination)
 end
-save(fullfile(destination, ['/run_' num2str(run) '_conditions.mat']), 'names', 'onsets', 'durations', 'pmod', 'orth')
+if model_version == "other"
+    save(fullfile(destination, ['/run_' num2str(run) '_conditions.mat']), 'names', 'onsets', 'durations')
+else
+    save(fullfile(destination, ['/run_' num2str(run) '_conditions.mat']), 'names', 'onsets', 'durations', 'pmod', 'orth')
+end
 
 end
 end
