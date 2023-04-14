@@ -36,7 +36,3 @@ spm_jobman('run', matlabbatch);
 clear matlabbatch
 
 end
-
-
-
->>>>>>> 5f4c3248c8658a48e33ddde3a64a3c3023bbd04f
