@@ -1,4 +1,4 @@
-function func_level1(folder_processed, bids_folder, SPM_folder, sub , model_version)
+function func_level1(folder_processed, bids_folder, SPM_folder, sub , model_version, splitting)
 
 spm('defaults', 'fMRI');
 
@@ -11,7 +11,11 @@ param_smoothing = 6; % what was the smoothing parameter?
 mask_file = {fullfile(SPM_folder,'/mask_ICV.nii,1')};
 
 %path of results
-data.destination = fullfile(SPM_folder,'/results', model_version, sub);
+if ischar(splitting) && splitting ~= model_version
+    data.destination = fullfile(SPM_folder,'/results', splitting, model_version, sub);
+elseif ischar(splitting) && splitting == model_version || ~splitting
+    data.destination = fullfile(SPM_folder,'/results', model_version, sub);
+end
 
 %% start spm 1stLvL model
 if ~exist(data.destination,'dir')
