@@ -1,4 +1,4 @@
-function conditions(model_version)
+function conditions(model_version, splitting)
 
 subjects = [01 02 03 04 05 06 07 09 10 11 12 14 15 17 18 19 20 21 22 23 24 25 26 27 28 29 30 33 34 35 36 37 38 39 40 41 42 43 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64];
 %subjects = [01 02];
@@ -33,16 +33,18 @@ end
 if runType == "tactile"
     names{1} = 'ChoiceTactile';
     names{2} = 'FeedbackTactile';
-    pmod = struct('name', {}, 'param', {}, 'poly', {});
     if contains(model_version, "spe") && ~contains(model_version, "rpe")
+        pmod = struct('name', {}, 'param', {}, 'poly', {});
         pmod(1).name{1}  = strcat(model_version, 'Tactile');
         pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
         pmod(1).poly{1}  = 1;
-    elseif contains(model_version, "rpe") && ~contains(model_version, "spe") 
+    elseif contains(model_version, "rpe") && ~contains(model_version, "spe")
+        pmod = struct('name', {}, 'param', {}, 'poly', {});
         pmod(2).name{1} = strcat(model_version, 'Tactile');
         pmod(2).param{1} = fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0);
         pmod(2).poly{1}  = 1;
     elseif contains(model_version, "_")
+        pmod = struct('name', {}, 'param', {}, 'poly', {});
         model = split(model_version, '_');
         pmod(1).name{1}  = strcat(string(model(1,1)), 'Tactile');
         pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
@@ -55,16 +57,18 @@ if runType == "tactile"
 elseif runType == "audio"
     names{1} = 'ChoiceAudio';
     names{2} = 'FeedbackAudio';
-    pmod = struct('name', {}, 'param', {}, 'poly', {});
     if contains(model_version, "spe") && ~contains(model_version, "rpe")
+         pmod = struct('name', {}, 'param', {}, 'poly', {});
         pmod(1).name{1}  = strcat(model_version, 'Audio');
         pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
         pmod(1).poly{1}  = 1;
     elseif contains(model_version, "rpe") && ~contains(model_version, "spe") 
+         pmod = struct('name', {}, 'param', {}, 'poly', {});
         pmod(2).name{1} = strcat(model_version, 'Audio');
         pmod(2).param{1} = fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0);
         pmod(2).poly{1}  = 1;
     elseif contains(model_version, "_")
+         pmod = struct('name', {}, 'param', {}, 'poly', {});
         model = split(model_version, '_');
         pmod(1).name{1}  = strcat(string(model(1,1)), 'Tactile');
         pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
@@ -84,8 +88,11 @@ orth{1} = false;
 orth{2} = false;
 
 
-
-destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subject)], ['beh'], [model_version]);
+if ischar(splitting) && splitting ~= string(model_version)
+    destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subject)], ['beh'], [splitting],[model_version]);
+else
+    destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subject)], ['beh'], [model_version]);
+end
 if ~exist(destination,'dir')
     mkdir(destination)
 end

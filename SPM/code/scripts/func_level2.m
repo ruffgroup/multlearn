@@ -1,16 +1,16 @@
 function func_level2(path,subs, model_version, contrast_num, splitting)
 
 % path of data
-if ischar(splitting) && splitting ~= model_version
+if ischar(splitting) && splitting ~= string(model_version)
     data.destination = fullfile(path.SPM_folder,'/results', splitting, model_version, strcat('Second_level_con', num2str(contrast_num )), filesep );
-elseif ischar(splitting) && splitting == model_version || ~splitting
+elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
     data.destination = fullfile(path.SPM_folder,'/results', model_version, strcat('Second_level_con', num2str(contrast_num )), filesep );
 end
 spm_jobman('initcfg');
 
-if ischar(splitting) && splitting ~= model_version
+if ischar(splitting) && splitting ~= string(model_version)
     folder_files = dir(fullfile(path.SPM_folder,'/results', splitting, model_version, 'sub-*'));
-elseif ischar(splitting) && splitting == model_version || ~splitting
+elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
     folder_files = dir(fullfile(path.SPM_folder,'/results', model_version, 'sub-*'));
 end
 for ii = 1:numel(subs)

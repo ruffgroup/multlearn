@@ -20,6 +20,7 @@ else
     error("Constants audio and tactile not defined")
 end
 
+matlabbatch{1}.spm.stats.con.spmmat = cellstr(fullfile(data.destination, 'SPM.mat'));
 matlabbatch{1}.spm.stats.con.consess{1}.tcon.name = 'tactile-audio';
 matlabbatch{1}.spm.stats.con.consess{1}.tcon.weights = contrasts_tactile - contrasts_audio;
 matlabbatch{1}.spm.stats.con.consess{1}.tcon.sessrep = 'none';

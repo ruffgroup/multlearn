@@ -1,16 +1,16 @@
-function func_level2_SnPM(path,subs, model_version, contrast_num, split, tVal)
+function func_level2_SnPM(path,subs, model_version, contrast_num, splitting, tVal)
 
 % path of data
-if split && split ~= model_version
-    data.destination = fullfile(path.SPM_folder,'/results', split, model_version, strcat('Second_level_SnPM_con', num2str(contrast_num )), filesep );
-elseif split && split == model_version || ~split
+if ischar(splitting) && splitting ~= string(model_version)
+    data.destination = fullfile(path.SPM_folder,'/results', splitting, model_version, strcat('Second_level_SnPM_con', num2str(contrast_num )), filesep );
+elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
     data.destination = fullfile(path.SPM_folder,'/results', model_version, strcat('Second_level_SnPM_con', num2str(contrast_num )), filesep );
 end
 spm_jobman('initcfg');
 
-if split && split ~= model_version
-    folder_files = dir(fullfile(path.SPM_folder,'/results', split, model_version, 'sub-*'));
-elseif split && split == model_version || ~split
+if ischar(splitting) && splitting ~= string(model_version)
+    folder_files = dir(fullfile(path.SPM_folder,'/results', splitting, model_version, 'sub-*'));
+elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
     folder_files = dir(fullfile(path.SPM_folder,'/results', model_version, 'sub-*'));
 end
 

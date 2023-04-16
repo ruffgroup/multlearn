@@ -26,7 +26,16 @@ addpath(fullfile('scripts'));
 %% Create conditions file
 for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
     model_version = convertStringsToChars(i);
-    conditions(model_version)
+    if ~contains(model_version, "_")
+        splitting = false;
+        conditions(model_version, splitting)
+    else
+        splitting = model_version;
+        model = split(model_version, "_");
+        conditions(char(model(1,1)), splitting)
+        conditions(char(model(2,1)), splitting)
+        conditions(model_version, splitting)
+    end
 end
 
 %% 1. run tapas
@@ -75,15 +84,13 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 % 
      parfor (sub = 1:numSubs,M)
          if model_version == "other"
-            func_contrast_level1(path, subs(sub).name, del_old_con);
+             func_contrast_level1(path, subs(sub).name, del_old_con);
          elseif ~contains(model_version, "_") && model_version ~= "other"
              splitting = false;
-             func_contrast_level1(path, subs(sub).name, del_old_con);
              func_contrast_level1_Pmod(path, subs(sub).name, model_version, del_old_con, splitting);
          else
              splitting = model_version;
              model = split(model_version, "_");
-             func_contrast_level1(path, subs(sub).name, del_old_con);
              func_contrast_level1_Pmod(path, subs(sub).name, char(model(1,1)), del_old_con, splitting);
              func_contrast_level1_Pmod(path, subs(sub).name, char(model(2,1)), del_old_con, splitting);
              func_contrast_level1_BothPmods(path, subs(sub).name, model_version, del_old_con);

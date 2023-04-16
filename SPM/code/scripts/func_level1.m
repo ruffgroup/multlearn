@@ -11,9 +11,9 @@ param_smoothing = 6; % what was the smoothing parameter?
 mask_file = {fullfile(SPM_folder,'/mask_ICV.nii,1')};
 
 %path of results
-if ischar(splitting) && splitting ~= model_version
+if ischar(splitting) && splitting ~= string(model_version)
     data.destination = fullfile(SPM_folder,'/results', splitting, model_version, sub);
-elseif ischar(splitting) && splitting == model_version || ~splitting
+elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
     data.destination = fullfile(SPM_folder,'/results', model_version, sub);
 end
 
@@ -106,7 +106,11 @@ for nrun = 1:numel(data.source)
     %%
     
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).cond = struct('name', {}, 'onset', {}, 'duration', {}, 'tmod', {}, 'pmod', {}, 'orth', {});
-    multicondition_file=fullfile(folder_processed, sub,['beh'],model_version,filesep,['run_', num2str(nrun), '_conditions.mat']);
+    if ischar(splitting) && splitting ~= string(model_version)
+        multicondition_file=fullfile(folder_processed, sub,['beh'],splitting, model_version,filesep,['run_', num2str(nrun), '_conditions.mat']);
+    else
+        multicondition_file=fullfile(folder_processed, sub,['beh'],model_version,filesep,['run_', num2str(nrun), '_conditions.mat']);
+    end
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = cellstr(string(multicondition_file));
     %matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = {cellstr(fullfile(folder_processed, sub,['beh'],model_version, ['run_' num2str(nrun) '_conditions.mat']))};
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).regress = struct('name', {}, 'val', {});
