@@ -24,7 +24,7 @@ from TaskDesign import task_Design
 
 class Plotting:
 
-    def __init__(self, mainTrials, additionalTrials, gridCount, ID, ww, method):
+    def __init__(self, mainTrials, additionalTrials, gridCount, ID, ww, method, reps):
         
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
@@ -32,18 +32,17 @@ class Plotting:
         self.ID = ID
         self.statLearnPar = 1
         self.ww = ww
-        self.method = method
-        if platform.system() == 'Windows':
-            wanted_dir = '/data/sourcedata/behavior/modified_files'
-        else:
-            wanted_dir = '/data/sourcedata/behavior/modified_files'
+        self.method = method 
+        self.reps = reps
+
+        wanted_dir = '/data/sourcedata/behavior/modified_files'
         # Get savedVals file
         self.savedValsFile = glob.glob(os.path.abspath(wanted_dir)+"/*{}_savedValues.csv".format(self.ID))[0]
 
 
     # Simple plots
 
-    def plots_simplestFitting(self, ww, NLL_array, alphas, betas, reps=50):
+    def plots_simplestFitting(self, NLL_array, alphas, betas, pearce):
         
         print("simple")
         saving_folder = "simple"
@@ -62,21 +61,24 @@ class Plotting:
             notAttracts = runData.accurate[runData.correctResponse == 1]
 
             
-            A_line = pd.DataFrame(ma(attracts, ww, method)).astype(float).interpolate(option='spline', order=1)
-            NA_line = pd.DataFrame(ma(notAttracts, ww, method)).astype(float).interpolate(option='spline', order=1)
-            Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).astype(float).interpolate(option='spline', order=1)
+            A_line = pd.DataFrame(ma(attracts, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
+            NA_line = pd.DataFrame(ma(notAttracts, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
+            Acc_line = pd.DataFrame(ma(runData.accurate, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
 
 
-            simA_lines = np.empty((reps, int(self.mainTrials / 2)-ww+1))
-            simNA_lines = np.empty((reps, int(self.mainTrials / 2)-ww+1))
-            simAcc_lines = np.empty((reps, int(self.mainTrials)-ww+1))
+            simA_lines = np.empty((self.reps, int(self.mainTrials / 2)-self.ww+1))
+            simNA_lines = np.empty((self.reps, int(self.mainTrials / 2)-self.ww+1))
+            simAcc_lines = np.empty((self.reps, int(self.mainTrials)-self.ww+1))
 
             taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
             feedbackAcc = runData.feedbackAccuracy.astype(int)
 
-            for i in range(reps):
-                simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta)
+            for i in range(self.reps):
+                if pearce:
+                    simulation = task_Design(self.mainTrials, self.additionalTrials, pearce=1, omega=alpha, beta=beta)
+                else:
+                    simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta)
                 simulation.taskStructure(taskStruct, green, feedbackAcc)
                 simulation.RLloops()
 
@@ -84,9 +86,9 @@ class Plotting:
                 simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
                 simC = simulation.accurate
                 if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                    simA_lines[i, :] = ma(simAttracts, ww, method)
-                    simNA_lines[i, :] = ma(simNotAttracts, ww, method)
-                    simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
+                    simA_lines[i, :] = ma(simAttracts, self.ww, self.method)
+                    simNA_lines[i, :] = ma(simNotAttracts, self.ww, self.method)
+                    simAcc_lines[i, :] = ma(simC.flatten(), self.ww, self.method)
 
             if simA_lines.size:
                 simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
@@ -94,7 +96,11 @@ class Plotting:
                 simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
 
                 fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-                fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, beta {3}"
+                if pearce:
+                    fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, beta {3}"
+                                .format(self.ID, run + 1, np.round(alpha, 2), np.round(beta, 2)))
+                else:
+                    fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, beta {3}"
                                 .format(self.ID, run + 1, np.round(alpha, 2), np.round(beta, 2)))
 
                 ax[0].plot(A_line, label='Real data')
@@ -142,7 +148,10 @@ class Plotting:
 
 
                 os.makedirs(saving_folder, exist_ok=True)
-                save_name = "{0}_{1}_simplePlots.pdf".format(self.ID, run)
+                if pearce:
+                    save_name = "{0}_{1}_simplePearcePlots.pdf".format(self.ID, run)
+                else:
+                    save_name = "{0}_{1}_simplePlots.pdf".format(self.ID, run)
                 file_path = os.path.join(saving_folder, save_name)
 
                 pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
@@ -154,7 +163,7 @@ class Plotting:
 
     # Value plots
 
-    def plots_valueFitting(self, ww, method, reps=50):
+    def plots_valueFitting(self):
 
         count = 0
 
@@ -208,17 +217,17 @@ class Plotting:
                 avgAccCorrReward = np.nanmean(accCorrReward)
                 avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
 
-                A_line = pd.DataFrame(ma(attracts, ww, method)).astype(float).interpolate(option='spline', order=1)
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).astype(float).interpolate(option='spline', order=1)
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).astype(float).interpolate(option='spline', order=1)
+                A_line = pd.DataFrame(ma(attracts, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
+                NA_line = pd.DataFrame(ma(notAttracts, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
+                Acc_line = pd.DataFrame(ma(runData.accurate, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
 
                 MoA_Line = pd.DataFrame(MostAcc)
                 MiA_Line = pd.DataFrame(MiddleAcc)
                 LA_line = pd.DataFrame(LeastAcc)
 
-                simA_lines = np.empty((reps, int(self.mainTrials / 2)))
-                simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
-                simAcc_lines = np.empty((reps, int(self.mainTrials)))
+                simA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
+                simNA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
+                simAcc_lines = np.empty((self.reps, int(self.mainTrials)))
 
                 taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
                 green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
@@ -254,7 +263,7 @@ class Plotting:
                         idx = np.where(np.isnan(runData.accurate[50:60]))[0][:toFlip]
                         feedbackAcc[idx + 50] = 1
 
-                for i in range(reps):
+                for i in range(self.reps):
                     simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
                                              V_option0Init=V_option0, V_option1Init=V_option1)
                     simulation.taskStructure(taskStruct, green, feedbackAcc)
@@ -265,9 +274,9 @@ class Plotting:
                     simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
                     simC = simulation.accurate
                     if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, ww, method)
-                        simNA_lines[i, :] = ma(simNotAttracts, ww, method)
-                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
+                        simA_lines[i, :] = ma(simAttracts, self.ww, self.method)
+                        simNA_lines[i, :] = ma(simNotAttracts, self.ww, self.method)
+                        simAcc_lines[i, :] = ma(simC.flatten(), self.ww, self.method)
 
                 if simA_lines.size:
                     simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
@@ -370,18 +379,18 @@ class Plotting:
 
     # Update plots
 
-    def plots_updateFitting(self, ww, method, reps=50, version=None):
+    def plots_updateFitting(self):
 
         count = 0
         for ID in self.IDs:
             print(ID)
             print("update")
-            if version == None:
+            if self.version == None:
                 saving_folder = "updateSimple"
-            elif version == "two":
+            elif self.version == "two":
                 print("action")
                 saving_folder = "updateAction"
-            elif version == "four":
+            elif self.version == "four":
                 print("actionReward")
                 saving_folder = "updateActionReward"
 
@@ -392,9 +401,9 @@ class Plotting:
                 alpha = self.all_alphas[count, run]
                 beta = self.all_betas[count, run]
                 alpha2 = self.all_alphas2[count, run]
-                if version == "two":
+                if self.version == "two":
                     alpha3 = self.all_alphas3[count, run]
-                elif version == "four":
+                elif self.version == "four":
                     alpha3 = self.all_alphas3[count, run]
                     alpha4 = self.all_alphas4[count, run]
                     alpha5 = self.all_alphas5[count, run]
@@ -440,17 +449,17 @@ class Plotting:
                 avgAccCorrReward = np.nanmean(accCorrReward)
                 avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
 
-                A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
+                A_line = pd.DataFrame(ma(attracts, self.ww, self.method)).fillna(method='ffill')
+                NA_line = pd.DataFrame(ma(notAttracts, self.ww, self.method)).fillna(method='ffill')
+                Acc_line = pd.DataFrame(ma(runData.accurate, self.ww, self.method)).fillna(method='ffill')
 
                 MoA_Line = pd.DataFrame(MostAcc)
                 MiA_Line = pd.DataFrame(MiddleAcc)
                 LA_line = pd.DataFrame(LeastAcc)
 
-                simA_lines = np.empty((reps, int(self.mainTrials / 2)))
-                simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
-                simAcc_lines = np.empty((reps, int(self.mainTrials)))
+                simA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
+                simNA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
+                simAcc_lines = np.empty((self.reps, int(self.mainTrials)))
 
                 taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
@@ -484,11 +493,11 @@ class Plotting:
                         idx = np.where(np.isnan(runData.accurate[50:60]))[0][:toFlip]
                         feedbackAcc[idx + 50] = 1
 
-                for i in range(reps):
-                    if version is None:
+                for i in range(self.reps):
+                    if self.version is None:
                         simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
                                                  alpha2=alpha2)
-                    elif version == "two":
+                    elif self.version == "two":
                         simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
                                                  alpha2=alpha2, alpha3=alpha3)
                     else:
@@ -501,9 +510,9 @@ class Plotting:
                     simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
                     simC = simulation.accurate
                     if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, ww, method)
-                        simNA_lines[i, :] = ma(simNotAttracts, ww, method)
-                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
+                        simA_lines[i, :] = ma(simAttracts, self.ww, self.method)
+                        simNA_lines[i, :] = ma(simNotAttracts, self.ww, self.method)
+                        simAcc_lines[i, :] = ma(simC.flatten(), self.ww, self.method)
 
                 if simA_lines.size:
                     simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
@@ -511,12 +520,12 @@ class Plotting:
                     simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
 
                     fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-                    if version is None:
+                    if self.version is None:
                         fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
                                      "beta {3}, alpha2 {4}"
                                      .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
                                              np.round(alpha2, 2)))
-                    elif version == "two":
+                    elif self.version == "two":
                         fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
                                      "beta {3}, alpha2 {4}, alpha3 {5}"
                                      .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
@@ -597,14 +606,14 @@ class Plotting:
                     plt.ylabel('NLL', fontweight='bold')
                     plt.title("Participant {0}, run {1}: NLL and alpha2 scatter plot".format(ID, run + 1))
 
-                    if version == "two":
+                    if self.version == "two":
                         plt.figure(7)
                         plt.scatter(NLL_array[:, 4], NLL_array[:, 2])
                         plt.xlabel('alpha3', fontweight='bold')
                         plt.ylabel('NLL', fontweight='bold')
                         plt.title("Participant {0}, run {1}: NLL and alpha3 scatter plot".format(ID, run + 1))
 
-                    elif version == "four":
+                    elif self.version == "four":
                         plt.figure(7)
                         plt.scatter(NLL_array[:, 4], NLL_array[:, 2])
                         plt.xlabel('alpha3', fontweight='bold')
@@ -626,11 +635,11 @@ class Plotting:
 
                     os.makedirs(saving_folder, exist_ok=True)
 
-                    if version is None:
+                    if self.version is None:
                         save_name = "{0}_{1}_simpleUpdatePlots.pdf".format(ID, run)
                         file_path = os.path.join(saving_folder, save_name)
                         pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    elif version == "two":
+                    elif self.version == "two":
                         save_name = "{0}_{1}_actionUpdatePlots.pdf".format(ID, run)
                         file_path = os.path.join(saving_folder, save_name)
                         pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
@@ -650,17 +659,17 @@ class Plotting:
 
     # Update and Init V0 and V1 plots
 
-    def plots_updateInitFitting(self, ww, method, reps=50, version=None):
+    def plots_updateInitFitting(self):
 
         count = 0
         for ID in self.IDs:
             print(ID)
             print("initUpdate")
-            if version == None:
+            if self.version == None:
                 saving_folder = "initValUpdateSimple"
-            elif version == "two":
+            elif self.version == "two":
                 saving_folder = "initValUpdateAction"
-            elif version == "four":
+            elif self.version == "four":
                 saving_folder = "initValUpdateActionReward"
 
             subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
@@ -670,9 +679,9 @@ class Plotting:
                 alpha = self.all_alphas[count, run]
                 beta = self.all_betas[count, run]
                 alpha2 = self.all_alphas2[count, run]
-                if version == "two":
+                if self.version == "two":
                     alpha3 = self.all_alphas3[count, run]
-                elif version == "four":
+                elif self.version == "four":
                     alpha3 = self.all_alphas3[count, run]
                     alpha4 = self.all_alphas4[count, run]
                     alpha5 = self.all_alphas5[count, run]
@@ -720,17 +729,17 @@ class Plotting:
                 avgAccCorrReward = np.nanmean(accCorrReward)
                 avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
 
-                A_line = pd.DataFrame(ma(attracts, ww, method)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, ww, method)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, ww, method)).fillna(method='ffill')
+                A_line = pd.DataFrame(ma(attracts, self.ww, self.method)).fillna(method='ffill')
+                NA_line = pd.DataFrame(ma(notAttracts, self.ww, self.method)).fillna(method='ffill')
+                Acc_line = pd.DataFrame(ma(runData.accurate, self.ww, self.method)).fillna(method='ffill')
 
                 MoA_Line = pd.DataFrame(MostAcc)
                 MiA_Line = pd.DataFrame(MiddleAcc)
                 LA_line = pd.DataFrame(LeastAcc)
 
-                simA_lines = np.empty((reps, int(self.mainTrials / 2)))
-                simNA_lines = np.empty((reps, int(self.mainTrials / 2)))
-                simAcc_lines = np.empty((reps, int(self.mainTrials)))
+                simA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
+                simNA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
+                simAcc_lines = np.empty((self.reps, int(self.mainTrials)))
 
                 taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
@@ -764,11 +773,11 @@ class Plotting:
                         idx = np.where(np.isnan(runData.accurate[50:60]))[0][:toFlip]
                         feedbackAcc[idx + 50] = 1
 
-                for i in range(reps):
-                    if version is None:
+                for i in range(self.reps):
+                    if self.version is None:
                         simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
                                                  alpha2=alpha2, V_option0Init=V_option0, V_option1Init=V_option1)
-                    elif version == "two":
+                    elif self.version == "two":
                         simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
                                                  alpha2=alpha2, alpha3=alpha3, V_option0Init=V_option0, V_option1Init=V_option1)
                     else:
@@ -782,9 +791,9 @@ class Plotting:
                     simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
                     simC = simulation.accurate
                     if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, ww, method)
-                        simNA_lines[i, :] = ma(simNotAttracts, ww, method)
-                        simAcc_lines[i, :] = ma(simC.flatten(), ww, method)
+                        simA_lines[i, :] = ma(simAttracts, self.ww, self.method)
+                        simNA_lines[i, :] = ma(simNotAttracts, self.ww, self.method)
+                        simAcc_lines[i, :] = ma(simC.flatten(), self.ww, self.method)
 
                 if simA_lines.size:
                     simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
@@ -792,13 +801,13 @@ class Plotting:
                     simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
 
                     fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-                    if version is None:
+                    if self.version is None:
                         fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
                                      "beta {3}, alpha2 {4}, V0Init {5}, V1Init {6}"
                                      .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
                                              np.round(alpha2, 2), np.round(V_option0[0][0], 2),
                                              np.round(V_option1[0][0], 2)))
-                    elif version == "two":
+                    elif self.version == "two":
                         fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
                                      "beta {3}, alpha2 {4}, alpha3 {5}, V0Init {6}, V1Init {7}"
                                      .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
@@ -894,14 +903,14 @@ class Plotting:
                     plt.ylabel('NLL', fontweight='bold')
                     plt.title("Participant {0}, run {1}: NLL and Init V1 scatter plot".format(ID, run + 1))
 
-                    if version == "two":
+                    if self.version == "two":
                         plt.figure(9)
                         plt.scatter(NLL_array[:, 6], NLL_array[:, 2])
                         plt.xlabel('alpha3', fontweight='bold')
                         plt.ylabel('NLL', fontweight='bold')
                         plt.title("Participant {0}, run {1}: NLL and alpha3 scatter plot".format(ID, run + 1))
 
-                    elif version == "four":
+                    elif self.version == "four":
                         plt.figure(9)
                         plt.scatter(NLL_array[:, 6], NLL_array[:, 2])
                         plt.xlabel('alpha3', fontweight='bold')
@@ -923,11 +932,11 @@ class Plotting:
 
                     os.makedirs(saving_folder, exist_ok=True)
 
-                    if version is None:
+                    if self.version is None:
                         save_name = "{0}_{1}_initValSimpleUpdatePlots.pdf".format(ID, run)
                         file_path = os.path.join(saving_folder, save_name)
                         pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    elif version == "two":
+                    elif self.version == "two":
                         save_name = "{0}_{1}_initValActionUpdatePlots.pdf".format(ID, run)
                         file_path = os.path.join(saving_folder, save_name)
                         pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)

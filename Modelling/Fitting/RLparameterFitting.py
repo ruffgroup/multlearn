@@ -25,7 +25,7 @@ from TaskDesign import task_Design
 
 class Fitting:
 
-    def __init__(self, mainTrials, additionalTrials, gridCount, ID, plotting=False, ww=None):
+    def __init__(self, mainTrials, additionalTrials, gridCount, ID, plotting=False, ww=10, method="valid", reps=50):
         
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
@@ -35,7 +35,7 @@ class Fitting:
         self.plotting = plotting
 
         if self.plotting:
-            self.Plot = Plotting(self.mainTrials, self.additionalTrials, self.gridCount, self.ID, ww)
+            self.Plot = Plotting(self.mainTrials, self.additionalTrials, self.gridCount, self.ID, ww=ww, method=method, reps=reps)
 
 
         wanted_dir = '/data/sourcedata/behavior/modified_files'
@@ -45,7 +45,7 @@ class Fitting:
         self.subjectData['stimulusPair'] = self.subjectData['stimulusPair'].apply(ast.literal_eval)
     ## Simple fitting
 
-    def simplestFitting(self):
+    def simplestFitting(self, pearce=False):
               
         fitted_alphas = np.empty((max(self.subjectData.runNumber)))
         fitted_betas = np.empty((max(self.subjectData.runNumber)))
@@ -89,6 +89,8 @@ class Fitting:
                 betaCheck = betaGrid[j]
                 run_V0[j, 0] = V_option0[0, 0, 0]
                 run_V1[j, 0] = V_option1[0, 0, 0]
+                if pearce:
+                    omega = 1
                 for t in range(0, max(runData.trialNumber)):
                     # Prob of choosing the 0th and 1st option respectively
                     choiceProb[t, 0] = np.exp(betaCheck * V_option0[
@@ -107,9 +109,15 @@ class Fitting:
                             runData.reward[t] - V_option0[(t,) + runData.stimulusPair[t]]
 
                         V_option0[t + 1, :] = V_option0[t, :]
-                        V_option0[(t + 1,) + runData.stimulusPair[t]] = \
-                            V_option0[(t,) + runData.stimulusPair[t]] + \
-                            alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                        if pearce:
+                            omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaCheck
+                            V_option0[(t + 1,) + runData.stimulusPair[t]] = \
+                                V_option0[(t,) + runData.stimulusPair[t]] + \
+                                omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                        else:
+                            V_option0[(t + 1,) + runData.stimulusPair[t]] = \
+                                V_option0[(t,) + runData.stimulusPair[t]] + \
+                                alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                         V_option1[t + 1, :] = V_option1[t, :]
 
@@ -118,9 +126,15 @@ class Fitting:
                             runData.reward[t] - V_option1[(t,) + runData.stimulusPair[t]]
 
                         V_option1[t + 1, :] = V_option1[t, :]
-                        V_option1[(t + 1,) + runData.stimulusPair[t]] = \
-                            V_option1[(t,) + runData.stimulusPair[t]] + \
-                            alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                        if pearce:
+                            omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaCheck
+                            V_option1[(t + 1,) + runData.stimulusPair[t]] = \
+                                V_option1[(t,) + runData.stimulusPair[t]] + \
+                                omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                        else:
+                            V_option1[(t + 1,) + runData.stimulusPair[t]] = \
+                                V_option1[(t,) + runData.stimulusPair[t]] + \
+                                alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
                         V_option0[t + 1, :] = V_option0[t, :]
                     else:
                         V_option1[t + 1, :] = V_option1[t, :]
@@ -148,10 +162,13 @@ class Fitting:
 
         newPath = os.path.join(pathlib.Path(__file__).resolve().parents[3], "/data/fittedParameters/sub-{}".format(self.ID))
         Path(newPath).mkdir(parents=True, exist_ok=True)
-        scipy.io.savemat(newPath+'/rpeSimple.mat'.format(self.ID), mdict={'rpe': RPE})
+        if pearce:
+            scipy.io.savemat(newPath+'/rpeSimplePearce.mat'.format(self.ID), mdict={'rpe': RPE})
+        else:
+            scipy.io.savemat(newPath+'/rpeSimple.mat'.format(self.ID), mdict={'rpe': RPE})
 
         if self.plotting:
-            self.Plot.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
+            self.Plot.plots_simplestFitting(NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, pearce=pearce)
 
         return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
 
@@ -809,19 +826,19 @@ IDs = ["01", "02", "03", "04", "05", "06", "07", "09", "10", "11", "12", "14", "
        "58", "59", "60", "61", "62", "63", "64"]
 
 for IDnr in IDs:
-    fitted = Fitting(60, 0, 5000, ID=IDnr)
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
 
 # # Run stat learning
     #beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
 
 
 # # Run the simplest RL model
-    #fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
+    fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
 
     #fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
 # # Run the RL model including initial V0 and V1 as free parameters
-    fitted_alphas, fitted_betas, best_LLs, fitted_V_option0Inits, fitted_V_option1Inits, RPE, V0, V1, NLL_array = fitted.valFitting()
+    #fitted_alphas, fitted_betas, best_LLs, fitted_V_option0Inits, fitted_V_option1Inits, RPE, V0, V1, NLL_array = fitted.valFitting()
     #fitted.plots_valueFitting(ww=10, method='same', reps=50)
 
 # # Run the RL model with extra learning rates for the other pairs
