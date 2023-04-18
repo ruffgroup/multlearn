@@ -53,7 +53,11 @@ class Fitting:
                 reps=reps,
             )
 
-        wanted_dir = "/data/sourcedata/behavior/modified_files"
+        if platform.system() == 'Windows':
+            wanted_dir = '/data/sourcedata/behavior/modified_files'
+        else:
+            wanted_dir = '/Volumes/SDrive/data/sourcedata/behavior/modified_files'
+
         # Get savedVals file
         self.savedValsFile = glob.glob(
             os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID)
@@ -66,6 +70,8 @@ class Fitting:
     ## Simple fitting
 
     def simplestFitting(self, pearce=False):
+            
+        print(self.ID)
         fitted_alphas = np.empty((max(self.subjectData.runNumber)))
         fitted_betas = np.empty((max(self.subjectData.runNumber)))
         best_LLs = np.empty((max(self.subjectData.runNumber)))
@@ -229,10 +235,12 @@ class Fitting:
             V0[run] = run_V0[minIndex]
             V1[run] = run_V1[minIndex]
 
-        newPath = os.path.join(
-            pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{}".format(self.ID),
-        )
+        if platform.system() == 'Windows':
+            new_dir = "/data/fittedParameters/"
+        else:
+            new_dir = "/Volumes/SDrive/data/fittedParameters/"
+
+        newPath = os.path.join(pathlib.Path(__file__).resolve().parents[3], new_dir+"/sub-{}".format(self.ID))
         Path(newPath).mkdir(parents=True, exist_ok=True)
         if pearce:
             scipy.io.savemat(
