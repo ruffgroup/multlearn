@@ -63,14 +63,17 @@ class Fitting:
             ast.literal_eval
         )
 
-    ## Simple fitting
+    ##
 
-    def simplestFitting(self, pearce=False):
-        fitted_alphas = np.empty((max(self.subjectData.runNumber)))
+    def basicFitting(self, version=None, pearce=False, init=False):
+        """
+        version: None or "two" for separate alpha for V1
+        pearce: False or True for Pearce Hall implementation
+        init: False or True for initial V0 and V1
+        """
+        fitted_alphas = fitted_alphas2 = np.empty((max(self.subjectData.runNumber)))
         fitted_betas = np.empty((max(self.subjectData.runNumber)))
         best_LLs = np.empty((max(self.subjectData.runNumber)))
-        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 3))
-        NLL_array[:] = np.nan
 
         RPE = np.empty(
             (max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials)
@@ -88,10 +91,26 @@ class Fitting:
             )
         )
 
+        fitted_V_option0Inits = fitted_V_option1Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
+
+        if version == "two" and not init:
+            NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 4))
+        elif version == "two" and init:
+            NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 6))
+        elif not version and init:
+            NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 5))
+        else:
+            NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 3))
+        NLL_array[:] = np.nan
+
         for run in range(0, max(self.subjectData.runNumber)):
             alphaGrid = np.random.rand(self.gridCount, 1)
+            if version == "two":
+                alpha2Grid = np.random.rand(self.gridCount, 1)
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
+            if init:
+                V_option0Init_Grid = V_option1Init_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
             runData = self.subjectData[
                 self.subjectData.runNumber == run + 1
             ].reset_index()
@@ -115,20 +134,28 @@ class Fitting:
                 actionProb[:] = np.nan
                 V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
                 V_option0[:] = np.nan
-                V_option0[0, :] = 0.5
                 V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
                 V_option1[:] = np.nan
-                V_option1[0, :] = 0.5
+                if init:
+                    V_option0[0, :] = V_option0Init_Grid[j]
+                    V_option1[0, :] = V_option1Init_Grid[j]
+                else:
+                    V_option0[0, :] = 0.5
+                    V_option1[0, :] = 0.5
+                
                 rewardPE = np.empty((max(runData.trialNumber), 3, 3))
                 rewardPE[:] = np.nan
 
                 # Checking parameters from the grid
                 alphaCheck = alphaGrid[j]
+                if version == "two":
+                    alpha2Check = alpha2Grid[j]
                 betaCheck = betaGrid[j]
                 run_V0[j, 0] = V_option0[0, 0, 0]
                 run_V1[j, 0] = V_option1[0, 0, 0]
                 if pearce:
                     omega = 1
+                    omega2 = 1
                 for t in range(0, max(runData.trialNumber)):
                     # Prob of choosing the 0th and 1st option respectively
                     choiceProb[t, 0] = np.exp(
@@ -186,22 +213,56 @@ class Fitting:
                         )
 
                         V_option1[t + 1, :] = V_option1[t, :]
-                        if pearce:
-                            omega = (
-                                omega
-                                + (
-                                    abs(rewardPE[(t,) + runData.stimulusPair[t]])
-                                    - omega
+                        if version == "two":
+                            if pearce:
+                                omega2 = (
+                                    omega2
+                                    + (
+                                        abs(rewardPE[(t,) + runData.stimulusPair[t]])
+                                        - omega2
+                                    )
+                                    * alpha2Check
                                 )
-                                * alphaCheck
-                            )
-                            V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
-                                (t,) + runData.stimulusPair[t]
-                            ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                V_option1[
+                                    (t + 1,) + runData.stimulusPair[t]
+                                ] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega2 * (
+                                    rewardPE[(t,) + runData.stimulusPair[t]]
+                                )
+                            else:
+                                V_option1[
+                                    (t + 1,) + runData.stimulusPair[t]
+                                ] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + alpha2Check * (
+                                    rewardPE[(t,) + runData.stimulusPair[t]]
+                                )
                         else:
-                            V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
-                                (t,) + runData.stimulusPair[t]
-                            ] + alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                            if pearce:
+                                omega = (
+                                    omega
+                                    + (
+                                        abs(rewardPE[(t,) + runData.stimulusPair[t]])
+                                        - omega
+                                    )
+                                    * alphaCheck
+                                )
+                                V_option1[
+                                    (t + 1,) + runData.stimulusPair[t]
+                                ] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega * (
+                                    rewardPE[(t,) + runData.stimulusPair[t]]
+                                )
+                            else:
+                                V_option1[
+                                    (t + 1,) + runData.stimulusPair[t]
+                                ] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + alphaCheck * (
+                                    rewardPE[(t,) + runData.stimulusPair[t]]
+                                )
                         V_option0[t + 1, :] = V_option0[t, :]
                     else:
                         V_option1[t + 1, :] = V_option1[t, :]
@@ -217,264 +278,161 @@ class Fitting:
                 NLL_array[run, j, 0] = alphaCheck
                 NLL_array[run, j, 1] = betaCheck
                 NLL_array[run, j, 2] = negativeLogLikelihood
+                if version == "two" and init:
+                    NLL_array[run, j, 3] = alpha2Check
+                    NLL_array[run, j, 4] = V_option0Init_Grid[j][0][0]
+                    NLL_array[run, j, 5] = V_option1Init_Grid[j][0][0]
+                elif version == "two" and not init:
+                    NLL_array[run, j, 3] = alpha2Check
+                elif init and not version:
+                    NLL_array[run, j, 3] = V_option0Init_Grid[j][0][0]
+                    NLL_array[run, j, 4] = V_option1Init_Grid[j][0][0]
                 LL_array[j, 0] = Likelihood
 
             minIndex = np.argmin(NLL_array[run, :, 2])
             maxIndex = np.nanargmax(LL_array[:, 0])
 
             fitted_alphas[run] = NLL_array[run, minIndex, 0]
+            if version == "two":
+                fitted_alphas2[run] = NLL_array[run, minIndex, 3]
             fitted_betas[run] = NLL_array[run, minIndex, 1]
+            if init:
+                fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
+                fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
             best_LLs[run] = LL_array[maxIndex]
             RPE[run] = run_RPEs[minIndex]
             V0[run] = run_V0[minIndex]
             V1[run] = run_V1[minIndex]
-
-        newPath = os.path.join(
-            pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{}".format(self.ID),
-        )
-        Path(newPath).mkdir(parents=True, exist_ok=True)
-        if pearce:
-            scipy.io.savemat(
-                newPath + "/rpeSimplePearce.mat".format(self.ID), mdict={"rpe": RPE}
-            )
-        else:
-            scipy.io.savemat(
-                newPath + "/rpeSimple.mat".format(self.ID), mdict={"rpe": RPE}
-            )
 
         if self.plotting:
-            self.Plot.plots_simplestFitting(
-                NLL_array=NLL_array,
-                alphas=fitted_alphas,
-                betas=fitted_betas,
-                pearce=pearce,
-            )
-
-        return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
-
-    ## Value fitting
-
-    def valFitting(self, pearce=False):
-        fitted_alphas = np.empty((max(self.subjectData.runNumber)))
-        fitted_betas = np.empty((max(self.subjectData.runNumber)))
-        best_LLs = np.empty((max(self.subjectData.runNumber)))
-        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 5))
-        NLL_array[:] = np.nan
-
-        RPE = np.empty(
-            (max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials)
-        )
-        V0 = np.empty(
-            (
-                max(self.subjectData.runNumber),
-                self.mainTrials + self.additionalTrials + 1,
-            )
-        )
-        V1 = np.empty(
-            (
-                max(self.subjectData.runNumber),
-                self.mainTrials + self.additionalTrials + 1,
-            )
-        )
-
-        fitted_V_option0Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
-        fitted_V_option1Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
-
-        for run in range(0, max(self.subjectData.runNumber)):
-            runData = self.subjectData[
-                self.subjectData.runNumber == run + 1
-            ].reset_index()
-            alphaGrid = np.random.rand(self.gridCount, 1)
-            betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
-            LL_array = np.empty((self.gridCount, 1))
-            # V_option0Init_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
-            V_option0_rand = np.random.rand(self.gridCount, 1)
-            V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape(
-                (self.gridCount, 3, 3)
-            )
-            # V_option1Init_Grid = np.random.uniform(0, 1, (self.gridCount, 3, 3))
-            V_option1_rand = np.random.rand(self.gridCount, 1)
-            V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape(
-                (self.gridCount, 3, 3)
-            )
-
-            run_RPEs = np.empty(
-                (self.gridCount, self.mainTrials + self.additionalTrials)
-            )
-            run_V0 = np.empty(
-                (self.gridCount, self.mainTrials + self.additionalTrials + 1)
-            )
-            run_V1 = np.empty(
-                (self.gridCount, self.mainTrials + self.additionalTrials + 1)
-            )
-
-            # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
-            for j in range(0, self.gridCount):
-                # For each point on the grid we instantiate the arrays for the time steps-
-                """Instantiating for the fitting"""
-
-                choiceProb = np.empty((max(runData.trialNumber), 2))
-                choiceProb[:] = np.nan
-                actionProb = np.empty((max(runData.trialNumber), 1))
-                actionProb[:] = np.nan
-                V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                V_option0[:] = np.nan
-                V_option0[0, :] = V_option0Init_Grid[j]
-                V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                V_option1[:] = np.nan
-                V_option1[0, :] = V_option1Init_Grid[j]
-                rewardPE = np.empty((max(runData.trialNumber), 3, 3))
-                rewardPE[:] = np.nan
-
-                # Checking parameters from the grid
-                alphaCheck = alphaGrid[j]
-                betaCheck = betaGrid[j]
-                run_V0[j, 0] = V_option0[0, 0, 0]
-                run_V1[j, 0] = V_option1[0, 0, 0]
-                if pearce:
-                    omega = 1
-                for t in range(0, max(runData.trialNumber)):
-                    # Prob of choosing the 0th and 1st option respectively
-                    choiceProb[t, 0] = np.exp(
-                        betaCheck * V_option0[((t,) + runData.stimulusPair[t])]
-                    ) / (
-                        (
-                            np.exp(
-                                betaCheck * V_option0[((t,) + runData.stimulusPair[t])]
-                            )
-                        )
-                        + (
-                            np.exp(
-                                betaCheck * V_option1[((t,) + runData.stimulusPair[t])]
-                            )
-                        )
-                    )
-                    choiceProb[t, 1] = 1 - choiceProb[t, 0]
-
-                    actionProb[t, :] = (
-                        choiceProb[t, int(runData.action[t])]
-                        if ~np.isnan(runData.action[t])
-                        else np.nan
-                    )
-
-                    if runData.action[t] == 0:
-                        rewardPE[(t,) + runData.stimulusPair[t]] = (
-                            runData.reward[t]
-                            - V_option0[(t,) + runData.stimulusPair[t]]
-                        )
-
-                        V_option0[t + 1, :] = V_option0[t, :]
-
-                        if pearce:
-                            omega = (
-                                omega
-                                + (
-                                    abs(rewardPE[(t,) + runData.stimulusPair[t]])
-                                    - omega
-                                )
-                                * alphaCheck
-                            )
-                            V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
-                                (t,) + runData.stimulusPair[t]
-                            ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
-                        else:
-                            V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
-                                (t,) + runData.stimulusPair[t]
-                            ] + alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
-
-                        V_option1[t + 1, :] = V_option1[t, :]
-
-                    elif runData.action[t] == 1:
-                        rewardPE[(t,) + runData.stimulusPair[t]] = (
-                            runData.reward[t]
-                            - V_option1[(t,) + runData.stimulusPair[t]]
-                        )
-
-                        V_option1[t + 1, :] = V_option1[t, :]
-
-                        if pearce:
-                            omega = (
-                                omega
-                                + (
-                                    abs(rewardPE[(t,) + runData.stimulusPair[t]])
-                                    - omega
-                                )
-                                * alphaCheck
-                            )
-                            V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
-                                (t,) + runData.stimulusPair[t]
-                            ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
-                        else:
-                            V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
-                                (t,) + runData.stimulusPair[t]
-                            ] + alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
-                        V_option0[t + 1, :] = V_option0[t, :]
-                    else:
-                        V_option1[t + 1, :] = V_option1[t, :]
-                        V_option0[t + 1, :] = V_option0[t, :]
-
-                    run_RPEs[j, t] = rewardPE[(t,) + runData.stimulusPair[t]]
-                    run_V0[j, t + 1] = V_option0[(t + 1,) + runData.stimulusPair[t]]
-                    run_V1[j, t + 1] = V_option1[(t + 1,) + runData.stimulusPair[t]]
-
-                negativeLogLikelihood = -np.sum(
-                    np.log(actionProb[~np.isnan(actionProb)])
+            if version == "two" and init:
+                self.Plot.plots_basicFitting(
+                    NLL_array=NLL_array,
+                    alphas=fitted_alphas,
+                    betas=fitted_betas,
+                    pearce=pearce,
+                    alphas2=fitted_alphas2,
+                    V_option0Inits=fitted_V_option0Inits, 
+                    V_option1Inits=fitted_V_option1Inits
                 )
-                Likelihood = np.prod(actionProb[~np.isnan(actionProb)])
-
-                NLL_array[run, j, 0] = alphaCheck
-                NLL_array[run, j, 1] = betaCheck
-                NLL_array[run, j, 2] = negativeLogLikelihood
-                NLL_array[run, j, 3] = V_option0Init_Grid[j][0][0]
-                NLL_array[run, j, 4] = V_option1Init_Grid[j][0][0]
-                LL_array[j, 0] = Likelihood
-
-            minIndex = np.argmin(NLL_array[run, :, 2])
-            maxIndex = np.nanargmax(LL_array[:, 0])
-
-            fitted_alphas[run] = NLL_array[run, minIndex, 0]
-            fitted_betas[run] = NLL_array[run, minIndex, 1]
-            best_LLs[run] = LL_array[maxIndex]
-            fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
-            fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
-            RPE[run] = run_RPEs[minIndex]
-            V0[run] = run_V0[minIndex]
-            V1[run] = run_V1[minIndex]
+            elif version == "two" and not init:
+                self.Plot.plots_basicFitting(
+                    NLL_array=NLL_array,
+                    alphas=fitted_alphas,
+                    betas=fitted_betas,
+                    pearce=pearce,
+                    alphas2=fitted_alphas2,
+                )
+            elif not version and init:
+                self.Plot.plots_basicFitting(
+                    NLL_array=NLL_array,
+                    alphas=fitted_alphas,
+                    betas=fitted_betas,
+                    pearce=pearce,
+                    V_option0Inits=fitted_V_option0Inits, 
+                    V_option1Inits=fitted_V_option1Inits
+                )
+            else:
+                self.Plot.plots_basicFitting(
+                    NLL_array=NLL_array,
+                    alphas=fitted_alphas,
+                    betas=fitted_betas,
+                    pearce=pearce,
+                )
 
         newPath = os.path.join(
             pathlib.Path(__file__).resolve().parents[3],
             "/data/fittedParameters/sub-{}".format(self.ID),
         )
         Path(newPath).mkdir(parents=True, exist_ok=True)
-        if pearce:
-            scipy.io.savemat(
-                newPath + "/rpeValPearce.mat".format(self.ID), mdict={"rpe": RPE}
+
+        if version == "two" and not init:
+            if pearce:
+                scipy.io.savemat(
+                    newPath + "/rpe2Pearce.mat".format(self.ID),
+                    mdict={"rpe": RPE},
+                )
+            else:
+                scipy.io.savemat(
+                    newPath + "/rpe2.mat".format(self.ID), mdict={"rpe": RPE}
+                )
+            return (
+                fitted_alphas,
+                fitted_alphas2,
+                fitted_betas,
+                best_LLs,
+                RPE,
+                V0,
+                V1,
+                NLL_array,
+            )
+        elif version == "two" and init:
+            if pearce:
+                scipy.io.savemat(
+                    newPath + "/rpe2InitPearce.mat".format(self.ID),
+                    mdict={"rpe": RPE},
+                )
+            else:
+                scipy.io.savemat(
+                    newPath + "/rpe2Init.mat".format(self.ID), mdict={"rpe": RPE}
+                )
+            return (
+                fitted_alphas,
+                fitted_alphas2,
+                fitted_betas,
+                best_LLs,
+                RPE,
+                V0,
+                V1,
+                NLL_array,
+                fitted_V_option0Inits,
+                fitted_V_option1Inits
+            )
+        elif not version and init:
+            if pearce:
+                scipy.io.savemat(
+                    newPath + "/rpeInitPearce.mat".format(self.ID),
+                    mdict={"rpe": RPE},
+                )
+            else:
+                scipy.io.savemat(
+                    newPath + "/rpeInit.mat".format(self.ID), mdict={"rpe": RPE}
+                )
+            return (
+                fitted_alphas,
+                fitted_betas,
+                best_LLs,
+                RPE,
+                V0,
+                V1,
+                NLL_array,
+                fitted_V_option0Inits,
+                fitted_V_option1Inits
             )
         else:
-            scipy.io.savemat(
-                newPath + "/rpeVal.mat".format(self.ID), mdict={"rpe": RPE}
-            )
+            if pearce:
+                scipy.io.savemat(
+                    newPath + "/rpePearce.mat".format(self.ID), mdict={"rpe": RPE}
+                )
+            else:
+                scipy.io.savemat(
+                    newPath + "/rpe.mat".format(self.ID), mdict={"rpe": RPE}
+                )
+            return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
 
-        return (
-            fitted_alphas,
-            fitted_betas,
-            best_LLs,
-            fitted_V_option0Inits,
-            fitted_V_option1Inits,
-            RPE,
-            V0,
-            V1,
-            NLL_array,
-        )
 
     # Extra update rule multiple versions
 
     # In update fitting model, when version is None, this means that the pairs corresponding to the same
     # visual or audio/tactile stimulus gets updated as well in the opposite direction with some
-    # different learning rate alpha2
+    # different learning rate alphaOther
     # Meanwhile when version is "two", then there is action dependance, ACTION AND REWARD (4)
-    def updateFitting(self, version=None, pearce=False):
+    def transferFitting(self, version=None, pearce=False, init=False):
+        """
+        version: None, "two" or "four"
+        pearce: True or False
+        init: True or False
+        """
         fitted_alphas = np.empty((max(self.subjectData.runNumber)))
         fitted_alphas2 = np.empty((max(self.subjectData.runNumber)))
         if version == "two":
@@ -507,13 +465,13 @@ class Fitting:
 
         for run in range(0, max(self.subjectData.runNumber)):
             alphaGrid = np.random.rand(self.gridCount, 1)
-            alpha2Grid = np.random.rand(self.gridCount, 1)
+            alphaOtherGrid = np.random.rand(self.gridCount, 1)
             if version == "two":
-                alpha3Grid = np.random.rand(self.gridCount, 1)
+                alphaOther2Grid = np.random.rand(self.gridCount, 1)
             elif version == "four":
-                alpha3Grid = np.random.rand(self.gridCount, 1)
-                alpha4Grid = np.random.rand(self.gridCount, 1)
-                alpha5Grid = np.random.rand(self.gridCount, 1)
+                alphaOther2Grid = np.random.rand(self.gridCount, 1)
+                alphaOther3Grid = np.random.rand(self.gridCount, 1)
+                alphaOther4Grid = np.random.rand(self.gridCount, 1)
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             runData = self.subjectData[
@@ -548,13 +506,13 @@ class Fitting:
 
                 # Checking parameters from the grid
                 alphaCheck = alphaGrid[j]
-                alpha2Check = alpha2Grid[j]
+                alphaOtherCheck = alphaOtherGrid[j]
                 if version == "two":
-                    alpha3Check = alpha3Grid[j]
+                    alphaOther2Check = alphaOther2Grid[j]
                 elif version == "four":
-                    alpha3Check = alpha3Grid[j]
-                    alpha4Check = alpha4Grid[j]
-                    alpha5Check = alpha5Grid[j]
+                    alphaOther2Check = alphaOther2Grid[j]
+                    alphaOther3Check = alphaOther3Grid[j]
+                    alphaOther4Check = alphaOther4Grid[j]
                 betaCheck = betaGrid[j]
 
                 run_V0[j, 0] = V_option0[0, 0, 0]
@@ -627,7 +585,7 @@ class Fitting:
                                     omega = (
                                         omega
                                         + (abs(rewardPE[(t,) + pair]) - omega)
-                                        * alpha2Check
+                                        * alphaOtherCheck
                                     )
                                     V_option0[(t + 1,) + pair] = V_option0[
                                         (t,) + pair
@@ -637,7 +595,7 @@ class Fitting:
                                 else:
                                     V_option0[(t + 1,) + pair] = V_option0[
                                         (t,) + pair
-                                    ] + alpha2Check * (
+                                    ] + alphaOtherCheck * (
                                         1 - runData.reward[t] - V_option0[(t,) + pair]
                                     )
                         else:
@@ -646,7 +604,7 @@ class Fitting:
                                     omega = (
                                         omega
                                         + (abs(rewardPE[(t,) + pair]) - omega)
-                                        * alpha3Check
+                                        * alphaOther2Check
                                     )
                                     V_option0[(t + 1,) + pair] = V_option0[
                                         (t,) + pair
@@ -656,7 +614,7 @@ class Fitting:
                                 else:
                                     V_option0[(t + 1,) + pair] = V_option0[
                                         (t,) + pair
-                                    ] + alpha3Check * (
+                                    ] + alphaOther2Check * (
                                         1 - runData.reward[t] - V_option0[(t,) + pair]
                                     )
                         V_option1[t + 1, :] = V_option1[t, :]
@@ -691,7 +649,7 @@ class Fitting:
                                     omega = (
                                         omega
                                         + (abs(rewardPE[(t,) + pair]) - omega)
-                                        * alpha2Check
+                                        * alphaOtherCheck
                                     )
                                     V_option1[(t + 1,) + pair] = V_option1[
                                         (t,) + pair
@@ -707,7 +665,7 @@ class Fitting:
                                     V_option1[(t + 1,) + pair] = V_option1[
                                         (t,) + pair
                                     ] + (
-                                        alpha2Check
+                                        alphaOtherCheck
                                         * (
                                             1
                                             - runData.reward[t]
@@ -720,7 +678,7 @@ class Fitting:
                                     omega = (
                                         omega
                                         + (abs(rewardPE[(t,) + pair]) - omega)
-                                        * alpha3Check
+                                        * alphaOther2Check
                                     )
                                     V_option1[(t + 1,) + pair] = V_option1[
                                         (t,) + pair
@@ -736,7 +694,7 @@ class Fitting:
                                     V_option1[(t + 1,) + pair] = V_option1[
                                         (t,) + pair
                                     ] + (
-                                        alpha3Check
+                                        alphaOther2Check
                                         * (
                                             1
                                             - runData.reward[t]
@@ -750,7 +708,7 @@ class Fitting:
                                         omega = (
                                             omega
                                             + (abs(rewardPE[(t,) + pair]) - omega)
-                                            * alpha4Check
+                                            * alphaOther3Check
                                         )
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
@@ -766,7 +724,7 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
                                         ] + (
-                                            alpha4Check
+                                            alphaOther3Check
                                             * (
                                                 1
                                                 - runData.reward[t]
@@ -779,7 +737,7 @@ class Fitting:
                                         omega = (
                                             omega
                                             + (abs(rewardPE[(t,) + pair]) - omega)
-                                            * alpha5Check
+                                            * alphaOther4Check
                                         )
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
@@ -795,7 +753,7 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
                                         ] + (
-                                            alpha5Check
+                                            alphaOther4Check
                                             * (
                                                 1
                                                 - runData.reward[t]
@@ -820,13 +778,13 @@ class Fitting:
                 NLL_array[run, j, 0] = alphaCheck
                 NLL_array[run, j, 1] = betaCheck
                 NLL_array[run, j, 2] = negativeLogLikelihood
-                NLL_array[run, j, 3] = alpha2Check
+                NLL_array[run, j, 3] = alphaOtherCheck
                 if version == "two":
-                    NLL_array[run, j, 4] = alpha3Check
+                    NLL_array[run, j, 4] = alphaOther2Check
                 elif version == "four":
-                    NLL_array[run, j, 4] = alpha3Check
-                    NLL_array[run, j, 5] = alpha4Check
-                    NLL_array[run, j, 6] = alpha5Check
+                    NLL_array[run, j, 4] = alphaOther2Check
+                    NLL_array[run, j, 5] = alphaOther3Check
+                    NLL_array[run, j, 6] = alphaOther4Check
 
                 LL_array[j, 0] = Likelihood
 
@@ -955,13 +913,13 @@ class Fitting:
 
         for run in range(0, max(self.subjectData.runNumber)):
             alphaGrid = np.random.rand(self.gridCount, 1)
-            alpha2Grid = np.random.rand(self.gridCount, 1)
+            alphaOtherGrid = np.random.rand(self.gridCount, 1)
             if version == "two":
-                alpha3Grid = np.random.rand(self.gridCount, 1)
+                alphaOther2Grid = np.random.rand(self.gridCount, 1)
             elif version == "four":
-                alpha3Grid = np.random.rand(self.gridCount, 1)
-                alpha4Grid = np.random.rand(self.gridCount, 1)
-                alpha5Grid = np.random.rand(self.gridCount, 1)
+                alphaOther2Grid = np.random.rand(self.gridCount, 1)
+                alphaOther3Grid = np.random.rand(self.gridCount, 1)
+                alphaOther4Grid = np.random.rand(self.gridCount, 1)
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             runData = self.subjectData[
@@ -1006,13 +964,13 @@ class Fitting:
 
                 # Checking parameters from the grid
                 alphaCheck = alphaGrid[j]
-                alpha2Check = alpha2Grid[j]
+                alphaOtherCheck = alphaOtherGrid[j]
                 if version == "two":
-                    alpha3Check = alpha3Grid[j]
+                    alphaOther2Check = alphaOther2Grid[j]
                 elif version == "four":
-                    alpha3Check = alpha3Grid[j]
-                    alpha4Check = alpha4Grid[j]
-                    alpha5Check = alpha5Grid[j]
+                    alphaOther2Check = alphaOther2Grid[j]
+                    alphaOther3Check = alphaOther3Grid[j]
+                    alphaOther4Check = alphaOther4Grid[j]
                 betaCheck = betaGrid[j]
 
                 run_V0[j, 0] = V_option0[0, 0, 0]
@@ -1085,7 +1043,7 @@ class Fitting:
                                     omega = (
                                         omega
                                         + (abs(rewardPE[(t,) + pair]) - omega)
-                                        * alpha2Check
+                                        * alphaOtherCheck
                                     )
                                     V_option0[(t + 1,) + pair] = V_option0[
                                         (t,) + pair
@@ -1095,7 +1053,7 @@ class Fitting:
                                 else:
                                     V_option0[(t + 1,) + pair] = V_option0[
                                         (t,) + pair
-                                    ] + alpha2Check * (
+                                    ] + alphaOtherCheck * (
                                         1 - runData.reward[t] - V_option0[(t,) + pair]
                                     )
                         else:
@@ -1104,7 +1062,7 @@ class Fitting:
                                     omega = (
                                         omega
                                         + (abs(rewardPE[(t,) + pair]) - omega)
-                                        * alpha3Check
+                                        * alphaOther2Check
                                     )
                                     V_option0[(t + 1,) + pair] = V_option0[
                                         (t,) + pair
@@ -1114,7 +1072,7 @@ class Fitting:
                                 else:
                                     V_option0[(t + 1,) + pair] = V_option0[
                                         (t,) + pair
-                                    ] + alpha3Check * (
+                                    ] + alphaOther2Check * (
                                         1 - runData.reward[t] - V_option0[(t,) + pair]
                                     )
                         V_option1[t + 1, :] = V_option1[t, :]
@@ -1150,7 +1108,7 @@ class Fitting:
                                     omega = (
                                         omega
                                         + (abs(rewardPE[(t,) + pair]) - omega)
-                                        * alpha2Check
+                                        * alphaOtherCheck
                                     )
                                     V_option1[(t + 1,) + pair] = V_option1[
                                         (t,) + pair
@@ -1166,7 +1124,7 @@ class Fitting:
                                     V_option1[(t + 1,) + pair] = V_option1[
                                         (t,) + pair
                                     ] + (
-                                        alpha2Check
+                                        alphaOtherCheck
                                         * (
                                             1
                                             - runData.reward[t]
@@ -1179,7 +1137,7 @@ class Fitting:
                                     omega = (
                                         omega
                                         + (abs(rewardPE[(t,) + pair]) - omega)
-                                        * alpha3Check
+                                        * alphaOther2Check
                                     )
                                     V_option1[(t + 1,) + pair] = V_option1[
                                         (t,) + pair
@@ -1195,7 +1153,7 @@ class Fitting:
                                     V_option1[(t + 1,) + pair] = V_option1[
                                         (t,) + pair
                                     ] + (
-                                        alpha3Check
+                                        alphaOther2Check
                                         * (
                                             1
                                             - runData.reward[t]
@@ -1209,7 +1167,7 @@ class Fitting:
                                         omega = (
                                             omega
                                             + (abs(rewardPE[(t,) + pair]) - omega)
-                                            * alpha4Check
+                                            * alphaOther3Check
                                         )
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
@@ -1225,7 +1183,7 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
                                         ] + (
-                                            alpha4Check
+                                            alphaOther3Check
                                             * (
                                                 1
                                                 - runData.reward[t]
@@ -1238,7 +1196,7 @@ class Fitting:
                                         omega = (
                                             omega
                                             + (abs(rewardPE[(t,) + pair]) - omega)
-                                            * alpha5Check
+                                            * alphaOther4Check
                                         )
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
@@ -1254,7 +1212,7 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
                                         ] + (
-                                            alpha5Check
+                                            alphaOther4Check
                                             * (
                                                 1
                                                 - runData.reward[t]
@@ -1281,13 +1239,13 @@ class Fitting:
                 NLL_array[run, j, 2] = negativeLogLikelihood
                 NLL_array[run, j, 3] = V_option0Init_Grid[j][0][0]
                 NLL_array[run, j, 4] = V_option1Init_Grid[j][0][0]
-                NLL_array[run, j, 5] = alpha2Check
+                NLL_array[run, j, 5] = alphaOtherCheck
                 if version == "two":
-                    NLL_array[run, j, 6] = alpha3Check
+                    NLL_array[run, j, 6] = alphaOther2Check
                 elif version == "four":
-                    NLL_array[run, j, 6] = alpha3Check
-                    NLL_array[run, j, 7] = alpha4Check
-                    NLL_array[run, j, 8] = alpha5Check
+                    NLL_array[run, j, 6] = alphaOther2Check
+                    NLL_array[run, j, 7] = alphaOther3Check
+                    NLL_array[run, j, 8] = alphaOther4Check
 
                 LL_array[j, 0] = Likelihood
 
@@ -1600,7 +1558,7 @@ for IDnr in IDs:
         V0,
         V1,
         NLL_array,
-    ) = fitted.simplestFitting(pearce=True)
+    ) = fitted.basicFitting(pearce=True)
 
     # fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
