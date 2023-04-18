@@ -2,10 +2,10 @@
 clear all
 
 % SETTINGS:
-ISrun_level1 = 0;
+ISrun_level1 = 1;
 ISrun_level2SPM = 1;
 ISrun_level2SnPM = 0;
-del_old_con = 1; % delete old contrasts if you re-run only second level analyses
+del_old_con = 0; % delete old contrasts if you re-run only second level analyses
 
 path.folder_processed = dir(fullfile('../../../data/ds-mlearn/derivatives/fmriprep'));
 path.folder_processed = [path.folder_processed(1).folder '/'];
@@ -18,7 +18,7 @@ path.SPM_folder = [path.SPM_folder(1).folder '/'];
 subs = dir(fullfile(path.folder_processed, 'sub-*'));
 subs = subs([subs.isdir]');
 subs = subs(~contains({subs.name},{'sub-08', 'sub-13', 'sub-44'}));
-models = ["spe", "rpeSimple", "spe_rpeSimple"]; % "other", "spe", "rpeSimple"
+models = ["rpeSimplePearce", "spe_rpeSimplePearce"]; % "other", "spe", "rpeSimple"
 tVals = [2.3, 2.6, 3.1];
 
 addpath(fullfile('scripts'));

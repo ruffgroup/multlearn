@@ -14,7 +14,7 @@ elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitt
     folder_files = dir(fullfile(path.SPM_folder,'/results', model_version, 'sub-*'));
 end
 for ii = 1:numel(subs)
-    if constrast_num < 10
+    if contrast_num < 10
         contrasts{ii,1} = ([ folder_files(ii).folder, filesep, subs(ii).name , filesep, 'con_000' , num2str(contrast_num) ,'.nii,1' ]);
     else
         contrasts{ii,1} = ([ folder_files(ii).folder, filesep, subs(ii).name , filesep, 'con_00' , num2str(contrast_num) ,'.nii,1' ]);
