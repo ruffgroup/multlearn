@@ -70,11 +70,11 @@ elseif runType == "audio"
     elseif contains(model_version, "_")
          pmod = struct('name', {}, 'param', {}, 'poly', {});
         model = split(model_version, '_');
-        pmod(1).name{1}  = strcat(string(model(1,1)), 'Tactile');
+        pmod(1).name{1}  = strcat(string(model(1,1)), 'Audio');
         pmod(1).param{1} = fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0);
         pmod(1).poly{1}  = 1;
 
-        pmod(2).name{1} = strcat(string(model(2,1)), 'Tactile');
+        pmod(2).name{1} = strcat(string(model(2,1)), 'Audio');
         pmod(2).param{1} = fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0);
         pmod(2).poly{1}  = 1;
     end

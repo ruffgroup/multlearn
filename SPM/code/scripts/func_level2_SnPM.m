@@ -2,9 +2,9 @@ function func_level2_SnPM(path,subs, model_version, contrast_num, splitting, tVa
 
 % path of data
 if ischar(splitting) && splitting ~= string(model_version)
-    data.destination = fullfile(path.SPM_folder,'/results', splitting, model_version, strcat('Second_level_SnPM_con', num2str(contrast_num )), filesep );
+    data.destination = fullfile(path.SPM_folder,'/results', splitting, model_version, string(tVal), strcat('Second_level_SnPM_con', num2str(contrast_num )), filesep );
 elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
-    data.destination = fullfile(path.SPM_folder,'/results', model_version, strcat('Second_level_SnPM_con', num2str(contrast_num )), filesep );
+    data.destination = fullfile(path.SPM_folder,'/results', model_version, string(tVal),strcat('Second_level_SnPM_con', num2str(contrast_num )), filesep );
 end
 spm_jobman('initcfg');
 
@@ -41,7 +41,7 @@ matlabbatch{3}.spm.tools.snpm.inference.SnPMmat(1) = cfg_dep('Compute: SnPM.mat 
 matlabbatch{3}.spm.tools.snpm.inference.Thr.Clus.ClusSize.CFth = NaN;
 matlabbatch{3}.spm.tools.snpm.inference.Thr.Clus.ClusSize.ClusSig.FWEthC = 0.05;
 matlabbatch{3}.spm.tools.snpm.inference.Tsign = 1;
-matlabbatch{3}.spm.tools.snpm.inference.WriteFiltImg.name = strcat('SnPM_filtered_', tVal);
+matlabbatch{3}.spm.tools.snpm.inference.WriteFiltImg.name = strcat('SnPM_filtered_', string(tVal));
 matlabbatch{3}.spm.tools.snpm.inference.Report = 'MIPtable';
 
 spm('defaults', 'fMRI');

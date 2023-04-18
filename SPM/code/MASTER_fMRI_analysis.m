@@ -2,10 +2,10 @@
 clear all
 
 % SETTINGS:
-ISrun_level1 = 1;
+ISrun_level1 = 0;
 ISrun_level2SPM = 1;
-ISrun_level2SnPM = 1;
-del_old_con = 0; % delete old contrasts if you re-run only second level analyses
+ISrun_level2SnPM = 0;
+del_old_con = 1; % delete old contrasts if you re-run only second level analyses
 
 path.folder_processed = dir(fullfile('../../../data/ds-mlearn/derivatives/fmriprep'));
 path.folder_processed = [path.folder_processed(1).folder '/'];
@@ -18,7 +18,7 @@ path.SPM_folder = [path.SPM_folder(1).folder '/'];
 subs = dir(fullfile(path.folder_processed, 'sub-*'));
 subs = subs([subs.isdir]');
 subs = subs(~contains({subs.name},{'sub-08', 'sub-13', 'sub-44'}));
-models = ["other", "spe", "rpeSimple", "spe_rpeSimple"];
+models = ["spe", "rpeSimple", "spe_rpeSimple"]; % "other", "spe", "rpeSimple"
 tVals = [2.3, 2.6, 3.1];
 
 addpath(fullfile('scripts'));
@@ -115,7 +115,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 
     elseif ~contains(model_version, "_") && model_version ~= "other"
         splitting = false;
-        num_contrasts = 5;
+        num_contrasts = 7;
         parfor (k = 1:num_contrasts,M)
             if ISrun_level2SPM == 1
                 func_level2(path,subs, model_version, k, splitting);
@@ -130,9 +130,9 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
     else
         splitting = model_version;
         model = split(model_version, "_");
-        num_contrasts1 = 5;
-        num_contrasts2 = 5;
-        num_contrasts3 = 11;
+        num_contrasts1 = 7;
+        num_contrasts2 = 7;
+        num_contrasts3 = 13;
 
         parfor (k = 1:num_contrasts1,M)
             if ISrun_level2SPM == 1

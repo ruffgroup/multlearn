@@ -21,7 +21,6 @@ model = split(model_version, "_");
     end
 
 
-
 %% contrasts
 
 contrasts_SPE = double(contains(SPM.xX.name,{['x' var_int1 'Tactile^' ], ['x' var_int1 'Audio^']}));
