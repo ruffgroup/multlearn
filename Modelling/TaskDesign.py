@@ -284,7 +284,7 @@ class task_Design:
                                                                                                         tuple(
                                                                                                             self.stimulusPair[
                                                                                                             i + self.additionalTrials,
-                                                                                                            :])]* + self.alpha * (
+                                                                                                            :])] + self.alpha * (
                                                                                                     self.rewardPE[
                                                                                                         (i,) + tuple(
                                                                                                             self.stimulusPair[
@@ -333,11 +333,11 @@ class task_Design:
 
         self.errorPercentage = (error / self.mainTrials) * 100
 
-        # print("action", self.action)
-        # print("reward", self.reward)
-        # print(self.rewardPE)
-        # print("V_option0", self.V_option0)
-        # print("V_option1", self.V_option1)
+    #print("action", self.action)
+    #print("reward", self.reward)
+    #print(self.rewardPE)
+    #print("V_option0", self.V_option0)
+    #print("V_option1", self.V_option1)
 
     """ Statistical learning """
 

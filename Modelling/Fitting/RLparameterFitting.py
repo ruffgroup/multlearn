@@ -25,7 +25,7 @@ from TaskDesign import task_Design
 
 class Fitting:
 
-    def __init__(self, mainTrials, additionalTrials, gridCount, ID, plotting=False, ww=10, method="valid", reps=50):
+    def __init__(self, mainTrials, additionalTrials, gridCount, ID, plotting=False, ww=5, method="valid", reps=50):
         
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
@@ -820,20 +820,22 @@ def ma(interval, window_size = 10, method = 'same'):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
+# 
+
 IDs = ["01", "02", "03", "04", "05", "06", "07", "09", "10", "11", "12", "14", "15", "17", "18", "19", "20",
        "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "33", "34", "35", "36", "37", "38", "39",
        "40", "41", "42", "43", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57",
        "58", "59", "60", "61", "62", "63", "64"]
 
 for IDnr in IDs:
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
 
 # # Run stat learning
     #beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
 
 
 # # Run the simplest RL model
-    fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting()
+    fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array = fitted.simplestFitting(pearce=True)
 
     #fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
