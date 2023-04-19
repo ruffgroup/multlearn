@@ -71,7 +71,7 @@ class Fitting:
         pearce: False or True for Pearce Hall implementation
         init: False or True for initial V0 and V1
         """
-        fitted_alphas = fitted_alphas2 = np.empty((max(self.subjectData.runNumber)))
+        fitted_alphas, fitted_alphas2 = (np.empty((max(self.subjectData.runNumber))) for i in range(2))
         fitted_betas = np.empty((max(self.subjectData.runNumber)))
         best_LLs = np.empty((max(self.subjectData.runNumber)))
 
@@ -91,7 +91,7 @@ class Fitting:
             )
         )
 
-        fitted_V_option0Inits = fitted_V_option1Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
+        fitted_V_option0Inits, fitted_V_option1Inits = (np.empty((max(self.subjectData.runNumber), 3, 3)) for i in range(2))
 
         NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 6))
         NLL_array[:] = np.nan
