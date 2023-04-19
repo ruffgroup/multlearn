@@ -93,14 +93,7 @@ class Fitting:
 
         fitted_V_option0Inits = fitted_V_option1Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
 
-        if extra and not init:
-            NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 4))
-        elif extra and init:
-            NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 6))
-        elif not extra and init:
-            NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 5))
-        else:
-            NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 3))
+        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 6))
         NLL_array[:] = np.nan
 
         for run in range(0, max(self.subjectData.runNumber)):
@@ -278,15 +271,12 @@ class Fitting:
                 NLL_array[run, j, 0] = alphaCheck
                 NLL_array[run, j, 1] = betaCheck
                 NLL_array[run, j, 2] = negativeLogLikelihood
-                if extra and init:
+                if extra:
                     NLL_array[run, j, 3] = alpha2Check
+                if init:
                     NLL_array[run, j, 4] = V_option0Init_Grid[j][0][0]
                     NLL_array[run, j, 5] = V_option1Init_Grid[j][0][0]
-                elif extra and not init:
-                    NLL_array[run, j, 3] = alpha2Check
-                elif init and not extra:
-                    NLL_array[run, j, 3] = V_option0Init_Grid[j][0][0]
-                    NLL_array[run, j, 4] = V_option1Init_Grid[j][0][0]
+                
                 LL_array[j, 0] = Likelihood
 
             minIndex = np.argmin(NLL_array[run, :, 2])
@@ -1090,7 +1080,7 @@ IDs = [
 ]
 
 for IDnr in IDs:
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
 
     # # Run stat learning
     # beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
@@ -1098,14 +1088,14 @@ for IDnr in IDs:
     # # Run the simplest RL model
     (
         fitted_alphas,
+        fitted_alphas2,
         fitted_betas,
         best_LLs,
         RPE,
         V0,
         V1,
         NLL_array,
-    ) = fitted.basicFitting(pearce=True)
-
+    ) = fitted.basicFitting(pearce=True, extra=True, init=False)
     # fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
 # # Run the RL model including initial V0 and V1 as free parameters

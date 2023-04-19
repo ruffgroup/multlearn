@@ -44,17 +44,22 @@ class Plotting:
 
     def plots_basicFitting(self, NLL_array, alphas, betas, pearce, alphas2=None, V_option0Inits=None, V_option1Inits=None):
         
-        print("simple")
-        saving_folder = "simple"
+        saving_folder = "basic"
         subjectData = pd.read_csv(self.savedValsFile)
 
         for run in range(0, max(subjectData.runNumber)):
             NLL_run = NLL_array[run]
             alpha = alphas[run]
             beta = betas[run]
-            if alphas2:
+            if alphas2 is not None:
                 alpha2 = alphas2[run]
-
+            else:
+                alpha2 = None
+            if V_option0Inits is not None:
+                V_option0 = V_option0Inits[run]
+                V_option1 = V_option1Inits[run]
+            else:
+                V_option0 = V_option1 = None
             runData = subjectData[subjectData.runNumber == run + 1].reset_index()
             green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
             green = [ast.literal_eval(green[0]), ast.literal_eval(green[1]), ast.literal_eval(green[2])]
@@ -77,10 +82,8 @@ class Plotting:
             feedbackAcc = runData.feedbackAccuracy.astype(int)
 
             for i in range(self.reps):
-                if pearce:
-                    simulation = task_Design(self.mainTrials, self.additionalTrials, pearce=1, omega=alpha, beta=beta)
-                else:
-                    simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta)
+                
+                simulation = task_Design(self.mainTrials, self.additionalTrials, pearce=pearce, alpha=alpha, beta=beta, alpha2=alpha2, V_option0Init=V_option0, V_option1Init=V_option1)
                 simulation.taskStructure(taskStruct, green, feedbackAcc)
                 simulation.RLloops()
 
@@ -136,24 +139,36 @@ class Plotting:
                 ax.set_zlabel('NLL', fontweight='bold')
                 ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(self.ID, run + 1))
 
-                plt.figure(3)
-                plt.scatter(NLL_run[:, 0], NLL_run[:, -1])
-                plt.xlabel('alpha', fontweight='bold')
-                plt.ylabel('NLL', fontweight='bold')
-                plt.title("Participant {0}, run {1}: NLL and alpha scatter plot".format(self.ID, run + 1))
 
-                plt.figure(4)
-                plt.scatter(NLL_run[:, 1], NLL_run[:, -1])
-                plt.xlabel('beta', fontweight='bold')
-                plt.ylabel('NLL', fontweight='bold')
-                plt.title("Participant {0}, run {1}: NLL and beta scatter plot".format(self.ID, run + 1))
+                for idx, var in enumerate([(0, alpha),(1, beta),(3, alpha2), (4, V_option0), (5, V_option1)]):
+                    if var[1]:
+                        plt.figure(idx+3)
+                        plt.scatter(NLL_run[:, var[0]], NLL_run[:, -1])
+                        plt.xlabel('{}'.format(var[1]), fontweight='bold')
+                        plt.ylabel('NLL', fontweight='bold')
+                        plt.title("Participant {0}, run {1}: NLL and {2} scatter plot".format(self.ID, run + 1, var[1]))
 
 
                 os.makedirs(saving_folder, exist_ok=True)
                 if pearce:
-                    save_name = "{0}_{1}_simplePearcePlots.pdf".format(self.ID, run)
+                    if alpha2 and V_option0:
+                        save_name = "{0}_{1}_ExtraInitPearcePlots.pdf".format(self.ID, run)
+                    elif alpha2 and not V_option0:
+                        save_name = "{0}_{1}_ExtraPearcePlots.pdf".format(self.ID, run)
+                    elif V_option0 and not alpha2:
+                        save_name = "{0}_{1}_InitPearcePlots.pdf".format(self.ID, run)
+                    else:
+                        save_name = "{0}_{1}_PearcePlots.pdf".format(self.ID, run)
                 else:
-                    save_name = "{0}_{1}_simplePlots.pdf".format(self.ID, run)
+                    if alpha2 and V_option0:
+                        save_name = "{0}_{1}_ExtraInitPlots.pdf".format(self.ID, run)
+                    elif alpha2 and not V_option0:
+                        save_name = "{0}_{1}_ExtraPlots.pdf".format(self.ID, run)
+                    elif V_option0 and not alpha2:
+                        save_name = "{0}_{1}_InitPlots.pdf".format(self.ID, run)
+                    else:
+                        save_name = "{0}_{1}_Plots.pdf".format(self.ID, run)
+                    
                 file_path = os.path.join(saving_folder, save_name)
 
                 pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)

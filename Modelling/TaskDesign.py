@@ -22,7 +22,7 @@ class task_Design:
         alphaOther4=None,
         V_option0Init=None,
         V_option1Init=None,
-        pearce=0,
+        pearce=False,
         omega=None,
     ):
         """How task is conducted"""
@@ -46,7 +46,7 @@ class task_Design:
         self.punishProb = 0.0
         self.punishMag = 0.0
 
-        if pearce == 1:
+        if pearce:
             self.omegaPearce = np.empty(self.mainTrials)
             self.omega2Pearce = np.empty(self.mainTrials)
 
@@ -93,7 +93,7 @@ class task_Design:
         self.alphaOther3 = alphaOther3
         self.alphaOther4 = alphaOther4
 
-        if self.pearce == 1:
+        if self.pearce:
             self.omega = 1
             self.omega2 = 1
 
@@ -306,7 +306,7 @@ class task_Design:
                     ]
                 )
                 self.V_option0[i + 1, :] = self.V_option0[i, :]
-                if self.pearce == 1:
+                if self.pearce:
                     self.omega = (
                         self.omega
                         + (
@@ -412,7 +412,7 @@ class task_Design:
                 )
                 self.V_option1[i + 1, :] = self.V_option1[i, :]
                 if self.alpha2:
-                    if self.pearce == 1:
+                    if self.pearce:
                         self.omega2 = (
                             self.omega2
                             + (
@@ -458,7 +458,7 @@ class task_Design:
                             ]
                         )
                 else:
-                    if self.pearce == 1:
+                    if self.pearce:
                         self.omega = (
                             self.omega
                             + (
@@ -570,7 +570,8 @@ class task_Design:
             ]
 
             if self.pearce:
-                self.alphaPearce[i] = self.alpha
+                self.alphaPearce[i] = self.omega
+                self.alphaPearce2[i] = self.omega2
 
         self.errorPercentage = (error / self.mainTrials) * 100
 
