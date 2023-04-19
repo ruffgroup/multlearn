@@ -570,8 +570,8 @@ class task_Design:
             ]
 
             if self.pearce:
-                self.alphaPearce[i] = self.omega
-                self.alphaPearce2[i] = self.omega2
+                self.omegaPearce[i] = self.omega
+                self.omega2Pearce[i] = self.omega2
 
         self.errorPercentage = (error / self.mainTrials) * 100
 
