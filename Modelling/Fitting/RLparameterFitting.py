@@ -71,9 +71,16 @@ class Fitting:
         pearce: False or True for Pearce Hall implementation
         init: False or True for initial V0 and V1
         """
-        fitted_alphas, fitted_alphas2 = (np.empty((max(self.subjectData.runNumber))) for i in range(2))
-        fitted_betas = np.empty((max(self.subjectData.runNumber)))
-        best_LLs = np.empty((max(self.subjectData.runNumber)))
+        fitted_alphas, fitted_alphas2, fitted_betas, best_LLs = (
+            np.empty((max(self.subjectData.runNumber))) for i in range(4)
+        )
+
+        fitted_V_option0Inits, fitted_V_option1Inits = (
+            np.empty((max(self.subjectData.runNumber), 3, 3)) for i in range(2)
+        )
+
+        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 6))
+        NLL_array[:] = np.nan
 
         RPE = np.empty(
             (max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials)
@@ -91,11 +98,6 @@ class Fitting:
             )
         )
 
-        fitted_V_option0Inits, fitted_V_option1Inits = (np.empty((max(self.subjectData.runNumber), 3, 3)) for i in range(2))
-
-        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 6))
-        NLL_array[:] = np.nan
-
         for run in range(0, max(self.subjectData.runNumber)):
             alphaGrid = np.random.rand(self.gridCount, 1)
             if extra:
@@ -103,19 +105,20 @@ class Fitting:
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             if init:
-                V_option0Init_Grid = V_option1Init_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
+                V_option0Init_Grid, V_option1Init_Grid = (
+                    np.random.uniform(0, 1, (self.gridCount, 3, 3)) for i in range(2)
+                )
             runData = self.subjectData[
                 self.subjectData.runNumber == run + 1
             ].reset_index()
             run_RPEs = np.empty(
                 (self.gridCount, self.mainTrials + self.additionalTrials)
             )
-            run_V0 = np.empty(
-                (self.gridCount, self.mainTrials + self.additionalTrials + 1)
+            run_V0, run_V1 = (
+                np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
+                for i in range(2)
             )
-            run_V1 = np.empty(
-                (self.gridCount, self.mainTrials + self.additionalTrials + 1)
-            )
+
             # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
             for j in range(0, self.gridCount):
                 # For each point on the grid we instantiate the arrays for the time steps-
@@ -125,17 +128,17 @@ class Fitting:
                 choiceProb[:] = np.nan
                 actionProb = np.empty((max(runData.trialNumber), 1))
                 actionProb[:] = np.nan
-                V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                V_option0[:] = np.nan
-                V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                V_option1[:] = np.nan
+                V_option0, V_option1 = (
+                    np.empty((max(runData.trialNumber) + 1, 3, 3)) for i in range(2)
+                )
+                V_option0[:], V_option1[:] = (np.nan for i in range(2))
                 if init:
                     V_option0[0, :] = V_option0Init_Grid[j]
                     V_option1[0, :] = V_option1Init_Grid[j]
                 else:
                     V_option0[0, :] = 0.5
                     V_option1[0, :] = 0.5
-                
+
                 rewardPE = np.empty((max(runData.trialNumber), 3, 3))
                 rewardPE[:] = np.nan
 
@@ -146,9 +149,10 @@ class Fitting:
                 betaCheck = betaGrid[j]
                 run_V0[j, 0] = V_option0[0, 0, 0]
                 run_V1[j, 0] = V_option1[0, 0, 0]
+
                 if pearce:
-                    omega = 1
-                    omega2 = 1
+                    omega, omega2 = (1 for i in range(2))
+
                 for t in range(0, max(runData.trialNumber)):
                     # Prob of choosing the 0th and 1st option respectively
                     choiceProb[t, 0] = np.exp(
@@ -276,7 +280,7 @@ class Fitting:
                 if init:
                     NLL_array[run, j, 4] = V_option0Init_Grid[j][0][0]
                     NLL_array[run, j, 5] = V_option1Init_Grid[j][0][0]
-                
+
                 LL_array[j, 0] = Likelihood
 
             minIndex = np.argmin(NLL_array[run, :, 2])
@@ -302,8 +306,8 @@ class Fitting:
                     betas=fitted_betas,
                     pearce=pearce,
                     alphas2=fitted_alphas2,
-                    V_option0Inits=fitted_V_option0Inits, 
-                    V_option1Inits=fitted_V_option1Inits
+                    V_option0Inits=fitted_V_option0Inits,
+                    V_option1Inits=fitted_V_option1Inits,
                 )
             elif extra and not init:
                 self.Plot.plots_basicFitting(
@@ -319,8 +323,8 @@ class Fitting:
                     alphas=fitted_alphas,
                     betas=fitted_betas,
                     pearce=pearce,
-                    V_option0Inits=fitted_V_option0Inits, 
-                    V_option1Inits=fitted_V_option1Inits
+                    V_option0Inits=fitted_V_option0Inits,
+                    V_option1Inits=fitted_V_option1Inits,
                 )
             else:
                 self.Plot.plots_basicFitting(
@@ -376,7 +380,7 @@ class Fitting:
                 V1,
                 NLL_array,
                 fitted_V_option0Inits,
-                fitted_V_option1Inits
+                fitted_V_option1Inits,
             )
         elif not extra and init:
             if pearce:
@@ -397,7 +401,7 @@ class Fitting:
                 V1,
                 NLL_array,
                 fitted_V_option0Inits,
-                fitted_V_option1Inits
+                fitted_V_option1Inits,
             )
         else:
             if pearce:
@@ -409,7 +413,6 @@ class Fitting:
                     newPath + "/rpe.mat".format(self.ID), mdict={"rpe": RPE}
                 )
             return fitted_alphas, fitted_betas, best_LLs, RPE, V0, V1, NLL_array
-
 
     # Extra update rule multiple versions
 
@@ -424,22 +427,22 @@ class Fitting:
         pearce: True or False
         init: True or False
         """
-        fitted_alphas = np.empty((max(self.subjectData.runNumber)))
-        fitted_otherAlphas = np.empty((max(self.subjectData.runNumber)))
-        if version == "two":
-            fitted_otherAlphas2 = np.empty((max(self.subjectData.runNumber)))
-        elif version == "four":
-            fitted_otherAlphas2 = np.empty((max(self.subjectData.runNumber)))
-            fitted_otherAlphas3 = np.empty((max(self.subjectData.runNumber)))
-            fitted_otherAlphas4 = np.empty((max(self.subjectData.runNumber)))
+        (
+            fitted_alphas,
+            fitted_alphas2,
+            fitted_otherAlphas,
+            fitted_otherAlphas2,
+            fitted_otherAlphas3,
+            fitted_otherAlphas4,
+            fitted_betas,
+            best_LLs,
+        ) = (np.empty((max(self.subjectData.runNumber))) for i in range(8))
 
-        fitted_betas = np.empty((max(self.subjectData.runNumber)))
-        best_LLs = np.empty((max(self.subjectData.runNumber)))
+        fitted_V_option0Inits, fitted_V_option1Inits = (
+            np.empty((max(self.subjectData.runNumber), 3, 3)) for i in range(2)
+        )
 
-        if init:
-            fitted_V_option0Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
-            fitted_V_option1Inits = np.empty((max(self.subjectData.runNumber), 3, 3))
-        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 5))
+        NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 8))
         NLL_array[:] = np.nan
 
         RPE = np.empty(
@@ -459,14 +462,17 @@ class Fitting:
         )
 
         for run in range(0, max(self.subjectData.runNumber)):
-            alphaGrid = np.random.rand(self.gridCount, 1)
-            alphaOtherGrid = np.random.rand(self.gridCount, 1)
+            alphaGrid, alphaOtherGrid = (
+                np.random.rand(self.gridCount, 1) for i in range(2)
+            )
+            if extra:
+                alpha2Grid = np.random.rand(self.gridCount, 1)
             if version == "two":
                 alphaOther2Grid = np.random.rand(self.gridCount, 1)
             elif version == "four":
-                alphaOther2Grid = np.random.rand(self.gridCount, 1)
-                alphaOther3Grid = np.random.rand(self.gridCount, 1)
-                alphaOther4Grid = np.random.rand(self.gridCount, 1)
+                alphaOther2Grid, alphaOther3Grid, alphaOther4Grid = (
+                    np.random.rand(self.gridCount, 1) for i in range(3)
+                )
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             runData = self.subjectData[
@@ -482,8 +488,8 @@ class Fitting:
                 (self.gridCount, self.mainTrials + self.additionalTrials + 1)
             )
             if init:
-                V_option0Init_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
-                V_option1Init_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
+                V_option0Init_Grid = np.random.uniform(0, 1, (self.gridCount, 3, 3))
+                V_option1Init_Grid = np.random.uniform(0, 1, (self.gridCount, 3, 3))
             # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
             for j in range(0, self.gridCount):
                 # For each point on the grid we instantiate the arrays for the time steps-
@@ -493,15 +499,24 @@ class Fitting:
                 choiceProb[:] = np.nan
                 actionProb = np.empty((max(runData.trialNumber), 1))
                 actionProb[:] = np.nan
-                V_option0 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                V_option0[:] = np.nan
-                V_option1 = np.empty((max(runData.trialNumber) + 1, 3, 3))
-                V_option1[:] = np.nan
+                V_option0, V_option1 = (
+                    np.empty((max(runData.trialNumber) + 1, 3, 3)) for i in range(2)
+                )
+                V_option0[:], V_option1[:] = (np.nan for i in range(2))
+                if init:
+                    V_option0[0, :] = V_option0Init_Grid[j]
+                    V_option1[0, :] = V_option1Init_Grid[j]
+                else:
+                    V_option0[0, :] = 0.5
+                    V_option1[0, :] = 0.5
+
                 rewardPE = np.empty((max(runData.trialNumber), 3, 3))
                 rewardPE[:] = np.nan
 
                 # Checking parameters from the grid
                 alphaCheck = alphaGrid[j]
+                if extra:
+                    alpha2Check = alpha2Grid[j]
                 alphaOtherCheck = alphaOtherGrid[j]
                 if version == "two":
                     alphaOther2Check = alphaOther2Grid[j]
@@ -510,17 +525,12 @@ class Fitting:
                     alphaOther3Check = alphaOther3Grid[j]
                     alphaOther4Check = alphaOther4Grid[j]
                 betaCheck = betaGrid[j]
-                if init:
-                    V_option0[0, :] = V_option0Init_Grid[j]
-                    V_option1[0, :] = V_option1Init_Grid[j]
-                else:
-                    V_option0[0, :] = 0.5
-                    V_option1[0, :] = 0.5
-
                 run_V0[j, 0] = V_option0[0, 0, 0]
                 run_V1[j, 0] = V_option1[0, 0, 0]
+
                 if pearce:
-                    omega = 1
+                    omega, omega2 = (1 for i in range(2))
+
                 for t in range(0, max(runData.trialNumber)):
                     otherPairs = [
                         p
@@ -788,8 +798,8 @@ class Fitting:
                     NLL_array[run, j, 5] = alphaOther3Check
                     NLL_array[run, j, 6] = alphaOther4Check
                 # NLL_array[run, j, ?] = alpha2Check
-                #NLL_array[run, j, ?] = V_option0Init_Grid[j][0][0]
-                #NLL_array[run, j, ?] = V_option1Init_Grid[j][0][0]
+                # NLL_array[run, j, ?] = V_option0Init_Grid[j][0][0]
+                # NLL_array[run, j, ?] = V_option1Init_Grid[j][0][0]
                 LL_array[j, 0] = Likelihood
 
             minIndex = np.argmin(NLL_array[run, :, 2])
@@ -880,7 +890,6 @@ class Fitting:
                 V1,
                 NLL_array,
             )
-
 
     # Statistical learning
     def statisticalLearning(self, statLearnPar=1):
@@ -1095,7 +1104,7 @@ for IDnr in IDs:
         V0,
         V1,
         NLL_array,
-    ) = fitted.basicFitting(pearce=True, extra=True, init=False)
+    ) = fitted.basicFitting(pearce=False, extra=True, init=False)
     # fitted.plots_simplestFitting(ww=10, NLL_array=NLL_array, alphas=fitted_alphas, betas=fitted_betas, method ='valid', reps=50)
 
 # # Run the RL model including initial V0 and V1 as free parameters

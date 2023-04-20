@@ -115,7 +115,7 @@ class Plotting:
 
                 fig, ax = plt.subplots(3, 1, figsize=(12, 12))
                 if pearce:
-                    if alpha2 and V_option0:
+                    if alpha2 and V_option0 is not None:
                         fig.suptitle(
                             "MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, alpha2 (pearce) {3}, beta {4}, V0 {5}, V1 {6}".format(
                                 self.ID,
@@ -123,25 +123,25 @@ class Plotting:
                                 np.round(alpha, 2),
                                 np.round(alpha2, 2),
                                 np.round(beta, 2),
-                                np.round(V_option0, 2),
-                                np.round(V_option1, 2),
+                                np.round(V_option0[0][0], 2),
+                                np.round(V_option1[0][0], 2),
                             )
                         )
-                    elif alpha2 and not V_option0:
+                    elif alpha2 and V_option0 is None:
                         fig.suptitle(
                             "MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, alpha2 (pearce) {3}, beta {4}".format(
                                 self.ID, run + 1, np.round(alpha, 2), np.round(alpha2, 2), np.round(beta, 2)
                             )
                         )
-                    elif V_option0 and not alpha2:
+                    elif V_option0 is not None and not alpha2:
                         fig.suptitle(
                             "MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, beta {3}, V0 {4}, V1 {5}".format(
                                 self.ID,
                                 run + 1,
                                 np.round(alpha, 2),
                                 np.round(beta, 2),
-                                np.round(V_option0, 2),
-                                np.round(V_option1, 2),
+                                np.round(V_option0[0][0], 2),
+                                np.round(V_option1[0][0], 2),
                             )
                         )
                     else:
@@ -151,7 +151,7 @@ class Plotting:
                             )
                         )
                 else:
-                    if alpha2 and V_option0:
+                    if alpha2 and V_option0 is not None:
                         fig.suptitle(
                             "MA of binary accuracy for participant {0}, run {1}: alpha {2}, alpha2 {3}, beta {4}, V0 {5}, V1 {6}".format(
                                 self.ID,
@@ -159,25 +159,25 @@ class Plotting:
                                 np.round(alpha, 2),
                                 np.round(alpha2, 2),
                                 np.round(beta, 2),
-                                np.round(V_option0, 2),
-                                np.round(V_option1, 2),
+                                np.round(V_option0[0][0], 2),
+                                np.round(V_option1[0][0], 2),
                             )
                         )
-                    elif alpha2 and not V_option0:
+                    elif alpha2 and V_option0 is None:
                         fig.suptitle(
                             "MA of binary accuracy for participant {0}, run {1}: alpha {2}, alpha2 {3}, beta {4}".format(
                                 self.ID, run + 1, np.round(alpha, 2), np.round(alpha2, 2), np.round(beta, 2)
                             )
                         )
-                    elif V_option0 and not alpha2:
+                    elif V_option0 is not None and not alpha2:
                         fig.suptitle(
                             "MA of binary accuracy for participant {0}, run {1}: alpha {2}, beta {3}, V0 {4}, V1 {5}".format(
                                 self.ID,
                                 run + 1,
                                 np.round(alpha, 2),
                                 np.round(beta, 2),
-                                np.round(V_option0, 2),
-                                np.round(V_option1, 2),
+                                np.round(V_option0[0][0], 2),
+                                np.round(V_option1[0][0], 2),
                             )
                         )
                     else:
@@ -217,41 +217,41 @@ class Plotting:
                 ax.set_ylabel("beta", fontweight="bold")
                 ax.set_zlabel("NLL", fontweight="bold")
                 ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(self.ID, run + 1))
-
-                for idx, var in enumerate(
-                    [
+                
+                count = 3
+                for var in [
                         (0, alpha, "alpha"),
                         (1, beta, "beta"),
                         (3, alpha2, "alpha2"),
                         (4, V_option0, "V0"),
                         (5, V_option1, "V1"),
-                    ]
-                ):
-                    if var[1]:
-                        plt.figure(idx + 3)
+                    ]:
+                    if var[1] is not None:
+                        plt.figure(count)
                         plt.scatter(NLL_run[:, var[0]], NLL_run[:, 2])
                         plt.xlabel("{}".format(var[2]), fontweight="bold")
                         plt.ylabel("NLL", fontweight="bold")
                         plt.title(
                             "Participant {0}, run {1}: NLL and {2} scatter plot".format(self.ID, run + 1, var[2])
                         )
+                        count += 1
 
                 os.makedirs(saving_folder, exist_ok=True)
                 if pearce:
-                    if alpha2 and V_option0:
+                    if alpha2 and V_option0 is not None:
                         save_name = "{0}_{1}_ExtraInitPearcePlots.pdf".format(self.ID, run)
-                    elif alpha2 and not V_option0:
+                    elif alpha2 and V_option0 is None:
                         save_name = "{0}_{1}_ExtraPearcePlots.pdf".format(self.ID, run)
-                    elif V_option0 and not alpha2:
+                    elif V_option0 is not None and not alpha2:
                         save_name = "{0}_{1}_InitPearcePlots.pdf".format(self.ID, run)
                     else:
                         save_name = "{0}_{1}_PearcePlots.pdf".format(self.ID, run)
                 else:
-                    if alpha2 and V_option0:
+                    if alpha2 and V_option0 is not None:
                         save_name = "{0}_{1}_ExtraInitPlots.pdf".format(self.ID, run)
-                    elif alpha2 and not V_option0:
+                    elif alpha2 and V_option0 is None:
                         save_name = "{0}_{1}_ExtraPlots.pdf".format(self.ID, run)
-                    elif V_option0 and not alpha2:
+                    elif V_option0 is not None and not alpha2:
                         save_name = "{0}_{1}_InitPlots.pdf".format(self.ID, run)
                     else:
                         save_name = "{0}_{1}_Plots.pdf".format(self.ID, run)
