@@ -673,7 +673,7 @@ class Fitting:
     # Meanwhile when version is "two", then there is action dependance, ACTION AND REWARD (4)
     def transferFitting(self, version=None, extra=False, pearce=False, init=False):
         """
-        version: None, "two" or "four" for one, two or three alphas for other pairs
+        version: None, "two" or "four" for one, two or three discount rates for other pairs
         Extra: False or True for separate alpha for V1
         pearce: True or False
         init: True or False
@@ -681,10 +681,10 @@ class Fitting:
         (
             fitted_alphas,
             fitted_alphas2,
-            fitted_otherAlphas,
-            fitted_otherAlphas2,
-            fitted_otherAlphas3,
-            fitted_otherAlphas4,
+            fitted_K1,
+            fitted_K2,
+            fitted_K3,
+            fitted_K4,
             fitted_betas,
             best_LLs,
         ) = (np.empty((max(self.subjectData.runNumber))) for i in range(8))
@@ -711,13 +711,13 @@ class Fitting:
         )
 
         for run in range(0, max(self.subjectData.runNumber)):
-            alphaGrid, alphaOtherGrid = (np.random.rand(self.gridCount, 1) for i in range(2))
+            alphaGrid, K1Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
             if extra:
                 alpha2Grid = np.random.rand(self.gridCount, 1)
-            if version == "two":
-                alphaOther2Grid = np.random.rand(self.gridCount, 1)
-            elif version == "four":
-                alphaOther2Grid, alphaOther3Grid, alphaOther4Grid = (
+            if version == "two" or version == "four":
+                K2Grid = np.random.rand(self.gridCount, 1)
+            if version == "four":
+                K3Grid, K4Grid = (
                     np.random.rand(self.gridCount, 1) for i in range(3)
                 )
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
@@ -752,15 +752,23 @@ class Fitting:
 
                 # Checking parameters from the grid
                 alphaCheck = alphaGrid[j]
-                if extra:
-                    alpha2Check = alpha2Grid[j]
-                alphaOtherCheck = alphaOtherGrid[j]
-                if version == "two":
-                    alphaOther2Check = alphaOther2Grid[j]
+                if extra and not asym:
+                    alpha3Check = alpha2Check
+                    alpha2Check = alpha4Check = alpha2Grid[j]
+                elif asym and not extra:
+                    alpha3Check = alpha2Grid[j]
+                    alpha4Check = alphaCheck
+
+                K1Check = K1Grid[j]
+                if version == None:
+                    K2Check = K3Check = K4Check = K1Check
+                elif version == "two":
+                    K3Check = K1Check
+                    K2Check = K4Check = K2Grid[j]
                 elif version == "four":
-                    alphaOther2Check = alphaOther2Grid[j]
-                    alphaOther3Check = alphaOther3Grid[j]
-                    alphaOther4Check = alphaOther4Grid[j]
+                    K2Check = K2Grid[j]
+                    K3Check = K3Grid[j]
+                    K4Check = K4Grid[j]
                 betaCheck = betaGrid[j]
                 run_V0[j, 0] = V_option0[0, 0, 0]
                 run_V1[j, 0] = V_option1[0, 0, 0]
@@ -793,38 +801,48 @@ class Fitting:
 
                         V_option0[t + 1, :] = V_option0[t, :]
 
-                        if pearce:
-                            omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaCheck
-                            V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
-                                (t,) + runData.stimulusPair[t]
-                            ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
-                        else:
-                            V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
-                                (t,) + runData.stimulusPair[t]
-                            ] + alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                        if runData.reward[t] == 1:
 
-                        if version is None or version == "two" or (version == "four" and runData.reward[t] == 1):
-                            for pair in otherPairs:
-                                if pearce:
-                                    omega = omega + (abs(rewardPE[(t,) + pair]) - omega) * alphaOtherCheck
-                                    V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + omega * (
-                                        1 - runData.reward[t] - V_option0[(t,) + pair]
-                                    )
-                                else:
-                                    V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + alphaOtherCheck * (
-                                        1 - runData.reward[t] - V_option0[(t,) + pair]
-                                    )
+                            if pearce:
+                                omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaCheck
+                                V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                
+                                for pair in otherPairs:
+                                    V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K1Check * omega * (
+                                        1 - runData.reward[t] - V_option0[(t,) + pair])
+                                    
+                            else:
+                                V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                for pair in otherPairs:
+                                    V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K1Check * alphaCheck * (
+                                        1 - runData.reward[t] - V_option0[(t,) + pair])
+                                    
                         else:
-                            for pair in otherPairs:
-                                if pearce:
-                                    omega = omega + (abs(rewardPE[(t,) + pair]) - omega) * alphaOther2Check
-                                    V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + omega * (
-                                        1 - runData.reward[t] - V_option0[(t,) + pair]
-                                    )
-                                else:
-                                    V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + alphaOther2Check * (
-                                        1 - runData.reward[t] - V_option0[(t,) + pair]
-                                    )
+                            if pearce:
+                                omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha3Check
+                                V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                
+                                for pair in otherPairs:
+                                    V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K3Check * omega * (
+                                        1 - runData.reward[t] - V_option0[(t,) + pair])
+                                    
+                            else:
+                                V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + alpha3Check * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                for pair in otherPairs:
+                                    V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K3Check * alpha3Check * (
+                                        1 - runData.reward[t] - V_option0[(t,) + pair])
+                                
+
                         V_option1[t + 1, :] = V_option1[t, :]
 
                     elif runData.action[t] == 1:
@@ -833,61 +851,48 @@ class Fitting:
                         )
 
                         V_option1[t + 1, :] = V_option1[t, :]
-                        if pearce:
-                            omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaCheck
-                            V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
-                                (t,) + runData.stimulusPair[t]
-                            ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
-                        else:
-                            V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
-                                (t,) + runData.stimulusPair[t]
-                            ] + alphaCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
 
-                        if version is None:
-                            for pair in otherPairs:
-                                if pearce:
-                                    omega = omega + (abs(rewardPE[(t,) + pair]) - omega) * alphaOtherCheck
-                                    V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + (
-                                        omega * (1 - runData.reward[t] - V_option1[(t,) + pair])
-                                    )
-                                else:
-                                    V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + (
-                                        alphaOtherCheck * (1 - runData.reward[t] - V_option1[(t,) + pair])
-                                    )
-                        elif version == "two":
-                            for pair in otherPairs:
-                                if pearce:
-                                    omega = omega + (abs(rewardPE[(t,) + pair]) - omega) * alphaOther2Check
-                                    V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + (
-                                        omega * (1 - runData.reward[t] - V_option1[(t,) + pair])
-                                    )
-                                else:
-                                    V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + (
-                                        alphaOther2Check * (1 - runData.reward[t] - V_option1[(t,) + pair])
-                                    )
-                        else:
-                            if runData.reward[t] == 1:
+                        if runData.reward[t] == 1:
+                            if pearce:
+                                omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2Check
+                                V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+
                                 for pair in otherPairs:
-                                    if pearce:
-                                        omega = omega + (abs(rewardPE[(t,) + pair]) - omega) * alphaOther3Check
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + (
-                                            omega * (1 - runData.reward[t] - V_option1[(t,) + pair])
-                                        )
-                                    else:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + (
-                                            alphaOther3Check * (1 - runData.reward[t] - V_option1[(t,) + pair])
-                                        )
+                                    V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K2Check * omega * (
+                                        1 - runData.reward[t] - V_option1[(t,) + pair])
+                                    
                             else:
+                                V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + alpha2Check * (rewardPE[(t,) + runData.stimulusPair[t]])
+
                                 for pair in otherPairs:
-                                    if pearce:
-                                        omega = omega + (abs(rewardPE[(t,) + pair]) - omega) * alphaOther4Check
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + (
-                                            omega * (1 - runData.reward[t] - V_option1[(t,) + pair])
-                                        )
-                                    else:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + (
-                                            alphaOther4Check * (1 - runData.reward[t] - V_option1[(t,) + pair])
-                                        )
+                                    V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K2Check * alpha2Check * (
+                                        1 - runData.reward[t] - V_option1[(t,) + pair])
+                                    
+                        else:
+                            if pearce:
+                                omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha4Check
+                                V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                for pair in otherPairs:
+                                    V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K4Check * omega * (
+                                        1 - runData.reward[t] - V_option1[(t,) + pair])
+                                    
+                            else:
+                                V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + alpha4Check * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                for pair in otherPairs:
+                                    V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K4Check * alpha4Check * (
+                                        1 - runData.reward[t] - V_option1[(t,) + pair])
+                                    
+                                    
 
                         V_option0[t + 1, :] = V_option0[t, :]
 
