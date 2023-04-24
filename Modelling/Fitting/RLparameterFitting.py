@@ -61,16 +61,26 @@ class Fitting:
 
     ##
 
-    def basicFitting(self, extra=False, pearce=False, init=False, asym=False):
+    def basicFitting(self, extra=False, pearce=False, init=False, asym=False, transfer=None):
         """
         extra: False or True for separate alpha for V1
         pearce: False or True for Pearce Hall implementation
         init: False or True for initial V0 and V1
         asym : False or True for separate alphas based on reward
+        transfer: None, one, two or four indicating the amount of discount free parameters for pairs that share a stimulus
         """
-        fitted_alphasPos, fitted_alphasNeg, fitted_alphas2Pos, fitted_alphas2Neg, fitted_betas, best_LLs = (
-            np.empty((max(self.subjectData.runNumber))) for i in range(6)
-        )
+        (
+            fitted_alphasPos,
+            fitted_alphasNeg,
+            fitted_alphas2Pos,
+            fitted_alphas2Neg,
+            fitted_K1,
+            fitted_K2,
+            fitted_K3,
+            fitted_K4,
+            fitted_betas,
+            best_LLs,
+        ) = (np.empty((max(self.subjectData.runNumber))) for i in range(10))
 
         fitted_V_option0Inits, fitted_V_option1Inits = (
             np.empty((max(self.subjectData.runNumber), 3, 3)) for i in range(2)
@@ -103,6 +113,14 @@ class Fitting:
                 alpha2Grid = np.random.rand(self.gridCount, 1)
             elif asym and not extra:
                 alphaPosGrid, alphaNegGrid = (np.random.rand(self.gridCount, 1) for i in range(2))
+
+            if transfer is not None:
+                K1Grid = np.random.rand(self.gridCount, 1)
+            if transfer == "two" or transfer == "four":
+                K2Grid = np.random.rand(self.gridCount, 1)
+            if transfer == "four":
+                K3Grid, K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
+
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             if init:
@@ -150,6 +168,18 @@ class Fitting:
                     alpha2NegCheck = alpha2NegGrid[j]
                 else:
                     alphaPosCheck = alpha2PosCheck = alphaNegCheck = alpha2NegCheck = alphaGrid[j]
+
+                if transfer == "one":
+                    K1Check = K2Check = K3Check = K4Check = K1Grid[j]
+                elif transfer == "two":
+                    K1Check = K3Check = K1Grid[j]
+                    K2Check = K4Check = K2Grid[j]
+                elif transfer == "four":
+                    K1Check = K1Grid[j]
+                    K2Check = K2Grid[j]
+                    K3Check = K3Grid[j]
+                    K4Check = K4Grid[j]
+                
                 betaCheck = betaGrid[j]
                 run_V0[j, 0] = V_option0[0, 0, 0]
                 run_V1[j, 0] = V_option1[0, 0, 0]
@@ -158,6 +188,12 @@ class Fitting:
                     omega = 1
 
                 for t in range(0, max(runData.trialNumber)):
+                    otherPairs = [
+                        p
+                        for p in list(runData.stimulusPair.unique())
+                        if bool(p[0] == runData.stimulusPair[t][0]) ^ bool(p[1] == runData.stimulusPair[t][1])
+                    ]
+
                     # Prob of choosing the 0th and 1st option respectively
                     choiceProb[t, 0] = np.exp(betaCheck * V_option0[((t,) + runData.stimulusPair[t])]) / (
                         (np.exp(betaCheck * V_option0[((t,) + runData.stimulusPair[t])]))
@@ -176,28 +212,53 @@ class Fitting:
                         V_option0[t + 1, :] = V_option0[t, :]
 
                         if runData.reward[t] == 1:
-                            
                             if pearce:
                                 omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaPosCheck
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                if transfer is not None:
+                                    for pair in otherPairs:
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K1Check * omega * (
+                                            1 - runData.reward[t] - V_option0[(t,) + pair]
+                                        )
                             else:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
                                 ] + alphaPosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
 
-                            V_option1[t + 1, :] = V_option1[t, :]
+                                if transfer is not None:
+                                    for pair in otherPairs:
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K1Check * alphaPosCheck * (
+                                            1 - runData.reward[t] - V_option0[(t,) + pair]
+                                        )
+
+                            
                         else:
                             if pearce:
                                 omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaNegCheck
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                if transfer is not None:
+                                    for pair in otherPairs:
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K3Check * omega * (
+                                            1 - runData.reward[t] - V_option0[(t,) + pair]
+                                        )
+
                             else:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
                                 ] + alphaNegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                if transfer is not None:
+                                    for pair in otherPairs:
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K3Check * alphaNegCheck * (
+                                            1 - runData.reward[t] - V_option0[(t,) + pair]
+                                        )
+                        V_option1[t + 1, :] = V_option1[t, :]
 
                     elif runData.action[t] == 1:
                         rewardPE[(t,) + runData.stimulusPair[t]] = (
@@ -205,6 +266,7 @@ class Fitting:
                         )
 
                         V_option1[t + 1, :] = V_option1[t, :]
+
                         if runData.reward[t] == 1:
                             if pearce:
                                 omega = (
@@ -213,20 +275,47 @@ class Fitting:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                if transfer is not None:
+                                    for pair in otherPairs:
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K2Check * omega * (
+                                            1 - runData.reward[t] - V_option1[(t,) + pair]
+                                        )
                             else:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
                                 ] + alpha2PosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                if transfer is not None:
+                                    for pair in otherPairs:
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K2Check * alpha2PosCheck * (
+                                            1 - runData.reward[t] - V_option1[(t,) + pair]
+                                        )
                         else:
                             if pearce:
-                                omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2NegCheck
+                                omega = (
+                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2NegCheck
+                                )
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                if transfer is not None:
+                                    for pair in otherPairs:
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K4Check * omega * (
+                                            1 - runData.reward[t] - V_option1[(t,) + pair]
+                                        )
                             else:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
                                 ] + alpha2NegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                if transfer is not None:
+                                    for pair in otherPairs:
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K4Check * alpha2NegCheck * (
+                                            1 - runData.reward[t] - V_option1[(t,) + pair]
+                                        )
+
                         V_option0[t + 1, :] = V_option0[t, :]
                     else:
                         V_option1[t + 1, :] = V_option1[t, :]
@@ -251,6 +340,14 @@ class Fitting:
                 if init:
                     NLL_array[run, j, 6] = V_option0Init_Grid[j][0][0]
                     NLL_array[run, j, 7] = V_option1Init_Grid[j][0][0]
+                if transfer is not None:
+                    NLL_array[run, j, 8] = K1Check
+                if transfer == "two":
+                    NLL_array[run, j, 9] = K2Check
+                elif transfer == "four":
+                    NLL_array[run, j, 9] = K2Check
+                    NLL_array[run, j, 10] = K3Check
+                    NLL_array[run, j, 11] = K4Check
 
                 LL_array[j, 0] = Likelihood
 
@@ -270,6 +367,13 @@ class Fitting:
             if init:
                 fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
                 fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
+            if transfer is not None:
+                fitted_K1[run] = NLL_array[run, minIndex, 8]
+            if transfer == "two":
+                fitted_K2[run] = NLL_array[run, minIndex, 9]
+            elif transfer == "four":
+                fitted_K3[run] = NLL_array[run, minIndex, 10]
+                fitted_K4[run] = NLL_array[run, minIndex, 11]
             best_LLs[run] = LL_array[maxIndex]
             RPE[run] = run_RPEs[minIndex]
             V0[run] = run_V0[minIndex]
@@ -433,7 +537,7 @@ class Fitting:
             if version == "two" or version == "four":
                 K2Grid = np.random.rand(self.gridCount, 1)
             if version == "four":
-                K3Grid, K4Grid = (np.random.rand(self.gridCount, 1) for i in range(3))
+                K3Grid, K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
             betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
