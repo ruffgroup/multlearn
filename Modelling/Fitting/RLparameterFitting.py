@@ -393,7 +393,11 @@ class Fitting:
                 K1=fitted_K1,
                 K2=fitted_K2,
                 K3=fitted_K3,
-                K4=fitted_K4
+                K4=fitted_K4,
+                saveAs=saveAs,
+                extra=extra,
+                asym=asym,
+                transfer=transfer
             )
 
         newPath = os.path.join(

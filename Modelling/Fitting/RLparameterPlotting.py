@@ -37,28 +37,323 @@ class Plotting:
         # Get savedVals file
         self.savedValsFile = glob.glob(os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID))[0]
 
-    # Simple plots
-
-    def plots_basicFitting(
-        self, NLL_array, alphas, betas, pearce, alphas2=None, V_option0Inits=None, V_option1Inits=None
+    def plots_modelFitting(
+        self,
+        NLL_array,
+        alphasPos,
+        alphas2Pos,
+        alphasNeg,
+        alphas2Neg,
+        betas,
+        pearce,
+        V_option0Inits,
+        V_option1Inits,
+        K1,
+        K2,
+        K3,
+        K4,
+        saveAs,
+        extra,
+        asym,
+        transfer
     ):
-        saving_folder = "basic"
+        saving_folder = saveAs
         subjectData = pd.read_csv(self.savedValsFile)
 
         for run in range(0, max(subjectData.runNumber)):
             NLL_run = NLL_array[run]
-            alpha = alphas[run]
+            alphaPos = alphasPos[run]
             beta = betas[run]
-            if alphas2 is not None:
-                alpha2 = alphas2[run]
+            varList = ["beta: {}".format(beta)]
+            if extra and not asym:
+                alphaNeg = alphaPos
+                alpha2Neg = alpha2Pos = alphas2Pos[run]
+                varList.append("V0 alpha: {}".format(alphaPos))
+                varList.append("V1 alpha: {}".format(alpha2Pos))
+            elif asym and not extra:
+                alpha2Pos = alphaPos
+                alpha2Neg = alphaNeg = alphasNeg[run]
+                varList.append("Pos reward alpha: {}".format(alphaPos))
+                varList.append("Neg reward alpha: {}".format(alphaNeg))
+            elif asym and extra:
+                alpha2Pos = alphas2Pos[run]
+                alphaNeg = alphasNeg[run]
+                alpha2Neg = alphas2Neg[run]
+                varList.append("V0 Pos reward alpha: {}".format(alphaPos))
+                varList.append("V0 Neg reward alpha: {}".format(alphaNeg))
+                varList.append("V1 Pos reward alpha: {}".format(alpha2Pos))
+                varList.append("V1 Neg reward alpha: {}".format(alpha2Neg))
             else:
-                alpha2 = None
+                alpha2Pos = alphaNeg = alpha2Neg = alphaPos
+                varList.append("alpha: {}".format(alphaPos)) 
             if V_option0Inits is not None:
                 V_option0 = V_option0Inits[run]
                 V_option1 = V_option1Inits[run]
             else:
                 V_option0 = V_option1 = None
+
+            if transfer == "one":
+                K1run = K2run = K3run = K4run = K1[run]
+                transfer_sim = True
+            elif transfer == "two":
+                K3run = K1run
+                K4run = K2run = K2[run]
+                transfer_sim = True
+            elif transfer == "four":
+                K1run = K1[run]
+                K2run = K2[run]
+                K3run = K3[run]
+                K4run = K4[run]
+                transfer_sim = True
+            else:
+                K1run = K2run = K3run = K4run = None
+                transfer_sim = False
             
+
+            runData = subjectData[subjectData.runNumber == run + 1].reset_index()
+            green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
+            green = [ast.literal_eval(green[0]), ast.literal_eval(green[1]), ast.literal_eval(green[2])]
+
+            attracts = runData.accurate[runData.correctResponse == 0]
+            notAttracts = runData.accurate[runData.correctResponse == 1]
+
+            A_line = (
+                pd.DataFrame(ma(attracts, self.ww, self.method)).astype(float).interpolate(option="spline", order=1)
+            )
+            NA_line = (
+                pd.DataFrame(ma(notAttracts, self.ww, self.method)).astype(float).interpolate(option="spline", order=1)
+            )
+            Acc_line = (
+                pd.DataFrame(ma(runData.accurate, self.ww, self.method))
+                .astype(float)
+                .interpolate(option="spline", order=1)
+            )
+
+            simA_lines = np.empty((self.reps, int(self.mainTrials / 2) - self.ww + 1))
+            simNA_lines = np.empty((self.reps, int(self.mainTrials / 2) - self.ww + 1))
+            simAcc_lines = np.empty((self.reps, int(self.mainTrials) - self.ww + 1))
+
+            taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
+
+            feedbackAcc = runData.feedbackAccuracy.astype(int)
+
+            for i in range(self.reps):
+                simulation = task_Design(
+                    self.mainTrials,
+                    self.additionalTrials,
+                    alphaPos=alphaPos,
+                    alphaNeg=alphaNeg,
+                    alpha2Pos=alpha2Pos,
+                    alpha2Neg = alpha2Neg,
+                    beta=beta,
+                    K1=K1,
+                    K2=K2,
+                    K3=K3,
+                    K4=K4,
+                    V_option0Init=V_option0,
+                    V_option1Init=V_option1,
+                    pearce=pearce,
+                    transfer=transfer_sim
+                )
+                simulation.taskStructure(taskStruct, green, feedbackAcc)
+                simulation.RLloops()
+
+                simAttracts = simulation.accurate[simulation.correctResponse == 0]
+                simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
+                simC = simulation.accurate
+                if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
+                    simA_lines[i, :] = ma(simAttracts, self.ww, self.method)
+                    simNA_lines[i, :] = ma(simNotAttracts, self.ww, self.method)
+                    simAcc_lines[i, :] = ma(simC.flatten(), self.ww, self.method)
+
+            if simA_lines.size:
+                simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
+                simNA_line = pd.DataFrame(np.mean(simNA_lines, axis=0))
+                simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
+
+                fig, ax = plt.subplots(3, 1, figsize=(12, 12))
+                if pearce:
+                    if alpha2 and V_option0 is not None:
+                        fig.suptitle(
+                            "MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, alpha2 (pearce) {3}, beta {4}, V0 {5}, V1 {6}".format(
+                                self.ID,
+                                run + 1,
+                                np.round(alpha, 2),
+                                np.round(alpha2, 2),
+                                np.round(beta, 2),
+                                np.round(V_option0[0][0], 2),
+                                np.round(V_option1[0][0], 2),
+                            )
+                        )
+                    elif alpha2 and V_option0 is None:
+                        fig.suptitle(
+                            "MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, alpha2 (pearce) {3}, beta {4}".format(
+                                self.ID, run + 1, np.round(alpha, 2), np.round(alpha2, 2), np.round(beta, 2)
+                            )
+                        )
+                    elif V_option0 is not None and not alpha2:
+                        fig.suptitle(
+                            "MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, beta {3}, V0 {4}, V1 {5}".format(
+                                self.ID,
+                                run + 1,
+                                np.round(alpha, 2),
+                                np.round(beta, 2),
+                                np.round(V_option0[0][0], 2),
+                                np.round(V_option1[0][0], 2),
+                            )
+                        )
+                    else:
+                        fig.suptitle(
+                            "MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, beta {3}".format(
+                                self.ID, run + 1, np.round(alpha, 2), np.round(beta, 2)
+                            )
+                        )
+                else:
+                    if alpha2 and V_option0 is not None:
+                        fig.suptitle(
+                            "MA of binary accuracy for participant {0}, run {1}: alpha {2}, alpha2 {3}, beta {4}, V0 {5}, V1 {6}".format(
+                                self.ID,
+                                run + 1,
+                                np.round(alpha, 2),
+                                np.round(alpha2, 2),
+                                np.round(beta, 2),
+                                np.round(V_option0[0][0], 2),
+                                np.round(V_option1[0][0], 2),
+                            )
+                        )
+                    elif alpha2 and V_option0 is None:
+                        fig.suptitle(
+                            "MA of binary accuracy for participant {0}, run {1}: alpha {2}, alpha2 {3}, beta {4}".format(
+                                self.ID, run + 1, np.round(alpha, 2), np.round(alpha2, 2), np.round(beta, 2)
+                            )
+                        )
+                    elif V_option0 is not None and not alpha2:
+                        fig.suptitle(
+                            "MA of binary accuracy for participant {0}, run {1}: alpha {2}, beta {3}, V0 {4}, V1 {5}".format(
+                                self.ID,
+                                run + 1,
+                                np.round(alpha, 2),
+                                np.round(beta, 2),
+                                np.round(V_option0[0][0], 2),
+                                np.round(V_option1[0][0], 2),
+                            )
+                        )
+                    else:
+                        fig.suptitle(
+                            "MA of binary accuracy for participant {0}, run {1}: alpha {2}, beta {3}".format(
+                                self.ID, run + 1, np.round(alpha, 2), np.round(beta, 2)
+                            )
+                        )
+
+                ax[0].plot(A_line, label="Real data")
+                ax[0].plot(simA_line, label="Simulated data")
+                ax[0].set_title("Accurate for 'attracts'")
+                ax[0].set_ylim(0, 1.1)
+                ax[0].set_ylabel("Accurate")
+                ax[0].legend()
+
+                ax[1].plot(NA_line, label="Real data")
+                ax[1].plot(simNA_line, label="Simulated data")
+                ax[1].set_title("Accurate for 'does not attract'")
+                ax[1].set_ylim(0, 1.1)
+                ax[1].set_ylabel("Accurate")
+                ax[1].legend()
+
+                ax[2].plot(Acc_line, label="Real data")
+                ax[2].plot(simAcc_line, label="Simulated data")
+                ax[2].set_title("Accurate overall")
+                ax[2].set_ylim(0, 1.1)
+                ax[2].set_ylabel("Accurate")
+                ax[2].legend()
+
+                # Creating figure
+                fig = plt.figure(2)
+                ax = fig.add_subplot(111, projection="3d")
+                NLL_run[NLL_run[:, 2] > min(NLL_run[:, 2]) + 4] = np.nan
+                ax.scatter(NLL_run[:, 0], NLL_run[:, 1], NLL_run[:, 2], color="green")
+                ax.set_xlabel("alpha", fontweight="bold")
+                ax.set_ylabel("beta", fontweight="bold")
+                ax.set_zlabel("NLL", fontweight="bold")
+                ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(self.ID, run + 1))
+
+                count = 3
+                for var in [
+                    (0, alpha, "alpha"),
+                    (1, beta, "beta"),
+                    (3, alpha2, "alpha2"),
+                    (4, V_option0, "V0"),
+                    (5, V_option1, "V1"),
+                ]:
+                    if var[1] is not None:
+                        plt.figure(count)
+                        plt.scatter(NLL_run[:, var[0]], NLL_run[:, 2])
+                        plt.xlabel("{}".format(var[2]), fontweight="bold")
+                        plt.ylabel("NLL", fontweight="bold")
+                        plt.title(
+                            "Participant {0}, run {1}: NLL and {2} scatter plot".format(self.ID, run + 1, var[2])
+                        )
+                        count += 1
+
+                os.makedirs(saving_folder, exist_ok=True)
+                if pearce:
+                    if alpha2 and V_option0 is not None:
+                        save_name = "{0}_{1}_ExtraInitPearcePlots.pdf".format(self.ID, run)
+                    elif alpha2 and V_option0 is None:
+                        save_name = "{0}_{1}_ExtraPearcePlots.pdf".format(self.ID, run)
+                    elif V_option0 is not None and not alpha2:
+                        save_name = "{0}_{1}_InitPearcePlots.pdf".format(self.ID, run)
+                    else:
+                        save_name = "{0}_{1}_PearcePlots.pdf".format(self.ID, run)
+                else:
+                    if alpha2 and V_option0 is not None:
+                        save_name = "{0}_{1}_ExtraInitPlots.pdf".format(self.ID, run)
+                    elif alpha2 and V_option0 is None:
+                        save_name = "{0}_{1}_ExtraPlots.pdf".format(self.ID, run)
+                    elif V_option0 is not None and not alpha2:
+                        save_name = "{0}_{1}_InitPlots.pdf".format(self.ID, run)
+                    else:
+                        save_name = "{0}_{1}_Plots.pdf".format(self.ID, run)
+
+                file_path = os.path.join(saving_folder, save_name)
+
+                pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
+                for fig in range(1, plt.gcf().number + 1):
+                    pdf.savefig(fig)
+                pdf.close()
+
+                plt.close("all")
+
+    def plots_asymFitting(
+        self,
+        NLL_array,
+        alphasPos,
+        alphasNeg,
+        betas,
+        pearce,
+        alphas2Pos=None,
+        alphas2Neg=None,
+        V_option0Inits=None,
+        V_option1Inits=None,
+    ):
+        saving_folder = "asym"
+        subjectData = pd.read_csv(self.savedValsFile)
+
+        for run in range(0, max(subjectData.runNumber)):
+            NLL_run = NLL_array[run]
+            alphaPos = alphasPos[run]
+            alphaNeg = alphasNeg[run]
+            beta = betas[run]
+            if alphas2Pos is not None:
+                alpha2Pos = alphas2Pos[run]
+                alpha2Neg = alphas2Neg[run]
+            else:
+                alpha2Pos, alpha2Neg = (None for i in range(2))
+            if V_option0Inits is not None:
+                V_option0 = V_option0Inits[run]
+                V_option1 = V_option1Inits[run]
+            else:
+                V_option0 = V_option1 = None
+
             runData = subjectData[subjectData.runNumber == run + 1].reset_index()
             green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
             green = [ast.literal_eval(green[0]), ast.literal_eval(green[1]), ast.literal_eval(green[2])]
@@ -217,15 +512,15 @@ class Plotting:
                 ax.set_ylabel("beta", fontweight="bold")
                 ax.set_zlabel("NLL", fontweight="bold")
                 ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(self.ID, run + 1))
-                
+
                 count = 3
                 for var in [
-                        (0, alpha, "alpha"),
-                        (1, beta, "beta"),
-                        (3, alpha2, "alpha2"),
-                        (4, V_option0, "V0"),
-                        (5, V_option1, "V1"),
-                    ]:
+                    (0, alpha, "alpha"),
+                    (1, beta, "beta"),
+                    (3, alpha2, "alpha2"),
+                    (4, V_option0, "V0"),
+                    (5, V_option1, "V1"),
+                ]:
                     if var[1] is not None:
                         plt.figure(count)
                         plt.scatter(NLL_run[:, var[0]], NLL_run[:, 2])
