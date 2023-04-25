@@ -18,6 +18,7 @@ import ast
 import matplotlib.backends.backend_pdf
 from mpl_toolkits.mplot3d import Axes3D
 from RLparameterPlotting import Plotting
+from multiprocessing import Pool
 
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
@@ -106,13 +107,13 @@ class Fitting:
         for run in range(0, max(self.subjectData.runNumber)):
             alphaGrid = np.random.rand(self.gridCount, 1)
             if extra and asym:
-                alphaPosGrid, alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
-                    np.random.rand(self.gridCount, 1) for i in range(4)
+                alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
+                    np.random.rand(self.gridCount, 1) for i in range(3)
                 )
             elif extra and not asym:
                 alpha2Grid = np.random.rand(self.gridCount, 1)
             elif asym and not extra:
-                alphaPosGrid, alphaNegGrid = (np.random.rand(self.gridCount, 1) for i in range(2))
+                alphaNegGrid = np.random.rand(self.gridCount, 1)
 
             if transfer is not None:
                 K1Grid = np.random.rand(self.gridCount, 1)
@@ -121,18 +122,18 @@ class Fitting:
             if transfer == "four":
                 K3Grid, K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
 
-            betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
+            betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             if init:
+
                 V_option0_rand = np.random.rand(self.gridCount, 1)
-            V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape(
+                V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape(
                 (self.gridCount, 3, 3)
-            )
+                )
             
-            V_option1_rand = np.random.rand(self.gridCount, 1)
-            V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape(
+                V_option1Init_Grid = np.repeat(1 - V_option0_rand, 9, axis=1).reshape(
                 (self.gridCount, 3, 3)
-            )
+                )
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
@@ -166,10 +167,10 @@ class Fitting:
                     alphaPosCheck = alphaNegCheck = alphaGrid[j]
                     alpha2PosCheck = alpha2NegCheck = alpha2Grid[j]
                 elif asym and not extra:
-                    alphaPosCheck = alpha2PosCheck = alphaPosGrid[j]
+                    alphaPosCheck = alpha2PosCheck = alphaGrid[j]
                     alphaNegCheck = alpha2NegCheck = alphaNegGrid[j]
                 elif extra and asym:
-                    alphaPosCheck = alphaPosGrid[j]
+                    alphaPosCheck = alphaGrid[j]
                     alpha2PosCheck = alpha2PosGrid[j]
                     alphaNegCheck = alphaNegGrid[j]
                     alpha2NegCheck = alpha2NegGrid[j]
@@ -192,7 +193,7 @@ class Fitting:
                 run_V1[j, 0] = V_option1[0, 0, 0]
 
                 if pearce:
-                    omega = omega2 = omega3 = omega4 = 1
+                    omega = 1
 
                 for t in range(0, max(runData.trialNumber)):
                     otherPairs = [
@@ -240,24 +241,19 @@ class Fitting:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
                                         ] + K1Check * alphaPosCheck * (1 - runData.reward[t] - V_option0[(t,) + pair])
-                            if not asym and not extra:
-                                omega2 = omega3 = omega4 = omega
-                            elif asym and not extra:
-                                omega2 = omega
-                            elif extra and not asym:
-                                omega3 = omega
+                            
                         else:
                             if pearce:
-                                omega3 = (
-                                    omega3 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega3) * alphaNegCheck
+                                omega = (
+                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaNegCheck
                                 )
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
-                                ] + omega3 * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K3Check * omega3 * (
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K3Check * omega * (
                                             1 - runData.reward[t] - V_option0[(t,) + pair]
                                         )
 
@@ -271,12 +267,7 @@ class Fitting:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
                                         ] + K3Check * alphaNegCheck * (1 - runData.reward[t] - V_option0[(t,) + pair])
-                            if not asym and not extra:
-                                omega2 = omega = omega4 = omega3
-                            elif asym and not extra:
-                                omega4 = omega3
-                            elif extra and not asym:
-                                omega = omega3
+                            
                         V_option1[t + 1, :] = V_option1[t, :]
 
                     elif runData.action[t] == 1:
@@ -288,16 +279,16 @@ class Fitting:
 
                         if runData.reward[t] == 1:
                             if pearce:
-                                omega2 = (
-                                    omega2 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega2) * alpha2PosCheck
+                                omega = (
+                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2PosCheck
                                 )
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
-                                ] + omega2 * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K2Check * omega2 * (
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K2Check * omega * (
                                             1 - runData.reward[t] - V_option1[(t,) + pair]
                                         )
                             else:
@@ -311,24 +302,19 @@ class Fitting:
                                             (t,) + pair
                                         ] + K2Check * alpha2PosCheck * (1 - runData.reward[t] - V_option1[(t,) + pair])
 
-                            if not asym and not extra:
-                                omega3 = omega = omega4 = omega2
-                            elif asym and not extra:
-                                omega3 = omega2
-                            elif extra and not asym:
-                                omega4 = omega2
+                            
                         else:
                             if pearce:
-                                omega4 = (
-                                    omega4 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega4) * alpha2NegCheck
+                                omega = (
+                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2NegCheck
                                 )
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
-                                ] + omega4 * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K4Check * omega4 * (
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K4Check * omega * (
                                             1 - runData.reward[t] - V_option1[(t,) + pair]
                                         )
                             else:
@@ -342,12 +328,7 @@ class Fitting:
                                             (t,) + pair
                                         ] + K4Check * alpha2NegCheck * (1 - runData.reward[t] - V_option1[(t,) + pair])
 
-                            if not asym and not extra:
-                                omega2 = omega = omega3 = omega4
-                            elif asym and not extra:
-                                omega3 = omega4
-                            elif extra and not asym:
-                                omega2 = omega4
+                            
                         V_option0[t + 1, :] = V_option0[t, :]
                     else:
                         V_option1[t + 1, :] = V_option1[t, :]
@@ -570,7 +551,30 @@ def ma(interval, window_size=10, method="same"):
 
 #
 
-IDs = [
+def use_fitting(IDnr):
+     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+     (
+        fitted_alphasPos,
+        fitted_alphas2Pos,
+        fitted_alphasNeg,
+        fitted_alphas2Neg,
+        fitted_betas,
+        best_LLs,
+        RPE,
+        V0,
+        V1,
+        NLL_array,
+        fitted_V_option0Inits,
+        fitted_V_option1Inits,
+        fitted_K1,
+        fitted_K2,
+        fitted_K3,
+        fitted_K4,
+    ) = fitted.modelFitting(saveAs="PearceInitFourAlphas", pearce=True, extra=True, init=True, asym=True)
+
+
+def main():
+    configurations = [
     "01",
     "02",
     "03",
@@ -631,31 +635,15 @@ IDs = [
     "64",
 ]
 
-for IDnr in IDs:
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    pool = Pool(8)
+    pool.map(use_fitting, configurations)
+
+if __name__ == '__main__':
+    main()
 
     # # Run stat learning
     # beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
 
-    # # Run the simplest RL model
-    (
-        fitted_alphasPos,
-        fitted_alphas2Pos,
-        fitted_alphasNeg,
-        fitted_alphas2Neg,
-        fitted_betas,
-        best_LLs,
-        RPE,
-        V0,
-        V1,
-        NLL_array,
-        fitted_V_option0Inits,
-        fitted_V_option1Inits,
-        fitted_K1,
-        fitted_K2,
-        fitted_K3,
-        fitted_K4,
-    ) = fitted.modelFitting(saveAs="PearceInitFourAlphas", pearce=True, extra=True, init=True, asym=True)
 
 # You can always include statistical learning; necessary to get surprise values
 # beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
