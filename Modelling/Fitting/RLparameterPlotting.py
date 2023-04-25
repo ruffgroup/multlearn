@@ -18,40 +18,105 @@ import ast
 import matplotlib.backends.backend_pdf
 from mpl_toolkits.mplot3d import Axes3D
 
-sys.path.append(sys.path[0] + '/..')
+sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
 
 
 class Plotting:
-
     def __init__(self, mainTrials, additionalTrials, gridCount, ID, ww, method, reps):
-        
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
         self.gridCount = gridCount
         self.ID = ID
         self.statLearnPar = 1
         self.ww = ww
-        self.method = method 
+        self.method = method
         self.reps = reps
 
-        wanted_dir = '/data/sourcedata/behavior/modified_files'
+        wanted_dir = "/data/sourcedata/behavior/modified_files"
         # Get savedVals file
-        self.savedValsFile = glob.glob(os.path.abspath(wanted_dir)+"/*{}_savedValues.csv".format(self.ID))[0]
+        self.savedValsFile = glob.glob(os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID))[0]
 
-
-    # Simple plots
-
-    def plots_simplestFitting(self, NLL_array, alphas, betas, pearce):
-        
-        print("simple")
-        saving_folder = "simple"
+    def plots_modelFitting(
+        self,
+        NLL_array,
+        alphasPos,
+        alphas2Pos,
+        alphasNeg,
+        alphas2Neg,
+        betas,
+        pearce,
+        V_option0Inits,
+        V_option1Inits,
+        K1,
+        K2,
+        K3,
+        K4,
+        saveAs,
+        extra,
+        asym,
+        transfer
+    ):
+        saving_folder = saveAs
         subjectData = pd.read_csv(self.savedValsFile)
 
         for run in range(0, max(subjectData.runNumber)):
             NLL_run = NLL_array[run]
-            alpha = alphas[run]
+            alphaPos = alphasPos[run]
             beta = betas[run]
+            varList = ["beta: {}".format(np.round(beta, 2))]
+            if extra and not asym:
+                alphaNeg = alphaPos
+                alpha2Neg = alpha2Pos = alphas2Pos[run]
+                varList.append(", V0 alpha: {}".format(np.round(alphaPos, 2)))
+                varList.append(", V1 alpha: {}".format(np.round(alpha2Pos, 2)))
+            elif asym and not extra:
+                alpha2Pos = alphaPos
+                alpha2Neg = alphaNeg = alphasNeg[run]
+                varList.append(", Pos reward alpha: {}".format(np.round(alphaPos, 2)))
+                varList.append(", Neg reward alpha: {}".format(np.round(alphaNeg, 2)))
+            elif asym and extra:
+                alpha2Pos = alphas2Pos[run]
+                alphaNeg = alphasNeg[run]
+                alpha2Neg = alphas2Neg[run]
+                varList.append(", V0 Pos reward alpha: {}".format(np.round(alphaPos, 2)))
+                varList.append(", V0 Neg reward alpha: {}".format(np.round(alphaNeg, 2)))
+                varList.append(", V1 Pos reward alpha: {}".format(np.round(alpha2Pos, 2)))
+                varList.append(", V1 Neg reward alpha: {}".format(np.round(alpha2Neg, 2)))
+            else:
+                alpha2Pos = alphaNeg = alpha2Neg = alphaPos
+                varList.append(", alpha: {}".format(np.round(alphaPos, 2))) 
+            if V_option0Inits is not None:
+                V_option0 = V_option0Inits[run]
+                V_option1 = V_option1Inits[run]
+                varList.append("\nV0 init: {0}, V1 init {1}".format(np.round(V_option0[0][0], 2), np.round(V_option1[0][0], 2)))
+            else:
+                V_option0 = V_option1 = None
+
+            if transfer == "one":
+                K1run = K2run = K3run = K4run = K1[run]
+                transfer_sim = True
+                varList.append(", Kappa: {}".format(np.round(K1run, 2)))
+            elif transfer == "two":
+                K3run = K1run
+                K4run = K2run = K2[run]
+                transfer_sim = True
+                varList.append(", V0 Kappa: {}".format(np.round(K1run, 2)))
+                varList.append(", V1 Kappa: {}".format(np.round(K2run, 2)))
+            elif transfer == "four":
+                K1run = K1[run]
+                K2run = K2[run]
+                K3run = K3[run]
+                K4run = K4[run]
+                varList.append(", V0 Pos Kappa: {}".format(np.round(K1run, 2)))
+                varList.append(", V1 Pos Kappa: {}".format(np.round(K2run, 2)))
+                varList.append(", V0 Neg Kappa: {}".format(np.round(K3run, 2)))
+                varList.append(", V1 Neg Kappa: {}".format(np.round(K4run, 2)))
+                transfer_sim = True
+            else:
+                K1run = K2run = K3run = K4run = None
+                transfer_sim = False
+            
 
             runData = subjectData[subjectData.runNumber == run + 1].reset_index()
             green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
@@ -60,25 +125,44 @@ class Plotting:
             attracts = runData.accurate[runData.correctResponse == 0]
             notAttracts = runData.accurate[runData.correctResponse == 1]
 
-            
-            A_line = pd.DataFrame(ma(attracts, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
-            NA_line = pd.DataFrame(ma(notAttracts, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
-            Acc_line = pd.DataFrame(ma(runData.accurate, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
+            A_line = (
+                pd.DataFrame(ma(attracts, self.ww, self.method)).astype(float).interpolate(option="spline", order=1)
+            )
+            NA_line = (
+                pd.DataFrame(ma(notAttracts, self.ww, self.method)).astype(float).interpolate(option="spline", order=1)
+            )
+            Acc_line = (
+                pd.DataFrame(ma(runData.accurate, self.ww, self.method))
+                .astype(float)
+                .interpolate(option="spline", order=1)
+            )
 
-
-            simA_lines = np.empty((self.reps, int(self.mainTrials / 2)-self.ww+1))
-            simNA_lines = np.empty((self.reps, int(self.mainTrials / 2)-self.ww+1))
-            simAcc_lines = np.empty((self.reps, int(self.mainTrials)-self.ww+1))
+            simA_lines = np.empty((self.reps, int(self.mainTrials / 2) - self.ww + 1))
+            simNA_lines = np.empty((self.reps, int(self.mainTrials / 2) - self.ww + 1))
+            simAcc_lines = np.empty((self.reps, int(self.mainTrials) - self.ww + 1))
 
             taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
 
             feedbackAcc = runData.feedbackAccuracy.astype(int)
 
             for i in range(self.reps):
-                if pearce:
-                    simulation = task_Design(self.mainTrials, self.additionalTrials, pearce=1, omega=alpha, beta=beta)
-                else:
-                    simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta)
+                simulation = task_Design(
+                    self.mainTrials,
+                    self.additionalTrials,
+                    alphaPos=alphaPos,
+                    alphaNeg=alphaNeg,
+                    alpha2Pos=alpha2Pos,
+                    alpha2Neg = alpha2Neg,
+                    beta=beta,
+                    K1=K1,
+                    K2=K2,
+                    K3=K3,
+                    K4=K4,
+                    V_option0Init=V_option0,
+                    V_option1Init=V_option1,
+                    pearce=pearce,
+                    transfer=transfer_sim
+                )
                 simulation.taskStructure(taskStruct, green, feedbackAcc)
                 simulation.RLloops()
 
@@ -96,62 +180,78 @@ class Plotting:
                 simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
 
                 fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-                if pearce:
-                    fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha (pearce) {2}, beta {3}"
-                                .format(self.ID, run + 1, np.round(alpha, 2), np.round(beta, 2)))
-                else:
-                    fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, beta {3}"
-                                .format(self.ID, run + 1, np.round(alpha, 2), np.round(beta, 2)))
+                titleStr = " ".join(varList)
+                fig.suptitle(
+                    "MA of binary accuracy for participant {0}, run {1}:" .format(
+                        self.ID,
+                        run + 1
+                    ) + " " + titleStr
+                )
 
-                ax[0].plot(A_line, label='Real data')
-                ax[0].plot(simA_line, label='Simulated data')
+                ax[0].plot(A_line, label="Real data")
+                ax[0].plot(simA_line, label="Simulated data")
                 ax[0].set_title("Accurate for 'attracts'")
                 ax[0].set_ylim(0, 1.1)
                 ax[0].set_ylabel("Accurate")
                 ax[0].legend()
 
-                ax[1].plot(NA_line, label='Real data')
-                ax[1].plot(simNA_line, label='Simulated data')
+                ax[1].plot(NA_line, label="Real data")
+                ax[1].plot(simNA_line, label="Simulated data")
                 ax[1].set_title("Accurate for 'does not attract'")
                 ax[1].set_ylim(0, 1.1)
                 ax[1].set_ylabel("Accurate")
                 ax[1].legend()
 
-                ax[2].plot(Acc_line, label='Real data')
-                ax[2].plot(simAcc_line, label='Simulated data')
+                ax[2].plot(Acc_line, label="Real data")
+                ax[2].plot(simAcc_line, label="Simulated data")
                 ax[2].set_title("Accurate overall")
                 ax[2].set_ylim(0, 1.1)
                 ax[2].set_ylabel("Accurate")
                 ax[2].legend()
 
+                plt.tight_layout()
+
                 # Creating figure
                 fig = plt.figure(2)
-                ax = fig.add_subplot(111, projection='3d')
-                NLL_run[NLL_run[:, -1] > min(NLL_run[:, -1]) + 10] = np.nan
-                ax.scatter(NLL_run[:, 0], NLL_run[:, 1], NLL_run[:, -1], color="green")
-                ax.set_xlabel('alpha', fontweight='bold')
-                ax.set_ylabel('beta', fontweight='bold')
-                ax.set_zlabel('NLL', fontweight='bold')
+                ax = fig.add_subplot(111, projection="3d")
+                NLL_run[NLL_run[:, 0] > min(NLL_run[:, 0]) + 8] = np.nan
+                ax.scatter(NLL_run[:, 1], NLL_run[:, 2], NLL_run[:, 0], color="green")
+                ax.set_xlabel("alpha", fontweight="bold")
+                ax.set_ylabel("beta", fontweight="bold")
+                ax.set_zlabel("NLL", fontweight="bold")
                 ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(self.ID, run + 1))
 
-                plt.figure(3)
-                plt.scatter(NLL_run[:, 0], NLL_run[:, -1])
-                plt.xlabel('alpha', fontweight='bold')
-                plt.ylabel('NLL', fontweight='bold')
-                plt.title("Participant {0}, run {1}: NLL and alpha scatter plot".format(self.ID, run + 1))
+                plt.tight_layout()
 
-                plt.figure(4)
-                plt.scatter(NLL_run[:, 1], NLL_run[:, -1])
-                plt.xlabel('beta', fontweight='bold')
-                plt.ylabel('NLL', fontweight='bold')
-                plt.title("Participant {0}, run {1}: NLL and beta scatter plot".format(self.ID, run + 1))
-
+                count = 3
+                for var in [
+                    (1, alphaPos, "V0 Pos alpha"),
+                    (2, beta, "beta"),
+                    (3, alphaNeg, "V0 Neg alpha"),
+                    (4, alpha2Pos, "V1 Pos alpha"),
+                    (5, alpha2Neg, "V1 Neg alpha"),
+                    (6, V_option0[0][0], "V0"),
+                    (7, V_option1[0][0], "V1"),
+                    (8, K1run, "V0 Pos Kappa"),
+                    (9, K2run, "V1 Pos Kappa"),
+                    (10, K3run, "V0 Neg Kappa"),
+                    (11, K4run, "V1 Neg Kappa")
+                ]:
+                    if var[1] is not None:
+                        plt.figure(count)
+                        plt.scatter(NLL_run[:, var[0]], NLL_run[:, 0])
+                        plt.xlabel("{}".format(var[2]), fontweight="bold")
+                        plt.ylabel("NLL", fontweight="bold")
+                        plt.title(
+                            "Participant {0}, run {1}: NLL and {2} scatter plot".format(self.ID, run + 1, var[2])
+                        )
+                        plt.tight_layout()
+                        count += 1
 
                 os.makedirs(saving_folder, exist_ok=True)
-                if pearce:
-                    save_name = "{0}_{1}_simplePearcePlots.pdf".format(self.ID, run)
-                else:
-                    save_name = "{0}_{1}_simplePlots.pdf".format(self.ID, run)
+ 
+                save_name = "{0}_{1}_{2}_Plots.pdf".format(self.ID, run, saveAs)
+
                 file_path = os.path.join(saving_folder, save_name)
 
                 pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
@@ -159,806 +259,13 @@ class Plotting:
                     pdf.savefig(fig)
                 pdf.close()
 
-                plt.close('all')
-
-    # Value plots
-
-    def plots_valueFitting(self):
-
-        count = 0
-
-        for ID in self.IDs:
-            print("now")
-            saving_folder = "initVal"
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-
-            for run in range(0, max(subjectData.runNumber)):
-                NLL_array = self.NLL_arrays[count, run, :, :]
-                alpha = self.all_alphas[count, run]
-                beta = self.all_betas[count, run]
-                V_option0 = self.all_V_option0Inits[count, run]
-                V_option1 = self.all_V_option1Inits[count, run]
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
-
-                attracts = runData.accurate[runData.correctResponse == 0]
-                notAttracts = runData.accurate[runData.correctResponse == 1]
-
-                MostAcc = runData.accurate[runData.combinationConditionalProbability == 0.5]
-                MiddleAcc = runData.accurate[runData.combinationConditionalProbability == 0.35]
-                LeastAcc = runData.accurate[runData.combinationConditionalProbability == 0.15]
-
-                oppositeReward = np.where(runData.reward != runData.correctResponse)[0]
-                oppositeRewardNext = oppositeReward + 1
-                oppositeRewardNext = oppositeRewardNext[oppositeRewardNext < 60]
-                accOppReward = runData.accurate.loc[oppositeRewardNext]
-                oppositeRewardPairs = runData.stimulusPair[oppositeReward]
-                nextOppPairAcc = list()
-                for pair, idx in zip(oppositeRewardPairs, oppositeReward):
-                    subset = runData.loc[idx + 1:, ['stimulusPair', 'accurate']]
-                    temp = subset[subset.stimulusPair == pair].reset_index()
-                    if not temp.empty:
-                        nextOppPairAcc.append(temp.accurate[0])
-
-                avgAccOppReward = np.nanmean(accOppReward)
-                avgNextOppPairAcc = np.nanmean(nextOppPairAcc)
-
-                correctReward = np.where(runData.reward == runData.correctResponse)[0]
-                correctRewardNext = correctReward + 1
-                correctRewardNext = correctRewardNext[correctRewardNext < 60]
-                accCorrReward = runData.accurate.loc[correctRewardNext]
-                correctRewardPairs = runData.stimulusPair[correctReward]
-                nextCorrPairAcc = list()
-                for pair, idx in zip(correctRewardPairs, correctReward):
-                    subset = runData.loc[idx + 1:, ['stimulusPair', 'accurate']]
-                    temp = subset[subset.stimulusPair == pair].reset_index()
-                    if not temp.empty:
-                        nextCorrPairAcc.append(temp.accurate[0])
-
-                avgAccCorrReward = np.nanmean(accCorrReward)
-                avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
-
-                A_line = pd.DataFrame(ma(attracts, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
-                NA_line = pd.DataFrame(ma(notAttracts, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
-                Acc_line = pd.DataFrame(ma(runData.accurate, self.ww, self.method)).astype(float).interpolate(option='spline', order=1)
-
-                MoA_Line = pd.DataFrame(MostAcc)
-                MiA_Line = pd.DataFrame(MiddleAcc)
-                LA_line = pd.DataFrame(LeastAcc)
-
-                simA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
-                simNA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
-                simAcc_lines = np.empty((self.reps, int(self.mainTrials)))
-
-                taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
-                green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
-                green = [ast.literal_eval(green[0]), ast.literal_eval(green[1]), ast.literal_eval(green[2])]
-
-                if 'feedbackAccuracy' in runData.columns:
-                    feedbackAcc = runData.feedbackAccuracy.astype(int)
-                else:
-                    feedbackAcc = np.array(runData.accurate == runData.reward).astype(int)
-
-                    if len(np.where(feedbackAcc[0:10] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[0:10] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[0:10]))[0][:toFlip]
-                        feedbackAcc[idx] = 1
-                    if len(np.where(feedbackAcc[10:20] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[10:20] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[10:20]))[0][:toFlip]
-                        feedbackAcc[idx + 10] = 1
-                    if len(np.where(feedbackAcc[20:30] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[20:30] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[20:30]))[0][:toFlip]
-                        feedbackAcc[idx + 20] = 1
-                    if len(np.where(feedbackAcc[30:40] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[30:40] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[30:40]))[0][:toFlip]
-                        feedbackAcc[idx + 30] = 1
-                    if len(np.where(feedbackAcc[40:50] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[40:50] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[40:50]))[0][:toFlip]
-                        feedbackAcc[idx + 40] = 1
-                    if len(np.where(feedbackAcc[50:60] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[50:60] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[50:60]))[0][:toFlip]
-                        feedbackAcc[idx + 50] = 1
-
-                for i in range(self.reps):
-                    simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
-                                             V_option0Init=V_option0, V_option1Init=V_option1)
-                    simulation.taskStructure(taskStruct, green, feedbackAcc)
-                    # simulation.taskStructure()
-                    simulation.RLloops()
-                    simulation.statisticalLearning()
-                    simAttracts = simulation.accurate[simulation.correctResponse == 0]
-                    simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
-                    simC = simulation.accurate
-                    if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, self.ww, self.method)
-                        simNA_lines[i, :] = ma(simNotAttracts, self.ww, self.method)
-                        simAcc_lines[i, :] = ma(simC.flatten(), self.ww, self.method)
-
-                if simA_lines.size:
-                    simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
-                    simNA_line = pd.DataFrame(np.mean(simNA_lines, axis=0))
-                    simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
-
-                    fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-                    fig.suptitle("Participant {0}, run {1}: alpha {2}, beta {3}, V_option0 {4} and V_option1 {5}"
-                                 .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
-                                         np.round(V_option0[0, 0], 2),
-                                         np.round(V_option1[0, 0], 2)))
-
-                    ax[0].plot(A_line, label='Real data')
-                    ax[0].plot(simA_line, label='Simulated data')
-                    ax[0].set_title("Accurate for 'attracts'")
-                    ax[0].set_ylim(0, 1.1)
-                    ax[0].set_ylabel("Accurate")
-                    ax[0].legend()
-
-                    ax[1].plot(NA_line, label='Real data')
-                    ax[1].plot(simNA_line, label='Simulated data')
-                    ax[1].set_title("Accurate for 'does not attract'")
-                    ax[1].set_ylim(0, 1.1)
-                    ax[1].set_ylabel("Accurate")
-                    ax[1].legend()
-
-                    ax[2].plot(Acc_line, label='Real data')
-                    ax[2].plot(simAcc_line, label='Simulated data')
-                    ax[2].set_title("Accurate overall")
-                    ax[2].set_ylim(0, 1.1)
-                    ax[2].set_ylabel("Accurate")
-                    ax[2].legend()
-
-                    fig2, ax2 = plt.subplots(3, 1, figsize=(12, 12))
-                    bars = [np.nanmean(LA_line), np.nanmean(MoA_Line), np.nanmean(MiA_Line)]
-                    x = ['0.15', '0.35', '0.5']
-                    ax2[0].bar(x, bars)
-                    ax2[0].set_title("Accuracy per Conditional Probability")
-                    ax2[0].set_ylim(0, 1.1)
-                    ax2[0].set_ylabel("Average Accurate")
-
-                    x = ['Wrong reward', 'True reward']
-                    ax2[1].bar(x, [avgAccOppReward, avgAccCorrReward])
-                    ax2[1].set_title("Accuracy on trial after wrong or true reward")
-                    ax2[1].set_ylim(0, 1.1)
-                    ax2[1].set_ylabel("Average Accurate")
-
-                    x = ['Wrong reward', 'True reward']
-                    ax2[2].bar(x, [avgNextOppPairAcc, avgNextCorrPairAcc])
-                    ax2[2].set_title("Accuracy on next occurrence same pair after wrong or true reward")
-                    ax2[2].set_ylim(0, 1.1)
-                    ax2[2].set_ylabel("Average Accurate")
-
-                    # Creating figure
-                    fig = plt.figure(3)
-                    ax = fig.add_subplot(111, projection='3d')
-                    NLL_array[NLL_array[:, 2] > min(NLL_array[:, 2]) + 20] = np.nan
-                    ax.scatter(NLL_array[:, 0], NLL_array[:, 1], NLL_array[:, 2], color="green")
-                    ax.set_xlabel('alpha', fontweight='bold')
-                    ax.set_ylabel('beta', fontweight='bold')
-                    ax.set_zlabel('NLL', fontweight='bold')
-                    ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(ID, run + 1))
-
-                    plt.figure(4)
-                    plt.scatter(NLL_array[:, 0], NLL_array[:, 2])
-                    plt.xlabel('alpha', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and alpha scatter plot".format(ID, run + 1))
-
-                    plt.figure(5)
-                    plt.scatter(NLL_array[:, 1], NLL_array[:, 2])
-                    plt.xlabel('beta', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and beta scatter plot".format(ID, run + 1))
-
-                    plt.figure(6)
-                    plt.scatter(NLL_array[:,3], NLL_array[:, 2])
-                    plt.xlabel('Initial V0', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and Init V0 scatter plot".format(ID, run + 1))
-
-                    plt.figure(7)
-                    plt.scatter(NLL_array[:,4], NLL_array[:, 2])
-                    plt.xlabel('Initial V1', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and Init V1 scatter plot".format(ID, run + 1))
-
-                    os.makedirs(saving_folder, exist_ok=True)
-                    save_name = "{0}_{1}_initValPlots.pdf".format(ID, run)
-                    file_path = os.path.join(saving_folder, save_name)
-
-                    pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    for fig in range(1, plt.gcf().number + 1):
-                        pdf.savefig(fig)
-                    pdf.close()
-
-                    plt.close('all')
-
-            count += 1
-
-    # Update plots
-
-    def plots_updateFitting(self):
-
-        count = 0
-        for ID in self.IDs:
-            print(ID)
-            print("update")
-            if self.version == None:
-                saving_folder = "updateSimple"
-            elif self.version == "two":
-                print("action")
-                saving_folder = "updateAction"
-            elif self.version == "four":
-                print("actionReward")
-                saving_folder = "updateActionReward"
-
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-
-            for run in range(0, max(subjectData.runNumber)):
-                NLL_array = self.NLL_arrays[count, run, :, :]
-                alpha = self.all_alphas[count, run]
-                beta = self.all_betas[count, run]
-                alpha2 = self.all_alphas2[count, run]
-                if self.version == "two":
-                    alpha3 = self.all_alphas3[count, run]
-                elif self.version == "four":
-                    alpha3 = self.all_alphas3[count, run]
-                    alpha4 = self.all_alphas4[count, run]
-                    alpha5 = self.all_alphas5[count, run]
-
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
-                green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
-                green = [ast.literal_eval(green[0]), ast.literal_eval(green[1]), ast.literal_eval(green[2])]
-
-                attracts = runData.accurate[runData.correctResponse == 0]
-                notAttracts = runData.accurate[runData.correctResponse == 1]
-
-                MostAcc = runData.accurate[runData.combinationConditionalProbability == 0.5]
-                MiddleAcc = runData.accurate[runData.combinationConditionalProbability == 0.35]
-                LeastAcc = runData.accurate[runData.combinationConditionalProbability == 0.15]
-
-                oppositeReward = np.where(runData.reward != runData.correctResponse)[0]
-                oppositeRewardNext = oppositeReward + 1
-                oppositeRewardNext = oppositeRewardNext[oppositeRewardNext < 60]
-                accOppReward = runData.accurate.loc[oppositeRewardNext]
-                oppositeRewardPairs = runData.stimulusPair[oppositeReward]
-                nextOppPairAcc = list()
-                for pair, idx in zip(oppositeRewardPairs, oppositeReward):
-                    subset = runData.loc[idx + 1:, ['stimulusPair', 'accurate']]
-                    temp = subset[subset.stimulusPair == pair].reset_index()
-                    if not temp.empty:
-                        nextOppPairAcc.append(temp.accurate[0])
-
-                avgAccOppReward = np.nanmean(accOppReward)
-                avgNextOppPairAcc = np.nanmean(nextOppPairAcc)
-
-                correctReward = np.where(runData.reward == runData.correctResponse)[0]
-                correctRewardNext = correctReward + 1
-                correctRewardNext = correctRewardNext[correctRewardNext < 60]
-                accCorrReward = runData.accurate.loc[correctRewardNext]
-                correctRewardPairs = runData.stimulusPair[correctReward]
-                nextCorrPairAcc = list()
-                for pair, idx in zip(correctRewardPairs, correctReward):
-                    subset = runData.loc[idx + 1:, ['stimulusPair', 'accurate']]
-                    temp = subset[subset.stimulusPair == pair].reset_index()
-                    if not temp.empty:
-                        nextCorrPairAcc.append(temp.accurate[0])
-
-                avgAccCorrReward = np.nanmean(accCorrReward)
-                avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
-
-                A_line = pd.DataFrame(ma(attracts, self.ww, self.method)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, self.ww, self.method)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, self.ww, self.method)).fillna(method='ffill')
-
-                MoA_Line = pd.DataFrame(MostAcc)
-                MiA_Line = pd.DataFrame(MiddleAcc)
-                LA_line = pd.DataFrame(LeastAcc)
-
-                simA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
-                simNA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
-                simAcc_lines = np.empty((self.reps, int(self.mainTrials)))
-
-                taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
-
-                if 'feedbackAccuracy' in runData.columns:
-                    feedbackAcc = runData.feedbackAccuracy.astype(int)
-                else:
-                    feedbackAcc = np.array(runData.accurate == runData.reward).astype(int)
-
-                    if len(np.where(feedbackAcc[0:10] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[0:10] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[0:10]))[0][:toFlip]
-                        feedbackAcc[idx] = 1
-                    if len(np.where(feedbackAcc[10:20] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[10:20] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[10:20]))[0][:toFlip]
-                        feedbackAcc[idx + 10] = 1
-                    if len(np.where(feedbackAcc[20:30] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[20:30] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[20:30]))[0][:toFlip]
-                        feedbackAcc[idx + 20] = 1
-                    if len(np.where(feedbackAcc[30:40] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[30:40] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[30:40]))[0][:toFlip]
-                        feedbackAcc[idx + 30] = 1
-                    if len(np.where(feedbackAcc[40:50] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[40:50] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[40:50]))[0][:toFlip]
-                        feedbackAcc[idx + 40] = 1
-                    if len(np.where(feedbackAcc[50:60] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[50:60] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[50:60]))[0][:toFlip]
-                        feedbackAcc[idx + 50] = 1
-
-                for i in range(self.reps):
-                    if self.version is None:
-                        simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
-                                                 alpha2=alpha2)
-                    elif self.version == "two":
-                        simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
-                                                 alpha2=alpha2, alpha3=alpha3)
-                    else:
-                        simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
-                                                 alpha2=alpha2, alpha3=alpha3, alpha4=alpha4, alpha5=alpha5)
-                    simulation.taskStructure(taskStruct, green, feedbackAcc)
-                    # simulation.taskStructure()
-                    simulation.RLloops()
-                    simAttracts = simulation.accurate[simulation.correctResponse == 0]
-                    simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
-                    simC = simulation.accurate
-                    if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, self.ww, self.method)
-                        simNA_lines[i, :] = ma(simNotAttracts, self.ww, self.method)
-                        simAcc_lines[i, :] = ma(simC.flatten(), self.ww, self.method)
-
-                if simA_lines.size:
-                    simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
-                    simNA_line = pd.DataFrame(np.mean(simNA_lines, axis=0))
-                    simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
-
-                    fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-                    if self.version is None:
-                        fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
-                                     "beta {3}, alpha2 {4}"
-                                     .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
-                                             np.round(alpha2, 2)))
-                    elif self.version == "two":
-                        fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
-                                     "beta {3}, alpha2 {4}, alpha3 {5}"
-                                     .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
-                                             np.round(alpha2, 2), np.round(alpha3, 2)))
-                    else:
-                        fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
-                                     "beta {3}, alpha2 {4}, alpha3 {5}, alpha4 {6}, alpha5 {7}"
-                                     .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
-                                             np.round(alpha2, 2), np.round(alpha3, 2),
-                                             np.round(alpha4, 2), np.round(alpha5, 2)))
-
-                    ax[0].plot(A_line, label='Real data')
-                    ax[0].plot(simA_line, label='Simulated data')
-                    ax[0].set_title("Accurate for 'attracts'")
-                    ax[0].set_ylim(0, 1.1)
-                    ax[0].set_ylabel("Accurate")
-                    ax[0].legend()
-
-                    ax[1].plot(NA_line, label='Real data')
-                    ax[1].plot(simNA_line, label='Simulated data')
-                    ax[1].set_title("Accurate for 'does not attract'")
-                    ax[1].set_ylim(0, 1.1)
-                    ax[1].set_ylabel("Accurate")
-                    ax[1].legend()
-
-                    ax[2].plot(Acc_line, label='Real data')
-                    ax[2].plot(simAcc_line, label='Simulated data')
-                    ax[2].set_title("Accurate overall")
-                    ax[2].set_ylim(0, 1.1)
-                    ax[2].set_ylabel("Accurate")
-                    ax[2].legend()
-
-                    fig2, ax2 = plt.subplots(3, 1, figsize=(12, 12))
-                    bars = [np.nanmean(LA_line), np.nanmean(MoA_Line), np.nanmean(MiA_Line)]
-                    x = ['0.15', '0.35', '0.5']
-                    ax2[0].bar(x, bars)
-                    ax2[0].set_title("Accuracy per Conditional Probability")
-                    ax2[0].set_ylim(0, 1.1)
-                    ax2[0].set_ylabel("Average Accurate")
-
-                    x = ['Wrong reward', 'True reward']
-                    ax2[1].bar(x, [avgAccOppReward, avgAccCorrReward])
-                    ax2[1].set_title("Accuracy on trial after wrong or true reward")
-                    ax2[1].set_ylim(0, 1.1)
-                    ax2[1].set_ylabel("Average Accurate")
-
-                    x = ['Wrong reward', 'True reward']
-                    ax2[2].bar(x, [avgNextOppPairAcc, avgNextCorrPairAcc])
-                    ax2[2].set_title("Accuracy on next occurrence same pair after wrong or true reward")
-                    ax2[2].set_ylim(0, 1.1)
-                    ax2[2].set_ylabel("Average Accurate")
-
-                    # Creating figure
-                    fig = plt.figure(3)
-                    ax = fig.add_subplot(111, projection='3d')
-                    NLL_array[NLL_array[:, 2] > min(NLL_array[:, 2]) + 20] = np.nan
-                    ax.scatter(NLL_array[:, 0], NLL_array[:, 1], NLL_array[:, 2], color="green")
-                    ax.set_xlabel('alpha', fontweight='bold')
-                    ax.set_ylabel('beta', fontweight='bold')
-                    ax.set_zlabel('NLL', fontweight='bold')
-                    ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(ID, run + 1))
-
-                    plt.figure(4)
-                    plt.scatter(NLL_array[:, 0], NLL_array[:, 2])
-                    plt.xlabel('alpha', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and alpha scatter plot".format(ID, run + 1))
-
-                    plt.figure(5)
-                    plt.scatter(NLL_array[:, 1], NLL_array[:, 2])
-                    plt.xlabel('beta', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and beta scatter plot".format(ID, run + 1))
-
-                    plt.figure(6)
-                    plt.scatter(NLL_array[:, 3], NLL_array[:, 2])
-                    plt.xlabel('alpha2', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and alpha2 scatter plot".format(ID, run + 1))
-
-                    if self.version == "two":
-                        plt.figure(7)
-                        plt.scatter(NLL_array[:, 4], NLL_array[:, 2])
-                        plt.xlabel('alpha3', fontweight='bold')
-                        plt.ylabel('NLL', fontweight='bold')
-                        plt.title("Participant {0}, run {1}: NLL and alpha3 scatter plot".format(ID, run + 1))
-
-                    elif self.version == "four":
-                        plt.figure(7)
-                        plt.scatter(NLL_array[:, 4], NLL_array[:, 2])
-                        plt.xlabel('alpha3', fontweight='bold')
-                        plt.ylabel('NLL', fontweight='bold')
-                        plt.title("Participant {0}, run {1}: NLL and alpha3 scatter plot".format(ID, run + 1))
-
-                        plt.figure(8)
-                        plt.scatter(NLL_array[:, 5], NLL_array[:, 2])
-                        plt.xlabel('alpha4', fontweight='bold')
-                        plt.ylabel('NLL', fontweight='bold')
-                        plt.title("Participant {0}, run {1}: NLL and alpha4 scatter plot".format(ID, run + 1))
-
-                        plt.figure(9)
-                        plt.scatter(NLL_array[:, 6], NLL_array[:, 2])
-                        plt.xlabel('alpha5', fontweight='bold')
-                        plt.ylabel('NLL', fontweight='bold')
-                        plt.title("Participant {0}, run {1}: NLL and alpha5 scatter plot".format(ID, run + 1))
-
-
-                    os.makedirs(saving_folder, exist_ok=True)
-
-                    if self.version is None:
-                        save_name = "{0}_{1}_simpleUpdatePlots.pdf".format(ID, run)
-                        file_path = os.path.join(saving_folder, save_name)
-                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    elif self.version == "two":
-                        save_name = "{0}_{1}_actionUpdatePlots.pdf".format(ID, run)
-                        file_path = os.path.join(saving_folder, save_name)
-                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    else:
-                        save_name = "{0}_{1}_actionRewardUpdatePlots.pdf".format(ID, run)
-                        file_path = os.path.join(saving_folder, save_name)
-                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    
-                    for fig in range(1, plt.gcf().number + 1):
-                        pdf.savefig(fig)
-                    pdf.close()
-
-                    plt.close('all')
-
-
-            count += 1
-
-    # Update and Init V0 and V1 plots
-
-    def plots_updateInitFitting(self):
-
-        count = 0
-        for ID in self.IDs:
-            print(ID)
-            print("initUpdate")
-            if self.version == None:
-                saving_folder = "initValUpdateSimple"
-            elif self.version == "two":
-                saving_folder = "initValUpdateAction"
-            elif self.version == "four":
-                saving_folder = "initValUpdateActionReward"
-
-            subjectData = pd.read_csv(str([file[1] for file in self.savedValsFiles if file[0] == ID][0]))
-
-            for run in range(0, max(subjectData.runNumber)):
-                NLL_array = self.NLL_arrays[count, run, :, :]
-                alpha = self.all_alphas[count, run]
-                beta = self.all_betas[count, run]
-                alpha2 = self.all_alphas2[count, run]
-                if self.version == "two":
-                    alpha3 = self.all_alphas3[count, run]
-                elif self.version == "four":
-                    alpha3 = self.all_alphas3[count, run]
-                    alpha4 = self.all_alphas4[count, run]
-                    alpha5 = self.all_alphas5[count, run]
-                V_option0 = self.all_V_option0Inits[count, run]
-                V_option1 = self.all_V_option1Inits[count, run]
-
-                runData = subjectData[subjectData.runNumber == run + 1].reset_index()
-                green = runData[runData.combinationConditionalProbability == 0.5].stimulusPair.unique()
-                green = [ast.literal_eval(green[0]), ast.literal_eval(green[1]), ast.literal_eval(green[2])]
-
-                attracts = runData.accurate[runData.correctResponse == 0]
-                notAttracts = runData.accurate[runData.correctResponse == 1]
-
-                MostAcc = runData.accurate[runData.combinationConditionalProbability == 0.5]
-                MiddleAcc = runData.accurate[runData.combinationConditionalProbability == 0.35]
-                LeastAcc = runData.accurate[runData.combinationConditionalProbability == 0.15]
-
-                oppositeReward = np.where(runData.reward != runData.correctResponse)[0]
-                oppositeRewardNext = oppositeReward + 1
-                oppositeRewardNext = oppositeRewardNext[oppositeRewardNext < 60]
-                accOppReward = runData.accurate.loc[oppositeRewardNext]
-                oppositeRewardPairs = runData.stimulusPair[oppositeReward]
-                nextOppPairAcc = list()
-                for pair, idx in zip(oppositeRewardPairs, oppositeReward):
-                    subset = runData.loc[idx + 1:, ['stimulusPair', 'accurate']]
-                    temp = subset[subset.stimulusPair == pair].reset_index()
-                    if not temp.empty:
-                        nextOppPairAcc.append(temp.accurate[0])
-
-                avgAccOppReward = np.nanmean(accOppReward)
-                avgNextOppPairAcc = np.nanmean(nextOppPairAcc)
-
-                correctReward = np.where(runData.reward == runData.correctResponse)[0]
-                correctRewardNext = correctReward + 1
-                correctRewardNext = correctRewardNext[correctRewardNext < 60]
-                accCorrReward = runData.accurate.loc[correctRewardNext]
-                correctRewardPairs = runData.stimulusPair[correctReward]
-                nextCorrPairAcc = list()
-                for pair, idx in zip(correctRewardPairs, correctReward):
-                    subset = runData.loc[idx + 1:, ['stimulusPair', 'accurate']]
-                    temp = subset[subset.stimulusPair == pair].reset_index()
-                    if not temp.empty:
-                        nextCorrPairAcc.append(temp.accurate[0])
-
-                avgAccCorrReward = np.nanmean(accCorrReward)
-                avgNextCorrPairAcc = np.nanmean(nextCorrPairAcc)
-
-                A_line = pd.DataFrame(ma(attracts, self.ww, self.method)).fillna(method='ffill')
-                NA_line = pd.DataFrame(ma(notAttracts, self.ww, self.method)).fillna(method='ffill')
-                Acc_line = pd.DataFrame(ma(runData.accurate, self.ww, self.method)).fillna(method='ffill')
-
-                MoA_Line = pd.DataFrame(MostAcc)
-                MiA_Line = pd.DataFrame(MiddleAcc)
-                LA_line = pd.DataFrame(LeastAcc)
-
-                simA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
-                simNA_lines = np.empty((self.reps, int(self.mainTrials / 2)))
-                simAcc_lines = np.empty((self.reps, int(self.mainTrials)))
-
-                taskStruct = np.array([list(tuple(ast.literal_eval(x))) for x in runData.stimulusPair])
-
-                if 'feedbackAccuracy' in runData.columns:
-                    feedbackAcc = runData.feedbackAccuracy.astype(int)
-                else:
-                    feedbackAcc = np.array(runData.accurate == runData.reward).astype(int)
-
-                    if len(np.where(feedbackAcc[0:10] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[0:10] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[0:10]))[0][:toFlip]
-                        feedbackAcc[idx] = 1
-                    if len(np.where(feedbackAcc[10:20] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[10:20] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[10:20]))[0][:toFlip]
-                        feedbackAcc[idx + 10] = 1
-                    if len(np.where(feedbackAcc[20:30] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[20:30] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[20:30]))[0][:toFlip]
-                        feedbackAcc[idx + 20] = 1
-                    if len(np.where(feedbackAcc[30:40] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[30:40] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[30:40]))[0][:toFlip]
-                        feedbackAcc[idx + 30] = 1
-                    if len(np.where(feedbackAcc[40:50] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[40:50] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[40:50]))[0][:toFlip]
-                        feedbackAcc[idx + 40] = 1
-                    if len(np.where(feedbackAcc[50:60] == 0)[0]) > 2:
-                        toFlip = len(np.where(feedbackAcc[50:60] == 0)[0])
-                        idx = np.where(np.isnan(runData.accurate[50:60]))[0][:toFlip]
-                        feedbackAcc[idx + 50] = 1
-
-                for i in range(self.reps):
-                    if self.version is None:
-                        simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
-                                                 alpha2=alpha2, V_option0Init=V_option0, V_option1Init=V_option1)
-                    elif self.version == "two":
-                        simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
-                                                 alpha2=alpha2, alpha3=alpha3, V_option0Init=V_option0, V_option1Init=V_option1)
-                    else:
-                        simulation = task_Design(self.mainTrials, self.additionalTrials, alpha=alpha, beta=beta,
-                                                 alpha2=alpha2, alpha3=alpha3, alpha4=alpha4, alpha5=alpha5,
-                                                 V_option0Init=V_option0, V_option1Init=V_option1)
-                    simulation.taskStructure(taskStruct, green, feedbackAcc)
-                    # simulation.taskStructure()
-                    simulation.RLloops()
-                    simAttracts = simulation.accurate[simulation.correctResponse == 0]
-                    simNotAttracts = simulation.accurate[simulation.correctResponse == 1]
-                    simC = simulation.accurate
-                    if simAttracts.shape[0] == 30 & simNotAttracts.shape[0] == 30:
-                        simA_lines[i, :] = ma(simAttracts, self.ww, self.method)
-                        simNA_lines[i, :] = ma(simNotAttracts, self.ww, self.method)
-                        simAcc_lines[i, :] = ma(simC.flatten(), self.ww, self.method)
-
-                if simA_lines.size:
-                    simA_line = pd.DataFrame(np.mean(simA_lines, axis=0))
-                    simNA_line = pd.DataFrame(np.mean(simNA_lines, axis=0))
-                    simAcc_line = pd.DataFrame(np.mean(simAcc_lines, axis=0))
-
-                    fig, ax = plt.subplots(3, 1, figsize=(12, 12))
-                    if self.version is None:
-                        fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
-                                     "beta {3}, alpha2 {4}, V0Init {5}, V1Init {6}"
-                                     .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
-                                             np.round(alpha2, 2), np.round(V_option0[0][0], 2),
-                                             np.round(V_option1[0][0], 2)))
-                    elif self.version == "two":
-                        fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
-                                     "beta {3}, alpha2 {4}, alpha3 {5}, V0Init {6}, V1Init {7}"
-                                     .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
-                                             np.round(alpha2, 2), np.round(alpha3, 2),
-                                             np.round(V_option0[0][0], 2), np.round(V_option1[0][0], 2)))
-                    else:
-                        fig.suptitle("MA of binary accuracy for participant {0}, run {1}: alpha {2}, "
-                                     "beta {3}, alpha2 {4}, alpha3 {5}, alpha4 {6}, alpha5 {7},"
-                                     "V0Init {8}, V1Init {9}"
-                                     .format(ID, run + 1, np.round(alpha, 2), np.round(beta, 2),
-                                             np.round(alpha2, 2), np.round(alpha3, 2),
-                                             np.round(alpha4, 2), np.round(alpha5, 2),
-                                             np.round(V_option0[0][0], 2), np.round(V_option1[0][0], 2)))
-
-                    ax[0].plot(A_line, label='Real data')
-                    ax[0].plot(simA_line, label='Simulated data')
-                    ax[0].set_title("Accurate for 'attracts'")
-                    ax[0].set_ylim(0, 1.1)
-                    ax[0].set_ylabel("Accurate")
-                    ax[0].legend()
-
-                    ax[1].plot(NA_line, label='Real data')
-                    ax[1].plot(simNA_line, label='Simulated data')
-                    ax[1].set_title("Accurate for 'does not attract'")
-                    ax[1].set_ylim(0, 1.1)
-                    ax[1].set_ylabel("Accurate")
-                    ax[1].legend()
-
-                    ax[2].plot(Acc_line, label='Real data')
-                    ax[2].plot(simAcc_line, label='Simulated data')
-                    ax[2].set_title("Accurate overall")
-                    ax[2].set_ylim(0, 1.1)
-                    ax[2].set_ylabel("Accurate")
-                    ax[2].legend()
-
-                    fig2, ax2 = plt.subplots(3, 1, figsize=(12, 12))
-                    bars = [np.nanmean(LA_line), np.nanmean(MoA_Line), np.nanmean(MiA_Line)]
-                    x = ['0.15', '0.35', '0.5']
-                    ax2[0].bar(x, bars)
-                    ax2[0].set_title("Accuracy per Conditional Probability")
-                    ax2[0].set_ylim(0, 1.1)
-                    ax2[0].set_ylabel("Average Accurate")
-
-                    x = ['Wrong reward', 'True reward']
-                    ax2[1].bar(x, [avgAccOppReward, avgAccCorrReward])
-                    ax2[1].set_title("Accuracy on trial after wrong or true reward")
-                    ax2[1].set_ylim(0, 1.1)
-                    ax2[1].set_ylabel("Average Accurate")
-
-                    x = ['Wrong reward', 'True reward']
-                    ax2[2].bar(x, [avgNextOppPairAcc, avgNextCorrPairAcc])
-                    ax2[2].set_title("Accuracy on next occurrence same pair after wrong or true reward")
-                    ax2[2].set_ylim(0, 1.1)
-                    ax2[2].set_ylabel("Average Accurate")
-
-                    # Creating figure
-                    fig = plt.figure(3)
-                    ax = fig.add_subplot(111, projection='3d')
-                    NLL_array[NLL_array[:, 2] > min(NLL_array[:, 2]) + 20] = np.nan
-                    ax.scatter(NLL_array[:, 0], NLL_array[:, 1], NLL_array[:, 2], color="green")
-                    ax.set_xlabel('alpha', fontweight='bold')
-                    ax.set_ylabel('beta', fontweight='bold')
-                    ax.set_zlabel('NLL', fontweight='bold')
-                    ax.set_title("Participant {0}, run {1}: NLL, alpha and beta 3D scatter plot".format(ID, run + 1))
-
-                    plt.figure(4)
-                    plt.scatter(NLL_array[:, 0], NLL_array[:, 2])
-                    plt.xlabel('alpha', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and alpha scatter plot".format(ID, run + 1))
-
-                    plt.figure(5)
-                    plt.scatter(NLL_array[:, 1], NLL_array[:, 2])
-                    plt.xlabel('beta', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and beta scatter plot".format(ID, run + 1))
-
-                    plt.figure(6)
-                    plt.scatter(NLL_array[:, 5], NLL_array[:, 2])
-                    plt.xlabel('alpha2', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and alpha2 scatter plot".format(ID, run + 1))
-
-                    plt.figure(7)
-                    plt.scatter(NLL_array[:, 3], NLL_array[:, 2])
-                    plt.xlabel('Initial V0', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and Init V0 scatter plot".format(ID, run + 1))
-
-                    plt.figure(8)
-                    plt.scatter(NLL_array[:, 4], NLL_array[:, 2])
-                    plt.xlabel('Initial V1', fontweight='bold')
-                    plt.ylabel('NLL', fontweight='bold')
-                    plt.title("Participant {0}, run {1}: NLL and Init V1 scatter plot".format(ID, run + 1))
-
-                    if self.version == "two":
-                        plt.figure(9)
-                        plt.scatter(NLL_array[:, 6], NLL_array[:, 2])
-                        plt.xlabel('alpha3', fontweight='bold')
-                        plt.ylabel('NLL', fontweight='bold')
-                        plt.title("Participant {0}, run {1}: NLL and alpha3 scatter plot".format(ID, run + 1))
-
-                    elif self.version == "four":
-                        plt.figure(9)
-                        plt.scatter(NLL_array[:, 6], NLL_array[:, 2])
-                        plt.xlabel('alpha3', fontweight='bold')
-                        plt.ylabel('NLL', fontweight='bold')
-                        plt.title("Participant {0}, run {1}: NLL and alpha3 scatter plot".format(ID, run + 1))
-
-                        plt.figure(10)
-                        plt.scatter(NLL_array[:, 7], NLL_array[:, 2])
-                        plt.xlabel('alpha4', fontweight='bold')
-                        plt.ylabel('NLL', fontweight='bold')
-                        plt.title("Participant {0}, run {1}: NLL and alpha4 scatter plot".format(ID, run + 1))
-
-                        plt.figure(11)
-                        plt.scatter(NLL_array[:, 8], NLL_array[:, 2])
-                        plt.xlabel('alpha5', fontweight='bold')
-                        plt.ylabel('NLL', fontweight='bold')
-                        plt.title("Participant {0}, run {1}: NLL and alpha5 scatter plot".format(ID, run + 1))
-
-
-                    os.makedirs(saving_folder, exist_ok=True)
-
-                    if self.version is None:
-                        save_name = "{0}_{1}_initValSimpleUpdatePlots.pdf".format(ID, run)
-                        file_path = os.path.join(saving_folder, save_name)
-                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    elif self.version == "two":
-                        save_name = "{0}_{1}_initValActionUpdatePlots.pdf".format(ID, run)
-                        file_path = os.path.join(saving_folder, save_name)
-                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    else:
-                        save_name = "{0}_{1}_initValActionRewardUpdatePlots.pdf".format(ID, run)
-                        file_path = os.path.join(saving_folder, save_name)
-                        pdf = matplotlib.backends.backend_pdf.PdfPages(file_path)
-                    
-                    for fig in range(1, plt.gcf().number + 1):
-                        pdf.savefig(fig)
-                    pdf.close()
-
-                    plt.close('all')
-
-            count += 1
+                plt.close("all")
 
     # Stat learning plots
 
     def plots_stats(self, beliefs, surprise):
-
         subjectData = pd.read_csv(self.savedValsFile)
-        subjectData['stimulusPair'] = subjectData['stimulusPair'].apply(ast.literal_eval)
+        subjectData["stimulusPair"] = subjectData["stimulusPair"].apply(ast.literal_eval)
         # subjectInfo = pd.read_csv(str([file[1] for file in self.expInfoFiles if file[0] == ID][0]))
 
         for run in range(0, max(subjectData.runNumber)):
@@ -966,34 +273,25 @@ class Plotting:
             statSurprise = surprise[run]
 
             plt.figure(1)
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 0, 0], label="1A")
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 0, 1], label="1B")
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 0, 2], label="1C")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 0, 0], label="1A")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 0, 1], label="1B")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 0, 2], label="1C")
             plt.title("Learning of statistical structure (beliefs) by Bayesian observer")
 
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 1, 0], label="2A")
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 1, 1], label="2B")
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 1, 2], label="2C")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 1, 0], label="2A")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 1, 1], label="2B")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 1, 2], label="2C")
 
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 2, 0], label="3A")
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 2, 1], label="3B")
-            plt.plot(range(0, self.mainTrials + 1),
-                        beliefsStat[:, 2, 2], label="3C")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 2, 0], label="3A")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 2, 1], label="3B")
+            plt.plot(range(0, self.mainTrials + 1), beliefsStat[:, 2, 2], label="3C")
 
             plt.xlabel("trials")
             plt.ylabel("Beliefs of probabilities co-occurence")
             plt.legend(bbox_to_anchor=(0.99, 0.65))
-            plt.axhline(y=0.15 * 0.33, color='r', linestyle='-')
-            plt.axhline(y=0.35 * 0.33, color='g', linestyle='-')
-            plt.axhline(y=0.5 * 0.33, color='b', linestyle='-')
+            plt.axhline(y=0.15 * 0.33, color="r", linestyle="-")
+            plt.axhline(y=0.35 * 0.33, color="g", linestyle="-")
+            plt.axhline(y=0.5 * 0.33, color="b", linestyle="-")
 
             plt.figure(2)
             plt.plot(statSurprise[~np.isnan(statSurprise)])
@@ -1005,7 +303,6 @@ class Plotting:
             plt.show()
 
 
-def ma(interval, window_size = 10, method = 'same'):
-    window = np.ones(int(window_size))/float(window_size)
+def ma(interval, window_size=10, method="same"):
+    window = np.ones(int(window_size)) / float(window_size)
     return np.convolve(interval, window, method)
-
