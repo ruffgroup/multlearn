@@ -461,7 +461,6 @@ class Fitting:
             fitted_K4,
         )
 
-    
 
     # Statistical learning
     def statisticalLearning(self, statLearnPar=1):
@@ -565,24 +564,6 @@ def ma(interval, window_size=10, method="same"):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-parent_id = os.getpid()
-
-
-def worker_init():
-    def sig_int(signal_num, frame):
-        print("signal: %s" % signal_num)
-        parent = psutil.Process(parent_id)
-        for child in parent.children():
-            if child.pid != os.getpid():
-                print("killing child: %s" % child.pid)
-                child.kill()
-        print("killing parent: %s" % parent_id)
-        parent.kill()
-        print("suicide: %s" % os.getpid())
-        psutil.Process(os.getpid()).kill()
-
-    signal.signal(signal.SIGINT, sig_int)
-
 
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
@@ -668,8 +649,21 @@ def main():
         "64",
     ]
 
-    pool = Pool(8, worker_init)
-    pool.map(use_fitting, configurations)
+    original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+    pool = Pool(8)
+    signal.signal(signal.SIGINT, original_sigint_handler)
+    try:
+        res = pool.map_async(use_fitting, configurations)
+        print("Waiting for results")
+        res.get() # Without the timeout this blocking call ignores all signals.
+    except KeyboardInterrupt:
+        print("Caught KeyboardInterrupt, terminating workers")
+        pool.terminate()
+    else:
+        print("Normal termination")
+        pool.close()
+    pool.join()
+
 
 
 if __name__ == "__main__":
