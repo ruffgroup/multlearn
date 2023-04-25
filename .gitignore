@@ -8,9 +8,10 @@
 /dataSources.local.xml
 # Ignore spm results folder
 SPM/results/
-# Ignore pdf files, png, pycache, matlab, npy
+# Ignore pdf files, png, pycache, matlab, npy, tsv
 *.pdf
 *.png
 *.pyc
 *.mat
 *.npy
+*.tsv

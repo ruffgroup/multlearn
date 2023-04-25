@@ -442,24 +442,8 @@ class Fitting:
         with open(newPath + "/V0_" + saveAs + ".npy", "wb") as f:
             np.save(f, V1)
 
-        return (
-            fitted_alphasPos,
-            fitted_alphas2Pos,
-            fitted_alphasNeg,
-            fitted_alphas2Neg,
-            fitted_betas,
-            best_LLs,
-            RPE,
-            V0,
-            V1,
-            NLL_array,
-            fitted_V_option0Inits,
-            fitted_V_option1Inits,
-            fitted_K1,
-            fitted_K2,
-            fitted_K3,
-            fitted_K4,
-        )
+    
+
 
 
     # Statistical learning
@@ -567,24 +551,7 @@ def ma(interval, window_size=10, method="same"):
 
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    (
-        fitted_alphasPos,
-        fitted_alphas2Pos,
-        fitted_alphasNeg,
-        fitted_alphas2Neg,
-        fitted_betas,
-        best_LLs,
-        RPE,
-        V0,
-        V1,
-        NLL_array,
-        fitted_V_option0Inits,
-        fitted_V_option1Inits,
-        fitted_K1,
-        fitted_K2,
-        fitted_K3,
-        fitted_K4,
-    ) = fitted.modelFitting(saveAs="Pearce", pearce=True)
+    fitted.modelFitting(saveAs="Pearce", pearce=True)
 
 
 def main():
@@ -649,13 +616,12 @@ def main():
         "64",
     ]
 
-    original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+
     pool = Pool(8)
-    signal.signal(signal.SIGINT, original_sigint_handler)
     try:
         res = pool.map_async(use_fitting, configurations)
         print("Waiting for results")
-        res.get() # Without the timeout this blocking call ignores all signals.
+        res.get(0xFFFF)
     except KeyboardInterrupt:
         print("Caught KeyboardInterrupt, terminating workers")
         pool.terminate()
@@ -668,6 +634,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    # # Run stat learning
-    # beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
