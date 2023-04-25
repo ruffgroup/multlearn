@@ -460,6 +460,8 @@ class Fitting:
             fitted_K3,
             fitted_K4,
         )
+    
+
 
 
     # Statistical learning
@@ -649,13 +651,15 @@ def main():
         "64",
     ]
 
-    original_sigint_handler = signal.signal(signal.SIGINT, signal.SIG_IGN)
+    def init_worker():
+        signal.signal(signal.SIGINT, signal.SIG_IGN)
+    
     pool = Pool(8)
-    signal.signal(signal.SIGINT, original_sigint_handler)
+    signal.signal(signal.SIGINT, init_worker)
     try:
         res = pool.map_async(use_fitting, configurations)
         print("Waiting for results")
-        res.get() # Without the timeout this blocking call ignores all signals.
+        res.get()
     except KeyboardInterrupt:
         print("Caught KeyboardInterrupt, terminating workers")
         pool.terminate()
