@@ -654,8 +654,7 @@ def main():
     def init_worker():
         signal.signal(signal.SIGINT, signal.SIG_IGN)
     
-    pool = Pool(8)
-    signal.signal(signal.SIGINT, init_worker)
+    pool = Pool(8, init_worker)
     try:
         res = pool.map_async(use_fitting, configurations)
         print("Waiting for results")
