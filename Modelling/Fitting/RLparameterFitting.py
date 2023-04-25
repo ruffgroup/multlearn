@@ -57,10 +57,10 @@ class Fitting:
                 reps=reps,
             )
 
-        if platform.system() == 'Windows':
-            wanted_dir = '/data/sourcedata/behavior/modified_files'
+        if platform.system() == "Windows":
+            wanted_dir = "/data/sourcedata/behavior/modified_files"
         else:
-            wanted_dir = '/Volumes/SDrive/data/sourcedata/behavior/modified_files'
+            wanted_dir = "/Volumes/SDrive/data/sourcedata/behavior/modified_files"
 
         # Get savedVals file
         self.savedValsFile = glob.glob(os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID))[0]
@@ -133,7 +133,8 @@ class Fitting:
                 V_option0_rand = np.random.rand(self.gridCount, 1)
                 V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
-                V_option1Init_Grid = np.repeat(1 - V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
+                V_option1_rand = np.random.rand(self.gridCount, 1)
+                V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
@@ -154,7 +155,7 @@ class Fitting:
                 V_option0[:], V_option1[:] = (np.nan for i in range(2))
                 if init:
                     V_option0[0, :] = V_option0Init_Grid[j]
-                    V_option1[0, :] = 1 - V_option0Init_Grid[j]
+                    V_option1[0, :] = V_option1Init_Grid[j]
                 else:
                     V_option0[0, :] = 0.5
                     V_option1[0, :] = 0.5
@@ -228,7 +229,9 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K1Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K1Check * omega * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
                             else:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
@@ -249,7 +252,9 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K3Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K3Check * omega * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
                             else:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
@@ -281,7 +286,9 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K2Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K2Check * omega * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
                             else:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
@@ -304,7 +311,9 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K4Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K4Check * omega * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
                             else:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
@@ -355,38 +364,38 @@ class Fitting:
             maxIndex = np.nanargmax(LL_array[:, 0])
 
             fitted_alphasPos[run] = NLL_array[run, minIndex, 1]
-            np.savetxt(fname="alphasPos_" + saveAs + ".tsv", X=fitted_alphasPos, delimiter=',')
+            np.savetxt(fname="alphasPos_" + saveAs + ".tsv", X=fitted_alphasPos, delimiter=",")
             if asym and not extra:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
-                np.savetxt(fname="alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=',')
+                np.savetxt(fname="alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=",")
             elif extra and not asym:
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
-                np.savetxt(fname="alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=',')
+                np.savetxt(fname="alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=",")
             elif extra and asym:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
-                np.savetxt(fname="alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=',')
+                np.savetxt(fname="alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=",")
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
-                np.savetxt(fname="alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=',')
+                np.savetxt(fname="alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=",")
                 fitted_alphas2Neg[run] = NLL_array[run, minIndex, 5]
-                np.savetxt(fname="alphas2Neg_" + saveAs + ".tsv", X=fitted_alphas2Neg, delimiter=',')
+                np.savetxt(fname="alphas2Neg_" + saveAs + ".tsv", X=fitted_alphas2Neg, delimiter=",")
             fitted_betas[run] = NLL_array[run, minIndex, 2]
-            np.savetxt(fname="betas_" + saveAs + ".tsv", X=fitted_betas, delimiter=',')
+            np.savetxt(fname="betas_" + saveAs + ".tsv", X=fitted_betas, delimiter=",")
             if init:
                 fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
                 fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
             if transfer is not None:
                 fitted_K1[run] = NLL_array[run, minIndex, 8]
-                np.savetxt(fname="K1_" + saveAs + ".tsv", X=fitted_K1, delimiter=',')
+                np.savetxt(fname="K1_" + saveAs + ".tsv", X=fitted_K1, delimiter=",")
             if transfer == "two":
                 fitted_K2[run] = NLL_array[run, minIndex, 9]
-                np.savetxt(fname="K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=',')
+                np.savetxt(fname="K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=",")
             elif transfer == "four":
                 fitted_K2[run] = NLL_array[run, minIndex, 9]
-                np.savetxt(fname="K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=',')
+                np.savetxt(fname="K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=",")
                 fitted_K3[run] = NLL_array[run, minIndex, 10]
-                np.savetxt(fname="K3_" + saveAs + ".tsv", X=fitted_K3, delimiter=',')
+                np.savetxt(fname="K3_" + saveAs + ".tsv", X=fitted_K3, delimiter=",")
                 fitted_K4[run] = NLL_array[run, minIndex, 11]
-                np.savetxt(fname="K4_" + saveAs + ".tsv", X=fitted_K4, delimiter=',')
+                np.savetxt(fname="K4_" + saveAs + ".tsv", X=fitted_K4, delimiter=",")
             best_LLs[run] = LL_array[maxIndex]
             RPE[run] = run_RPEs[minIndex]
             V0[run] = run_V0[minIndex]
@@ -451,6 +460,8 @@ class Fitting:
             fitted_K3,
             fitted_K4,
         )
+
+    
 
     # Statistical learning
     def statisticalLearning(self, statLearnPar=1):
@@ -555,9 +566,11 @@ def ma(interval, window_size=10, method="same"):
 # You can only run ONE model fitting at a time
 
 parent_id = os.getpid()
+
+
 def worker_init():
     def sig_int(signal_num, frame):
-        print('signal: %s' % signal_num)
+        print("signal: %s" % signal_num)
         parent = psutil.Process(parent_id)
         for child in parent.children():
             if child.pid != os.getpid():
@@ -567,7 +580,9 @@ def worker_init():
         parent.kill()
         print("suicide: %s" % os.getpid())
         psutil.Process(os.getpid()).kill()
+
     signal.signal(signal.SIGINT, sig_int)
+
 
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
@@ -652,9 +667,10 @@ def main():
         "63",
         "64",
     ]
-    
+
     pool = Pool(8, worker_init)
     pool.map(use_fitting, configurations)
+
 
 if __name__ == "__main__":
     main()
