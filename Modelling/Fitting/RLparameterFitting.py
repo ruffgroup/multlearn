@@ -355,26 +355,38 @@ class Fitting:
             maxIndex = np.nanargmax(LL_array[:, 0])
 
             fitted_alphasPos[run] = NLL_array[run, minIndex, 1]
+            np.savetxt(fname="alphasPos_" + saveAs + ".tsv", X=fitted_alphasPos, delimiter=',')
             if asym and not extra:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
+                np.savetxt(fname="alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=',')
             elif extra and not asym:
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
+                np.savetxt(fname="alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=',')
             elif extra and asym:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
+                np.savetxt(fname="alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=',')
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
+                np.savetxt(fname="alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=',')
                 fitted_alphas2Neg[run] = NLL_array[run, minIndex, 5]
+                np.savetxt(fname="alphas2Neg_" + saveAs + ".tsv", X=fitted_alphas2Neg, delimiter=',')
             fitted_betas[run] = NLL_array[run, minIndex, 2]
+            np.savetxt(fname="betas_" + saveAs + ".tsv", X=fitted_betas, delimiter=',')
             if init:
                 fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
                 fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
             if transfer is not None:
                 fitted_K1[run] = NLL_array[run, minIndex, 8]
+                np.savetxt(fname="K1_" + saveAs + ".tsv", X=fitted_K1, delimiter=',')
             if transfer == "two":
                 fitted_K2[run] = NLL_array[run, minIndex, 9]
+                np.savetxt(fname="K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=',')
             elif transfer == "four":
                 fitted_K2[run] = NLL_array[run, minIndex, 9]
+                np.savetxt(fname="K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=',')
                 fitted_K3[run] = NLL_array[run, minIndex, 10]
+                np.savetxt(fname="K3_" + saveAs + ".tsv", X=fitted_K3, delimiter=',')
                 fitted_K4[run] = NLL_array[run, minIndex, 11]
+                np.savetxt(fname="K4_" + saveAs + ".tsv", X=fitted_K4, delimiter=',')
             best_LLs[run] = LL_array[maxIndex]
             RPE[run] = run_RPEs[minIndex]
             V0[run] = run_V0[minIndex]
@@ -403,7 +415,7 @@ class Fitting:
 
         newPath = os.path.join(
             pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{}".format(self.ID),
+            "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
         )
         Path(newPath).mkdir(parents=True, exist_ok=True)
 
@@ -414,6 +426,12 @@ class Fitting:
 
         with open(newPath + "/BIC_" + saveAs + ".npy", "wb") as f:
             np.save(f, best_LLs)
+
+        with open(newPath + "/V0_" + saveAs + ".npy", "wb") as f:
+            np.save(f, V0)
+
+        with open(newPath + "/V0_" + saveAs + ".npy", "wb") as f:
+            np.save(f, V1)
 
         return (
             fitted_alphasPos,
