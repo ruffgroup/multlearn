@@ -18,7 +18,10 @@ import ast
 import matplotlib.backends.backend_pdf
 from mpl_toolkits.mplot3d import Axes3D
 from RLparameterPlotting import Plotting
+import multiprocessing
 from multiprocessing import Pool
+import signal
+import psutil
 
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
@@ -107,9 +110,7 @@ class Fitting:
         for run in range(0, max(self.subjectData.runNumber)):
             alphaGrid = np.random.rand(self.gridCount, 1)
             if extra and asym:
-                alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
-                    np.random.rand(self.gridCount, 1) for i in range(3)
-                )
+                alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (np.random.rand(self.gridCount, 1) for i in range(3))
             elif extra and not asym:
                 alpha2Grid = np.random.rand(self.gridCount, 1)
             elif asym and not extra:
@@ -125,15 +126,10 @@ class Fitting:
             betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             if init:
-
                 V_option0_rand = np.random.rand(self.gridCount, 1)
-                V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape(
-                (self.gridCount, 3, 3)
-                )
-            
-                V_option1Init_Grid = np.repeat(1 - V_option0_rand, 9, axis=1).reshape(
-                (self.gridCount, 3, 3)
-                )
+                V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
+
+                V_option1Init_Grid = np.repeat(1 - V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
@@ -154,7 +150,7 @@ class Fitting:
                 V_option0[:], V_option1[:] = (np.nan for i in range(2))
                 if init:
                     V_option0[0, :] = V_option0Init_Grid[j]
-                    V_option1[0, :] = V_option1Init_Grid[j]
+                    V_option1[0, :] = 1 - V_option0Init_Grid[j]
                 else:
                     V_option0[0, :] = 0.5
                     V_option1[0, :] = 0.5
@@ -228,9 +224,7 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K1Check * omega * (
-                                            1 - runData.reward[t] - V_option0[(t,) + pair]
-                                        )
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K1Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
                             else:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
@@ -240,23 +234,18 @@ class Fitting:
                                     for pair in otherPairs:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
-                                        ] + K1Check * alphaPosCheck * (1 - runData.reward[t] - V_option0[(t,) + pair])
-                            
+                                        ] - K1Check * alphaPosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
                         else:
                             if pearce:
-                                omega = (
-                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaNegCheck
-                                )
+                                omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaNegCheck
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] + K3Check * omega * (
-                                            1 - runData.reward[t] - V_option0[(t,) + pair]
-                                        )
-
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K3Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
                             else:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
@@ -266,8 +255,8 @@ class Fitting:
                                     for pair in otherPairs:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
-                                        ] + K3Check * alphaNegCheck * (1 - runData.reward[t] - V_option0[(t,) + pair])
-                            
+                                        ] - K3Check * alphaNegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
                         V_option1[t + 1, :] = V_option1[t, :]
 
                     elif runData.action[t] == 1:
@@ -288,9 +277,7 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K2Check * omega * (
-                                            1 - runData.reward[t] - V_option1[(t,) + pair]
-                                        )
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K2Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
                             else:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
@@ -300,9 +287,8 @@ class Fitting:
                                     for pair in otherPairs:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
-                                        ] + K2Check * alpha2PosCheck * (1 - runData.reward[t] - V_option1[(t,) + pair])
+                                        ] - K2Check * alpha2PosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
 
-                            
                         else:
                             if pearce:
                                 omega = (
@@ -314,9 +300,7 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] + K4Check * omega * (
-                                            1 - runData.reward[t] - V_option1[(t,) + pair]
-                                        )
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K4Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
                             else:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
@@ -326,9 +310,8 @@ class Fitting:
                                     for pair in otherPairs:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
-                                        ] + K4Check * alpha2NegCheck * (1 - runData.reward[t] - V_option1[(t,) + pair])
+                                        ] - K4Check * alpha2NegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
 
-                            
                         V_option0[t + 1, :] = V_option0[t, :]
                     else:
                         V_option1[t + 1, :] = V_option1[t, :]
@@ -421,7 +404,7 @@ class Fitting:
         Path(newPath).mkdir(parents=True, exist_ok=True)
 
         scipy.io.savemat(
-            newPath + "/" + saveAs + ".mat".format(self.ID),
+            newPath + "/rpe" + saveAs + ".mat".format(self.ID),
             mdict={"rpe": RPE},
         )
 
@@ -549,11 +532,24 @@ def ma(interval, window_size=10, method="same"):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-#
+parent_id = os.getpid()
+def worker_init():
+    def sig_int(signal_num, frame):
+        print('signal: %s' % signal_num)
+        parent = psutil.Process(parent_id)
+        for child in parent.children():
+            if child.pid != os.getpid():
+                print("killing child: %s" % child.pid)
+                child.kill()
+        print("killing parent: %s" % parent_id)
+        parent.kill()
+        print("suicide: %s" % os.getpid())
+        psutil.Process(os.getpid()).kill()
+    signal.signal(signal.SIGINT, sig_int)
 
 def use_fitting(IDnr):
-     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-     (
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    (
         fitted_alphasPos,
         fitted_alphas2Pos,
         fitted_alphasNeg,
@@ -575,70 +571,70 @@ def use_fitting(IDnr):
 
 def main():
     configurations = [
-    "01",
-    "02",
-    "03",
-    "04",
-    "05",
-    "06",
-    "07",
-    "09",
-    "10",
-    "11",
-    "12",
-    "14",
-    "15",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "23",
-    "24",
-    "25",
-    "26",
-    "27",
-    "28",
-    "29",
-    "30",
-    "33",
-    "34",
-    "35",
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "45",
-    "46",
-    "47",
-    "48",
-    "49",
-    "50",
-    "51",
-    "52",
-    "53",
-    "54",
-    "55",
-    "56",
-    "57",
-    "58",
-    "59",
-    "60",
-    "61",
-    "62",
-    "63",
-    "64",
-]
-
-    pool = Pool(8)
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "09",
+        "10",
+        "11",
+        "12",
+        "14",
+        "15",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "33",
+        "34",
+        "35",
+        "36",
+        "37",
+        "38",
+        "39",
+        "40",
+        "41",
+        "42",
+        "43",
+        "45",
+        "46",
+        "47",
+        "48",
+        "49",
+        "50",
+        "51",
+        "52",
+        "53",
+        "54",
+        "55",
+        "56",
+        "57",
+        "58",
+        "59",
+        "60",
+        "61",
+        "62",
+        "63",
+        "64",
+    ]
+    
+    pool = Pool(8, worker_init)
     pool.map(use_fitting, configurations)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
     # # Run stat learning
