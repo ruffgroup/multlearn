@@ -566,7 +566,7 @@ def use_fitting(IDnr):
         fitted_K2,
         fitted_K3,
         fitted_K4,
-    ) = fitted.modelFitting(saveAs="PearceInitFourAlphas", pearce=True, extra=True, init=True, asym=True)
+    ) = fitted.modelFitting(saveAs="Pearce", pearce=True)
 
 
 def main():
