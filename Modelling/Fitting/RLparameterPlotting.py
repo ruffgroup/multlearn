@@ -89,12 +89,13 @@ class Plotting:
             else:
                 alpha2Pos = alphaNeg = alpha2Neg = alphaPos
                 varList.append(", alpha: {}".format(np.round(alphaPos, 2))) 
-            if V_option0Inits is not None:
+            if not np.isnan(V_option0Inits).all():
                 V_option0 = V_option0Inits[run]
                 V_option1 = V_option1Inits[run]
                 varList.append("\nV0 init: {0}, V1 init {1}".format(np.round(V_option0[0][0], 2), np.round(V_option1[0][0], 2)))
             else:
                 V_option0 = V_option1 = None
+            
 
             if transfer == "one":
                 K1run = K2run = K3run = K4run = K1[run]
@@ -233,8 +234,8 @@ class Plotting:
                     (3, alphaNeg, "V0 Neg alpha"),
                     (4, alpha2Pos, "V1 Pos alpha"),
                     (5, alpha2Neg, "V1 Neg alpha"),
-                    (6, V_option0[0][0], "V0"),
-                    (7, V_option1[0][0], "V1"),
+                    (6, V_option0, "V0"),
+                    (7, V_option1, "V1"),
                     (8, K1run, "V0 Pos Kappa"),
                     (9, K2run, "V1 Pos Kappa"),
                     (10, K3run, "V0 Neg Kappa"),

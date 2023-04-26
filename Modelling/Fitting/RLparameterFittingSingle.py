@@ -85,9 +85,22 @@ class Fitting:
             fitted_betas,
             best_LLs,
         ) = (np.empty((max(self.subjectData.runNumber))) for i in range(10))
+        (
+            fitted_alphasPos[:],
+            fitted_alphasNeg[:],
+            fitted_alphas2Pos[:],
+            fitted_alphas2Neg[:],
+            fitted_K1[:],
+            fitted_K2[:],
+            fitted_K3[:],
+            fitted_K4[:],
+            fitted_betas[:],
+            best_LLs[:],
+        ) = (np.nan for i in range(10))
 
         fitted_V_optionInits = np.empty((max(self.subjectData.runNumber), 3, 3))
-        
+        fitted_V_optionInits[:] = np.nan
+
         NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 11))
         NLL_array[:] = np.nan
 
@@ -98,6 +111,7 @@ class Fitting:
                 self.mainTrials + self.additionalTrials + 1,
             )
         )
+        RPE[:], V[:] = (np.nan for i in range(2))
         for run in range(0, max(self.subjectData.runNumber)):
             alphaGrid = np.random.rand(self.gridCount, 1)
             if extra and asym:
@@ -116,15 +130,17 @@ class Fitting:
 
             betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
+            LL_array[:] = np.nan
             if init:
-                V_optionInit_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
-                #V_option_rand = np.random.rand(self.gridCount, 1)
-                #V_optionInit_Grid = np.repeat(V_option_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
+                #V_optionInit_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
+                V_option_rand = np.random.rand(self.gridCount, 1)
+                V_optionInit_Grid = np.repeat(V_option_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
             run_V = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
             
+            run_RPEs[:], run_V[:] = (np.nan for i in range(2))
 
             # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
             for j in range(0, self.gridCount):
@@ -185,11 +201,12 @@ class Fitting:
                     ]
 
                     # Prob of choosing the 0th and 1st option respectively
-                    choiceProb[t, 0] = np.exp(betaCheck * V_option[((t,) + runData.stimulusPair[t])]) / (
-                        np.exp(betaCheck * V_option[((t,) + runData.stimulusPair[t])])
-                        + sum([np.exp(betaCheck * V_option[((t,) + pair[t])]) for pair in otherPairs])
+                    absP = np.exp(betaCheck * abs(V_option[((t,) + runData.stimulusPair[t])])) / (
+                        np.exp(betaCheck * abs(V_option[((t,) + runData.stimulusPair[t])]))
+                        + (1 - np.exp(betaCheck * abs(V_option[((t,) + runData.stimulusPair[t])])))
                     )
-                    choiceProb[t, 1] = 1 - choiceProb[t, 0]
+                    choiceProb[t, 0] = absP if V_option[((t,) + runData.stimulusPair[t])] >= 0 else 1 - absP
+                    choiceProb[t, 1] = absP if V_option[((t,) + runData.stimulusPair[t])] < 0 else 1 - absP
 
                     actionProb[t, :] = (
                         choiceProb[t, int(runData.action[t])] if ~np.isnan(runData.action[t]) else np.nan
