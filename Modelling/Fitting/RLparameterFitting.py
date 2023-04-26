@@ -214,7 +214,7 @@ class Fitting:
                 run_V1[j, 0] = V_option1[0, 0, 0]
 
                 if pearce:
-                    omega = 1
+                    omega = omega2 = omega3 = omega4 = 1
 
                 for t in range(0, max(runData.trialNumber)):
                     otherPairs = [
@@ -262,17 +262,24 @@ class Fitting:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
                                         ] - K1Check * alphaPosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                            
+                            if not asym and not extra:
+                                omega2 = omega3 = omega4 = omega
+                            elif asym and not extra:
+                                omega2 = omega
+                            elif extra and not asym:
+                                omega3 = omega
 
                         else:
                             if pearce:
-                                omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaNegCheck
+                                omega3 = omega3 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega3) * alphaNegCheck
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
-                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] + omega3 * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K3Check * omega * (
+                                        V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K3Check * omega3 * (
                                             rewardPE[(t,) + runData.stimulusPair[t]]
                                         )
                             else:
@@ -286,6 +293,13 @@ class Fitting:
                                             (t,) + pair
                                         ] - K3Check * alphaNegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
 
+                            if not asym and not extra:
+                                omega2 = omega = omega4 = omega3
+                            elif asym and not extra:
+                                omega4 = omega3
+                            elif extra and not asym:
+                                omega = omega3
+
                         V_option1[t + 1, :] = V_option1[t, :]
 
                     elif runData.action[t] == 1:
@@ -297,16 +311,16 @@ class Fitting:
 
                         if runData.reward[t] == 1:
                             if pearce:
-                                omega = (
-                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2PosCheck
+                                omega2 = (
+                                    omega2 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega2) * alpha2PosCheck
                                 )
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
-                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] + omega2 * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K2Check * omega * (
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K2Check * omega2 * (
                                             rewardPE[(t,) + runData.stimulusPair[t]]
                                         )
                             else:
@@ -319,19 +333,25 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
                                         ] - K2Check * alpha2PosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
-
+                            if not asym and not extra:
+                                omega3 = omega = omega4 = omega2
+                            elif asym and not extra:
+                                omega3 = omega2
+                            elif extra and not asym:
+                                omega4 = omega2
+    
                         else:
                             if pearce:
-                                omega = (
-                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2NegCheck
+                                omega4 = (
+                                    omega4 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega4) * alpha2NegCheck
                                 )
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
-                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] + omega4 * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K4Check * omega * (
+                                        V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K4Check * omega4 * (
                                             rewardPE[(t,) + runData.stimulusPair[t]]
                                         )
                             else:
@@ -344,6 +364,14 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
                                         ] - K4Check * alpha2NegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                            
+                            if not asym and not extra:
+                                omega2 = omega = omega3 = omega4
+                            elif asym and not extra:
+                                omega3 = omega4
+                            elif extra and not asym:
+                                omega2 = omega4
+    
 
                         V_option0[t + 1, :] = V_option0[t, :]
                     else:
@@ -632,7 +660,7 @@ def handle_ctrl_c(func):
 @handle_ctrl_c
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
+    fitted.modelFitting(saveAs="Pearce", pearce=True)
 
 def pool_ctrl_c_handler(*args, **kwargs):
     global ctrl_c_entered
