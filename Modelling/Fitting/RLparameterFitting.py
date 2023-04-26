@@ -336,7 +336,7 @@ class Fitting:
                             if not asym and not extra:
                                 omega3 = omega = omega4 = omega2
                             elif asym and not extra:
-                                omega3 = omega2
+                                omega = omega2
                             elif extra and not asym:
                                 omega4 = omega2
     
@@ -660,7 +660,7 @@ def handle_ctrl_c(func):
 @handle_ctrl_c
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="Pearce", pearce=True)
+    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
 
 def pool_ctrl_c_handler(*args, **kwargs):
     global ctrl_c_entered

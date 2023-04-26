@@ -541,7 +541,7 @@ class task_Design:
                     if not self.asym and not self.extra:
                         self.omega3 = self.omega = self.omega4 = self.omega2
                     elif self.asym and not self.extra:
-                        self.omega3 = self.omega2
+                        self.omega = self.omega2
                     elif self.extra and not self.asym:
                         self.omega4 = self.omega2
 
