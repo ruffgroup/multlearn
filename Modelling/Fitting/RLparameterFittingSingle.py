@@ -2,29 +2,20 @@ from random import *
 import os
 import glob
 import numpy as np
-import matplotlib.pyplot as plt
 import scipy.stats
 import scipy.io
 import pandas as pd
-import numpy.ma as ma
-import pickle
-import seaborn as sns
 import sys
 import pathlib
 from pathlib import Path
-import re
 import platform
 import ast
-import matplotlib.backends.backend_pdf
-from mpl_toolkits.mplot3d import Axes3D
 from RLparameterPlotting import Plotting
-import multiprocessing
 from multiprocessing import Pool
 import signal
-import psutil
+from functools import wraps
 
 sys.path.append(sys.path[0] + "/..")
-from TaskDesign import task_Design
 
 
 class Fitting:
@@ -73,6 +64,16 @@ class Fitting:
         asym : False or True for separate alphas based on reward
         transfer: None, one, two or four indicating the amount of discount free parameters for pairs that share a stimulus
         """
+        if platform.system() == "Windows":
+            newPath = os.path.join(
+                pathlib.Path(__file__).resolve().parents[3],"/data/fittedParameters/sub-{0}/{1}_{2}".format(self.ID, saveAs, "Single"),
+            )
+        else:
+            newPath = os.path.join(
+            str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{0}/{1}_{2}".format(self.ID, saveAs, "Single"),
+        )
+        Path(newPath).mkdir(parents=True, exist_ok=True)
+
         (
             fitted_alphasPos,
             fitted_alphasNeg,
@@ -349,25 +350,37 @@ class Fitting:
             maxIndex = np.nanargmax(LL_array[:, 0])
 
             fitted_alphasPos[run] = NLL_array[run, minIndex, 1]
+            np.savetxt(fname=newPath + "/alphasPos_" + saveAs + "_single.tsv", X=fitted_alphasPos, delimiter=",")
             if asym and not extra:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
+                np.savetxt(fname=newPath + "/alphasNeg_" + saveAs + "_single.tsv", X=fitted_alphasNeg, delimiter=",")
             elif extra and not asym:
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
+                np.savetxt(fname=newPath + "/alphas2Pos_" + saveAs + "_single.tsv", X=fitted_alphas2Pos, delimiter=",")
             elif extra and asym:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
+                np.savetxt(fname=newPath + "/alphasNeg_" + saveAs + "_single.tsv", X=fitted_alphasNeg, delimiter=",")
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
+                np.savetxt(fname=newPath + "/alphas2Pos_" + saveAs + "_single.tsv", X=fitted_alphas2Pos, delimiter=",")
                 fitted_alphas2Neg[run] = NLL_array[run, minIndex, 5]
+                np.savetxt(fname=newPath + "/alphas2Neg_" + saveAs + "_single.tsv", X=fitted_alphas2Neg, delimiter=",")
             fitted_betas[run] = NLL_array[run, minIndex, 2]
+            np.savetxt(fname=newPath + "/betas_" + saveAs + "_single.tsv", X=fitted_betas, delimiter=",")
             if init:
                 fitted_V_optionInits[run] = V_optionInit_Grid[minIndex]
             if transfer is not None:
-                fitted_K1[run] = NLL_array[run, minIndex, 8]
+                fitted_K1[run] = NLL_array[run, minIndex, 7]
+                np.savetxt(fname=newPath + "/K1_" + saveAs + "_single.tsv", X=fitted_K1, delimiter=",")
             if transfer == "two":
-                fitted_K2[run] = NLL_array[run, minIndex, 9]
+                fitted_K2[run] = NLL_array[run, minIndex, 8]
+                np.savetxt(fname=newPath + "/K2_" + saveAs + "_single.tsv", X=fitted_K2, delimiter=",")
             elif transfer == "four":
-                fitted_K2[run] = NLL_array[run, minIndex, 9]
-                fitted_K3[run] = NLL_array[run, minIndex, 10]
-                fitted_K4[run] = NLL_array[run, minIndex, 11]
+                fitted_K2[run] = NLL_array[run, minIndex, 8]
+                np.savetxt(fname=newPath + "/K2_" + saveAs + "_single.tsv", X=fitted_K2, delimiter=",")
+                fitted_K3[run] = NLL_array[run, minIndex, 9]
+                np.savetxt(fname=newPath + "/K3_" + saveAs + "_single.tsv", X=fitted_K3, delimiter=",")
+                fitted_K4[run] = NLL_array[run, minIndex, 10]
+                np.savetxt(fname=newPath + "/K4_" + saveAs + "_single.tsv", X=fitted_K4, delimiter=",")
             best_LLs[run] = LL_array[maxIndex]
             RPE[run] = run_RPEs[minIndex]
             V[run] = run_V[minIndex]
@@ -392,12 +405,6 @@ class Fitting:
                 transfer=transfer,
             )
 
-        newPath = os.path.join(
-            pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{}".format(self.ID),
-        )
-        Path(newPath).mkdir(parents=True, exist_ok=True)
-
         scipy.io.savemat(
             newPath + "/rpe" + saveAs + "_single.mat".format(self.ID),
             mdict={"rpe": RPE},
@@ -406,22 +413,8 @@ class Fitting:
         with open(newPath + "/BIC_" + saveAs + "_single.npy", "wb") as f:
             np.save(f, best_LLs)
 
-        return (
-            fitted_alphasPos,
-            fitted_alphas2Pos,
-            fitted_alphasNeg,
-            fitted_alphas2Neg,
-            fitted_betas,
-            best_LLs,
-            RPE,
-            V,
-            NLL_array,
-            fitted_V_optionInits,
-            fitted_K1,
-            fitted_K2,
-            fitted_K3,
-            fitted_K4,
-        )
+        with open(newPath + "/V_" + saveAs + "_single.npy", "wb") as f:
+            np.save(f, V)
 
     # Statistical learning
     def statisticalLearning(self, statLearnPar=1):
@@ -517,51 +510,10 @@ class Fitting:
         return ID_beliefs, ID_surprise
 
 
-def ma(interval, window_size=10, method="same"):
-    window = np.ones(int(window_size)) / float(window_size)
-    return np.convolve(interval, window, method)
-
-
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-parent_id = os.getpid()
-def worker_init():
-    def sig_int(signal_num, frame):
-        print('signal: %s' % signal_num)
-        parent = psutil.Process(parent_id)
-        for child in parent.children():
-            if child.pid != os.getpid():
-                print("killing child: %s" % child.pid)
-                child.kill()
-        print("killing parent: %s" % parent_id)
-        parent.kill()
-        print("suicide: %s" % os.getpid())
-        psutil.Process(os.getpid()).kill()
-    signal.signal(signal.SIGINT, sig_int)
-
-def use_fitting(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    (
-        fitted_alphasPos,
-        fitted_alphas2Pos,
-        fitted_alphasNeg,
-        fitted_alphas2Neg,
-        fitted_betas,
-        best_LLs,
-        RPE,
-        V,
-        NLL_array,
-        fitted_V_optionInits,
-        fitted_K1,
-        fitted_K2,
-        fitted_K3,
-        fitted_K4,
-    ) = fitted.modelSingleFitting(saveAs="PearceInitFourAlphas", pearce=True, extra=True, init=True, asym=True)
-
-
-def main():
-    configurations = [
+configurations = [
         "01",
         "02",
         "03",
@@ -621,17 +573,53 @@ def main():
         "63",
         "64",
     ]
+
+def handle_ctrl_c(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        global ctrl_c_entered
+        if not ctrl_c_entered:
+            signal.signal(signal.SIGINT, default_sigint_handler) # the default
+            try:
+                return func(*args, **kwargs)
+            except KeyboardInterrupt:
+                ctrl_c_entered = True
+                return KeyboardInterrupt()
+            finally:
+                signal.signal(signal.SIGINT, pool_ctrl_c_handler)
+        else:
+            return KeyboardInterrupt()
+    return wrapper
+
+@handle_ctrl_c
+def use_fitting(IDnr):
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
+
+def pool_ctrl_c_handler(*args, **kwargs):
+    global ctrl_c_entered
+    ctrl_c_entered = True
+
+def init_pool():
+    global ctrl_c_entered
+    global default_sigint_handler
+    ctrl_c_entered = False
+    default_sigint_handler = signal.signal(signal.SIGINT, pool_ctrl_c_handler)
+
+def main():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    pool = Pool(8, initializer=init_pool)
+    results = pool.map(use_fitting, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
+        print('Ctrl-C was entered.')
+    pool.close()
+    pool.join()
     
-    pool = Pool(8, worker_init)
-    pool.map(use_fitting, configurations)
+    #for IDnr in configurations:
+    #    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    #    fitted.modelFitting(saveAs="Pearce", pearce=True)
+
+
 
 if __name__ == "__main__":
     main()
-
-    # # Run stat learning
-    # beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
-
-
-# You can always include statistical learning; necessary to get surprise values
-# beliefs, surprise = fitted.statisticalLearning(statLearnPar=1)
-# fitted.plots_stats(beliefs, surprise)
