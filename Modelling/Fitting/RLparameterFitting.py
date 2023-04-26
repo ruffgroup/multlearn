@@ -144,7 +144,7 @@ class Fitting:
             if transfer == "four":
                 K3Grid, K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
 
-            betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
+            betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             LL_array[:] = np.nan
             if init:
