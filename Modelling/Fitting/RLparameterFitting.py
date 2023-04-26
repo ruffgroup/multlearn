@@ -22,6 +22,8 @@ import multiprocessing
 from multiprocessing import Pool
 import signal
 import psutil
+from time import sleep
+from functools import wraps
 
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
@@ -96,15 +98,30 @@ class Fitting:
             fitted_betas,
             best_LLs,
         ) = (np.empty((max(self.subjectData.runNumber))) for i in range(10))
+        (
+            fitted_alphasPos[:],
+            fitted_alphasNeg[:],
+            fitted_alphas2Pos[:],
+            fitted_alphas2Neg[:],
+            fitted_K1[:],
+            fitted_K2[:],
+            fitted_K3[:],
+            fitted_K4[:],
+            fitted_betas[:],
+            best_LLs[:],
+        ) = (np.nan for i in range(10))
 
         fitted_V_option0Inits, fitted_V_option1Inits = (
             np.empty((max(self.subjectData.runNumber), 3, 3)) for i in range(2)
         )
 
+        fitted_V_option0Inits[:], fitted_V_option1Inits[:] = (np.nan for i in range(2))
+
         NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 12))
         NLL_array[:] = np.nan
 
         RPE = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials))
+        
         V0 = np.empty(
             (
                 max(self.subjectData.runNumber),
@@ -117,37 +134,40 @@ class Fitting:
                 self.mainTrials + self.additionalTrials + 1,
             )
         )
+        RPE[:], V0[:], V1[:] = (np.nan for i in range(3))
 
         for run in range(0, max(self.subjectData.runNumber)):
-            self.alphaGrid = np.random.rand(self.gridCount, 1)
+            alphaGrid = np.random.rand(self.gridCount, 1)
             if extra and asym:
-                self.alphaNegGrid, self.alpha2PosGrid, self.alpha2NegGrid = (np.random.rand(self.gridCount, 1) for i in range(3))
+                alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (np.random.rand(self.gridCount, 1) for i in range(3))
             elif extra and not asym:
-                self.alpha2Grid = np.random.rand(self.gridCount, 1)
+                alpha2Grid = np.random.rand(self.gridCount, 1)
             elif asym and not extra:
-                self.alphaNegGrid = np.random.rand(self.gridCount, 1)
+                alphaNegGrid = np.random.rand(self.gridCount, 1)
 
             if transfer is not None:
-                self.K1Grid = np.random.rand(self.gridCount, 1)
+                K1Grid = np.random.rand(self.gridCount, 1)
             if transfer == "two" or transfer == "four":
-                self.K2Grid = np.random.rand(self.gridCount, 1)
+                K2Grid = np.random.rand(self.gridCount, 1)
             if transfer == "four":
-                self.K3Grid, self.K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
+                K3Grid, K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
 
-            self.betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
+            betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             if init:
                 V_option0_rand = np.random.rand(self.gridCount, 1)
-                self.V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
+                V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
                 V_option1_rand = np.random.rand(self.gridCount, 1)
-                self.V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
+                V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
             run_V0, run_V1 = (
                 np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1)) for i in range(2)
             )
+
+            run_RPEs[:], run_V0[:], run_V1[:] = (np.nan for i in range(3))
 
             # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
             for j in range(0, self.gridCount):
@@ -161,8 +181,8 @@ class Fitting:
                 V_option0, V_option1 = (np.empty((max(runData.trialNumber) + 1, 3, 3)) for i in range(2))
                 V_option0[:], V_option1[:] = (np.nan for i in range(2))
                 if init:
-                    V_option0[0, :] = self.V_option0Init_Grid[j]
-                    V_option1[0, :] = self.V_option1Init_Grid[j]
+                    V_option0[0, :] = V_option0Init_Grid[j]
+                    V_option1[0, :] = V_option1Init_Grid[j]
                 else:
                     V_option0[0, :] = 0.5
                     V_option1[0, :] = 0.5
@@ -172,31 +192,31 @@ class Fitting:
 
                 # Checking parameters from the grid
                 if extra and not asym:
-                    alphaPosCheck = alphaNegCheck = self.alphaGrid[j]
-                    alpha2PosCheck = alpha2NegCheck = self.alpha2Grid[j]
+                    alphaPosCheck = alphaNegCheck = alphaGrid[j]
+                    alpha2PosCheck = alpha2NegCheck = alpha2Grid[j]
                 elif asym and not extra:
-                    alphaPosCheck = alpha2PosCheck = self.alphaGrid[j]
-                    alphaNegCheck = alpha2NegCheck = self.alphaNegGrid[j]
+                    alphaPosCheck = alpha2PosCheck = alphaGrid[j]
+                    alphaNegCheck = alpha2NegCheck = alphaNegGrid[j]
                 elif extra and asym:
-                    alphaPosCheck = self.alphaGrid[j]
-                    alpha2PosCheck = self.alpha2PosGrid[j]
-                    alphaNegCheck = self.alphaNegGrid[j]
-                    alpha2NegCheck = self.alpha2NegGrid[j]
+                    alphaPosCheck = alphaGrid[j]
+                    alpha2PosCheck = alpha2PosGrid[j]
+                    alphaNegCheck = alphaNegGrid[j]
+                    alpha2NegCheck = alpha2NegGrid[j]
                 else:
-                    alphaPosCheck = alpha2PosCheck = alphaNegCheck = alpha2NegCheck = self.alphaGrid[j]
+                    alphaPosCheck = alpha2PosCheck = alphaNegCheck = alpha2NegCheck = alphaGrid[j]
 
                 if transfer == "one":
-                    K1Check = K2Check = K3Check = K4Check = self.K1Grid[j]
+                    K1Check = K2Check = K3Check = K4Check = K1Grid[j]
                 elif transfer == "two":
-                    K1Check = K3Check = self.K1Grid[j]
-                    K2Check = K4Check = self.K2Grid[j]
+                    K1Check = K3Check = K1Grid[j]
+                    K2Check = K4Check = K2Grid[j]
                 elif transfer == "four":
-                    K1Check = self.K1Grid[j]
-                    K2Check = self.K2Grid[j]
-                    K3Check = self.K3Grid[j]
-                    K4Check = self.K4Grid[j]
+                    K1Check = K1Grid[j]
+                    K2Check = K2Grid[j]
+                    K3Check = K3Grid[j]
+                    K4Check = K4Grid[j]
 
-                betaCheck = self.betaGrid[j]
+                betaCheck = betaGrid[j]
                 run_V0[j, 0] = V_option0[0, 0, 0]
                 run_V1[j, 0] = V_option1[0, 0, 0]
 
@@ -354,8 +374,8 @@ class Fitting:
                     NLL_array[run, j, 4] = alpha2PosCheck
                     NLL_array[run, j, 5] = alpha2NegCheck
                 if init:
-                    NLL_array[run, j, 6] = self.V_option0Init_Grid[j][0][0]
-                    NLL_array[run, j, 7] = self.V_option1Init_Grid[j][0][0]
+                    NLL_array[run, j, 6] = V_option0Init_Grid[j][0][0]
+                    NLL_array[run, j, 7] = V_option1Init_Grid[j][0][0]
                 if transfer is not None:
                     NLL_array[run, j, 8] = K1Check
                 if transfer == "two":
@@ -388,8 +408,8 @@ class Fitting:
             fitted_betas[run] = NLL_array[run, minIndex, 2]
             np.savetxt(fname=newPath + "/betas_" + saveAs + ".tsv", X=fitted_betas, delimiter=",")
             if init:
-                fitted_V_option0Inits[run] = self.V_option0Init_Grid[minIndex]
-                fitted_V_option1Inits[run] = self.V_option1Init_Grid[minIndex]
+                fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
+                fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
             if transfer is not None:
                 fitted_K1[run] = NLL_array[run, minIndex, 8]
                 np.savetxt(fname=newPath + "/K1_" + saveAs + ".tsv", X=fitted_K1, delimiter=",")
@@ -442,8 +462,7 @@ class Fitting:
 
         with open(newPath + "/V0_" + saveAs + ".npy", "wb") as f:
             np.save(f, V1)
-
-
+        
     # Statistical learning
     def statisticalLearning(self, statLearnPar=1):
         self.statLearnPar = statLearnPar
@@ -546,14 +565,7 @@ def ma(interval, window_size=10, method="same"):
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-
-def use_fitting(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
-
-
-def main():
-    configurations = [
+configurations = [
         "01",
         "02",
         "03",
@@ -614,19 +626,50 @@ def main():
         "64",
     ]
 
+def handle_ctrl_c(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        global ctrl_c_entered
+        if not ctrl_c_entered:
+            signal.signal(signal.SIGINT, default_sigint_handler) # the default
+            try:
+                return func(*args, **kwargs)
+            except KeyboardInterrupt:
+                ctrl_c_entered = True
+                return KeyboardInterrupt()
+            finally:
+                signal.signal(signal.SIGINT, pool_ctrl_c_handler)
+        else:
+            return KeyboardInterrupt()
+    return wrapper
 
-    pool = Pool(8)
-    try:
-        res = pool.map_async(use_fitting, configurations)
-        print("Waiting for results")
-        res.get(0xFFFF)
-    except KeyboardInterrupt:
-        print("Caught KeyboardInterrupt, terminating workers")
-        pool.terminate()
-    else:
-        print("Normal termination")
-        pool.close()
+@handle_ctrl_c
+def use_fitting(IDnr):
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
+
+def pool_ctrl_c_handler(*args, **kwargs):
+    global ctrl_c_entered
+    ctrl_c_entered = True
+
+def init_pool():
+    global ctrl_c_entered
+    global default_sigint_handler
+    ctrl_c_entered = False
+    default_sigint_handler = signal.signal(signal.SIGINT, pool_ctrl_c_handler)
+
+def main():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    pool = Pool(8, initializer=init_pool)
+    results = pool.map(use_fitting, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
+        print('Ctrl-C was entered.')
+    pool.close()
     pool.join()
+    
+    #for IDnr in configurations:
+    #    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    #    fitted.modelFitting(saveAs="Pearce", pearce=True)
 
 
 
