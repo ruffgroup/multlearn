@@ -2,27 +2,17 @@ from random import *
 import os
 import glob
 import numpy as np
-import matplotlib.pyplot as plt
 import scipy.stats
 import scipy.io
 import pandas as pd
-import numpy.ma as ma
-import pickle
-import seaborn as sns
 import sys
 import pathlib
 from pathlib import Path
-import re
 import platform
 import ast
-import matplotlib.backends.backend_pdf
-from mpl_toolkits.mplot3d import Axes3D
 from RLparameterPlotting import Plotting
-import multiprocessing
 from multiprocessing import Pool
 import signal
-import psutil
-from time import sleep
 from functools import wraps
 
 sys.path.append(sys.path[0] + "/..")
@@ -557,12 +547,6 @@ class Fitting:
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise})
         return ID_beliefs, ID_surprise
-
-
-def ma(interval, window_size=10, method="same"):
-    window = np.ones(int(window_size)) / float(window_size)
-    return np.convolve(interval, window, method)
-
 
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
