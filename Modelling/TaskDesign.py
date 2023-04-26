@@ -346,16 +346,11 @@ class task_Design:
                             for p2 in SimOtherPairs:
                                 self.V_option0[(i + 1,) + tuple(p2)] = self.V_option0[
                                     (i,) + tuple(p2)
-                                ] + self.K1 * self.omega * (
-                                    1
-                                    - self.reward[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                    - self.V_option0[(i,) + tuple(p2)]
-                                )
+                                ] + self.K1 * self.omega * self.rewardPE[
+                                (i,)
+                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
+                            ]
+                                
                     else:
                         self.V_option0[
                         (i + 1,)
@@ -375,16 +370,10 @@ class task_Design:
                             for p2 in SimOtherPairs:
                                 self.V_option0[(i + 1,) + tuple(p2)] = self.V_option0[
                                     (i,) + tuple(p2)
-                                ] + self.K1 * self.alphaPos * (
-                                    1
-                                    - self.reward[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                    - self.V_option0[(i,) + tuple(p2)]
-                                )
+                                ] - self.K1 * self.alphaPos * self.rewardPE[
+                                (i,)
+                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
+                            ]
                     
                 else:
                     if self.pearce:
@@ -422,16 +411,10 @@ class task_Design:
                             for p2 in SimOtherPairs:
                                 self.V_option0[(i + 1,) + tuple(p2)] = self.V_option0[
                                     (i,) + tuple(p2)
-                                ] + self.K3 * self.omega * (
-                                    1
-                                    - self.reward[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                    - self.V_option0[(i,) + tuple(p2)]
-                                )
+                                ] - self.K3 * self.omega * self.rewardPE[
+                                (i,)
+                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
+                            ]
                     else:
                         self.V_option0[
                         (i + 1,)
@@ -451,16 +434,10 @@ class task_Design:
                             for p2 in SimOtherPairs:
                                 self.V_option0[(i + 1,) + tuple(p2)] = self.V_option0[
                                     (i,) + tuple(p2)
-                                ] + self.K3 * self.alphaNeg * (
-                                    1
-                                    - self.reward[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                    - self.V_option0[(i,) + tuple(p2)]
-                                )
+                                ] - self.K3 * self.alphaNeg * self.rewardPE[
+                                (i,)
+                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
+                            ]
                 
                     
 
@@ -516,16 +493,11 @@ class task_Design:
                             for p2 in SimOtherPairs:
                                 self.V_option1[(i + 1,) + tuple(p2)] = self.V_option1[
                                     (i,) + tuple(p2)
-                                ] + self.K2 * self.omega * (
-                                    1
-                                    - self.reward[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                    - self.V_option1[(i,) + tuple(p2)]
-                                )
+                                ] - self.K2 * self.omega * self.rewardPE[
+                                (i,)
+                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
+                            ]
+                                
                     else:
                         self.V_option1[
                             (i + 1,)
@@ -546,16 +518,10 @@ class task_Design:
                             for p2 in SimOtherPairs:
                                 self.V_option1[(i + 1,) + tuple(p2)] = self.V_option1[
                                     (i,) + tuple(p2)
-                                ] + self.K2 * self.alpha2Pos * (
-                                    1
-                                    - self.reward[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                    - self.V_option1[(i,) + tuple(p2)]
-                                )
+                                ] - self.K2 * self.alpha2Pos * self.rewardPE[
+                                (i,)
+                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
+                            ]
                     
                 else:
                     if self.pearce:
@@ -593,16 +559,10 @@ class task_Design:
                             for p2 in SimOtherPairs:
                                 self.V_option1[(i + 1,) + tuple(p2)] = self.V_option1[
                                     (i,) + tuple(p2)
-                                ] + self.K4 * self.omega * (
-                                    1
-                                    - self.reward[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                    - self.V_option1[(i,) + tuple(p2)]
-                                )
+                                ] - self.K4 * self.omega * self.rewardPE[
+                                (i,)
+                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
+                            ]
                     else:
                         self.V_option1[
                             (i + 1,)
@@ -623,16 +583,10 @@ class task_Design:
                             for p2 in SimOtherPairs:
                                 self.V_option1[(i + 1,) + tuple(p2)] = self.V_option1[
                                     (i,) + tuple(p2)
-                                ] + self.K4 * self.alpha2Neg * (
-                                    1
-                                    - self.reward[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                    - self.V_option1[(i,) + tuple(p2)]
-                                )
+                                ] - self.K4 * self.alpha2Neg * self.rewardPE[
+                                (i,)
+                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
+                            ]
                     
                 self.V_option0[i + 1, :] = self.V_option0[i, :]
 
