@@ -130,6 +130,7 @@ class Fitting:
 
             betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
+            LL_array[:] = np.nan
             if init:
                 #V_optionInit_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
                 V_option_rand = np.random.rand(self.gridCount, 1)

@@ -158,6 +158,7 @@ class Fitting:
 
             betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
+            LL_array[:] = np.nan
             if init:
                 V_option0_rand = np.random.rand(self.gridCount, 1)
                 V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
