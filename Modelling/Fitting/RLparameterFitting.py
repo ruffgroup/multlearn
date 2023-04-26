@@ -28,6 +28,7 @@ from functools import wraps
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
 
+print(str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/")
 
 class Fitting:
     def __init__(
@@ -79,10 +80,13 @@ class Fitting:
         asym : False or True for separate alphas based on reward
         transfer: None, one, two or four indicating the amount of discount free parameters for pairs that share a stimulus
         """
-
-        newPath = os.path.join(
-            pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
+        if platform.system() == "Windows":
+            newPath = os.path.join(
+                str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
+            )
+        else:
+            newPath = os.path.join(
+            str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
         )
         Path(newPath).mkdir(parents=True, exist_ok=True)
 
@@ -549,8 +553,7 @@ class Fitting:
             ID_surprise[run] = trial_surprise
 
         newPath = os.path.join(
-            pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{}".format(self.ID),
+            str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{}".format(self.ID),
         )
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise})
