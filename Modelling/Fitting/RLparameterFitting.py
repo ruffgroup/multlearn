@@ -77,6 +77,13 @@ class Fitting:
         asym : False or True for separate alphas based on reward
         transfer: None, one, two or four indicating the amount of discount free parameters for pairs that share a stimulus
         """
+
+        newPath = os.path.join(
+            pathlib.Path(__file__).resolve().parents[3],
+            "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
+        )
+        Path(newPath).mkdir(parents=True, exist_ok=True)
+
         (
             fitted_alphasPos,
             fitted_alphasNeg,
@@ -112,29 +119,29 @@ class Fitting:
         )
 
         for run in range(0, max(self.subjectData.runNumber)):
-            alphaGrid = np.random.rand(self.gridCount, 1)
+            self.alphaGrid = np.random.rand(self.gridCount, 1)
             if extra and asym:
-                alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (np.random.rand(self.gridCount, 1) for i in range(3))
+                self.alphaNegGrid, self.alpha2PosGrid, self.alpha2NegGrid = (np.random.rand(self.gridCount, 1) for i in range(3))
             elif extra and not asym:
-                alpha2Grid = np.random.rand(self.gridCount, 1)
+                self.alpha2Grid = np.random.rand(self.gridCount, 1)
             elif asym and not extra:
-                alphaNegGrid = np.random.rand(self.gridCount, 1)
+                self.alphaNegGrid = np.random.rand(self.gridCount, 1)
 
             if transfer is not None:
-                K1Grid = np.random.rand(self.gridCount, 1)
+                self.K1Grid = np.random.rand(self.gridCount, 1)
             if transfer == "two" or transfer == "four":
-                K2Grid = np.random.rand(self.gridCount, 1)
+                self.K2Grid = np.random.rand(self.gridCount, 1)
             if transfer == "four":
-                K3Grid, K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
+                self.K3Grid, self.K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
 
-            betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
+            self.betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             if init:
                 V_option0_rand = np.random.rand(self.gridCount, 1)
-                V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
+                self.V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
                 V_option1_rand = np.random.rand(self.gridCount, 1)
-                V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
+                self.V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
@@ -154,8 +161,8 @@ class Fitting:
                 V_option0, V_option1 = (np.empty((max(runData.trialNumber) + 1, 3, 3)) for i in range(2))
                 V_option0[:], V_option1[:] = (np.nan for i in range(2))
                 if init:
-                    V_option0[0, :] = V_option0Init_Grid[j]
-                    V_option1[0, :] = V_option1Init_Grid[j]
+                    V_option0[0, :] = self.V_option0Init_Grid[j]
+                    V_option1[0, :] = self.V_option1Init_Grid[j]
                 else:
                     V_option0[0, :] = 0.5
                     V_option1[0, :] = 0.5
@@ -165,31 +172,31 @@ class Fitting:
 
                 # Checking parameters from the grid
                 if extra and not asym:
-                    alphaPosCheck = alphaNegCheck = alphaGrid[j]
-                    alpha2PosCheck = alpha2NegCheck = alpha2Grid[j]
+                    alphaPosCheck = alphaNegCheck = self.alphaGrid[j]
+                    alpha2PosCheck = alpha2NegCheck = self.alpha2Grid[j]
                 elif asym and not extra:
-                    alphaPosCheck = alpha2PosCheck = alphaGrid[j]
-                    alphaNegCheck = alpha2NegCheck = alphaNegGrid[j]
+                    alphaPosCheck = alpha2PosCheck = self.alphaGrid[j]
+                    alphaNegCheck = alpha2NegCheck = self.alphaNegGrid[j]
                 elif extra and asym:
-                    alphaPosCheck = alphaGrid[j]
-                    alpha2PosCheck = alpha2PosGrid[j]
-                    alphaNegCheck = alphaNegGrid[j]
-                    alpha2NegCheck = alpha2NegGrid[j]
+                    alphaPosCheck = self.alphaGrid[j]
+                    alpha2PosCheck = self.alpha2PosGrid[j]
+                    alphaNegCheck = self.alphaNegGrid[j]
+                    alpha2NegCheck = self.alpha2NegGrid[j]
                 else:
-                    alphaPosCheck = alpha2PosCheck = alphaNegCheck = alpha2NegCheck = alphaGrid[j]
+                    alphaPosCheck = alpha2PosCheck = alphaNegCheck = alpha2NegCheck = self.alphaGrid[j]
 
                 if transfer == "one":
-                    K1Check = K2Check = K3Check = K4Check = K1Grid[j]
+                    K1Check = K2Check = K3Check = K4Check = self.K1Grid[j]
                 elif transfer == "two":
-                    K1Check = K3Check = K1Grid[j]
-                    K2Check = K4Check = K2Grid[j]
+                    K1Check = K3Check = self.K1Grid[j]
+                    K2Check = K4Check = self.K2Grid[j]
                 elif transfer == "four":
-                    K1Check = K1Grid[j]
-                    K2Check = K2Grid[j]
-                    K3Check = K3Grid[j]
-                    K4Check = K4Grid[j]
+                    K1Check = self.K1Grid[j]
+                    K2Check = self.K2Grid[j]
+                    K3Check = self.K3Grid[j]
+                    K4Check = self.K4Grid[j]
 
-                betaCheck = betaGrid[j]
+                betaCheck = self.betaGrid[j]
                 run_V0[j, 0] = V_option0[0, 0, 0]
                 run_V1[j, 0] = V_option1[0, 0, 0]
 
@@ -347,8 +354,8 @@ class Fitting:
                     NLL_array[run, j, 4] = alpha2PosCheck
                     NLL_array[run, j, 5] = alpha2NegCheck
                 if init:
-                    NLL_array[run, j, 6] = V_option0Init_Grid[j][0][0]
-                    NLL_array[run, j, 7] = V_option1Init_Grid[j][0][0]
+                    NLL_array[run, j, 6] = self.V_option0Init_Grid[j][0][0]
+                    NLL_array[run, j, 7] = self.V_option1Init_Grid[j][0][0]
                 if transfer is not None:
                     NLL_array[run, j, 8] = K1Check
                 if transfer == "two":
@@ -364,38 +371,38 @@ class Fitting:
             maxIndex = np.nanargmax(LL_array[:, 0])
 
             fitted_alphasPos[run] = NLL_array[run, minIndex, 1]
-            np.savetxt(fname="alphasPos_" + saveAs + ".tsv", X=fitted_alphasPos, delimiter=",")
+            np.savetxt(fname=newPath + "/alphasPos_" + saveAs + ".tsv", X=fitted_alphasPos, delimiter=",")
             if asym and not extra:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
-                np.savetxt(fname="alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=",")
+                np.savetxt(fname=newPath + "/alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=",")
             elif extra and not asym:
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
-                np.savetxt(fname="alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=",")
+                np.savetxt(fname=newPath + "/alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=",")
             elif extra and asym:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
-                np.savetxt(fname="alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=",")
+                np.savetxt(fname=newPath + "/alphasNeg_" + saveAs + ".tsv", X=fitted_alphasNeg, delimiter=",")
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
-                np.savetxt(fname="alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=",")
+                np.savetxt(fname=newPath + "/alphas2Pos_" + saveAs + ".tsv", X=fitted_alphas2Pos, delimiter=",")
                 fitted_alphas2Neg[run] = NLL_array[run, minIndex, 5]
-                np.savetxt(fname="alphas2Neg_" + saveAs + ".tsv", X=fitted_alphas2Neg, delimiter=",")
+                np.savetxt(fname=newPath + "/alphas2Neg_" + saveAs + ".tsv", X=fitted_alphas2Neg, delimiter=",")
             fitted_betas[run] = NLL_array[run, minIndex, 2]
-            np.savetxt(fname="betas_" + saveAs + ".tsv", X=fitted_betas, delimiter=",")
+            np.savetxt(fname=newPath + "/betas_" + saveAs + ".tsv", X=fitted_betas, delimiter=",")
             if init:
-                fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
-                fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
+                fitted_V_option0Inits[run] = self.V_option0Init_Grid[minIndex]
+                fitted_V_option1Inits[run] = self.V_option1Init_Grid[minIndex]
             if transfer is not None:
                 fitted_K1[run] = NLL_array[run, minIndex, 8]
-                np.savetxt(fname="K1_" + saveAs + ".tsv", X=fitted_K1, delimiter=",")
+                np.savetxt(fname=newPath + "/K1_" + saveAs + ".tsv", X=fitted_K1, delimiter=",")
             if transfer == "two":
                 fitted_K2[run] = NLL_array[run, minIndex, 9]
-                np.savetxt(fname="K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=",")
+                np.savetxt(fname=newPath + "/K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=",")
             elif transfer == "four":
                 fitted_K2[run] = NLL_array[run, minIndex, 9]
-                np.savetxt(fname="K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=",")
+                np.savetxt(fname=newPath + "/K2_" + saveAs + ".tsv", X=fitted_K2, delimiter=",")
                 fitted_K3[run] = NLL_array[run, minIndex, 10]
-                np.savetxt(fname="K3_" + saveAs + ".tsv", X=fitted_K3, delimiter=",")
+                np.savetxt(fname=newPath + "/K3_" + saveAs + ".tsv", X=fitted_K3, delimiter=",")
                 fitted_K4[run] = NLL_array[run, minIndex, 11]
-                np.savetxt(fname="K4_" + saveAs + ".tsv", X=fitted_K4, delimiter=",")
+                np.savetxt(fname=newPath + "/K4_" + saveAs + ".tsv", X=fitted_K4, delimiter=",")
             best_LLs[run] = LL_array[maxIndex]
             RPE[run] = run_RPEs[minIndex]
             V0[run] = run_V0[minIndex]
@@ -422,12 +429,6 @@ class Fitting:
                 transfer=transfer,
             )
 
-        newPath = os.path.join(
-            pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
-        )
-        Path(newPath).mkdir(parents=True, exist_ok=True)
-
         scipy.io.savemat(
             newPath + "/rpe" + saveAs + ".mat".format(self.ID),
             mdict={"rpe": RPE},
@@ -441,9 +442,6 @@ class Fitting:
 
         with open(newPath + "/V0_" + saveAs + ".npy", "wb") as f:
             np.save(f, V1)
-
-    
-
 
 
     # Statistical learning
@@ -551,7 +549,7 @@ def ma(interval, window_size=10, method="same"):
 
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="Pearce", pearce=True)
+    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
 
 
 def main():
