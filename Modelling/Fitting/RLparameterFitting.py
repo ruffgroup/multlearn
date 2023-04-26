@@ -26,7 +26,7 @@ import psutil
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
 
-print(pathlib.Path(__file__).resolve().parents[3])
+print(str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/")
 
 class Fitting:
     def __init__(
@@ -80,8 +80,7 @@ class Fitting:
         """
 
         newPath = os.path.join(
-            pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
+            str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
         )
         Path(newPath).mkdir(parents=True, exist_ok=True)
 
@@ -531,8 +530,7 @@ class Fitting:
             ID_surprise[run] = trial_surprise
 
         newPath = os.path.join(
-            pathlib.Path(__file__).resolve().parents[3],
-            "/data/fittedParameters/sub-{}".format(self.ID),
+            str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{}".format(self.ID),
         )
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise})
@@ -555,65 +553,66 @@ def use_fitting(IDnr):
 
 def main():
     configurations = [
-        "01",
-        "02",
-        "03",
-        "04",
-        "05",
-        "06",
-        "07",
-        "09",
-        "10",
-        "11",
-        "12",
-        "14",
-        "15",
-        "17",
-        "18",
-        "19",
-        "20",
-        "21",
-        "22",
-        "23",
-        "24",
-        "25",
-        "26",
-        "27",
-        "28",
-        "29",
-        "30",
-        "33",
-        "34",
-        "35",
-        "36",
-        "37",
-        "38",
-        "39",
-        "40",
-        "41",
-        "42",
-        "43",
-        "45",
-        "46",
-        "47",
-        "48",
-        "49",
-        "50",
-        "51",
-        "52",
-        "53",
-        "54",
-        "55",
-        "56",
-        "57",
-        "58",
-        "59",
-        "60",
-        "61",
-        "62",
-        "63",
-        "64",
-    ]
+         "01"]
+    #,
+    #     "02",
+    #     "03",
+    #     "04",
+    #     "05",
+    #     "06",
+    #     "07",
+    #     "09",
+    #     "10",
+    #     "11",
+    #     "12",
+    #     "14",
+    #     "15",
+    #     "17",
+    #     "18",
+    #     "19",
+    #     "20",
+    #     "21",
+    #     "22",
+    #     "23",
+    #     "24",
+    #     "25",
+    #     "26",
+    #     "27",
+    #     "28",
+    #     "29",
+    #     "30",
+    #     "33",
+    #     "34",
+    #     "35",
+    #     "36",
+    #     "37",
+    #     "38",
+    #     "39",
+    #     "40",
+    #     "41",
+    #     "42",
+    #     "43",
+    #     "45",
+    #     "46",
+    #     "47",
+    #     "48",
+    #     "49",
+    #     "50",
+    #     "51",
+    #     "52",
+    #     "53",
+    #     "54",
+    #     "55",
+    #     "56",
+    #     "57",
+    #     "58",
+    #     "59",
+    #     "60",
+    #     "61",
+    #     "62",
+    #     "63",
+    #     "64",
+    # ]
 
 
     pool = Pool(8)
