@@ -28,8 +28,6 @@ from functools import wraps
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
 
-print(str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/")
-
 class Fitting:
     def __init__(
         self,
@@ -82,7 +80,7 @@ class Fitting:
         """
         if platform.system() == "Windows":
             newPath = os.path.join(
-                str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
+                pathlib.Path(__file__).resolve().parents[3],"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
             )
         else:
             newPath = os.path.join(
