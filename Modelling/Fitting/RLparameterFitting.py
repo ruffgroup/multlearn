@@ -26,6 +26,7 @@ import psutil
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
 
+print(pathlib.Path(__file__).resolve().parents[3])
 
 class Fitting:
     def __init__(

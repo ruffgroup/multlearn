@@ -33,7 +33,10 @@ class Plotting:
         self.method = method
         self.reps = reps
 
-        wanted_dir = "/data/sourcedata/behavior/modified_files"
+        if platform.system() == "Windows":
+            wanted_dir = "/data/sourcedata/behavior/modified_files"
+        else:
+            wanted_dir = "/Volumes/SDrive/data/sourcedata/behavior/modified_files"
         # Get savedVals file
         self.savedValsFile = glob.glob(os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID))[0]
 
