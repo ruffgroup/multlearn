@@ -76,7 +76,7 @@ class task_Design_Single:
         self.alpha2Neg = alpha2Neg if not None else np.random.uniform(0, 1)
 
         if beta is None:
-            self.beta = 0 + 10.0 * random()
+            self.beta = 0 + 15.0 * random()
         else:
             self.beta = beta  # 2.0
         if self.transfer:

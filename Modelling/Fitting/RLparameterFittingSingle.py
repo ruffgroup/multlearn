@@ -131,7 +131,7 @@ class SingleFitting:
             if transfer == "four":
                 K3Grid, K4Grid = (np.random.rand(self.gridCount, 1) for i in range(2))
 
-            betaGrid = 0 + 10 * np.random.rand(self.gridCount, 1)
+            betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
             LL_array = np.empty((self.gridCount, 1))
             LL_array[:] = np.nan
             if init:
@@ -637,14 +637,17 @@ def use_fitting(IDnr):
     fitted = SingleFitting(60, 0, 5000, ID=IDnr, plotting=True)
     fitted.modelSingleFitting(saveAs="PearceAsymExtra", pearce=True, asym=True, extra=True)
 
+@handle_ctrl_c
 def use_fitting2(IDnr):
     fitted = SingleFitting(60, 0, 5000, ID=IDnr, plotting=True)
     fitted.modelSingleFitting(saveAs="PearceInitAsymExtra", pearce=True, init=True, asym=True, extra=True)
 
+@handle_ctrl_c
 def use_fitting3(IDnr):
     fitted = SingleFitting(60, 0, 5000, ID=IDnr, plotting=True)
     fitted.modelSingleFitting(saveAs="PearceT1", pearce=True, transfer="one")
 
+@handle_ctrl_c
 def use_fitting4(IDnr):
     fitted = SingleFitting(60, 0, 5000, ID=IDnr, plotting=True)
     fitted.modelSingleFitting(saveAs="PearceInitT1", pearce=True, init=True, tranfer="one")
