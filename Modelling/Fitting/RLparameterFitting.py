@@ -660,7 +660,22 @@ def handle_ctrl_c(func):
 @handle_ctrl_c
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
+    fitted.modelFitting(saveAs="PearceAsymExtra", pearce=True, asym=True, extra=True)
+
+@handle_ctrl_c
+def use_fitting2(IDnr):
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelFitting(saveAs="PearceInitAsymExtra", pearce=True, init=True, asym=True, extra=True)
+
+@handle_ctrl_c
+def use_fitting3(IDnr):
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelFitting(saveAs="PearceT1", pearce=True, transfer="one")
+
+@handle_ctrl_c
+def use_fitting4(IDnr):
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelFitting(saveAs="PearceInitT1", pearce=True, init=True, tranfer="one")
 
 def pool_ctrl_c_handler(*args, **kwargs):
     global ctrl_c_entered
@@ -677,9 +692,30 @@ def main():
     pool = Pool(8, initializer=init_pool)
     results = pool.map(use_fitting, configurations)
     if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
-        print('Ctrl-C was entered.')
+        print("Ctrl-C was entered.")
     pool.close()
     pool.join()
+
+    pool2 = Pool(8, initializer=init_pool)
+    results2 = pool2.map(use_fitting2, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
+        print("Ctrl-C was entered.")
+    pool2.close()
+    pool2.join()
+
+    pool3 = Pool(8, initializer=init_pool)
+    results3 = pool3.map(use_fitting3, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results3)):
+        print("Ctrl-C was entered.")
+    pool3.close()
+    pool3.join()
+
+    pool4 = Pool(8, initializer=init_pool)
+    results4 = pool4.map(use_fitting4, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results4)):
+        print("Ctrl-C was entered.")
+    pool4.close()
+    pool4.join()
     
     #for IDnr in configurations:
     #    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
