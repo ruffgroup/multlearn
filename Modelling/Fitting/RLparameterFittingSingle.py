@@ -10,7 +10,7 @@ import pathlib
 from pathlib import Path
 import platform
 import ast
-from RLparameterPlotting import Plotting
+from RLparameterPlottingSingle import SinglePlotting
 from multiprocessing import Pool
 import signal
 from functools import wraps
@@ -18,7 +18,7 @@ from functools import wraps
 sys.path.append(sys.path[0] + "/..")
 
 
-class Fitting:
+class SingleFitting:
     def __init__(
         self,
         mainTrials,
@@ -38,7 +38,7 @@ class Fitting:
         self.plotting = plotting
 
         if self.plotting:
-            self.Plot = Plotting(
+            self.Plot = SinglePlotting(
                 self.mainTrials,
                 self.additionalTrials,
                 self.gridCount,
@@ -66,12 +66,14 @@ class Fitting:
         """
         if platform.system() == "Windows":
             newPath = os.path.join(
-                pathlib.Path(__file__).resolve().parents[3],"/data/fittedParameters/sub-{0}/{1}_{2}".format(self.ID, saveAs, "Single"),
+                pathlib.Path(__file__).resolve().parents[3],
+                "/data/fittedParameters/sub-{0}/{1}_{2}".format(self.ID, saveAs, "Single"),
             )
         else:
             newPath = os.path.join(
-            str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{0}/{1}_{2}".format(self.ID, saveAs, "Single"),
-        )
+                str(pathlib.Path(__file__).resolve().parents[3])
+                + "/data/fittedParameters/sub-{0}/{1}_{2}".format(self.ID, saveAs, "Single"),
+            )
         Path(newPath).mkdir(parents=True, exist_ok=True)
 
         (
@@ -133,14 +135,14 @@ class Fitting:
             LL_array = np.empty((self.gridCount, 1))
             LL_array[:] = np.nan
             if init:
-                #V_optionInit_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
+                # V_optionInit_Grid = np.random.uniform(0,1,(self.gridCount, 3, 3))
                 V_option_rand = np.random.rand(self.gridCount, 1)
                 V_optionInit_Grid = np.repeat(V_option_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
             run_V = np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1))
-            
+
             run_RPEs[:], run_V[:] = (np.nan for i in range(2))
 
             # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
@@ -192,7 +194,7 @@ class Fitting:
                 run_V[j, 0] = V_option[0, 0, 0]
 
                 if pearce:
-                    omega = 1
+                    omega = omega2 = omega3 = omega4 = 1
 
                 for t in range(0, max(runData.trialNumber)):
                     otherPairs = [
@@ -202,16 +204,14 @@ class Fitting:
                     ]
 
                     # Prob of choosing the 0th and 1st option respectively
-                    absP = np.exp(betaCheck * abs(V_option[((t,) + runData.stimulusPair[t])])) / (
-                        np.exp(betaCheck * abs(V_option[((t,) + runData.stimulusPair[t])]))
-                        + (1 - np.exp(betaCheck * abs(V_option[((t,) + runData.stimulusPair[t])])))
+                    absP = np.exp(betaCheck * V_option[((t,) + runData.stimulusPair[t])]) / (
+                        np.exp(betaCheck * V_option[((t,) + runData.stimulusPair[t])])
+                        + np.exp(betaCheck * (1 - V_option[((t,) + runData.stimulusPair[t])]))
                     )
-                    choiceProb[t, 0] = absP if V_option[((t,) + runData.stimulusPair[t])] >= 0 else 1 - absP
-                    choiceProb[t, 1] = absP if V_option[((t,) + runData.stimulusPair[t])] < 0 else 1 - absP
+                    choiceProb[t, 0] = absP
+                    choiceProb[t, 1] = 1 - absP
 
-                    actionProb[t, :] = (
-                        choiceProb[t, int(runData.action[t])] if ~np.isnan(runData.action[t]) else np.nan
-                    )
+                    actionProb[t, :] = choiceProb[t, int(runData.action[t])] if ~np.isnan(runData.action[t]) else np.nan
 
                     if runData.action[t] == 0:
                         rewardPE[(t,) + runData.stimulusPair[t]] = (
@@ -228,7 +228,9 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] - K1Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] - K1Check * omega * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
                             else:
                                 V_option[(t + 1,) + runData.stimulusPair[t]] = V_option[
                                     (t,) + runData.stimulusPair[t]
@@ -236,20 +238,31 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option[(t + 1,) + pair] = V_option[
-                                            (t,) + pair
-                                        ] - K1Check * alphaPosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] - K1Check * alphaPosCheck * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
+
+                            if not asym and not extra:
+                                omega2 = omega3 = omega4 = omega
+                            elif asym and not extra:
+                                omega2 = omega
+                            elif extra and not asym:
+                                omega3 = omega
 
                         else:
                             if pearce:
-                                omega = omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alphaNegCheck
+                                omega3 = (
+                                    omega3 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega3) * alphaNegCheck
+                                )
                                 V_option[(t + 1,) + runData.stimulusPair[t]] = V_option[
                                     (t,) + runData.stimulusPair[t]
-                                ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] + omega3 * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] - K3Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] - K3Check * omega3 * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
 
                             else:
                                 V_option[(t + 1,) + runData.stimulusPair[t]] = V_option[
@@ -258,29 +271,38 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option[(t + 1,) + pair] = V_option[
-                                            (t,) + pair
-                                        ] - K3Check * alphaNegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] - K3Check * alphaNegCheck * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
+
+                            if not asym and not extra:
+                                omega2 = omega = omega4 = omega3
+                            elif asym and not extra:
+                                omega4 = omega3
+                            elif extra and not asym:
+                                omega = omega3
 
                     elif runData.action[t] == 1:
                         rewardPE[(t,) + runData.stimulusPair[t]] = (
-                            runData.reward[t] + V_option[(t,) + runData.stimulusPair[t]]
+                            runData.reward[t] - (1 - V_option[(t,) + runData.stimulusPair[t]])
                         )
 
                         V_option[t + 1, :] = V_option[t, :]
 
                         if runData.reward[t] == 1:
                             if pearce:
-                                omega = (
-                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2PosCheck
+                                omega2 = (
+                                    omega2 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega2) * alpha2PosCheck
                                 )
                                 V_option[(t + 1,) + runData.stimulusPair[t]] = V_option[
                                     (t,) + runData.stimulusPair[t]
-                                ] - omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] - omega2 * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] + K2Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] + K2Check * omega2 * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
                             else:
                                 V_option[(t + 1,) + runData.stimulusPair[t]] = V_option[
                                     (t,) + runData.stimulusPair[t]
@@ -288,22 +310,31 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option[(t + 1,) + pair] = V_option[
-                                            (t,) + pair
-                                        ] + K2Check * alpha2PosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] + K2Check * alpha2PosCheck * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
+
+                            if not asym and not extra:
+                                omega3 = omega = omega4 = omega2
+                            elif asym and not extra:
+                                omega3 = omega2
+                            elif extra and not asym:
+                                omega4 = omega2
 
                         else:
                             if pearce:
-                                omega = (
-                                    omega + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega) * alpha2NegCheck
+                                omega4 = (
+                                    omega4 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega4) * alpha2NegCheck
                                 )
                                 V_option[(t + 1,) + runData.stimulusPair[t]] = V_option[
                                     (t,) + runData.stimulusPair[t]
-                                ] - omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                ] - omega4 * (rewardPE[(t,) + runData.stimulusPair[t]])
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] + K4Check * omega * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] + K4Check * omega4 * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
                             else:
                                 V_option[(t + 1,) + runData.stimulusPair[t]] = V_option[
                                     (t,) + runData.stimulusPair[t]
@@ -311,13 +342,20 @@ class Fitting:
 
                                 if transfer is not None:
                                     for pair in otherPairs:
-                                        V_option[(t + 1,) + pair] = V_option[
-                                            (t,) + pair
-                                        ] + K4Check * alpha2NegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+                                        V_option[(t + 1,) + pair] = V_option[(t,) + pair] + K4Check * alpha2NegCheck * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
+
+                            if not asym and not extra:
+                                omega2 = omega = omega3 = omega4
+                            elif asym and not extra:
+                                omega3 = omega4
+                            elif extra and not asym:
+                                omega2 = omega4
 
                     else:
                         V_option[t + 1, :] = V_option[t, :]
-                        
+
                     run_RPEs[j, t] = rewardPE[(t,) + runData.stimulusPair[t]]
                     run_V[j, t + 1] = V_option[(t + 1,) + runData.stimulusPair[t]]
                 negativeLogLikelihood = -np.sum(np.log(actionProb[~np.isnan(actionProb)]))
@@ -514,72 +552,73 @@ class Fitting:
 # You can only run ONE model fitting at a time
 
 configurations = [
-        "01",
-        "02",
-        "03",
-        "04",
-        "05",
-        "06",
-        "07",
-        "09",
-        "10",
-        "11",
-        "12",
-        "14",
-        "15",
-        "17",
-        "18",
-        "19",
-        "20",
-        "21",
-        "22",
-        "23",
-        "24",
-        "25",
-        "26",
-        "27",
-        "28",
-        "29",
-        "30",
-        "33",
-        "34",
-        "35",
-        "36",
-        "37",
-        "38",
-        "39",
-        "40",
-        "41",
-        "42",
-        "43",
-        "45",
-        "46",
-        "47",
-        "48",
-        "49",
-        "50",
-        "51",
-        "52",
-        "53",
-        "54",
-        "55",
-        "56",
-        "57",
-        "58",
-        "59",
-        "60",
-        "61",
-        "62",
-        "63",
-        "64",
-    ]
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "09",
+    "10",
+    "11",
+    "12",
+    "14",
+    "15",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30",
+    "33",
+    "34",
+    "35",
+    "36",
+    "37",
+    "38",
+    "39",
+    "40",
+    "41",
+    "42",
+    "43",
+    "45",
+    "46",
+    "47",
+    "48",
+    "49",
+    "50",
+    "51",
+    "52",
+    "53",
+    "54",
+    "55",
+    "56",
+    "57",
+    "58",
+    "59",
+    "60",
+    "61",
+    "62",
+    "63",
+    "64",
+]
+
 
 def handle_ctrl_c(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
         global ctrl_c_entered
         if not ctrl_c_entered:
-            signal.signal(signal.SIGINT, default_sigint_handler) # the default
+            signal.signal(signal.SIGINT, default_sigint_handler)  # the default
             try:
                 return func(*args, **kwargs)
             except KeyboardInterrupt:
@@ -589,16 +628,32 @@ def handle_ctrl_c(func):
                 signal.signal(signal.SIGINT, pool_ctrl_c_handler)
         else:
             return KeyboardInterrupt()
+
     return wrapper
+
 
 @handle_ctrl_c
 def use_fitting(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
+    fitted = SingleFitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelSingleFitting(saveAs="PearceAsymExtra", pearce=True, asym=True, extra=True)
+
+def use_fitting2(IDnr):
+    fitted = SingleFitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelSingleFitting(saveAs="PearceInitAsymExtra", pearce=True, init=True, asym=True, extra=True)
+
+def use_fitting3(IDnr):
+    fitted = SingleFitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelSingleFitting(saveAs="PearceT1", pearce=True, transfer="one")
+
+def use_fitting4(IDnr):
+    fitted = SingleFitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted.modelSingleFitting(saveAs="PearceInitT1", pearce=True, init=True, tranfer="one")
+
 
 def pool_ctrl_c_handler(*args, **kwargs):
     global ctrl_c_entered
     ctrl_c_entered = True
+
 
 def init_pool():
     global ctrl_c_entered
@@ -606,20 +661,43 @@ def init_pool():
     ctrl_c_entered = False
     default_sigint_handler = signal.signal(signal.SIGINT, pool_ctrl_c_handler)
 
+
 def main():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     pool = Pool(8, initializer=init_pool)
     results = pool.map(use_fitting, configurations)
     if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
-        print('Ctrl-C was entered.')
+        print("Ctrl-C was entered.")
     pool.close()
     pool.join()
-    
-    #for IDnr in configurations:
+
+    pool2 = Pool(8, initializer=init_pool)
+    results2 = pool2.map(use_fitting2, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
+        print("Ctrl-C was entered.")
+    pool2.close()
+    pool2.join()
+
+    pool3 = Pool(8, initializer=init_pool)
+    results3 = pool3.map(use_fitting3, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results3)):
+        print("Ctrl-C was entered.")
+    pool3.close()
+    pool3.join()
+
+    pool4 = Pool(8, initializer=init_pool)
+    results4 = pool4.map(use_fitting4, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results4)):
+        print("Ctrl-C was entered.")
+    pool4.close()
+    pool4.join()
+
+    # for IDnr in configurations:
     #    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
     #    fitted.modelFitting(saveAs="Pearce", pearce=True)
 
 
-
 if __name__ == "__main__":
     main()
+    #fitted = SingleFitting(60, 0, 5000, ID="01", plotting=True)
+    #fitted.modelSingleFitting(saveAs="Pearce", pearce=True)

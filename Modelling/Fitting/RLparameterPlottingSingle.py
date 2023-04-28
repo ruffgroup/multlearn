@@ -3,26 +3,19 @@ import os
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.stats
 import scipy.io
 import pandas as pd
 import numpy.ma as ma
-import pickle
-import seaborn as sns
 import sys
-import pathlib
-from pathlib import Path
-import re
 import platform
 import ast
 import matplotlib.backends.backend_pdf
-from mpl_toolkits.mplot3d import Axes3D
 
 sys.path.append(sys.path[0] + "/..")
 from TaskDesignSingle import task_Design_Single
 
 
-class Plotting:
+class SinglePlotting:
     def __init__(self, mainTrials, additionalTrials, gridCount, ID, ww, method, reps):
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
@@ -40,7 +33,7 @@ class Plotting:
         # Get savedVals file
         self.savedValsFile = glob.glob(os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID))[0]
 
-    def plots_modelFitting(
+    def plots_modelSingleFitting(
         self,
         NLL_array,
         alphasPos,
@@ -70,8 +63,8 @@ class Plotting:
             if extra and not asym:
                 alphaNeg = alphaPos
                 alpha2Neg = alpha2Pos = alphas2Pos[run]
-                varList.append(", V0 alpha: {}".format(np.round(alphaPos, 2)))
-                varList.append(", V1 alpha: {}".format(np.round(alpha2Pos, 2)))
+                varList.append(", Attract alpha: {}".format(np.round(alphaPos, 2)))
+                varList.append(", Not attract alpha: {}".format(np.round(alpha2Pos, 2)))
             elif asym and not extra:
                 alpha2Pos = alphaPos
                 alpha2Neg = alphaNeg = alphasNeg[run]
@@ -81,10 +74,10 @@ class Plotting:
                 alpha2Pos = alphas2Pos[run]
                 alphaNeg = alphasNeg[run]
                 alpha2Neg = alphas2Neg[run]
-                varList.append(", V0 Pos reward alpha: {}".format(np.round(alphaPos, 2)))
-                varList.append(", V0 Neg reward alpha: {}".format(np.round(alphaNeg, 2)))
-                varList.append(", V1 Pos reward alpha: {}".format(np.round(alpha2Pos, 2)))
-                varList.append(", V1 Neg reward alpha: {}".format(np.round(alpha2Neg, 2)))
+                varList.append("\n, Attract Pos reward alpha: {}".format(np.round(alphaPos, 2)))
+                varList.append(", Attract Neg reward alpha: {}".format(np.round(alphaNeg, 2)))
+                varList.append(", Not attract Pos reward alpha: {}".format(np.round(alpha2Pos, 2)))
+                varList.append(",  Not attract Neg reward alpha: {}".format(np.round(alpha2Neg, 2)))
             else:
                 alpha2Pos = alphaNeg = alpha2Neg = alphaPos
                 varList.append(", alpha: {}".format(np.round(alphaPos, 2))) 
@@ -103,17 +96,17 @@ class Plotting:
                 K3run = K1run
                 K4run = K2run = K2[run]
                 transfer_sim = True
-                varList.append(", V0 Kappa: {}".format(np.round(K1run, 2)))
-                varList.append(", V1 Kappa: {}".format(np.round(K2run, 2)))
+                varList.append(", Attract Kappa: {}".format(np.round(K1run, 2)))
+                varList.append(", Not attract Kappa: {}".format(np.round(K2run, 2)))
             elif transfer == "four":
                 K1run = K1[run]
                 K2run = K2[run]
                 K3run = K3[run]
                 K4run = K4[run]
-                varList.append(", V0 Pos Kappa: {}".format(np.round(K1run, 2)))
-                varList.append(", V1 Pos Kappa: {}".format(np.round(K2run, 2)))
-                varList.append(", V0 Neg Kappa: {}".format(np.round(K3run, 2)))
-                varList.append(", V1 Neg Kappa: {}".format(np.round(K4run, 2)))
+                varList.append(", Attract Pos Kappa: {}".format(np.round(K1run, 2)))
+                varList.append(", Not attract Pos Kappa: {}".format(np.round(K2run, 2)))
+                varList.append("\n Attract Neg Kappa: {}".format(np.round(K3run, 2)))
+                varList.append(", Not attract Neg Kappa: {}".format(np.round(K4run, 2)))
                 transfer_sim = True
             else:
                 K1run = K2run = K3run = K4run = None
@@ -226,16 +219,16 @@ class Plotting:
 
                 count = 3
                 for var in [
-                    (1, alphaPos, "V0 Pos alpha"),
+                    (1, alphaPos, "Attract Pos alpha"),
                     (2, beta, "beta"),
-                    (3, alphaNeg, "V0 Neg alpha"),
-                    (4, alpha2Pos, "V1 Pos alpha"),
-                    (5, alpha2Neg, "V1 Neg alpha"),
+                    (3, alphaNeg, "Attract Neg alpha"),
+                    (4, alpha2Pos, "Not attract Pos alpha"),
+                    (5, alpha2Neg, "Not attract Neg alpha"),
                     (6, V_option, "V"),
-                    (7, K1run, "V0 Pos Kappa"),
-                    (8, K2run, "V1 Pos Kappa"),
-                    (9, K3run, "V0 Neg Kappa"),
-                    (10, K4run, "V1 Neg Kappa")
+                    (7, K1run, "Attract Pos Kappa"),
+                    (8, K2run, "Not attract Pos Kappa"),
+                    (9, K3run, "Attract Neg Kappa"),
+                    (10, K4run, "Not attract Neg Kappa")
                 ]:
                     if var[1] is not None:
                         plt.figure(count)
