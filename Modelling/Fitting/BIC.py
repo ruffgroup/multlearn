@@ -273,7 +273,7 @@ for IDnr in IDs:
     winning_model[models[best_fitting]] += 1
     listBestFits.append([IDnr, models[best_fitting]])
 
-with open("BestFitting.csv", "w", newline="") as f:
+with open("BestFitting.tsv", "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerows(listBestFits)
 
