@@ -27,7 +27,7 @@ class task_Design:
         pearce=False,
         extra=False,
         asym=False,
-        transfer=False
+        transfer=False,
     ):
         """How task is conducted"""
 
@@ -58,9 +58,7 @@ class task_Design:
             np.array([1, 0]),
             np.array([round(self.rewardProb * 10), round((1 - self.rewardProb) * 10)]),
         )
-        tempFeedbackAccuracy = tempFeedbackAccuracy[
-            np.random.permutation(np.size(tempFeedbackAccuracy))
-        ]
+        tempFeedbackAccuracy = tempFeedbackAccuracy[np.random.permutation(np.size(tempFeedbackAccuracy))]
 
         self.feedbackAccuracy = np.empty(0)
 
@@ -68,11 +66,7 @@ class task_Design:
             self.feedbackAccuracy = np.concatenate(
                 (
                     self.feedbackAccuracy,
-                    (
-                        tempFeedbackAccuracy[
-                            np.random.permutation(np.size(tempFeedbackAccuracy))
-                        ]
-                    ),
+                    (tempFeedbackAccuracy[np.random.permutation(np.size(tempFeedbackAccuracy))]),
                 ),
                 axis=0,
             )
@@ -82,7 +76,6 @@ class task_Design:
         self.transfer = transfer
         self.asym = asym
         self.extra = extra
-
 
         self.alphaPos = alphaPos if not None else np.random.uniform(0, 1)
         self.alphaNeg = alphaNeg if not None else np.random.uniform(0, 1)
@@ -122,16 +115,12 @@ class task_Design:
         self.statSurprise[:] = np.nan
         self.statSurpriseRow = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
         self.statSurpriseRow[:] = np.nan
-        self.statSurpriseColumn = np.empty(
-            (self.mainTrials + self.additionalTrials, 3, 3)
-        )
+        self.statSurpriseColumn = np.empty((self.mainTrials + self.additionalTrials, 3, 3))
         self.statSurpriseColumn[:] = np.nan
 
         self.rowBeliefs = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
         self.rowBeliefs[:] = np.nan
-        self.columnBeliefs = np.empty(
-            (self.mainTrials + self.additionalTrials + 1, 3, 3)
-        )
+        self.columnBeliefs = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
         self.columnBeliefs[:] = np.nan
         self.beliefsStat = np.empty((self.mainTrials + self.additionalTrials + 1, 3, 3))
         self.beliefsStat[:] = np.nan
@@ -156,9 +145,7 @@ class task_Design:
 
     def taskStructure(self, taskStruct=None, green=None, feedbackAcc=None):
         if taskStruct is None:
-            self.taskStruct = np.array(
-                [[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]]
-            )
+            self.taskStruct = np.array([[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]])
             self.taskStruct = np.repeat(
                 self.taskStruct,
                 (
@@ -180,9 +167,7 @@ class task_Design:
                 ).astype(int),
                 axis=0,
             )
-            self.randomLayout = np.random.permutation(
-                self.mainTrials + self.additionalTrials
-            )
+            self.randomLayout = np.random.permutation(self.mainTrials + self.additionalTrials)
             self.taskStruct = self.taskStruct[self.randomLayout]
         else:
             self.taskStruct = taskStruct
@@ -214,33 +199,10 @@ class task_Design:
             """Actions taken"""
 
             self.choiceProb[i, 0] = np.exp(
-                self.beta
-                * self.V_option0[
-                    ((i,) + tuple(self.stimulusPair[i + self.additionalTrials, :]))
-                ]
+                self.beta * self.V_option0[((i,) + tuple(self.stimulusPair[i + self.additionalTrials, :]))]
             ) / (
-                (
-                    np.exp(
-                        self.beta
-                        * self.V_option0[
-                            (
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            )
-                        ]
-                    )
-                )
-                + (
-                    np.exp(
-                        self.beta
-                        * self.V_option1[
-                            (
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            )
-                        ]
-                    )
-                )
+                (np.exp(self.beta * self.V_option0[((i,) + tuple(self.stimulusPair[i + self.additionalTrials, :]))]))
+                + (np.exp(self.beta * self.V_option1[((i,) + tuple(self.stimulusPair[i + self.additionalTrials, :]))]))
             )
             self.choiceProb[i, 1] = 1 - self.choiceProb[i, 0]
             rand3 = random()
@@ -252,42 +214,35 @@ class task_Design:
             """defining reward"""
 
             self.reward[i, :] = 0
-            if (
-                tuple(self.stimulusPair[i + self.additionalTrials, :])
-                in self.greenCells
-            ):  # When in green cells.
+            if tuple(self.stimulusPair[i + self.additionalTrials, :]) in self.greenCells:  # When in green cells.
                 self.correctResponse[i] = 0
-                if (
-                    self.action[i] == self.correctResponse[i]
-                ):  # correct action for green cells
+                if self.action[i] == self.correctResponse[i]:  # correct action for green cells
                     self.accurate[i] = 1
-                    self.reward[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ] = self.feedbackAccuracy[i]
+                    self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = self.feedbackAccuracy[
+                        i
+                    ]
 
                 else:  # incorrect action for greenCells
                     error = error + 1
                     self.accurate[i] = 0
-                    self.reward[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ] = (1 - self.feedbackAccuracy[i])
+                    self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                        1 - self.feedbackAccuracy[i]
+                    )
 
             else:  # When in white cells
                 self.correctResponse[i] = 1
-                if (
-                    self.action[i] == self.correctResponse[i]
-                ):  # correct action for whiteCells (non green cells)
+                if self.action[i] == self.correctResponse[i]:  # correct action for whiteCells (non green cells)
                     self.accurate[i] = 1
-                    self.reward[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ] = self.feedbackAccuracy[i]
+                    self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = self.feedbackAccuracy[
+                        i
+                    ]
 
                 else:  # Incorrect action for whiteCells (non green cells)
                     error = error + 1
                     self.accurate[i] = 0
-                    self.reward[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ] = (1 - self.feedbackAccuracy[i])
+                    self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                        1 - self.feedbackAccuracy[i]
+                    )
 
             """updating values"""
 
@@ -295,327 +250,210 @@ class task_Design:
             SimOtherPairs = [
                 p
                 for p in list(np.unique(self.taskStruct, axis=0))
-                if bool(p[0] == self.stimulusPair[i, 0])
-                ^ bool(p[1] == self.stimulusPair[i, 1])
+                if bool(p[0] == self.stimulusPair[i, 0]) ^ bool(p[1] == self.stimulusPair[i, 1])
             ]
 
             if self.action[i] == 0:
-                self.rewardPE[
-                    (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                ] = (
-                    self.reward[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ]
-                    - self.V_option0[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ]
+                self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                    self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                    - self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                 )
                 self.V_option0[i + 1, :] = self.V_option0[i, :]
 
-                if self.reward[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ] == 1:
+                if self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] == 1:
                     if self.pearce:
                         self.omega = (
                             self.omega
                             + (
-                                abs(
-                                    self.rewardPE[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                )
+                                abs(self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])])
                                 - self.omega
                             )
                             * self.alphaPos
                         )
-                        self.V_option0[
-                            (i + 1,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ] = (
-                            self.V_option0[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
-                            + self.omega
-                            * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                        self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                            self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                            + self.omega * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
                             for p2 in SimOtherPairs:
-                                self.V_option0[(i + 1,) + tuple(p2)] = self.V_option0[
-                                    (i,) + tuple(p2)
-                                ] + self.K1 * self.omega * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
-                                
+                                self.V_option0[(i + 1,) + tuple(p2)] = (
+                                    self.V_option0[(i,) + tuple(p2)]
+                                    - self.K1
+                                    * self.omega
+                                    * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                                )
+
                     else:
-                        self.V_option0[
-                        (i + 1,)
-                        + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ] = (
-                        self.V_option0[
-                            (i,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ]
-                        + self.alphaPos
-                        * self.rewardPE[
-                            (i,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ]
-                    )
+                        self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                            self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                            + self.alphaPos
+                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                        )
                         if self.transfer:
                             for p2 in SimOtherPairs:
-                                self.V_option0[(i + 1,) + tuple(p2)] = self.V_option0[
-                                    (i,) + tuple(p2)
-                                ] - self.K1 * self.alphaPos * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
-                    if not self.asym and not self.extra:
-                        self.omega2 = self.omega3 = self.omega4 = self.omega
-                    elif self.asym and not self.extra:
-                        self.omega2 = self.omega
-                    elif self.extra and not self.asym:
-                        self.omega3 = self.omega
-  
+                                self.V_option0[(i + 1,) + tuple(p2)] = (
+                                    self.V_option0[(i,) + tuple(p2)]
+                                    - self.K1
+                                    * self.alphaPos
+                                    * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                                )
+                    if self.pearce:
+                        if not self.asym and not self.extra:
+                            self.omega2 = self.omega3 = self.omega4 = self.omega
+                        elif self.asym and not self.extra:
+                            self.omega2 = self.omega
+                        elif self.extra and not self.asym:
+                            self.omega3 = self.omega
+
                 else:
                     if self.pearce:
                         self.omega3 = (
                             self.omega3
                             + (
-                                abs(
-                                    self.rewardPE[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                )
+                                abs(self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])])
                                 - self.omega3
                             )
                             * self.alphaNeg
                         )
-                        self.V_option0[
-                            (i + 1,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ] = (
-                            self.V_option0[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                        self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                            self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega3
-                            * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
                             for p2 in SimOtherPairs:
-                                self.V_option0[(i + 1,) + tuple(p2)] = self.V_option0[
-                                    (i,) + tuple(p2)
-                                ] - self.K3 * self.omega3 * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                                self.V_option0[(i + 1,) + tuple(p2)] = (
+                                    self.V_option0[(i,) + tuple(p2)]
+                                    - self.K3
+                                    * self.omega3
+                                    * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                                )
                     else:
-                        self.V_option0[
-                        (i + 1,)
-                        + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ] = (
-                        self.V_option0[
-                            (i,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ]
-                        + self.alphaNeg
-                        * self.rewardPE[
-                            (i,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ]
-                    )
+                        self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                            self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                            + self.alphaNeg
+                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                        )
                         if self.transfer:
                             for p2 in SimOtherPairs:
-                                self.V_option0[(i + 1,) + tuple(p2)] = self.V_option0[
-                                    (i,) + tuple(p2)
-                                ] - self.K3 * self.alphaNeg * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
-                
-                    if not self.asym and not self.extra:
-                        self.omega2 = self.omega = self.omega4 = self.omega3
-                    elif self.asym and not self.extra:
-                        self.omega4 = self.omega3
-                    elif self.extra and not self.asym:
-                        self.omega = self.omega3
+                                self.V_option0[(i + 1,) + tuple(p2)] = (
+                                    self.V_option0[(i,) + tuple(p2)]
+                                    - self.K3
+                                    * self.alphaNeg
+                                    * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                                )
+                    if self.pearce:
+                        if not self.asym and not self.extra:
+                            self.omega2 = self.omega = self.omega4 = self.omega3
+                        elif self.asym and not self.extra:
+                            self.omega4 = self.omega3
+                        elif self.extra and not self.asym:
+                            self.omega = self.omega3
 
                 self.V_option1[i + 1, :] = self.V_option1[i, :]
             else:
-                self.rewardPE[
-                    (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                ] = (
-                    self.reward[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ]
-                    - self.V_option1[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ]
+                self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                    self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                    - self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                 )
                 self.V_option1[i + 1, :] = self.V_option1[i, :]
-                
-                if self.reward[
-                        (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                    ] == 1:
+
+                if self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] == 1:
                     if self.pearce:
                         self.omega2 = (
                             self.omega2
                             + (
-                                abs(
-                                    self.rewardPE[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                )
+                                abs(self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])])
                                 - self.omega2
                             )
                             * self.alpha2Pos
                         )
-                        self.V_option1[
-                            (i + 1,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ] = (
-                            self.V_option1[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                        self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                            self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega2
-                            * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
                             for p2 in SimOtherPairs:
-                                self.V_option1[(i + 1,) + tuple(p2)] = self.V_option1[
-                                    (i,) + tuple(p2)
-                                ] - self.K2 * self.omega2 * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
-                                
+                                self.V_option1[(i + 1,) + tuple(p2)] = (
+                                    self.V_option1[(i,) + tuple(p2)]
+                                    - self.K2
+                                    * self.omega2
+                                    * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                                )
+
                     else:
-                        self.V_option1[
-                            (i + 1,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ] = (
-                            self.V_option1[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                        self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                            self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.alpha2Pos
-                            * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
                             for p2 in SimOtherPairs:
-                                self.V_option1[(i + 1,) + tuple(p2)] = self.V_option1[
-                                    (i,) + tuple(p2)
-                                ] - self.K2 * self.alpha2Pos * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
-                    
-                    if not self.asym and not self.extra:
-                        self.omega3 = self.omega = self.omega4 = self.omega2
-                    elif self.asym and not self.extra:
-                        self.omega = self.omega2
-                    elif self.extra and not self.asym:
-                        self.omega4 = self.omega2
+                                self.V_option1[(i + 1,) + tuple(p2)] = (
+                                    self.V_option1[(i,) + tuple(p2)]
+                                    - self.K2
+                                    * self.alpha2Pos
+                                    * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                                )
+                    if self.pearce:
+                        if not self.asym and not self.extra:
+                            self.omega3 = self.omega = self.omega4 = self.omega2
+                        elif self.asym and not self.extra:
+                            self.omega = self.omega2
+                        elif self.extra and not self.asym:
+                            self.omega4 = self.omega2
 
                 else:
                     if self.pearce:
                         self.omega4 = (
                             self.omega4
                             + (
-                                abs(
-                                    self.rewardPE[
-                                        (i,)
-                                        + tuple(
-                                            self.stimulusPair[i + self.additionalTrials, :]
-                                        )
-                                    ]
-                                )
+                                abs(self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])])
                                 - self.omega4
                             )
                             * self.alpha2Neg
                         )
-                        self.V_option1[
-                            (i + 1,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ] = (
-                            self.V_option1[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                        self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                            self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega4
-                            * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
                             for p2 in SimOtherPairs:
-                                self.V_option1[(i + 1,) + tuple(p2)] = self.V_option1[
-                                    (i,) + tuple(p2)
-                                ] - self.K4 * self.omega4 * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                                self.V_option1[(i + 1,) + tuple(p2)] = (
+                                    self.V_option1[(i,) + tuple(p2)]
+                                    - self.K4
+                                    * self.omega4
+                                    * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                                )
                     else:
-                        self.V_option1[
-                            (i + 1,)
-                            + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                        ] = (
-                            self.V_option1[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                        self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
+                            self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.alpha2Neg
-                            * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
+                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
                             for p2 in SimOtherPairs:
-                                self.V_option1[(i + 1,) + tuple(p2)] = self.V_option1[
-                                    (i,) + tuple(p2)
-                                ] - self.K4 * self.alpha2Neg * self.rewardPE[
-                                (i,)
-                                + tuple(self.stimulusPair[i + self.additionalTrials, :])
-                            ]
-                    
-                    if not self.asym and not self.extra:
-                        self.omega2 = self.omega = self.omega3 = self.omega4
-                    elif self.asym and not self.extra:
-                        self.omega3 = self.omega4
-                    elif self.extra and not self.asym:
-                        self.omega2 = self.omega4
+                                self.V_option1[(i + 1,) + tuple(p2)] = (
+                                    self.V_option1[(i,) + tuple(p2)]
+                                    - self.K4
+                                    * self.alpha2Neg
+                                    * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                                )
+                    if self.pearce:
+                        if not self.asym and not self.extra:
+                            self.omega2 = self.omega = self.omega3 = self.omega4
+                        elif self.asym and not self.extra:
+                            self.omega3 = self.omega4
+                        elif self.extra and not self.asym:
+                            self.omega2 = self.omega4
 
                 self.V_option0[i + 1, :] = self.V_option0[i, :]
 
@@ -645,12 +483,8 @@ class task_Design:
                 columnDen0 = 3 * self.statLearnPar
                 columnDen1 = 3 * self.statLearnPar
                 columnDen2 = 3 * self.statLearnPar
-                self.rowBeliefs[i, :] = (
-                    (self.statLearnPar + self.statCount[i, :]) / 3 * self.statLearnPar
-                )
-                self.columnBeliefs[i, :] = (
-                    (self.statLearnPar + self.statCount[i, :]) / 3 * self.statLearnPar
-                )
+                self.rowBeliefs[i, :] = (self.statLearnPar + self.statCount[i, :]) / 3 * self.statLearnPar
+                self.columnBeliefs[i, :] = (self.statLearnPar + self.statCount[i, :]) / 3 * self.statLearnPar
                 num = self.statLearnPar + self.statCount[i, :]
                 den = 9 * self.statLearnPar
                 # Total statistical beliefs irrespective of rows and columns.
@@ -660,36 +494,24 @@ class task_Design:
                 # Row beliefs
                 if self.simulatedData[i - 1, 0] == 0:
                     rowDen0 = rowDen0 + 1
-                    self.rowBeliefs[i, 0, :] = (
-                        self.statLearnPar + self.statCount[i, 0, :]
-                    ) / rowDen0
+                    self.rowBeliefs[i, 0, :] = (self.statLearnPar + self.statCount[i, 0, :]) / rowDen0
                 elif self.simulatedData[i - 1, 0] == 1:
                     rowDen1 = rowDen1 + 1
-                    self.rowBeliefs[i, 1, :] = (
-                        self.statLearnPar + self.statCount[i, 1, :]
-                    ) / rowDen1
+                    self.rowBeliefs[i, 1, :] = (self.statLearnPar + self.statCount[i, 1, :]) / rowDen1
                 else:
                     rowDen2 = rowDen2 + 1
-                    self.rowBeliefs[i, 2, :] = (
-                        self.statLearnPar + self.statCount[i, 2, :]
-                    ) / rowDen2
+                    self.rowBeliefs[i, 2, :] = (self.statLearnPar + self.statCount[i, 2, :]) / rowDen2
                 # column beliefs
                 self.columnBeliefs[i, :] = self.columnBeliefs[i - 1, :]
                 if self.simulatedData[i - 1, 1] == 0:
                     columnDen0 = columnDen0 + 1
-                    self.columnBeliefs[i, 0, :] = (
-                        self.statLearnPar + self.statCount[i, 0, :]
-                    ) / columnDen0
+                    self.columnBeliefs[i, 0, :] = (self.statLearnPar + self.statCount[i, 0, :]) / columnDen0
                 elif self.simulatedData[i - 1, 1] == 1:
                     columnDen1 = columnDen1 + 1
-                    self.columnBeliefs[i, 1, :] = (
-                        self.statLearnPar + self.statCount[i, 1, :]
-                    ) / columnDen1
+                    self.columnBeliefs[i, 1, :] = (self.statLearnPar + self.statCount[i, 1, :]) / columnDen1
                 else:
                     columnDen2 = columnDen2 + 1
-                    self.columnBeliefs[i, 2, :] = (
-                        self.statLearnPar + self.statCount[i, 2, :]
-                    ) / columnDen2
+                    self.columnBeliefs[i, 2, :] = (self.statLearnPar + self.statCount[i, 2, :]) / columnDen2
                 num = self.statLearnPar + self.statCount[i, :]
                 den = den + 1
                 # Total statistical beliefs irrespective of rows and columns.
@@ -710,6 +532,4 @@ class task_Design:
                 self.beliefsStat[(i,) + tuple(self.stimulusPair[i, :])]
             )
 
-            self.simulatedData[i, 3] = self.statSurprise[
-                (i,) + tuple(self.stimulusPair[i, :])
-            ]
+            self.simulatedData[i, 3] = self.statSurprise[(i,) + tuple(self.stimulusPair[i, :])]

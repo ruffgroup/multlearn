@@ -97,29 +97,31 @@ class Plotting:
                 V_option0 = V_option1 = None
             
 
-            if transfer == "one":
-                K1run = K2run = K3run = K4run = K1[run]
-                transfer_sim = True
-                varList.append(", Kappa: {}".format(np.round(K1run, 2)))
-            elif transfer == "two":
-                K3run = K1run
-                K4run = K2run = K2[run]
-                transfer_sim = True
-                varList.append(", V0 Kappa: {}".format(np.round(K1run, 2)))
-                varList.append(", V1 Kappa: {}".format(np.round(K2run, 2)))
-            elif transfer == "four":
+            if transfer:
                 K1run = K1[run]
-                K2run = K2[run]
-                K3run = K3[run]
-                K4run = K4[run]
-                varList.append(", V0 Pos Kappa: {}".format(np.round(K1run, 2)))
-                varList.append(", V1 Pos Kappa: {}".format(np.round(K2run, 2)))
-                varList.append(", V0 Neg Kappa: {}".format(np.round(K3run, 2)))
-                varList.append(", V1 Neg Kappa: {}".format(np.round(K4run, 2)))
-                transfer_sim = True
+                if extra and not asym:
+                    K3run = K1run
+                    K4run = K2run = K2[run]
+                    varList.append(", V0 Kappa: {}".format(np.round(K1run, 2)))
+                    varList.append(", V1 Kappa: {}".format(np.round(K2run, 2)))
+                elif asym and not extra:
+                    K2run = K1run
+                    K3run = K4run = K3[run]
+                    varList.append(", Pos Kappa: {}".format(np.round(K1run, 2)))
+                    varList.append(", Neg Kappa: {}".format(np.round(K3run, 2)))
+                elif asym and extra:
+                    K2run = K2[run]
+                    K3run = K3[run]
+                    K4run = K4[run]
+                    varList.append(", V0 Pos Kappa: {}".format(np.round(K1run, 2)))
+                    varList.append(", V1 Pos Kappa: {}".format(np.round(K2run, 2)))
+                    varList.append(", V0 Neg Kappa: {}".format(np.round(K3run, 2)))
+                    varList.append(", V1 Neg Kappa: {}".format(np.round(K4run, 2)))
+                else:
+                    K2run = K3run = K4run = K1run
+                    varList.append(", Kappa: {}".format(np.round(K1run, 2)))
             else:
                 K1run = K2run = K3run = K4run = None
-                transfer_sim = False
             
 
             runData = subjectData[subjectData.runNumber == run + 1].reset_index()
@@ -158,14 +160,16 @@ class Plotting:
                     alpha2Pos=alpha2Pos,
                     alpha2Neg = alpha2Neg,
                     beta=beta,
-                    K1=K1,
-                    K2=K2,
-                    K3=K3,
-                    K4=K4,
+                    K1=K1run,
+                    K2=K2run,
+                    K3=K3run,
+                    K4=K4run,
                     V_option0Init=V_option0,
                     V_option1Init=V_option1,
                     pearce=pearce,
-                    transfer=transfer_sim
+                    extra=extra,
+                    asym=asym,
+                    transfer=transfer
                 )
                 simulation.taskStructure(taskStruct, green, feedbackAcc)
                 simulation.RLloops()
