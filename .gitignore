@@ -16,6 +16,9 @@ Modelling/Fitting/*
 *.pdf
 *.png
 *.pyc
+*.nii
+*.gz
+._*
 #*.mat
 #*.npy
 #*.tsv

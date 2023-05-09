@@ -21,12 +21,20 @@ if contains(model_version, "spe") && ~contains(model_version, "rpe")
     spe = load(['/data/fittedParameters/sub-' subject '/' model_version '.mat']).spe;
 
 elseif contains(model_version, "rpe") && ~contains(model_version, "spe")
-    rpe = load(['/data/fittedParameters/sub-' subject '/' model_version '.mat']).rpe;
+    if contains(model_version, "Best")
+        rpe = load(['/data/fittedParameters/sub-' subject '/' model_version '.mat']).rpe.rpe;
+    else
+        rpe = load(['/data/fittedParameters/sub-' subject '/' model_version '.mat']).rpe;
+    end
 
 elseif contains(model_version, "_")
     model = split(model_version, '_');
     spe = load(['/data/fittedParameters/sub-' subject '/' char(model(1,1)) '.mat']).spe;
-    rpe = load(['/data/fittedParameters/sub-' subject '/' char(model(2,1)) '.mat']).rpe;
+    if contains(model_version, "Best")
+        rpe = load(['/data/fittedParameters/sub-' subject '/' char(model(2,1)) '.mat']).rpe.rpe;
+    else
+        rpe = load(['/data/fittedParameters/sub-' subject '/' char(model(2,1)) '.mat']).rpe;
+    end
 end
 
 

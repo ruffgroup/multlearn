@@ -72,6 +72,7 @@ class Fitting:
             newPath = os.path.join(
                 pathlib.Path(__file__).resolve().parents[3],"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
             )
+
         else:
             newPath = os.path.join(
             str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
@@ -258,6 +259,10 @@ class Fitting:
                                         V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K1Check * omega * (
                                             rewardPE[(t,) + runData.stimulusPair[t]]
                                         )
+                                        if V_option0[(t + 1,) + pair] > 1:
+                                            V_option0[(t + 1,) + pair] = 1
+                                        elif V_option0[(t + 1,) + pair] < 0:
+                                            V_option0[(t + 1,) + pair] = 0
                             else:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
@@ -268,6 +273,11 @@ class Fitting:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
                                         ] - K1Check * alphaPosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                        if V_option0[(t + 1,) + pair] > 1:
+                                            V_option0[(t + 1,) + pair] = 1
+                                        elif V_option0[(t + 1,) + pair] < 0:
+                                            V_option0[(t + 1,) + pair] = 0
                             if pearce:
                                 if not asym and not extra:
                                     omega2 = omega3 = omega4 = omega
@@ -288,6 +298,11 @@ class Fitting:
                                         V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K3Check * omega3 * (
                                             rewardPE[(t,) + runData.stimulusPair[t]]
                                         )
+
+                                        if V_option0[(t + 1,) + pair] > 1:
+                                            V_option0[(t + 1,) + pair] = 1
+                                        elif V_option0[(t + 1,) + pair] < 0:
+                                            V_option0[(t + 1,) + pair] = 0
                             else:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
@@ -298,6 +313,11 @@ class Fitting:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
                                         ] - K3Check * alphaNegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                        if V_option0[(t + 1,) + pair] > 1:
+                                            V_option0[(t + 1,) + pair] = 1
+                                        elif V_option0[(t + 1,) + pair] < 0:
+                                            V_option0[(t + 1,) + pair] = 0
 
                             if pearce:
                                 if not asym and not extra:
@@ -330,6 +350,11 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K2Check * omega2 * (
                                             rewardPE[(t,) + runData.stimulusPair[t]]
                                         )
+
+                                        if V_option1[(t + 1,) + pair] > 1:
+                                            V_option1[(t + 1,) + pair] = 1
+                                        elif V_option1[(t + 1,) + pair] < 0:
+                                            V_option1[(t + 1,) + pair] = 0
                             else:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
@@ -340,6 +365,11 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
                                         ] - K2Check * alpha2PosCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                        if V_option1[(t + 1,) + pair] > 1:
+                                            V_option1[(t + 1,) + pair] = 1
+                                        elif V_option1[(t + 1,) + pair] < 0:
+                                            V_option1[(t + 1,) + pair] = 0
                             if pearce:
                                 if not asym and not extra:
                                     omega3 = omega = omega4 = omega2
@@ -362,6 +392,11 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K4Check * omega4 * (
                                             rewardPE[(t,) + runData.stimulusPair[t]]
                                         )
+
+                                        if V_option1[(t + 1,) + pair] > 1:
+                                            V_option1[(t + 1,) + pair] = 1
+                                        elif V_option1[(t + 1,) + pair] < 0:
+                                            V_option1[(t + 1,) + pair] = 0
                             else:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
@@ -372,6 +407,11 @@ class Fitting:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
                                         ] - K4Check * alpha2NegCheck * (rewardPE[(t,) + runData.stimulusPair[t]])
+
+                                        if V_option1[(t + 1,) + pair] > 1:
+                                            V_option1[(t + 1,) + pair] = 1
+                                        elif V_option1[(t + 1,) + pair] < 0:
+                                            V_option1[(t + 1,) + pair] = 0
                             if pearce:
                                 if not asym and not extra:
                                     omega2 = omega = omega3 = omega4
@@ -420,7 +460,8 @@ class Fitting:
 
             minIndex = np.argmin(NLL_array[run, :, 0])
             maxIndex = np.nanargmax(LL_array[:, 0])
-
+            newPath = "bestFittingVals/sub-{0}".format(self.ID)
+            Path(newPath).mkdir(parents=True, exist_ok=True)
             fitted_alphasPos[run] = NLL_array[run, minIndex, 1]
             np.savetxt(fname=newPath + "/alphasPos_" + saveAs + ".tsv", X=fitted_alphasPos, delimiter=",")
             if asym and not extra:
@@ -592,68 +633,68 @@ class Fitting:
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
-#configurations = [
-        "01",
-        "02",
-        "03",
-        "04",
-        "05",
-        "06",
-        "07",
-        "09",
-        "10",
-        "11",
-        "12",
-        "14",
-        "15",
-        "17",
-        "18",
-        "19",
-        "20",
-        "21",
-        "22",
-        "23",
-        "24",
-        "25",
-        "26",
-        "27",
-        "28",
-        "29",
-        "30",
-        "33",
-        "34",
-        "35",
-        "36",
-        "37",
-        "38",
-        "39",
-        "40",
-        "41",
-        "42",
-        "43",
-        "45",
-        "46",
-        "47",
+configurations = [
+    #    "01",
+    #    "02",
+    #    "03",
+    #    "04",
+    #    "05",
+    #    "06",
+    #    "07",
+    #    "09",
+    #    "10",
+    #    "11",
+    #    "12",
+    #    "14",
+    #    "15",
+    #    "17",
+    #    "18",
+    #    "19",
+    #    "20",
+    #    "21",
+    #    "22",
+    #    "23",
+    #    "24",
+    #    "25",
+    #    "26",
+    #    "27",
+    #    "28",
+    #    "29",
+    #    "30",
+    #    "33",
+    #    "34",
+    #    "35",
+    #    "36",
+    #    "37",
+    #    "38",
+    #    "39",
+    #    "40",
+    #    "41",
+    #    "42",
+    #    "43",
+    #    "45",
+    #    "46",
+    #    "47",
         "48",
-        "49",
-        "50",
-        "51",
-        "52",
-        "53",
-        "54",
-        "55",
-        "56",
-        "57",
-        "58",
-        "59",
-        "60",
-        "61",
-        "62",
-        "63",
-        "64",
-#    ]
+    #    "49",
+    #    "50",
+    #    "51",
+    #    "52",
+    #    "53",
+    #    "54",
+    #    "55",
+    #    "56",
+    #    "57",
+    #    "58",
+    #    "59",
+    #    "60",
+    #    "61",
+    #    "62",
+    #    "63",
+    #    "64",
+   ]
 
-configurations = ["54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64"]
+
 
 def handle_ctrl_c(func):
     @wraps(func)
@@ -675,24 +716,22 @@ def handle_ctrl_c(func):
 @handle_ctrl_c
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="Init", init=True)
+    fitted.modelFitting(saveAs="InitTransfer", init=True, transfer=True)
 
-@handle_ctrl_c
+""" @handle_ctrl_c
 def use_fitting2(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="InitExtra", init=True, extra=True)
-    #fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    #fitted.modelFitting(saveAs="InitAsymTransfer", init=True, asym=True, transfer=True)
+    fitted.modelFitting(saveAs="PearceInitExtraAsymTransfer", pearce=True, init=True, extra=True, asym=True, transfer=True)
 
 @handle_ctrl_c
 def use_fitting3(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="InitExtraTransfer", init=True, extra=True, transfer=True)
+    fitted.modelFitting(saveAs="PearceInitExtraTransfer", pearce=True, init=True, extra=True, transfer=True)
 
 @handle_ctrl_c
 def use_fitting4(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="InitAsymExtraTransfer", init=True, extra=True, transfer=True, asym=True)
+    fitted.modelFitting(saveAs="Basic") """
 
 def pool_ctrl_c_handler(*args, **kwargs):
     global ctrl_c_entered
@@ -713,14 +752,14 @@ def main():
     pool.close()
     pool.join()
 
-    pool2 = Pool(8, initializer=init_pool)
+    """ pool2 = Pool(8, initializer=init_pool)
     results2 = pool2.map(use_fitting2, configurations)
     if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
         print("Ctrl-C was entered.")
     pool2.close()
     pool2.join()
 
-"""     pool3 = Pool(8, initializer=init_pool)
+    pool3 = Pool(8, initializer=init_pool)
     results3 = pool3.map(use_fitting3, configurations)
     if any(map(lambda x: isinstance(x, KeyboardInterrupt), results3)):
         print("Ctrl-C was entered.")
@@ -734,9 +773,7 @@ def main():
     pool4.close()
     pool4.join() """
     
-    #for IDnr in configurations:
-    #    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    #    fitted.modelFitting(saveAs="Pearce", pearce=True)
+    
 
 
 

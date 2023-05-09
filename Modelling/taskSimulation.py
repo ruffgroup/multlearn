@@ -1,7 +1,7 @@
 from TaskDesign import task_Design
 import numpy.ma as ma
 import seaborn as sns
-sns.set_context('talk')
+sns.set()
 import pandas as pd
 import scipy.stats
 import numpy as np
@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 ## Have to be multiples of 60
 mainTrials = 60
 additionalTrials = 0
-taskSimulation = task_Design(mainTrials,  additionalTrials, pearce=1, omega=0.3)
+taskSimulation = task_Design(mainTrials,  additionalTrials)
 
 # filehandler = open(
 #     '/Users/sbedi/Desktop/multisensory-project-rl/Human task design/filename', 'wb')
@@ -21,7 +21,7 @@ taskSimulation = task_Design(mainTrials,  additionalTrials, pearce=1, omega=0.3)
 
 
 taskSimulation.taskStructure()
-taskSimulation.RLloops()
+#taskSimulation.RLloops()
 taskSimulation.statisticalLearning()
  
 # """1000 subjects correlation plots"""
@@ -75,11 +75,11 @@ taskSimulation.statisticalLearning()
 # # plt.show()
 
 # # #
-# # # plt.plot(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)])
-# # # plt.xlabel("trials")
-# # # plt.ylabel("Total surprise")
-# # # plt.title("Total statistical surprise (one value for a particular cell at each trial)")
-# # # plt.show()
+plt.plot(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)])
+plt.xlabel("trials")
+plt.ylabel("Total surprise")
+plt.title("Statistical surprise signal")
+plt.show()
 # # #
 # # #
 # # # # print(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)])
@@ -90,23 +90,23 @@ taskSimulation.statisticalLearning()
 # # # # plt.show()
 # # #
 
-# plt.plot(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)])
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 0, 0]), label="00")
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 0, 1]), label="01")
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 0, 2]), label="02")
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 1, 0]), label="10")
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 1, 1]), label="11")
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 1, 2]), label="12")
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 2, 0]), label="20")
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 2, 1]), label="21")
-# # plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 2, 2]), label="22")
-# plt.xlabel("Trials")
-# plt.ylabel("Total surprise")
-# # plt.legend(bbox_to_anchor=(0.98, 0.9))
-# plt.title("Statistical surprise signal")
-# fig1 = plt.gcf()
-# plt.show()
-# plt.draw()
+plt.plot(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)])
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 0, 0]), label="00")
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 0, 1]), label="01")
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 0, 2]), label="02")
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 1, 0]), label="10")
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 1, 1]), label="11")
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 1, 2]), label="12")
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 2, 0]), label="20")
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 2, 1]), label="21")
+plt.plot(ma.masked_invalid(taskSimulation.statSurprise[:, 2, 2]), label="22")
+plt.xlabel("Trials")
+plt.ylabel("Total surprise")
+#plt.legend(bbox_to_anchor=(0.98, 0.9))
+plt.title("Statistical surprise signal")
+fig1 = plt.gcf()
+plt.show()
+plt.draw()
 # fig1.savefig('Surp.png', dpi=300, bbox_inches='tight')
 
 # # #
@@ -144,35 +144,36 @@ taskSimulation.statisticalLearning()
 # # #
 # # # """Beliefs plots"""
 # # # # Modality 1 = 0
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 0, 0], label="1A")
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 0, 1], label="1B")
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 0, 2], label="1C")
-# plt.title("Learning of statistical structure (beliefs) by Bayesian observer")
-# # plt.xlabel("trials")
-# # plt.ylabel("Beliefs of probabilities co-occurence")
-# # plt.show()
+plt.figure(figsize=(8, 6))
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 0, 0], label="1A")
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 0, 1], label="1B")
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 0, 2], label="1C")
+plt.title("Learning of statistical structure (beliefs) by Bayesian observer")
+plt.xlabel("trials")
+plt.ylabel("Beliefs of probabilities co-occurence")
+#plt.show()
 # # Modality 1 = 1
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 1, 0], label="2A")
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 1, 1], label="2B")
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 1, 2], label="2C")
-# # plt.title("Learning of statistical structure by Bayesian observer for 2 visual modality")
-# # plt.xlabel("trials")
-# # plt.ylabel("Beliefs of probabilities co-occurence")
-# # plt.show()
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 1, 0], label="2A")
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 1, 1], label="2B")
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 1, 2], label="2C")
+#plt.title("Learning of statistical structure by Bayesian observer for 2 visual modality")
+#plt.xlabel("trials")
+#plt.ylabel("Beliefs of probabilities co-occurence")
+#plt.show()
 # # Modality 1 = 2
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 2, 0], label="3A")
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 2, 1], label="3B")
-# plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 2, 2], label="3C")
-# plt.title("Statistical learning of 9 combinations")
-# plt.xlabel("trials")
-# plt.ylabel("Beliefs")
-# plt.legend(bbox_to_anchor=(0.99, 0.65))
-# plt.axhline(y=taskSimulation.modality0C*0.33, color='r', linestyle='-')
-# plt.axhline(y=taskSimulation.modality1B*0.33, color='g', linestyle='-')
-# plt.axhline(y=taskSimulation.modality1C*0.33, color='b', linestyle='-')
-# fig1 = plt.gcf()
-# plt.show()
-# plt.draw()
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 2, 0], label="3A")
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 2, 1], label="3B")
+plt.plot(range(0, taskSimulation.mainTrials+taskSimulation.additionalTrials+1), taskSimulation.beliefsStat[:, 2, 2], label="3C")
+#plt.title("Statistical learning of 9 combinations")
+#plt.xlabel("trials")
+#plt.ylabel("Beliefs")
+plt.legend(bbox_to_anchor=(0.99, 0.65))
+plt.axhline(y=taskSimulation.modality0C*0.33, color='r', linestyle='-')
+plt.axhline(y=taskSimulation.modality1B*0.33, color='g', linestyle='-')
+plt.axhline(y=taskSimulation.modality1C*0.33, color='b', linestyle='-')
+fig1 = plt.gcf()
+plt.show()
+plt.draw()
 # fig1.savefig('beliefs.png', dpi=300, bbox_inches='tight')
 
 # """Reinforcement Learning Plots"""
@@ -200,8 +201,8 @@ taskSimulation.statisticalLearning()
 # print(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)])
 # print(np.diff(taskSimulation.alphaPearce))
 
-plt.scatter(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)][1:], np.diff(taskSimulation.alphaPearce))
-plt.show()
+#plt.scatter(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)][1:], np.diff(taskSimulation.alphaPearce))
+#plt.show()
 
 
 # plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option1[:, 0, 0], label="1A")

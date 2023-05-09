@@ -18,7 +18,7 @@ path.SPM_folder = [path.SPM_folder(1).folder '/'];
 subs = dir(fullfile(path.folder_processed, 'sub-*'));
 subs = subs([subs.isdir]');
 subs = subs(~contains({subs.name},{'sub-08', 'sub-13', 'sub-44'}));
-models = ["spe_rpeSimplePearce"]; % "other", "spe", "rpeSimple", "spe_rpeSimple"
+models = ["spe_rpeBestOverall"]; % "other", "spe", "rpeSimple", "spe_rpeSimple"
 tVals = [2.3, 2.6, 3.1];
 
 addpath(fullfile('scripts'));
