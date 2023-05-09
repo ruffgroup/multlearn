@@ -9,9 +9,8 @@
 # Ignore spm results folder
 SPM/results/
 # Ignore plot folders in fitting
-!Modelling/Fitting/
+Modelling/Fitting/*/
 !Modelling/Fitting/bestFittingVals/
-Modelling/Fitting/*
 # Ignore pdf files, png, pycache, matlab, npy, tsv
 *.pdf
 *.png
