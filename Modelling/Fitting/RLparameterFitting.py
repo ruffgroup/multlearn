@@ -460,8 +460,8 @@ class Fitting:
 
             minIndex = np.argmin(NLL_array[run, :, 0])
             maxIndex = np.nanargmax(LL_array[:, 0])
-            # newPath = "bestFittingVals/sub-{0}".format(self.ID)
-            # Path(newPath).mkdir(parents=True, exist_ok=True)
+            newPath = "bestFittingVals/sub-{0}".format(self.ID)
+            Path(newPath).mkdir(parents=True, exist_ok=True)
             fitted_alphasPos[run] = NLL_array[run, minIndex, 1]
             np.savetxt(fname=newPath + "/alphasPos_" + saveAs + ".tsv", X=fitted_alphasPos, delimiter=",")
             if asym and not extra:
@@ -635,64 +635,64 @@ class Fitting:
 # You can only run ONE model fitting at a time
 
 configurations = [
-    "01",
-    "02",
-    "03",
-    "04",
-    "05",
-    "06",
-    "07",
-    "09",
-    "10",
-    "11",
-    "12",
-    "14",
-    "15",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "23",
-    "24",
-    "25",
-    "26",
-    "27",
-    "28",
-    "29",
-    "30",
-    "33",
-    "34",
-    "35",
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "45",
-    "46",
-    "47",
-    "48",
-    "49",
-    "50",
-    "51",
-    "52",
-    "53",
-    "54",
-    "55",
-    "56",
-    "57",
+#    "01",
+#    "02",
+#    "03",
+#    "04",
+#    "05",
+#    "06",
+#    "07",
+#    "09",
+#    "10",
+#    "11",
+#    "12",
+#    "14",
+#    "15",
+#    "17",
+#    "18",
+#    "19",
+#    "20",
+#    "21",
+#    "22",
+#    "23",
+#    "24",
+#    "25",
+#    "26",
+#    "27",
+#    "28",
+#    "29",
+#    "30",
+#    "33",
+#    "34",
+#    "35",
+#    "36",
+#    "37",
+#    "38",
+#    "39",
+#    "40",
+#    "41",
+#    "42",
+#    "43",
+#    "45",
+#    "46",
+#    "47",
+#    "48",
+#    "49",
+#    "50",
+#    "51",
+#    "52",
+#    "53",
+#    "54",
+#    "55",
+#    "56",
+#    "57",
     "58",
-    "59",
-    "60",
-    "61",
-    "62",
-    "63",
-    "64",
+#    "59",
+#    "60",
+#    "61",
+#    "62",
+#    "63",
+#    "64",
 ]
 
 
@@ -718,21 +718,21 @@ def handle_ctrl_c(func):
 @handle_ctrl_c
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="ExtraAsymTransfer", extra=True, asym=True, transfer=True)
+    fitted.modelFitting(saveAs="Asym", asym=True)
 
 
-@handle_ctrl_c
-def use_fitting2(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="PearceExtraAsymTransfer", pearce=True, extra=True, asym=True, transfer=True)
+# @handle_ctrl_c
+# def use_fitting2(IDnr):
+#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+#     fitted.modelFitting(saveAs="PearceExtraAsymTransfer", pearce=True, extra=True, asym=True, transfer=True)
 
 
-@handle_ctrl_c
-def use_fitting3(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(
-        saveAs="PearceInitExtraAsymTransfer", pearce=True, init=True, extra=True, asym=True, transfer=True
-    )
+# @handle_ctrl_c
+# def use_fitting3(IDnr):
+#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+#     fitted.modelFitting(
+#         saveAs="PearceInitExtraAsymTransfer", pearce=True, init=True, extra=True, asym=True, transfer=True
+#     )
 
 
 # @handle_ctrl_c
@@ -762,19 +762,19 @@ def main():
     pool.close()
     pool.join()
 
-    pool2 = Pool(8, initializer=init_pool)
-    results2 = pool2.map(use_fitting2, configurations)
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
-        print("Ctrl-C was entered.")
-    pool2.close()
-    pool2.join()
+    # pool2 = Pool(8, initializer=init_pool)
+    # results2 = pool2.map(use_fitting2, configurations)
+    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
+    #     print("Ctrl-C was entered.")
+    # pool2.close()
+    # pool2.join()
 
-    pool3 = Pool(8, initializer=init_pool)
-    results3 = pool3.map(use_fitting3, configurations)
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results3)):
-        print("Ctrl-C was entered.")
-    pool3.close()
-    pool3.join()
+    # pool3 = Pool(8, initializer=init_pool)
+    # results3 = pool3.map(use_fitting3, configurations)
+    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results3)):
+    #     print("Ctrl-C was entered.")
+    # pool3.close()
+    # pool3.join()
 
     # pool4 = Pool(8, initializer=init_pool)
     # results4 = pool4.map(use_fitting4, configurations)
