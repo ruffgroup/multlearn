@@ -1,50 +1,31 @@
 
 % Getting location of current directory where files are
-filePath = fileparts(fileparts(mfilename('fullpath')));
-addpath(fullfile((filePath), 'Fitting'))
 
 
-rpe_simple = load('rpe_simple.mat');
-spe_simple = load('spe_simple.mat');
-rpe_up = load('rpe_up.mat');
-spe_up = load('spe_up.mat');
-rpe_init = load('rpe_init.mat');
-spe_init = load('spe_init.mat');
-rpe_simple = rpe_simple.RPE_arr;
-spe_simple = spe_simple.SPE_arr;
-rpe_up = rpe_up.RPE_arr;
-spe_up = spe_up.SPE_arr;
-rpe_init = rpe_init.RPE_arr;
-spe_init = spe_init.SPE_arr;
-
-corr_simpleUp = [];
-for i = 1:size(rpe_simple,1)
-    for j = 1:size(rpe_simple,2)
-        c = corrcoef(rpe_simple(i,j,~isnan(rpe_simple(i,j,:))), rpe_up(i,j,~isnan(rpe_up(i,j,:))));
-        corr_simpleUp = [corr_simpleUp, c(1,2)];
-
+subjects = [01 02 03 04 05 06 07 09 10 11 12 14 15 17 18 19 20 21 22 23 24 25 26 27 28 29 30 33 34 35 36 37 38 39 40 41 42 43 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64];
+%subjects = [01 02];
+corr_spe_rpe = [];
+for subject=subjects
+    subject = num2str(subject, '%02d');
+    spe = load(['/data/fittedParameters/sub-' subject '/spe.mat']).spe;
+    rpe_best = load(['/data/fittedParameters/sub-' subject '/rpeBestOverall.mat']).rpe.rpe;
+    for run=1:6
+        c = corrcoef(spe(run,:),rpe_best(run,:), 'rows','complete');
+        corr_spe_rpe = [corr_spe_rpe c(1,2)];
     end
 end
 
-
-hist(corr_simpleUp)
+corr_R = mean(corr_spe_rpe);
+hist(corr_spe_rpe)
 h = findobj(gca,'Type','patch');
 set(h,'FaceColor','w','EdgeColor','b', 'linewidth', 2)
-xline(mean(corr_simpleUp), 'linewidth', 2)
+xline(mean(corr_spre_rpe), 'linewidth', 2)
 xlabel('correlation values', 'FontSize', 14);
 ylabel('number of correlations', 'FontSize', 14);
-title('Correlations between RPE of simple model and RPE of',' trasfer learning model (3 paramerters) for last 6 participants')
+title('Correlations between RPE and SPE')
 
 
 
-corr_simpleInit = [];
-for i = 1:size(rpe_simple,1)
-    for j = 1:size(rpe_simple,2)
-        c = corrcoef(rpe_simple(i,j,~isnan(rpe_simple(i,j,:))), rpe_init(i,j,~isnan(rpe_init(i,j,:))));
-        corr_simpleInit = [corr_simpleInit, c(1,2)];
-
-    end
-end
 
 % hist(corr_simpleInit)
 % h = findobj(gca,'Type','patch');

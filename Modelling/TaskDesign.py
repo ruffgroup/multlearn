@@ -77,20 +77,20 @@ class task_Design:
         self.asym = asym
         self.extra = extra
 
-        self.alphaPos = alphaPos if not None else np.random.uniform(0, 1)
-        self.alphaNeg = alphaNeg if not None else np.random.uniform(0, 1)
-        self.alpha2Pos = alpha2Pos if not None else np.random.uniform(0, 1)
-        self.alpha2Neg = alpha2Neg if not None else np.random.uniform(0, 1)
+        self.alphaPos = np.random.uniform(0, 1) if alphaPos is None else alphaPos
+        self.alphaNeg = np.random.uniform(0, 1) if alphaNeg is None else alphaNeg
+        self.alpha2Pos = np.random.uniform(0, 1) if alpha2Pos is None else alphaPos
+        self.alpha2Neg = np.random.uniform(0, 1) if alpha2Neg is None else alphaNeg
 
         if beta is None:
             self.beta = 0 + 15.0 * random()
         else:
             self.beta = beta  # 2.0
         if self.transfer:
-            self.K1 = K1 if not None else np.random.uniform(0, 1)
-            self.K2 = K2 if not None else np.random.uniform(0, 1)
-            self.K3 = K3 if not None else np.random.uniform(0, 1)
-            self.K4 = K4 if not None else np.random.uniform(0, 1)
+            self.K1 = np.random.uniform(0, 1) if K1 is None else K1
+            self.K2 = np.random.uniform(0, 1) if K2 is None else K2
+            self.K3 = np.random.uniform(0, 1) if K3 is None else K3
+            self.K4 = np.random.uniform(0, 1) if K4 is None else K4
 
         if self.pearce:
             self.omega = self.omega2 = self.omega3 = self.omega4 = 1
@@ -283,7 +283,10 @@ class task_Design:
                                     * self.omega
                                     * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                                 )
-
+                                if self.V_option0[(i + 1,) + tuple(p2)] > 1:
+                                    self.V_option0[(i + 1,) + tuple(p2)] = 1
+                                elif self.V_option0[(i + 1,) + tuple(p2)] < 0:
+                                    self.V_option0[(i + 1,) + tuple(p2)] = 0
                     else:
                         self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -298,6 +301,10 @@ class task_Design:
                                     * self.alphaPos
                                     * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                                 )
+                                if self.V_option0[(i + 1,) + tuple(p2)] > 1:
+                                    self.V_option0[(i + 1,) + tuple(p2)] = 1
+                                elif self.V_option0[(i + 1,) + tuple(p2)] < 0:
+                                    self.V_option0[(i + 1,) + tuple(p2)] = 0
                     if self.pearce:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega3 = self.omega4 = self.omega
@@ -318,8 +325,7 @@ class task_Design:
                         )
                         self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
-                            + self.omega3
-                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                            + self.omega3 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
@@ -330,6 +336,11 @@ class task_Design:
                                     * self.omega3
                                     * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                                 )
+
+                                if self.V_option0[(i + 1,) + tuple(p2)] > 1:
+                                    self.V_option0[(i + 1,) + tuple(p2)] = 1
+                                elif self.V_option0[(i + 1,) + tuple(p2)] < 0:
+                                    self.V_option0[(i + 1,) + tuple(p2)] = 0
                     else:
                         self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -344,6 +355,10 @@ class task_Design:
                                     * self.alphaNeg
                                     * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                                 )
+                                if self.V_option0[(i + 1,) + tuple(p2)] > 1:
+                                    self.V_option0[(i + 1,) + tuple(p2)] = 1
+                                elif self.V_option0[(i + 1,) + tuple(p2)] < 0:
+                                    self.V_option0[(i + 1,) + tuple(p2)] = 0
                     if self.pearce:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega = self.omega4 = self.omega3
@@ -372,8 +387,7 @@ class task_Design:
                         )
                         self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
-                            + self.omega2
-                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                            + self.omega2 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
@@ -384,6 +398,10 @@ class task_Design:
                                     * self.omega2
                                     * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                                 )
+                                if self.V_option1[(i + 1,) + tuple(p2)] > 1:
+                                    self.V_option1[(i + 1,) + tuple(p2)] = 1
+                                elif self.V_option1[(i + 1,) + tuple(p2)] < 0:
+                                    self.V_option1[(i + 1,) + tuple(p2)] = 0
 
                     else:
                         self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
@@ -400,6 +418,10 @@ class task_Design:
                                     * self.alpha2Pos
                                     * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                                 )
+                                if self.V_option1[(i + 1,) + tuple(p2)] > 1:
+                                    self.V_option1[(i + 1,) + tuple(p2)] = 1
+                                elif self.V_option1[(i + 1,) + tuple(p2)] < 0:
+                                    self.V_option1[(i + 1,) + tuple(p2)] = 0
                     if self.pearce:
                         if not self.asym and not self.extra:
                             self.omega3 = self.omega = self.omega4 = self.omega2
@@ -420,8 +442,7 @@ class task_Design:
                         )
                         self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
-                            + self.omega4
-                            * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
+                            + self.omega4 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                         )
 
                         if self.transfer:
@@ -432,6 +453,10 @@ class task_Design:
                                     * self.omega4
                                     * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                                 )
+                                if self.V_option1[(i + 1,) + tuple(p2)] > 1:
+                                    self.V_option1[(i + 1,) + tuple(p2)] = 1
+                                elif self.V_option1[(i + 1,) + tuple(p2)] < 0:
+                                    self.V_option1[(i + 1,) + tuple(p2)] = 0
                     else:
                         self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -447,6 +472,10 @@ class task_Design:
                                     * self.alpha2Neg
                                     * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                                 )
+                                if self.V_option1[(i + 1,) + tuple(p2)] > 1:
+                                    self.V_option1[(i + 1,) + tuple(p2)] = 1
+                                elif self.V_option1[(i + 1,) + tuple(p2)] < 0:
+                                    self.V_option1[(i + 1,) + tuple(p2)] = 0
                     if self.pearce:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega = self.omega3 = self.omega4

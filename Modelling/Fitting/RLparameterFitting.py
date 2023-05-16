@@ -18,6 +18,7 @@ from functools import wraps
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
 
+
 class Fitting:
     def __init__(
         self,
@@ -70,13 +71,15 @@ class Fitting:
         """
         if platform.system() == "Windows":
             newPath = os.path.join(
-                pathlib.Path(__file__).resolve().parents[3],"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
+                pathlib.Path(__file__).resolve().parents[3],
+                "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
             )
 
         else:
             newPath = os.path.join(
-            str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
-        )
+                str(pathlib.Path(__file__).resolve().parents[3])
+                + "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
+            )
         Path(newPath).mkdir(parents=True, exist_ok=True)
 
         (
@@ -114,7 +117,7 @@ class Fitting:
         NLL_array[:] = np.nan
 
         RPE = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials))
-        
+
         V0 = np.empty(
             (
                 max(self.subjectData.runNumber),
@@ -159,9 +162,7 @@ class Fitting:
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
-            run_V0, run_V1 = (
-                np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1)) for i in range(2)
-            )
+            run_V0, run_V1 = (np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1)) for i in range(2))
 
             run_RPEs[:], run_V0[:], run_V1[:] = (np.nan for i in range(3))
 
@@ -237,9 +238,7 @@ class Fitting:
                     )
                     choiceProb[t, 1] = 1 - choiceProb[t, 0]
 
-                    actionProb[t, :] = (
-                        choiceProb[t, int(runData.action[t])] if ~np.isnan(runData.action[t]) else np.nan
-                    )
+                    actionProb[t, :] = choiceProb[t, int(runData.action[t])] if ~np.isnan(runData.action[t]) else np.nan
 
                     if runData.action[t] == 0:
                         rewardPE[(t,) + runData.stimulusPair[t]] = (
@@ -288,7 +287,9 @@ class Fitting:
 
                         else:
                             if pearce:
-                                omega3 = omega3 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega3) * alphaNegCheck
+                                omega3 = (
+                                    omega3 + (abs(rewardPE[(t,) + runData.stimulusPair[t]]) - omega3) * alphaNegCheck
+                                )
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega3 * (rewardPE[(t,) + runData.stimulusPair[t]])
@@ -377,7 +378,7 @@ class Fitting:
                                     omega = omega2
                                 elif extra and not asym:
                                     omega4 = omega2
-    
+
                         else:
                             if pearce:
                                 omega4 = (
@@ -419,7 +420,6 @@ class Fitting:
                                     omega3 = omega4
                                 elif extra and not asym:
                                     omega2 = omega4
-    
 
                         V_option0[t + 1, :] = V_option0[t, :]
                     else:
@@ -460,8 +460,8 @@ class Fitting:
 
             minIndex = np.argmin(NLL_array[run, :, 0])
             maxIndex = np.nanargmax(LL_array[:, 0])
-            newPath = "bestFittingVals/sub-{0}".format(self.ID)
-            Path(newPath).mkdir(parents=True, exist_ok=True)
+            # newPath = "bestFittingVals/sub-{0}".format(self.ID)
+            # Path(newPath).mkdir(parents=True, exist_ok=True)
             fitted_alphasPos[run] = NLL_array[run, minIndex, 1]
             np.savetxt(fname=newPath + "/alphasPos_" + saveAs + ".tsv", X=fitted_alphasPos, delimiter=",")
             if asym and not extra:
@@ -537,7 +537,7 @@ class Fitting:
 
         with open(newPath + "/V1_" + saveAs + ".npy", "wb") as f:
             np.save(f, V1)
-        
+
     # Statistical learning
     def statisticalLearning(self, statLearnPar=1):
         self.statLearnPar = statLearnPar
@@ -624,76 +624,76 @@ class Fitting:
             ID_surprise[run] = trial_surprise
 
         newPath = os.path.join(
-            str(pathlib.Path(__file__).resolve().parents[3])+"/data/fittedParameters/sub-{}".format(self.ID),
+            str(pathlib.Path(__file__).resolve().parents[3]) + "/data/fittedParameters/sub-{}".format(self.ID),
         )
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise})
         return ID_beliefs, ID_surprise
 
+
 # Calls for different fitting and plotting functions
 # You can only run ONE model fitting at a time
 
 configurations = [
-    #    "01",
-    #    "02",
-    #    "03",
-    #    "04",
-    #    "05",
-    #    "06",
-    #    "07",
-    #    "09",
-    #    "10",
-    #    "11",
-    #    "12",
-    #    "14",
-    #    "15",
-    #    "17",
-    #    "18",
-    #    "19",
-    #    "20",
-    #    "21",
-    #    "22",
-    #    "23",
-    #    "24",
-    #    "25",
-    #    "26",
-    #    "27",
-    #    "28",
-    #    "29",
-    #    "30",
-    #    "33",
-    #    "34",
-    #    "35",
-    #    "36",
-    #    "37",
-    #    "38",
-    #    "39",
-    #    "40",
-    #    "41",
-    #    "42",
-    #    "43",
-    #    "45",
-    #    "46",
-    #    "47",
-        "48",
-    #    "49",
-    #    "50",
-    #    "51",
-    #    "52",
-    #    "53",
-    #    "54",
-    #    "55",
-    #    "56",
-    #    "57",
-    #    "58",
-    #    "59",
-    #    "60",
-    #    "61",
-    #    "62",
-    #    "63",
-    #    "64",
-   ]
-
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "09",
+    "10",
+    "11",
+    "12",
+    "14",
+    "15",
+    "17",
+    "18",
+    "19",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
+    "28",
+    "29",
+    "30",
+    "33",
+    "34",
+    "35",
+    "36",
+    "37",
+    "38",
+    "39",
+    "40",
+    "41",
+    "42",
+    "43",
+    "45",
+    "46",
+    "47",
+    "48",
+    "49",
+    "50",
+    "51",
+    "52",
+    "53",
+    "54",
+    "55",
+    "56",
+    "57",
+    "58",
+    "59",
+    "60",
+    "61",
+    "62",
+    "63",
+    "64",
+]
 
 
 def handle_ctrl_c(func):
@@ -701,7 +701,7 @@ def handle_ctrl_c(func):
     def wrapper(*args, **kwargs):
         global ctrl_c_entered
         if not ctrl_c_entered:
-            signal.signal(signal.SIGINT, default_sigint_handler) # the default
+            signal.signal(signal.SIGINT, default_sigint_handler)  # the default
             try:
                 return func(*args, **kwargs)
             except KeyboardInterrupt:
@@ -711,37 +711,47 @@ def handle_ctrl_c(func):
                 signal.signal(signal.SIGINT, pool_ctrl_c_handler)
         else:
             return KeyboardInterrupt()
+
     return wrapper
+
 
 @handle_ctrl_c
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="InitTransfer", init=True, transfer=True)
+    fitted.modelFitting(saveAs="ExtraAsymTransfer", extra=True, asym=True, transfer=True)
 
-""" @handle_ctrl_c
+
+@handle_ctrl_c
 def use_fitting2(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="PearceInitExtraAsymTransfer", pearce=True, init=True, extra=True, asym=True, transfer=True)
+    fitted.modelFitting(saveAs="PearceExtraAsymTransfer", pearce=True, extra=True, asym=True, transfer=True)
+
 
 @handle_ctrl_c
 def use_fitting3(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="PearceInitExtraTransfer", pearce=True, init=True, extra=True, transfer=True)
+    fitted.modelFitting(
+        saveAs="PearceInitExtraAsymTransfer", pearce=True, init=True, extra=True, asym=True, transfer=True
+    )
 
-@handle_ctrl_c
-def use_fitting4(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="Basic") """
+
+# @handle_ctrl_c
+# def use_fitting4(IDnr):
+#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+#     fitted.modelFitting(saveAs="PearceInitAsymTransfer", init=True, asym=True, pearce=True, transfer=True)
+
 
 def pool_ctrl_c_handler(*args, **kwargs):
     global ctrl_c_entered
     ctrl_c_entered = True
+
 
 def init_pool():
     global ctrl_c_entered
     global default_sigint_handler
     ctrl_c_entered = False
     default_sigint_handler = signal.signal(signal.SIGINT, pool_ctrl_c_handler)
+
 
 def main():
     signal.signal(signal.SIGINT, signal.SIG_IGN)
@@ -752,7 +762,7 @@ def main():
     pool.close()
     pool.join()
 
-    """ pool2 = Pool(8, initializer=init_pool)
+    pool2 = Pool(8, initializer=init_pool)
     results2 = pool2.map(use_fitting2, configurations)
     if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
         print("Ctrl-C was entered.")
@@ -766,15 +776,12 @@ def main():
     pool3.close()
     pool3.join()
 
-    pool4 = Pool(8, initializer=init_pool)
-    results4 = pool4.map(use_fitting4, configurations)
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results4)):
-        print("Ctrl-C was entered.")
-    pool4.close()
-    pool4.join() """
-    
-    
-
+    # pool4 = Pool(8, initializer=init_pool)
+    # results4 = pool4.map(use_fitting4, configurations)
+    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results4)):
+    #     print("Ctrl-C was entered.")
+    # pool4.close()
+    # pool4.join()
 
 
 if __name__ == "__main__":

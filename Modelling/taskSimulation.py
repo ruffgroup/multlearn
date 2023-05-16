@@ -411,49 +411,49 @@ plt.draw()
 
 
 # # All cells
-# PearsonCorr = scipy.stats.pearsonr(taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :][~np.isnan(
-#     taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :])], taskSimulation.rewardPE[:, :, :][~np.isnan(taskSimulation.rewardPE[:, :, :])])
-# print("pearson", PearsonCorr)
+PearsonCorr = scipy.stats.pearsonr(taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :][~np.isnan(
+     taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :])], taskSimulation.rewardPE[:, :, :][~np.isnan(taskSimulation.rewardPE[:, :, :])])
+print("pearson", PearsonCorr)
 
-# # SpearmanCorr = scipy.stats.spearmanr(ma.masked_invalid(
-# #     taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :]), ma.masked_invalid(taskSimulation.rewardPE[:, :, :]), nan_policy='omit')
-# # print("spearman", SpearmanCorr)
+# SpearmanCorr = scipy.stats.spearmanr(ma.masked_invalid(
+#     taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :]), ma.masked_invalid(taskSimulation.rewardPE[:, :, :]), nan_policy='omit')
+# print("spearman", SpearmanCorr)
 
-# regr = scipy.stats.linregress(taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2][~np.isnan(
-#     taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2])], taskSimulation.rewardPE[:, 2, 2][~np.isnan(taskSimulation.rewardPE[:, 2, 2])])
-# print("regression", regr)
-# print(regr[1])
+regr = scipy.stats.linregress(taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2][~np.isnan(
+    taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2])], taskSimulation.rewardPE[:, 2, 2][~np.isnan(taskSimulation.rewardPE[:, 2, 2])])
+print("regression", regr)
+print(regr[1])
 
-# # r22 = scipy.stats.spearmanr((taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2], taskSimulation.rewardPE[:, 2, 2]))
-# # print("r", r22)
+# r22 = scipy.stats.spearmanr((taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2], taskSimulation.rewardPE[:, 2, 2]))
+# print("r", r22)
 
 
-# # df = pd.DataFrame(taskSimulation.simulatedData,  columns=['visual', 'auditory', 'prederror', 'surprise'])
-# # print(df)
+# df = pd.DataFrame(taskSimulation.simulatedData,  columns=['visual', 'auditory', 'prederror', 'surprise'])
+# print(df)
 
-# # df.to_csv('/Users/sbedi/Desktop/multisensory-project-rl/Human task design/simulated.csv')
-# #
-# # print(taskSimulation.simulatedData)
+# df.to_csv('/Users/sbedi/Desktop/multisensory-project-rl/Human task design/simulated.csv')
+#
+# print(taskSimulation.simulatedData)
 
-# #
-# plt.scatter(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
-# PearsonCorr = scipy.stats.pearsonr(
-#     taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
-# SpearmanCorr = scipy.stats.spearmanr(
-#     taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
-# regr = scipy.stats.linregress(
-#     taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
-# x = np.linspace(np.min(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2]), np.max(
-#     taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2]), 500)
-# plt.plot(x, regr[0]*x+regr[1], '-',  color='k')
-# plt.xlabel("Reward prediction errors")
-# plt.ylabel("Statistical surprise")
-# plt.title("All cells - PearsonCorr:{:.4f}, p-value :{:.4f}\nalpha = {}, beta = {}, error% = {:.1f}".format(
-#     PearsonCorr[0], PearsonCorr[1], taskSimulation.alpha, taskSimulation.beta, taskSimulation.errorPercentage), fontweight="bold", fontsize=15)
-# fig1 = plt.gcf()
-# plt.show()
-# plt.draw()
-# fig1.savefig('corr.png', dpi=300, bbox_inches='tight')
+#
+plt.scatter(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
+PearsonCorr = scipy.stats.pearsonr(
+    taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
+SpearmanCorr = scipy.stats.spearmanr(
+    taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
+regr = scipy.stats.linregress(
+    taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
+x = np.linspace(np.min(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2]), np.max(
+    taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2]), 500)
+plt.plot(x, regr[0]*x+regr[1], '-',  color='k')
+plt.xlabel("Reward prediction errors")
+plt.ylabel("Statistical surprise")
+plt.title("All cells - PearsonCorr:{:.4f}, p-value :{:.4f}\nalpha = {}, beta = {}, error% = {:.1f}".format(
+    PearsonCorr[0], PearsonCorr[1], taskSimulation.alpha, taskSimulation.beta, taskSimulation.errorPercentage), fontweight="bold", fontsize=15)
+fig1 = plt.gcf()
+plt.show()
+plt.draw()
+fig1.savefig('corr.png', dpi=300, bbox_inches='tight')
 
 # """Value vs surprise"""
 # # plt.scatter(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3], taskSimulation.V_option1[1:, 0, 0])
