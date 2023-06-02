@@ -1,4 +1,4 @@
-function func_level1(folder_processed, bids_folder, SPM_folder, sub , model_version, splitting)
+function func_level1(folder_processed, bids_folder, SPM_folder, sub, model_version)
 
 spm('defaults', 'fMRI');
 
@@ -11,11 +11,7 @@ param_smoothing = 6; % what was the smoothing parameter?
 mask_file = {fullfile(SPM_folder,'/mask_ICV.nii,1')};
 
 %path of results
-if ischar(splitting) && splitting ~= string(model_version)
-    data.destination = fullfile(SPM_folder,'/results', splitting, model_version, sub);
-elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
-    data.destination = fullfile(SPM_folder,'/results', model_version, sub);
-end
+data.destination = fullfile(SPM_folder,'/results',model_version, sub);
 
 %% start spm 1stLvL model
 if ~exist(data.destination,'dir')
@@ -106,11 +102,8 @@ for nrun = 1:numel(data.source)
     %%
     
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).cond = struct('name', {}, 'onset', {}, 'duration', {}, 'tmod', {}, 'pmod', {}, 'orth', {});
-    if ischar(splitting) && splitting ~= string(model_version)
-        multicondition_file=fullfile(folder_processed, sub,['beh'],splitting, model_version,filesep,['run_', num2str(nrun), '_conditions.mat']);
-    else
-        multicondition_file=fullfile(folder_processed, sub,['beh'],model_version,filesep,['run_', num2str(nrun), '_conditions.mat']);
-    end
+
+    multicondition_file=fullfile(folder_processed, sub,['beh'],model_version,filesep,['run_', num2str(nrun), '_conditions.mat']);
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = cellstr(string(multicondition_file));
     %matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = {cellstr(fullfile(folder_processed, sub,['beh'],model_version, ['run_' num2str(nrun) '_conditions.mat']))};
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).regress = struct('name', {}, 'val', {});
@@ -124,7 +117,7 @@ matlabbatch{1}.spm.stats.fmri_spec.fact = struct('name', {}, 'levels', {});
 matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0];
 matlabbatch{1}.spm.stats.fmri_spec.volt = 1;
 matlabbatch{1}.spm.stats.fmri_spec.global = 'None';
-matlabbatch{1}.spm.stats.fmri_spec.mthresh = -Inf;
+matlabbatch{1}.spm.stats.fmri_spec.mthresh = 0.8;
 matlabbatch{1}.spm.stats.fmri_spec.mask = mask_file;
 matlabbatch{1}.spm.stats.fmri_spec.cvi = 'AR(1)';
 
@@ -133,10 +126,9 @@ matlabbatch{1}.spm.stats.fmri_spec.cvi = 'AR(1)';
 %matlabbatch{2}.spm.stats.review.spmmat =  {[fullfile(data.destination, 'SPM.mat')]};
 %matlabbatch{2}.spm.stats.review.display.orth = 1;
 %matlabbatch{2}.spm.stats.review.print = 'png';
-matlabbatch{2}.spm.stats.fmri_est.spmmat = {[fullfile(data.destination, 'SPM.mat')]};
+matlabbatch{2}.spm.stats.fmri_est.spmmat(1) = cfg_dep('fMRI model specification: SPM.mat File', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','spmmat'));
 matlabbatch{2}.spm.stats.fmri_est.write_residuals = 0;
 matlabbatch{2}.spm.stats.fmri_est.method.Classical = 1;
-
 
 %% run batch
 tic

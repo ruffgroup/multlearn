@@ -626,8 +626,13 @@ class Fitting:
         newPath = os.path.join(
             str(pathlib.Path(__file__).resolve().parents[3]) + "/data/fittedParameters/sub-{}".format(self.ID),
         )
+        newPath2 = "bestFittingVals/sub-{0}".format(self.ID)
         Path(newPath).mkdir(parents=True, exist_ok=True)
+        Path(newPath2).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(newPath + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise})
+        scipy.io.savemat(newPath2 + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise})
+        with open(newPath2 + "/spe.npy", "wb") as f:
+            np.save(f, ID_surprise)
         return ID_beliefs, ID_surprise
 
 
@@ -635,64 +640,64 @@ class Fitting:
 # You can only run ONE model fitting at a time
 
 configurations = [
-#    "01",
-#    "02",
-#    "03",
-#    "04",
-#    "05",
-#    "06",
-#    "07",
-#    "09",
-#    "10",
-#    "11",
-#    "12",
-#    "14",
-#    "15",
-#    "17",
-#    "18",
-#    "19",
-#    "20",
-#    "21",
-#    "22",
-#    "23",
-#    "24",
-#    "25",
-#    "26",
-#    "27",
-#    "28",
-#    "29",
-#    "30",
-#    "33",
-#    "34",
-#    "35",
-#    "36",
-#    "37",
-#    "38",
-#    "39",
-#    "40",
-#    "41",
-#    "42",
-#    "43",
-#    "45",
-#    "46",
-#    "47",
-#    "48",
-#    "49",
-#    "50",
-#    "51",
-#    "52",
-#    "53",
-#    "54",
-#    "55",
-#    "56",
-#    "57",
-    "58",
-#    "59",
-#    "60",
-#    "61",
-#    "62",
-#    "63",
-#    "64",
+   "01",
+   "02",
+   "03",
+   "04",
+   "05",
+   "06",
+   "07",
+   "09",
+   "10",
+   "11",
+   "12",
+   "14",
+   "15",
+   "17",
+   "18",
+   "19",
+   "20",
+   "21",
+   "22",
+   "23",
+   "24",
+   "25",
+   "26",
+   "27",
+   "28",
+   "29",
+   "30",
+   "33",
+   "34",
+   "35",
+   "36",
+   "37",
+   "38",
+   "39",
+   "40",
+   "41",
+   "42",
+   "43",
+   "45",
+   "46",
+   "47",
+   "48",
+   "49",
+   "50",
+   "51",
+   "52",
+   "53",
+   "54",
+   "55",
+   "56",
+   "57",
+   "58",
+   "59",
+   "60",
+   "61",
+   "62",
+   "63",
+   "64",
 ]
 
 
@@ -715,10 +720,10 @@ def handle_ctrl_c(func):
     return wrapper
 
 
-@handle_ctrl_c
-def use_fitting(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="Asym", asym=True)
+# @handle_ctrl_c
+# def use_fitting(IDnr):
+#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+#     fitted.modelFitting(saveAs="Asym", asym=True)
 
 
 # @handle_ctrl_c
@@ -740,6 +745,10 @@ def use_fitting(IDnr):
 #     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
 #     fitted.modelFitting(saveAs="PearceInitAsymTransfer", init=True, asym=True, pearce=True, transfer=True)
 
+@handle_ctrl_c
+def use_surprise(IDnr):
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
+    fitted.statisticalLearning()
 
 def pool_ctrl_c_handler(*args, **kwargs):
     global ctrl_c_entered
@@ -754,13 +763,13 @@ def init_pool():
 
 
 def main():
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-    pool = Pool(8, initializer=init_pool)
-    results = pool.map(use_fitting, configurations)
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
-        print("Ctrl-C was entered.")
-    pool.close()
-    pool.join()
+    # signal.signal(signal.SIGINT, signal.SIG_IGN)
+    # pool = Pool(8, initializer=init_pool)
+    # results = pool.map(use_fitting, configurations)
+    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
+    #     print("Ctrl-C was entered.")
+    # pool.close()
+    # pool.join()
 
     # pool2 = Pool(8, initializer=init_pool)
     # results2 = pool2.map(use_fitting2, configurations)
@@ -782,6 +791,14 @@ def main():
     #     print("Ctrl-C was entered.")
     # pool4.close()
     # pool4.join()
+
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    pool = Pool(8, initializer=init_pool)
+    results = pool.map(use_surprise, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
+        print("Ctrl-C was entered.")
+    pool.close()
+    pool.join()
 
 
 if __name__ == "__main__":

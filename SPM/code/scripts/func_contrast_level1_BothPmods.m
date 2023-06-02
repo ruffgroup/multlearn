@@ -38,9 +38,21 @@ contrasts_tactileBoth = (contrasts_tactileSPE + contrasts_tactileRPE) / 2;
 if numel(find(contains(SPM.xX.name,['Sn(1) ChoiceAudio']))) > 0
     contrasts_audio = double(contains(SPM.xX.name, {['Sn(1) constant'], ['Sn(3) constant'], ['Sn(5) constant']}));
     contrasts_tactile = double(contains(SPM.xX.name, {['Sn(2) constant'], ['Sn(4) constant'], ['Sn(6) constant']}));
+    contrasts_choice = double(contains(SPM.xX.name,{['Sn(1) ChoiceAudio*bf(1)'], ['Sn(2) ChoiceTactile*bf(1)'], ...
+        ['Sn(3) ChoiceAudio*bf(1)'], ['Sn(4) ChoiceTactile*bf(1)'], ['Sn(5) ChoiceAudio*bf(1)'], ...
+        ['Sn(6) ChoiceTactile*bf(1)']}));
+    contrasts_feedback = double(contains(SPM.xX.name,{['Sn(1) FeedbackAudio*bf(1)'], ['Sn(2) FeedbackTactile*bf(1)'], ...
+        ['Sn(3) FeedbackAudio*bf(1)'], ['Sn(4) FeedbackTactile*bf(1)'], ['Sn(5) FeedbackAudio*bf(1)'], ...
+        ['Sn(6) FeedbackTactile*bf(1)']}));
 elseif numel(find(contains(SPM.xX.name,['Sn(1) ChoiceTactile']))) > 0
     contrasts_tactile = double(contains(SPM.xX.name, {['Sn(1) constant'], ['Sn(3) constant'], ['Sn(5) constant']}));
     contrasts_audio = double(contains(SPM.xX.name, {['Sn(2) constant'], ['Sn(4) constant'], ['Sn(6) constant']}));
+    contrasts_choice = double(contains(SPM.xX.name,{['Sn(2) ChoiceAudio*bf(1)'], ['Sn(1) ChoiceTactile*bf(1)'], ...
+        ['Sn(4) ChoiceAudio*bf(1)'], ['Sn(3) ChoiceTactile*bf(1)'], ['Sn(6) ChoiceAudio*bf(1)'], ...
+        ['Sn(5) ChoiceTactile*bf(1)']}));
+    contrasts_feedback = double(contains(SPM.xX.name,{['Sn(2) FeedbackAudio*bf(1)'], ['Sn(1) FeedbackTactile*bf(1)'], ...
+        ['Sn(4) FeedbackAudio*bf(1)'], ['Sn(3) FeedbackTactile*bf(1)'], ['Sn(6) FeedbackAudio*bf(1)'], ...
+        ['Sn(5) FeedbackTactile*bf(1)']}));
 else
     error("Constants audio and tactile not defined")
 end
@@ -100,6 +112,14 @@ matlabbatch{1}.spm.stats.con.consess{12}.tcon.sessrep = 'none';
 matlabbatch{1}.spm.stats.con.consess{13}.tcon.name = 'audio-tactile';
 matlabbatch{1}.spm.stats.con.consess{13}.tcon.weights = contrasts_audio - contrasts_tactile;
 matlabbatch{1}.spm.stats.con.consess{13}.tcon.sessrep = 'none';
+
+matlabbatch{1}.spm.stats.con.consess{14}.tcon.name = 'choice';
+matlabbatch{1}.spm.stats.con.consess{14}.tcon.weights = contrasts_choice;
+matlabbatch{1}.spm.stats.con.consess{14}.tcon.sessrep = 'none';
+
+matlabbatch{1}.spm.stats.con.consess{15}.tcon.name = 'feedback';
+matlabbatch{1}.spm.stats.con.consess{15}.tcon.weights = contrasts_feedback;
+matlabbatch{1}.spm.stats.con.consess{15}.tcon.sessrep = 'none';
 
 
 
