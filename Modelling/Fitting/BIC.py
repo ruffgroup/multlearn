@@ -89,18 +89,18 @@ models = [
     "PearceInit",
     "PearceExtra",
     "PearceAsym",
-    #"PearceTransfer",
+    "PearceTransfer",
     "PearceInitExtra",
     "PearceInitAsym",
-    #"PearceInitTransfer",
+    "PearceInitTransfer",
     "PearceAsymExtra",
-    #"PearceExtraTransfer",
-    #"PearceAsymTransfer",
+    "PearceExtraTransfer",
+    "PearceAsymTransfer",
     "PearceInitExtraAsym",
-    #"PearceInitExtraTransfer",
-    #"PearceInitAsymTransfer",
-    #"PearceExtraAsymTransfer",
-    #"PearceInitExtraAsymTransfer"
+    "PearceInitExtraTransfer",
+    "PearceInitAsymTransfer",
+    "PearceExtraAsymTransfer",
+    "PearceInitExtraAsymTransfer"
 ]
 
 listBestFits = list()
@@ -126,18 +126,18 @@ BIC_Pearce = np.zeros(58)
 BIC_PearceInit = np.zeros(58)
 BIC_PearceExtra = np.zeros(58)
 BIC_PearceAsym = np.zeros(58)
-#BIC_PearceTransfer = np.zeros(58)
+BIC_PearceTransfer = np.zeros(58)
 BIC_PearceInitExtra = np.zeros(58)
 BIC_PearceInitAsym = np.zeros(58)
-#BIC_PearceInitTransfer = np.zeros(58)
+BIC_PearceInitTransfer = np.zeros(58)
 BIC_PearceAsymExtra = np.zeros(58)
-#BIC_PearceExtraTransfer = np.zeros(58)
-#BIC_PearceAsymTransfer = np.zeros(58)
+BIC_PearceExtraTransfer = np.zeros(58)
+BIC_PearceAsymTransfer = np.zeros(58)
 BIC_PearceInitExtraAsym = np.zeros(58)
-#BIC_PearceInitExtraTransfer = np.zeros(58)
-#BIC_PearceInitAsymTransfer = np.zeros(58)
-#BIC_PearceExtraAsymTransfer = np.zeros(58)
-#BIC_PearceInitExtraAsymTransfer = np.zeros(58)
+BIC_PearceInitExtraTransfer = np.zeros(58)
+BIC_PearceInitAsymTransfer = np.zeros(58)
+BIC_PearceExtraAsymTransfer = np.zeros(58)
+BIC_PearceInitExtraAsymTransfer = np.zeros(58)
 
 winning_model = {key: [0, 0] for key in models}
 
@@ -167,18 +167,18 @@ for idx, IDnr in enumerate(IDs):
     LL_PearceInit = np.load(newPath + "/PearceInit/BIC_PearceInit.npy")
     LL_PearceExtra = np.load(newPath + "/PearceExtra/BIC_PearceExtra.npy")
     LL_PearceAsym = np.load(newPath + "/PearceAsym/BIC_PearceAsym.npy")
-    #LL_PearceTransfer = np.load(newPath + "/PearceTransfer/BIC_PearceTransfer.npy")
+    LL_PearceTransfer = np.load(newPath + "/PearceTransfer/BIC_PearceTransfer.npy")
     LL_PearceInitExtra = np.load(newPath + "/PearceInitExtra/BIC_PearceInitExtra.npy")
     LL_PearceInitAsym = np.load(newPath + "/PearceInitAsym/BIC_PearceInitAsym.npy")
-    #LL_PearceInitTransfer = np.load(newPath + "/PearceInitTransfer/BIC_PearceInitTransfer.npy")
+    LL_PearceInitTransfer = np.load(newPath + "/PearceInitTransfer/BIC_PearceInitTransfer.npy")
     LL_PearceAsymExtra = np.load(newPath + "/PearceAsymExtra/BIC_PearceAsymExtra.npy")
-    #LL_PearceExtraTransfer = np.load(newPath + "/PearceExtraTransfer/BIC_PearceExtraTransfer.npy")
-    #LL_PearceAsymTransfer = np.load(newPath + "/PearceAsymTransfer/BIC_PearceAsymTransfer.npy")
+    LL_PearceExtraTransfer = np.load(newPath + "/PearceExtraTransfer/BIC_PearceExtraTransfer.npy")
+    LL_PearceAsymTransfer = np.load(newPath + "/PearceAsymTransfer/BIC_PearceAsymTransfer.npy")
     LL_PearceInitExtraAsym = np.load(newPath + "/PearceInitExtraAsym/BIC_PearceInitExtraAsym.npy")
-    #LL_PearceInitExtraTransfer = np.load(newPath + "/PearceInitExtraTransfer/BIC_PearceInitExtraTransfer.npy")
-    #LL_PearceInitAsymTransfer = np.load(newPath + "/PearceInitAsymTransfer/BIC_PearceInitAsymTransfer.npy")
-    #LL_PearceExtraAsymTransfer = np.load(newPath + "/PearceExtraAsymTransfer/BIC_PearceExtraAsymTransfer.npy")
-    #LL_PearceInitExtraAsymTransfer = np.load(newPath + "/PearceInitExtraAsymTransfer/BIC_PearceInitExtraAsymTransfer.npy")
+    LL_PearceInitExtraTransfer = np.load(newPath + "/PearceInitExtraTransfer/BIC_PearceInitExtraTransfer.npy")
+    LL_PearceInitAsymTransfer = np.load(newPath + "/PearceInitAsymTransfer/BIC_PearceInitAsymTransfer.npy")
+    LL_PearceExtraAsymTransfer = np.load(newPath + "/PearceExtraAsymTransfer/BIC_PearceExtraAsymTransfer.npy")
+    LL_PearceInitExtraAsymTransfer = np.load(newPath + "/PearceInitExtraAsymTransfer/BIC_PearceInitExtraAsymTransfer.npy")
     BIC_Basic[idx] = np.mean([2 * np.log(60) - 2 * np.log(LL_Basic[run]) for run in range(6)])
     BIC_Init[idx] = np.mean([4 * np.log(60) - 2 * np.log(LL_Init[run]) for run in range(6)])
     BIC_Extra[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_Extra[run]) for run in range(6)])
@@ -200,26 +200,26 @@ for idx, IDnr in enumerate(IDs):
     BIC_PearceInit[idx] = np.mean([4 * np.log(60) - 2 * np.log(LL_PearceInit[run]) for run in range(6)])
     BIC_PearceExtra[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_PearceExtra[run]) for run in range(6)])
     BIC_PearceAsym[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_PearceAsym[run]) for run in range(6)])
-    #BIC_PearceTransfer[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_PearceTransfer[run]) for run in range(6)])
+    BIC_PearceTransfer[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_PearceTransfer[run]) for run in range(6)])
     BIC_PearceInitExtra[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceInitExtra[run]) for run in range(6)])
     BIC_PearceInitAsym[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceInitAsym[run]) for run in range(6)])
-    #BIC_PearceInitTransfer[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceInitTransfer[run]) for run in range(6)])
+    BIC_PearceInitTransfer[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceInitTransfer[run]) for run in range(6)])
     BIC_PearceAsymExtra[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceAsymExtra[run]) for run in range(6)])
-    #BIC_PearceExtraTransfer[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceExtraTransfer[run]) for run in range(6)])
-    #BIC_PearceAsymTransfer[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceAsymTransfer[run]) for run in range(6)])
+    BIC_PearceExtraTransfer[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceExtraTransfer[run]) for run in range(6)])
+    BIC_PearceAsymTransfer[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_PearceAsymTransfer[run]) for run in range(6)])
     BIC_PearceInitExtraAsym[idx] = np.mean([7 * np.log(60) - 2 * np.log(LL_PearceInitExtraAsym[run]) for run in range(6)])
-    #BIC_PearceInitExtraTransfer[idx] = np.mean([
-    #    7 * np.log(60) - 2 * np.log(LL_PearceInitExtraTransfer[run]) for run in range(6)
-    #])
-    #BIC_PearceInitAsymTransfer[idx] = np.mean([
-    #    7 * np.log(60) - 2 * np.log(LL_PearceInitAsymTransfer[run]) for run in range(6)
-    #])
-    #BIC_PearceExtraAsymTransfer[idx] = np.mean([
-    #    9 * np.log(60) - 2 * np.log(LL_PearceExtraAsymTransfer[run]) for run in range(6)
-    #])
-    #BIC_PearceInitExtraAsymTransfer[idx] = np.mean([
-    #    11 * np.log(60) - 2 * np.log(LL_PearceInitExtraAsymTransfer[run]) for run in range(6)
-    #])
+    BIC_PearceInitExtraTransfer[idx] = np.mean([
+       7 * np.log(60) - 2 * np.log(LL_PearceInitExtraTransfer[run]) for run in range(6)
+    ])
+    BIC_PearceInitAsymTransfer[idx] = np.mean([
+       7 * np.log(60) - 2 * np.log(LL_PearceInitAsymTransfer[run]) for run in range(6)
+    ])
+    BIC_PearceExtraAsymTransfer[idx] = np.mean([
+       9 * np.log(60) - 2 * np.log(LL_PearceExtraAsymTransfer[run]) for run in range(6)
+    ])
+    BIC_PearceInitExtraAsymTransfer[idx] = np.mean([
+       11 * np.log(60) - 2 * np.log(LL_PearceInitExtraAsymTransfer[run]) for run in range(6)
+    ])
 
     best_fitting_arr = [
             BIC_Basic[idx],
@@ -242,18 +242,18 @@ for idx, IDnr in enumerate(IDs):
             BIC_PearceInit[idx],
             BIC_PearceExtra[idx],
             BIC_PearceAsym[idx],
-        #    BIC_PearceTransfer[idx],
+            BIC_PearceTransfer[idx],
             BIC_PearceInitExtra[idx],
             BIC_PearceInitAsym[idx],
-        #    BIC_PearceInitTransfer[idx],
+            BIC_PearceInitTransfer[idx],
             BIC_PearceAsymExtra[idx],
-        #    BIC_PearceExtraTransfer[idx],
-        #    BIC_PearceAsymTransfer[idx],
+            BIC_PearceExtraTransfer[idx],
+            BIC_PearceAsymTransfer[idx],
             BIC_PearceInitExtraAsym[idx],
-        #    BIC_PearceInitExtraTransfer[idx],
-        #    BIC_PearceInitAsymTransfer[idx],
-        #    BIC_PearceExtraAsymTransfer[idx],
-        #    BIC_PearceInitExtraAsymTransfer[idx],
+            BIC_PearceInitExtraTransfer[idx],
+            BIC_PearceInitAsymTransfer[idx],
+            BIC_PearceExtraAsymTransfer[idx],
+            BIC_PearceInitExtraAsymTransfer[idx],
         ]
     
     best_fitting = np.argmin(best_fitting_arr)

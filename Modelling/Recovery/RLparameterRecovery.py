@@ -30,7 +30,7 @@ NLL_array_list = []
 # Here we can change the trial Numbers and how many parameters we recover. should be a multiple of 60.
 mainTrials = 60
 additionalTrials = 0
-checkingCount = 348
+checkingCount = 58
 
 simulatedRLParams = np.empty((checkingCount, 2))
 simulatedRLParams[:] = np.nan
@@ -46,7 +46,7 @@ def recoveringParameters(mainTrials, additionalTrials, checkingCount):
         print("checking", i)
 
         # Simulating an object from the task design using the next 4 lines of code
-        taskSimulation = task_Design(mainTrials,  additionalTrials)
+        taskSimulation = task_Design(mainTrials,  additionalTrials, alphaPos=0.3, alphaNeg=0.3, alpha2Pos=0.3, alpha2Neg=0.3)
         taskSimulation.taskStructure()
         taskSimulation.RLloops()
         taskSimulation.statisticalLearning()
@@ -125,7 +125,7 @@ def recoveringParameters(mainTrials, additionalTrials, checkingCount):
         # plt.ylabel('NLL', fontweight='bold')
         # plt.show()
 
-        simulatedRLParams[i, 0] = taskSimulation.alpha
+        simulatedRLParams[i, 0] = taskSimulation.alphaPos
         simulatedRLParams[i, 1] = taskSimulation.beta
         recoveredRLParams[i, 0] = recoveredAlpha
         recoveredRLParams[i, 1] = recoveredBeta
@@ -171,7 +171,7 @@ plt.show()
 
 
 plt.hist(pearsonCorr[:, 0])
-plt.title("Histogram of correlation coefficients between surprise and RPE\n 50 subjects, {} + {} trials".format(mainTrials, additionalTrials))
+plt.title("Histogram of correlation coefficients between surprise and RPE\n 50 subjects, {0} trials, avg corr {1}, avg p {2}".format(mainTrials, np.mean(pearsonCorr[:,0]), np.mean(pearsonCorr[:,1])))
 plt.xlabel("pearson correlation coefficients")
 plt.ylabel("Frequency")
 plt.vlines(0, 0.0, 20.0, "black")

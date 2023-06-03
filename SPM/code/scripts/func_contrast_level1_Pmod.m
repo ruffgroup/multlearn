@@ -1,12 +1,14 @@
 function func_contrast_level1_Pmod(path, sub, model_version, del_old_con, splitting)
 
-% path of data
-data.source = [fullfile(path.folder_processed , sub)];
 %path of results
 if ischar(splitting)
-    data.destination = fullfile(path.SPM_folder,'/results', splitting, model_version, sub);
+    if ~exist(fullfile(path.SPM_folder,'/results', splitting, model_version),'dir')
+    mkdir(fullfile(path.SPM_folder,'/results', splitting, model_version))
+    end
+    copyfile(fullfile(path.SPM_folder,'/results', splitting, sub),fullfile(path.SPM_folder,'/results', splitting, model_version, sub))
+    data.destination = fullfile(path.SPM_folder,'/results', splitting, model_version, sub, filesep);
 else
-    data.destination = fullfile(path.SPM_folder,'/results', model_version, sub);
+    data.destination = fullfile(path.SPM_folder,'/results', model_version, sub, filesep);
 end
 spm_jobman('initcfg');
 

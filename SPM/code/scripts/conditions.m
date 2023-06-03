@@ -1,4 +1,4 @@
-function conditions(model_version, splitting)
+function conditions(model_version)
 
 subjects = [01 02 03 04 05 06 07 09 10 11 12 14 15 17 18 19 20 21 22 23 24 25 26 27 28 29 30 33 34 35 36 37 38 39 40 41 42 43 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64];
 %subjects = [01 02];
@@ -96,11 +96,9 @@ orth{1} = false;
 orth{2} = false;
 
 
-if ischar(splitting) && splitting ~= string(model_version)
-    destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subject)], ['beh'], [splitting],[model_version]);
-else
-    destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subject)], ['beh'], [model_version]);
-end
+
+destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subject)], ['beh'], [model_version]);
+
 if ~exist(destination,'dir')
     mkdir(destination)
 end

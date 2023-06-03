@@ -18,6 +18,8 @@ Modelling/Fitting/*/
 *.nii
 *.gz
 ._*
+*.hdr
+*.img
 #*.mat
 #*.npy
 #*.tsv
