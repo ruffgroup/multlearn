@@ -78,6 +78,7 @@ class task_Design:
         self.extra = extra
 
         self.alphaPos = alphaPos if not None else np.random.uniform(0, 1)
+        print(self.alphaPos)
         self.alphaNeg = alphaNeg if not None else np.random.uniform(0, 1)
         self.alpha2Pos = alpha2Pos if not None else np.random.uniform(0, 1)
         self.alpha2Neg = alpha2Neg if not None else np.random.uniform(0, 1)

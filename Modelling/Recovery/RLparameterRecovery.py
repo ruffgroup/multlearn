@@ -30,7 +30,7 @@ NLL_array_list = []
 # Here we can change the trial Numbers and how many parameters we recover. should be a multiple of 60.
 mainTrials = 60
 additionalTrials = 0
-checkingCount = 50
+checkingCount = 348
 
 simulatedRLParams = np.empty((checkingCount, 2))
 simulatedRLParams[:] = np.nan
