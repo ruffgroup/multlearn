@@ -5,6 +5,7 @@ import pathlib
 import scipy
 import csv
 import collections
+import shutil
 
 dataPath = os.path.join(pathlib.Path(__file__).resolve().parents[3], "/data/fittedParameters")
 IDs = [
@@ -259,6 +260,9 @@ for idx, IDnr in enumerate(IDs):
     best_fitting = np.argmin(best_fitting_arr)
     best_fitting_val = best_fitting_arr[best_fitting]
 
+    for i in range(5):
+        shutil.copy(models[best_fitting] + "/" + IDnr + "_" + str(i) + "_" + models[best_fitting] + "_Plots.pdf",
+                    "bestFittingVals/sub-" + IDnr)
 
     rpeBest = scipy.io.loadmat(
         newPath + "/" + models[best_fitting] + "/rpe" + models[best_fitting] + ".mat"

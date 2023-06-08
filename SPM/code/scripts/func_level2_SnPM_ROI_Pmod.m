@@ -12,9 +12,9 @@ end
 spm_jobman('initcfg');
 
 if ischar(splitting) && splitting ~= string(model_version)
-    folder_files = dir(fullfile(path.SPM_folder,'/results', splitting,'ROI_analysis', ROI_folder, ROI_name, model_version, 'sub-*'));
+    folder_files = dir(string(fullfile(path.SPM_folder,'/results', splitting,'ROI_analysis', ROI_folder, ROI_name, model_version, 'sub-*')));
 elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
-    folder_files = dir(fullfile(path.SPM_folder,'/results', model_version,'ROI_analysis', ROI_folder, ROI_name, 'sub-*'));
+    folder_files = dir(string(fullfile(path.SPM_folder,'/results', model_version,'ROI_analysis', ROI_folder, ROI_name, 'sub-*')));
 end
 
 
@@ -37,7 +37,7 @@ matlabbatch{1}.spm.tools.snpm.des.OneSampT.bVolm = 1;
 matlabbatch{1}.spm.tools.snpm.des.OneSampT.ST.ST_later = -1;
 matlabbatch{1}.spm.tools.snpm.des.OneSampT.masking.tm.tm_none = 1;
 matlabbatch{1}.spm.tools.snpm.des.OneSampT.masking.im = 1;
-matlabbatch{1}.spm.tools.snpm.des.OneSampT.masking.em = {string(strcat(ROI.folder,filesep,ROI.name, ',1'))};
+matlabbatch{1}.spm.tools.snpm.des.OneSampT.masking.em = {strcat(ROI.folder,filesep, ROI.name, ',1')};
 matlabbatch{1}.spm.tools.snpm.des.OneSampT.globalc.g_omit = 1;
 matlabbatch{1}.spm.tools.snpm.des.OneSampT.globalm.gmsca.gmsca_no = 1;
 matlabbatch{1}.spm.tools.snpm.des.OneSampT.globalm.glonorm = 1;

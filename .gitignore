@@ -12,7 +12,7 @@ SPM/results/
 Modelling/Fitting/*/
 !Modelling/Fitting/bestFittingVals/
 # Ignore pdf files, png, pycache, matlab, npy, tsv
-*.pdf
+#*.pdf
 *.png
 *.pyc
 *.nii
@@ -23,3 +23,4 @@ Modelling/Fitting/*/
 #*.mat
 #*.npy
 #*.tsv
+!Modelling/Fitting/bestFittingVals/*.pdf

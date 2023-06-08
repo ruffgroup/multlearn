@@ -4,9 +4,9 @@ spm_figure('GetWin','Graphics');
 
 if ischar(splitting) && splitting ~= string(model_version)
     if contains(string(model_version,'spe'))
-    data.ROI_pmod_folder = dit(fullfile(path.SPM_folder, 'results', splitting, 'ROIclusters', 'surprise'));
+    data.ROI_pmod_folder = dir(fullfile(path.SPM_folder, 'results', splitting, 'ROIclusters', 'surprise'));
     elseif contains(string(model_version,'rpe'))
-        data.ROI_pmod_folder = dit(fullfile(path.SPM_folder, 'results', splitting, 'ROIclusters', 'rpe'));
+        data.ROI_pmod_folder = dir(fullfile(path.SPM_folder, 'results', splitting, 'ROIclusters', 'rpe'));
     end
     data.ROI_pmod_folder = [path.ROI_pmod_folder(1).folder '/'];
     data.destination = fullfile(path.SPM_folder,'/results', splitting, 'ROI', ROI_folder, model_version, strcat('Second_level_SnPM_con', num2str(contrast_num )), filesep );

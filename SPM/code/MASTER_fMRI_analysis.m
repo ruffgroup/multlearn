@@ -3,9 +3,9 @@ clear all
 
 % SETTINGS:
 ISrun_level1 = 0;
-ISrun_level1_ROI = 1;
+ISrun_level1_ROI = 0;
 ISrun_contrasts = 0;
-ISrun_contrasts_ROI = 1;
+ISrun_contrasts_ROI = 0;
 ISrun_level2SPM = 0;
 ISrun_level2SnPM = 0;
 ISrun_level2Inference = 0;
@@ -28,7 +28,8 @@ subs = subs([subs.isdir]');
 subs = subs(~contains({subs.name},{'sub-08', 'sub-13', 'sub-44'}));
 models = ["spe_rpeBestOverall"]; % "other", "spe", "rpeSimple", "spe_rpeSimple"
 tVals = [2.4, 2.6, 3.1];
-ROI_tVals = [2.4, 2.6, 2.8, 3.1];
+%ROI_tVals = [2.4, 2.6, 2.8, 3.1];
+ROI_tVals = [1, 1.2, 1.5, 1.8];
 addpath(fullfile('scripts'));
 
 %% Create conditions file
@@ -196,7 +197,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), ROI)
                     catch
                     end
-                    
+
                 end
             end
         end
@@ -218,18 +219,18 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                 end
                 for ROI = ROI_choice_folder'
                     func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, 'choice',ROI);
-                    func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, 'choice', ROI);
+                    %func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, 'choice', ROI);
                 end
                 for ROI = ROI_feedback_folder'
-                    func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, 'feedback',ROI);
+                    %func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, 'feedback',ROI);
                     func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, 'feedback', ROI);
                 end
                 for ROI = ROI_pmod1_folder'
                     func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, char(model(1,1)),ROI);
-                    func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, char(model(1,1)), ROI);
+                    %func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, char(model(1,1)), ROI);
                 end
                 for ROI = ROI_pmod2_folder'
-                    func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, char(model(2,1)),ROI);
+                    %func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, char(model(2,1)),ROI);
                     func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, char(model(2,1)), ROI);
                 end
             end
@@ -267,11 +268,11 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                         end
                     end
                     for ROI = ROI_Pmod_folder'
-                        func_level2_SnPM_ROI_Pmod(path,subs, char(model(1,1)), k, splitting,'pmod', ROI);
+                        func_level2_SnPM_ROI_Pmod(path,subs, char(model(1,1)), k, splitting,char(model(1,1)), ROI);
                         if ISrun_level2Inference_ROI == 1
                             for tVal = ROI_tVals
                                 try
-                                    func_SnPM_inference_ROI(path, splitting, k, char(model(1,1)), tVal, 'pmod', ROI);
+                                    func_SnPM_inference_ROI(path, splitting, k, char(model(1,1)), tVal, char(model(1,1)), ROI);
                                 catch
                                 end
                             end
@@ -312,11 +313,11 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                         end
                     end
                     for ROI = ROI_Pmod_folder'
-                        func_level2_SnPM_ROI_Pmod(path,subs, char(model(1,1)), k, splitting,'pmod', ROI);
+                        func_level2_SnPM_ROI_Pmod(path,subs, char(model(1,1)), k, splitting,char(model(1,1)), ROI);
                         if ISrun_level2Inference_ROI == 1
                             for tVal = ROI_tVals
                                 try
-                                    func_SnPM_inference_ROI(path, splitting, k, char(model(1,1)), tVal, 'pmod', ROI);
+                                    func_SnPM_inference_ROI(path, splitting, k, char(model(1,1)), tVal, char(model(1,1)), ROI);
                                 catch
                                 end
                             end
@@ -380,11 +381,11 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                         end
                     end
                     for ROI = ROI_Pmod_folder'
-                        func_level2_SnPM_ROI_Pmod(path,subs, char(model(2,1)), k, splitting,'pmod', ROI);
+                        func_level2_SnPM_ROI_Pmod(path,subs, char(model(2,1)), k, splitting,char(model(2,1)), ROI);
                         if ISrun_level2Inference_ROI == 1
                             for tVal = ROI_tVals
                                 try
-                                    func_SnPM_inference_ROI(path, splitting, k, char(model(2,1)), tVal, 'pmod', ROI);
+                                    func_SnPM_inference_ROI(path, splitting, k, char(model(2,1)), tVal, char(model(2,1)), ROI);
                                 catch
                                 end
                             end
@@ -425,11 +426,11 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
                         end
                     end
                     for ROI = ROI_Pmod_folder'
-                        func_level2_SnPM_ROI_Pmod(path,subs, char(model(2,1)), k, splitting,'pmod', ROI);
+                        func_level2_SnPM_ROI_Pmod(path,subs, char(model(2,1)), k, splitting,char(model(2,1)), ROI);
                         if ISrun_level2Inference_ROI == 1
                             for tVal = ROI_tVals
                                 try
-                                    func_SnPM_inference_ROI(path, splitting, k, char(model(2,1)), tVal, 'pmod', ROI);
+                                    func_SnPM_inference_ROI(path, splitting, k, char(model(2,1)), tVal, char(model(2,1)), ROI);
                                 catch
                                 end
                             end

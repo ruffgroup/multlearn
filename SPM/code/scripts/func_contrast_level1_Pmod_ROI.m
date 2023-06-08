@@ -4,17 +4,17 @@ function func_contrast_level1_Pmod_ROI(path, sub, model_version, del_old_con, sp
 ROI_name = split(ROI.name,'_');
 ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
 if ischar(splitting)
-    if ~exist(fullfile(path.SPM_folder,'/results', splitting,'ROI_analysis', ROI_folder, ROI_name, model_version),'dir')
-    mkdir(fullfile(path.SPM_folder,'/results', splitting,'ROI_analysis', ROI_folder, ROI_name, model_version))
+    if ~exist(string(fullfile(path.SPM_folder,'/results', splitting,'ROI_analysis', ROI_folder, ROI_name, model_version)),'dir')
+    mkdir(string(fullfile(path.SPM_folder,'/results', splitting,'ROI_analysis', ROI_folder, ROI_name, model_version)))
+    copyfile(string(fullfile(path.SPM_folder,'/results', splitting,'ROI_analysis', ROI_folder, ROI_name, sub)),string(fullfile(path.SPM_folder,'/results', splitting, 'ROI_analysis', ROI_folder, ROI_name, model_version, sub)))
     end
-    copyfile(fullfile(path.SPM_folder,'/results', splitting,'ROI_analysis', ROI_folder, ROI_name, sub),fullfile(path.SPM_folder,'/results', splitting, 'ROI_analysis', ROI_folder, ROI_name, model_version, sub))
     data.destination = fullfile(path.SPM_folder,'/results', splitting, 'ROI_analysis', ROI_folder, ROI_name, model_version, sub);
 else
     data.destination = fullfile(path.SPM_folder,'/results', model_version, 'ROI_analysis', ROI_folder, ROI_name, sub);
 end
 spm_jobman('initcfg');
 
-load(fullfile(data.destination,'SPM.mat'));
+load(string(fullfile(data.destination,'SPM.mat')));
 %%
 runs_present = 6;
 
