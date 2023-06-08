@@ -24,7 +24,7 @@ def guess_root_folder():
 
 def get_run_index():
 
-    return pd.MultiIndex.from_product([range(1, 61), range(1, 7)], names=['trialNumber', 'runNumber'])
+    return pd.MultiIndex.from_product([range(1, 7), range(1, 61)], names=['runNumber','trialNumber'])
 
 def get_behavior(root_dir=None):
     
@@ -40,7 +40,7 @@ def get_behavior(root_dir=None):
         if not op.exists(fn):
             print(subject)
 
-        behavior.append(pd.read_csv(fn, index_col=[0, 1]))
+        behavior.append(pd.read_csv(fn, index_col=[1, 0]))
 
     behavior = pd.concat(behavior, keys=subjects, names=['subject'])
 
