@@ -646,38 +646,38 @@ configurations = [
 #    "04",
 #    "05",
 #    "06",
-#    "07",
+    "07",
 #    "09",
 #    "10",
-#    "11",
+    "11",
 #    "12",
 #    "14",
-#    "15",
+    "15",
 #    "17",
 #    "18",
 #    "19",
-#    "20",
-#    "21",
+    "20",
+    "21",
 #    "22",
 #    "23",
 #    "24",
 #    "25",
 #    "26",
 #    "27",
-#    "28",
+    "28",
    "29",
-   "30",
-#    "33",
+#   "30",
+#   "33",
 #    "34",
 #    "35",
 #    "36",
-#    "37",
+    "37",
 #    "38",
 #    "39",
 #    "40",
-#    "41",
-#    "42",
-#    "43",
+    "41",
+    "42",
+    "43",
 #    "45",
 #    "46",
 #    "47",
@@ -686,16 +686,16 @@ configurations = [
 #    "50",
 #    "51",
 #    "52",
-#    "53",
-#    "54",
+    "53",
+#   "54",
 #    "55",
-#    "56",
-#    "57",
+#   "56",
+#   "57",
 #    "58",
-#    "59",
-#    "60",
-#    "61",
-#    "62",
+    "59",
+#   "60",
+#   "61",
+    "62",
 #    "63",
 #    "64",
 ]
@@ -722,14 +722,14 @@ def handle_ctrl_c(func):
 
 @handle_ctrl_c
 def use_fitting(IDnr):
-    fitted = Fitting(60, 0, 5000, ID="29", plotting=True)
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
     fitted.modelFitting(saveAs="Basic")
 
 
-@handle_ctrl_c
-def use_fitting2(IDnr):
-    fitted = Fitting(60, 0, 5000, ID="30", plotting=True)
-    fitted.modelFitting(saveAs="Transfer", transfer=True)
+# @handle_ctrl_c
+# def use_fitting2(IDnr):
+#     fitted = Fitting(60, 0, 5000, ID="30", plotting=True)
+#     fitted.modelFitting(saveAs="Transfer", transfer=True)
 
 
 # @handle_ctrl_c
@@ -771,12 +771,12 @@ def main():
     pool.close()
     pool.join()
 
-    pool2 = Pool(8, initializer=init_pool)
-    results2 = pool2.map(use_fitting2, configurations)
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
-        print("Ctrl-C was entered.")
-    pool2.close()
-    pool2.join()
+    # pool2 = Pool(8, initializer=init_pool)
+    # results2 = pool2.map(use_fitting2, configurations)
+    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
+    #     print("Ctrl-C was entered.")
+    # pool2.close()
+    # pool2.join()
 
     # pool3 = Pool(8, initializer=init_pool)
     # results3 = pool3.map(use_fitting3, configurations)
