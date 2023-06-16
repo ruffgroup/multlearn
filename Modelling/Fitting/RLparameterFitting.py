@@ -162,7 +162,7 @@ class Fitting:
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
             run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
-            run_V0, run_V1 = (np.empty((self.gridCount, self.mainTrials + self.additionalTrials + 1)) for i in range(2))
+            run_V0, run_V1 = (np.empty((self.gridCount, self.mainTrials + self.additionalTrials)) for i in range(2))
 
             run_RPEs[:], run_V0[:], run_V1[:] = (np.nan for i in range(3))
 
@@ -218,8 +218,8 @@ class Fitting:
                         K1Check = K2Check = K3Check = K4Check = K1Grid[j]
 
                 betaCheck = betaGrid[j]
-                run_V0[j, 0] = V_option0[0, 0, 0]
-                run_V1[j, 0] = V_option1[0, 0, 0]
+                # run_V0[j, 0] = V_option0[0, 0, 0]
+                # run_V1[j, 0] = V_option1[0, 0, 0]
 
                 if pearce:
                     omega = omega2 = omega3 = omega4 = 1
@@ -427,8 +427,8 @@ class Fitting:
                         V_option0[t + 1, :] = V_option0[t, :]
 
                     run_RPEs[j, t] = rewardPE[(t,) + runData.stimulusPair[t]]
-                    run_V0[j, t + 1] = V_option0[(t + 1,) + runData.stimulusPair[t]]
-                    run_V1[j, t + 1] = V_option1[(t + 1,) + runData.stimulusPair[t]]
+                    run_V0[j, t] = V_option0[(t,) + runData.stimulusPair[t]]
+                    run_V1[j, t] = V_option1[(t,) + runData.stimulusPair[t]]
                 negativeLogLikelihood = -np.sum(np.log(actionProb[~np.isnan(actionProb)]))
                 Likelihood = np.prod(actionProb[~np.isnan(actionProb)])
                 NLL_array[run, j, 0] = negativeLogLikelihood
