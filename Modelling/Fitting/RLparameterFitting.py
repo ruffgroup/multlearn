@@ -121,13 +121,13 @@ class Fitting:
         V0 = np.empty(
             (
                 max(self.subjectData.runNumber),
-                self.mainTrials + self.additionalTrials + 1,
+                self.mainTrials + self.additionalTrials,
             )
         )
         V1 = np.empty(
             (
                 max(self.subjectData.runNumber),
-                self.mainTrials + self.additionalTrials + 1,
+                self.mainTrials + self.additionalTrials,
             )
         )
         RPE[:], V0[:], V1[:] = (np.nan for i in range(3))
