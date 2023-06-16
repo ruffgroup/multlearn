@@ -640,64 +640,64 @@ class Fitting:
 # You can only run ONE model fitting at a time
 
 configurations = [
-   "01",
-   "02",
-   "03",
-   "04",
-   "05",
-   "06",
-   "07",
-   "09",
-   "10",
-   "11",
-   "12",
-   "14",
-   "15",
-   "17",
-   "18",
-   "19",
-   "20",
-   "21",
-   "22",
-   "23",
-   "24",
-   "25",
-   "26",
-   "27",
-   "28",
+#    "01",
+#    "02",
+#    "03",
+#    "04",
+#    "05",
+#    "06",
+#    "07",
+#    "09",
+#    "10",
+#    "11",
+#    "12",
+#    "14",
+#    "15",
+#    "17",
+#    "18",
+#    "19",
+#    "20",
+#    "21",
+#    "22",
+#    "23",
+#    "24",
+#    "25",
+#    "26",
+#    "27",
+#    "28",
    "29",
    "30",
-   "33",
-   "34",
-   "35",
-   "36",
-   "37",
-   "38",
-   "39",
-   "40",
-   "41",
-   "42",
-   "43",
-   "45",
-   "46",
-   "47",
-   "48",
-   "49",
-   "50",
-   "51",
-   "52",
-   "53",
-   "54",
-   "55",
-   "56",
-   "57",
-   "58",
-   "59",
-   "60",
-   "61",
-   "62",
-   "63",
-   "64",
+#    "33",
+#    "34",
+#    "35",
+#    "36",
+#    "37",
+#    "38",
+#    "39",
+#    "40",
+#    "41",
+#    "42",
+#    "43",
+#    "45",
+#    "46",
+#    "47",
+#    "48",
+#    "49",
+#    "50",
+#    "51",
+#    "52",
+#    "53",
+#    "54",
+#    "55",
+#    "56",
+#    "57",
+#    "58",
+#    "59",
+#    "60",
+#    "61",
+#    "62",
+#    "63",
+#    "64",
 ]
 
 
@@ -720,16 +720,16 @@ def handle_ctrl_c(func):
     return wrapper
 
 
-# @handle_ctrl_c
-# def use_fitting(IDnr):
-#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-#     fitted.modelFitting(saveAs="Asym", asym=True)
+@handle_ctrl_c
+def use_fitting(IDnr):
+    fitted = Fitting(60, 0, 5000, ID="29", plotting=True)
+    fitted.modelFitting(saveAs="Basic")
 
 
-# @handle_ctrl_c
-# def use_fitting2(IDnr):
-#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-#     fitted.modelFitting(saveAs="PearceExtraAsymTransfer", pearce=True, extra=True, asym=True, transfer=True)
+@handle_ctrl_c
+def use_fitting2(IDnr):
+    fitted = Fitting(60, 0, 5000, ID="30", plotting=True)
+    fitted.modelFitting(saveAs="Transfer", transfer=True)
 
 
 # @handle_ctrl_c
@@ -745,10 +745,10 @@ def handle_ctrl_c(func):
 #     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
 #     fitted.modelFitting(saveAs="PearceInitAsymTransfer", init=True, asym=True, pearce=True, transfer=True)
 
-@handle_ctrl_c
-def use_surprise(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
-    fitted.statisticalLearning()
+# @handle_ctrl_c
+# def use_surprise(IDnr):
+#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
+#     fitted.statisticalLearning()
 
 def pool_ctrl_c_handler(*args, **kwargs):
     global ctrl_c_entered
@@ -763,20 +763,20 @@ def init_pool():
 
 
 def main():
-    # signal.signal(signal.SIGINT, signal.SIG_IGN)
-    # pool = Pool(8, initializer=init_pool)
-    # results = pool.map(use_fitting, configurations)
-    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
-    #     print("Ctrl-C was entered.")
-    # pool.close()
-    # pool.join()
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
+    pool = Pool(8, initializer=init_pool)
+    results = pool.map(use_fitting, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
+        print("Ctrl-C was entered.")
+    pool.close()
+    pool.join()
 
-    # pool2 = Pool(8, initializer=init_pool)
-    # results2 = pool2.map(use_fitting2, configurations)
-    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
-    #     print("Ctrl-C was entered.")
-    # pool2.close()
-    # pool2.join()
+    pool2 = Pool(8, initializer=init_pool)
+    results2 = pool2.map(use_fitting2, configurations)
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
+        print("Ctrl-C was entered.")
+    pool2.close()
+    pool2.join()
 
     # pool3 = Pool(8, initializer=init_pool)
     # results3 = pool3.map(use_fitting3, configurations)
@@ -792,13 +792,13 @@ def main():
     # pool4.close()
     # pool4.join()
 
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-    pool = Pool(8, initializer=init_pool)
-    results = pool.map(use_surprise, configurations)
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
-        print("Ctrl-C was entered.")
-    pool.close()
-    pool.join()
+    # signal.signal(signal.SIGINT, signal.SIG_IGN)
+    # pool = Pool(8, initializer=init_pool)
+    # results = pool.map(use_surprise, configurations)
+    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
+    #     print("Ctrl-C was entered.")
+    # pool.close()
+    # pool.join()
 
 
 if __name__ == "__main__":
