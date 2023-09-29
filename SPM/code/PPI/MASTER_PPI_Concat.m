@@ -2,22 +2,17 @@
 clear all
 
 % SETTINGS:
-ISrun_level1 = 0;
-ISrun_level1_ROI = 0;
-ISrun_contrasts = 0;
+ISrun_level1_ROI = 1;
 ISrun_contrasts_ROI = 0;
-ISrun_level2SPM = 0;
-ISrun_level2SnPM = 0;
-ISrun_level2Inference = 1;
 del_old_con = 0; % delete old contrasts if you re-run only second level analyses
 ISrun_level2_ROI = 0;
 ISrun_level2Inference_ROI = 0;
 
-path.folder_processed = dir(fullfile('../../../data/ds-mlearn/derivatives/fmriprep'));
+path.folder_processed = dir(fullfile('../../../../data/ds-mlearn/derivatives/fmriprep'));
 path.folder_processed = [path.folder_processed(1).folder '/'];
-path.bids_folder = dir(fullfile('../../../data/ds-mlearn'));
+path.bids_folder = dir(fullfile('../../../../data/ds-mlearn'));
 path.bids_folder = [path.bids_folder(1).folder '/'];
-path.SPM_folder = dir(fullfile('../../SPM'));
+path.SPM_folder = dir(fullfile('../../../SPM'));
 path.SPM_folder = [path.SPM_folder(1).folder '/'];
 path.neurosynth_folder = dir(fullfile(path.SPM_folder,'neurosynth/*.img'));
 %path.neurosynth_folder = [path.neurosynth_folder(1).folder '/'];
@@ -26,18 +21,14 @@ path.neurosynth_folder = dir(fullfile(path.SPM_folder,'neurosynth/*.img'));
 subs = dir(fullfile(path.folder_processed, 'sub-*'));
 subs = subs([subs.isdir]');
 subs = subs(~contains({subs.name},{'sub-08', 'sub-13', 'sub-44'}));
-%subs = subs(~contains({subs.name}, {'sub-08', 'sub-13', 'sub-44', ,'sub-54', 'sub-55', ...
-%    'sub-56','sub-57','sub-58','sub-59','sub-60','sub-61', 'sub-62', 'sub-63', 'sub-64'}));
 models = ["spe_rpeBestOverall"]; % "other", "spe", "rpeSimple", "spe_rpeSimple"
-tVals = [2.4, 2.6, 3.1];
-ROI_tVals = [2.4, 2.6, 2.8, 3.1];
-%ROI_tVals = [1, 1.2, 1.5, 1.8];
-addpath(fullfile('scripts'));
+ROI_tVals = [1];
+addpath(fullfile('scriptsPPI'));
 
-%% Create conditions file
+% Create conditions file
 % for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 %     model_version = convertStringsToChars(i);
-%     conditions(model_version)
+%     func_setup_PPI(model_version)
 % end
 
 %% 1. run tapas
@@ -68,89 +59,20 @@ numSubs = numel(subs);
 
 for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
     model_version = convertStringsToChars(i);
-    if ISrun_level1 == 1
-        parfor (sub = 1:numSubs,M)
-            try
-            func_level1(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version)
-            catch
-            end
-        end
-    end
-    %
-    if ISrun_contrasts == 1
-    parfor (sub = 1:numSubs,M)
-        if model_version == "other"
-            func_contrast_level1(path, subs(sub).name, del_old_con);
-        elseif ~contains(model_version, "_") && model_version ~= "other"
-            splitting = false;
-            func_contrast_level1_Pmod(path, subs(sub).name, model_version, del_old_con, splitting);
-        else
-            splitting = model_version;
-            model = split(model_version, "_");
-            func_contrast_level1_Pmod(path, subs(sub).name, char(model(1,1)), del_old_con, splitting);
-            func_contrast_level1_Pmod(path, subs(sub).name, char(model(2,1)), del_old_con, splitting);
-            func_contrast_level1_BothPmods(path, subs(sub).name, model_version, del_old_con);
-        end
-    end
-    end
 
-
-
-    if model_version == "other"
-        splitting = false;
-        num_contrasts = 2; % number set in func_contrast_level1
-
-        parfor (k = 1:num_contrasts,M)
-            if ISrun_level2SPM == 1
-                func_level2(path,subs, model_version, k, splitting);
-            end
-            if ISrun_level2SnPM == 1
-                func_level2_SnPM(path,subs, model_version, k, splitting);
-            end
-            if ISrun_level2Inference == 1
-                for tVal = tVals
-                    try
-                        func_SnPM_inference(path,splitting, k,model_version,tVal)
-                    catch
-                    end
-                end
-            end
-        end
-
-    elseif ~contains(model_version, "_") && model_version ~= "other"
-        splitting = false;
-        num_contrasts = 7;
-        parfor (k = 1:num_contrasts,M)
-            if ISrun_level2SPM == 1
-                func_level2(path,subs, model_version, k, splitting);
-            end
-            if ISrun_level2SnPM == 1
-                func_level2_SnPM(path,subs, model_version, k, splitting);
-            end
-            if ISrun_level2Inference == 1
-                for tVal = tVals
-                    try
-                        func_SnPM_inference(path,splitting, k,model_version,tVal)
-                    catch
-                    end
-                end
-            end
-        end
-
-    else
         splitting = model_version;
         model = split(model_version, "_");
         num_contrasts1 = 7;
         num_contrasts2 = 7;
         num_contrasts3 = 15;
-        ROI_audio_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
-                    'ROIclusters/audio/*.img'));
-        ROI_tactile_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
-                    'ROIclusters/tactile/*.img'));
-        ROI_choice_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
-                    'ROIclusters/choice/*.img'));
-        ROI_feedback_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
-                    'ROIclusters/feedback/*.img'));
+%         ROI_audio_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
+%                     'ROIclusters/audio/*.img'));
+%         ROI_tactile_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
+%                     'ROIclusters/tactile/*.img'));
+%         ROI_choice_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
+%                     'ROIclusters/choice/*.img'));
+%         ROI_feedback_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
+%                     'ROIclusters/feedback/*.img'));
         ROI_pmod1_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
                     'ROIclusters',char(model(1,1)), '*.img'));
         ROI_pmod2_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
@@ -158,101 +80,6 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 
         if ISrun_level1_ROI == 1
             parfor (sub = 1:numSubs,M)
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), char(model(1,1)), ROI_pmod1_folder(2))
-%                 catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), char(model(1,1)), ROI_pmod1_folder(3))
-%                 catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), char(model(1,1)), ROI_pmod1_folder(4))
-%                 catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), char(model(2,1)), ROI_pmod2_folder(7))
-%                 catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), char(model(2,1)), ROI_pmod2_folder(8))
-%                 catch
-%                 end
-%                 try
-% 
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), char(model(2,1)), ROI_pmod2_folder(6))
-%                     catch
-%                 end
-%                 try
-% 
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), char(model(2,1)), ROI_pmod2_folder(5))
-%                     catch
-%                 end
-%                 try
-% 
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), char(model(2,1)), ROI_pmod2_folder(4))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(1))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(5))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(6))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(7))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(8))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(3))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(4))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(5))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(6))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(7))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI_choice_folder(8))
-%                     catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'feedback', char(model(2,1)), ROI_feedback_folder(1))
-%                 catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'feedback', char(model(2,1)), ROI_feedback_folder(5))
-%                 catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'feedback', char(model(2,1)), ROI_feedback_folder(6))
-%                 catch
-%                 end
-%                 try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'feedback', char(model(2,1)), ROI_feedback_folder(7))
-%                 catch
-%                 end
 %                 for ROI = path.neurosynth_folder'
 %                     try
 %                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'neurosynth', ROI)
@@ -274,32 +101,31 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 %                 end
 %                 for ROI = ROI_choice_folder'
 %                     try
-%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', char(model(1,1)), ROI)
+%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'choice', ROI)
 %                     catch
 %                     end
 %                 end
-                for ROI = ROI_feedback_folder'
-                try
-                    func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'feedback', char(model(2,1)), ROI)
-                catch
-                end
-                end
+%                 for ROI = ROI_feedback_folder'
+%                 try
+%                     func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, 'feedback', ROI)
+%                 catch
+%                 end
+%                 end
                 for ROI = ROI_pmod1_folder'
                     try
 
-                    func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), char(model(1,1)), ROI)
+                    func_level1_PPI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), ROI)
                     catch
                     end
                 end
                 for ROI = ROI_pmod2_folder'
                     try
 
-                    func_level1_ROI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), char(model(2,1)), ROI)
+                    func_level1_PPI(path.folder_processed, path.bids_folder, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), ROI)
                     catch
                     end
 
                 end
-%
             end
         end
 
@@ -322,10 +148,10 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 %                     func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, 'choice',ROI);
 %                     %func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, 'choice', ROI);
 %                 end
-                for ROI = ROI_feedback_folder'
-                    %func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, 'feedback',ROI);
-                    func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, 'feedback', ROI);
-                end
+%                 for ROI = ROI_feedback_folder'
+%                     %func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, 'feedback',ROI);
+%                     func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, 'feedback', ROI);
+%                 end
                 for ROI = ROI_pmod1_folder'
                     func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, char(model(1,1)),ROI);
                     %func_contrast_level1_Pmod_ROI(path, subs(sub).name, char(model(2,1)), del_old_con, splitting, char(model(1,1)), ROI);
@@ -339,9 +165,6 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 
 
         parfor (k = 1:num_contrasts1,M)
-            if ISrun_level2SPM == 1
-                func_level2(path,subs, char(model(1,1)), k, splitting);
-            end
             if ISrun_level2SnPM == 1
                 func_level2_SnPM(path,subs, char(model(1,1)), k, splitting);
             end
@@ -356,7 +179,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
             if ISrun_level2_ROI == 1
                 ROI_Pmod_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
                     'ROIclusters',char(model(1,1)), '*.img'));
-                if k == 1 || k == 4 || k == 3 || k == 6
+                if k == 4 || k == 3 || k == 6
                     for ROI = path.neurosynth_folder'
                         func_level2_SnPM_ROI_Pmod(path,subs, char(model(1,1)), k, splitting, 'neurosynth',ROI);
                         if ISrun_level2Inference_ROI == 1
@@ -469,7 +292,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
             if ISrun_level2_ROI == 1
                 ROI_Pmod_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
                     'ROIclusters',char(model(2,1)), '*.img'));
-                if k==1 || k == 4 || k == 3 || k == 6
+                if k == 4 || k == 3 || k == 6
                     for ROI = path.neurosynth_folder'
                         func_level2_SnPM_ROI_Pmod(path,subs, char(model(2,1)), k, splitting, 'neurosynth',ROI);
                         if ISrun_level2Inference_ROI == 1
@@ -583,8 +406,6 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
 %                 func_level2_SnPM_ROI(path,subs, model_version, k, splitting, ROI);
 %             end
         end
-
-    end
 
 
 

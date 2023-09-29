@@ -44,10 +44,13 @@ matlabbatch{1}.spm.stats.fmri_spec.timing.units = 'secs';
 for nrun = 1:numel(data.source)
     
     % FIND CONSTANTS
-    info_scan = dir(strcat(bids_folder, sub, '/func/', sub, '_*_run-' ,num2str(nrun), '_bold.json'));
-    info_scan = read_json(fullfile(info_scan(end).folder, info_scan(end).name));
-    TR = info_scan.RepetitionTime;
-    Nslices = info_scan.MaxSlices;
+%     info_scan = dir(strcat(bids_folder, sub, '/func/', sub, '_*_run-' ,num2str(nrun), '_bold.json'));
+%     info_scan = read_json(fullfile(info_scan(end).folder, info_scan(end).name));
+%     TR = info_scan.RepetitionTime;
+%     Nslices = info_scan.MaxSlices;
+%     refSlice = round(Nslices/2); % IMPORTANT: CHANGE THIS VALUE DEPENDING ON THE REFERENCE SLICE
+    TR = 2.3338400000000004;
+    Nslices = 40;
     refSlice = round(Nslices/2); % IMPORTANT: CHANGE THIS VALUE DEPENDING ON THE REFERENCE SLICE
     
     

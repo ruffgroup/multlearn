@@ -1,4 +1,4 @@
-function func_level1_ROI(folder_processed, bids_folder, SPM_folder, sub, model_version, ROI_folder, splitting, ROI)
+function func_level1_PPI(folder_processed, SPM_folder, sub, model_version, splitting, ROI_folder, ROI)
 
 spm('defaults', 'fMRI');
 
@@ -10,7 +10,9 @@ ROI_name = split(ROI.name,'_');
 ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
 
 %path of results
-data.destination = string(fullfile(SPM_folder,'/results',model_version,'ROI_analysis', ROI_folder, ROI_name, splitting, sub));
+data.destination = string(fullfile(SPM_folder,'/results',model_version,'PPI', ROI_folder, ROI_name, sub));
+VOIfolder = string(fullfile(SPM_folder, '/results', model_version, 'ROI_analysis', ROI_folder, ROI_name, splitting,sub));
+
 
 %% start spm 1stLvL model
 if ~exist(data.destination,'dir')
@@ -50,7 +52,8 @@ for nrun = 1:numel(data.source)
 %     refSlice = round(Nslices/2); % IMPORTANT: CHANGE THIS VALUE DEPENDING ON THE REFERENCE SLICE
     TR = 2.3338400000000004;
     Nslices = 40;
-    refSlice = round(Nslices/2);
+    refSlice = round(Nslices/2); % IMPORTANT: CHANGE THIS VALUE DEPENDING ON THE REFERENCE SLICE
+    
     
     motion_param = [];
     other_param = [];
@@ -110,7 +113,9 @@ for nrun = 1:numel(data.source)
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = cellstr(string(multicondition_file));
     %matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = {cellstr(fullfile(folder_processed, sub,['beh'],model_version, ['run_' num2str(nrun) '_conditions.mat']))};
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).regress = struct('name', {}, 'val', {});
-    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {[fullfile(file_nuisance.folder,file_nuisance.name)]}; %note there should be always one file here
+    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {fullfile(strcat(VOIfolder,'\PPI_',num2str(nrun)))
+                                                               fullfile(file_nuisance.folder,file_nuisance.name)
+                                                                };
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).hpf = filter_thr;
     
 end

@@ -1,4 +1,4 @@
-function func_setup_PPI(model_version)
+function func_setup_PPI_Concat(model_version)
 subjects = [01 02 03 04 05 06 07 09 10 11 12 14 15 17 18 19 20 21 22 23 24 25 26 27 28 29 30 33 34 35 36 37 38 39 40 41 42 43 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64];
 %subjects = [01 02];
 
@@ -46,41 +46,33 @@ if runType == "tactile"
     spesA = [spesA zeros(1,60)];
     rpesA = [rpesA zeros(1,60)];
 
-    onsetsCT = [onsetsCT events.onset(choiceIdx)];
-    onsetsFT = [onsetsFT events.onset(feedbackIdx)];
-    onsetsCA = [onsetsCA zeros(1,60)];
-    onsetsFA = [onsetsFA zeros(1,60)];
+    onsetsCT = [onsetsCT; events.onset(choiceIdx)];
+    onsetsFT = [onsetsFT; events.onset(feedbackIdx)];
+    onsetsCA = [onsetsCA; zeros(60,1)];
+    onsetsFA = [onsetsFA; zeros(60,1)];
 
-    durationsCT = [durationsCT events.duration(choiceIdx)];
-    durationsFT = [durationsFT events.duration(feedbackIdx)];
-    durationsCA = [durationsCA zeros(1,60)];
-    durationsFA = [durationsFA zeros(1,60)];
+    durationsCT = [durationsCT; events.duration(choiceIdx)];
+    durationsFT = [durationsFT; events.duration(feedbackIdx)];
+    durationsCA = [durationsCA; zeros(60,1)];
+    durationsFA = [durationsFA; zeros(60,1)];
 
 elseif runType == "audio"
 
-    spesA = [spesT fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0)];
-    rpesA = [rpesT fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0)];
-    spesT = [spesA zeros(1,60)];
-    rpesT = [rpesA zeros(1,60)];
+    spesA = [spesA fillmissing(spe(run,:) - nanmean(spe(run,:)),"constant",0)];
+    rpesA = [rpesA fillmissing(rpe(run,:) - nanmean(rpe(run,:)),"constant",0)];
+    spesT = [spesT zeros(1,60)];
+    rpesT = [rpesT zeros(1,60)];
 
-    onsetsCA = [onsetsCA events.onset(choiceIdx)];
-    onsetsFA = [onsetsFA events.onset(feedbackIdx)];
-    onsetsCT = [onsetsCT zeros(1,60)];
-    onsetsFT = [onsetsFT zeros(1,60)];
+    onsetsCA = [onsetsCA; events.onset(choiceIdx)];
+    onsetsFA = [onsetsFA; events.onset(feedbackIdx)];
+    onsetsCT = [onsetsCT; zeros(60,1)];
+    onsetsFT = [onsetsFT; zeros(60,1)];
 
-    durationsCA = [durationsCA events.duration(choiceIdx)];
-    durationsFA = [durationsFA events.duration(feedbackIdx)];
-    durationsCT = [durationsCT zeros(1,60)];
-    durationsFT = [durationsFT zeros(1,60)];
+    durationsCA = [durationsCA; events.duration(choiceIdx)];
+    durationsFA = [durationsFA; events.duration(feedbackIdx)];
+    durationsCT = [durationsCT; zeros(60,1)];
+    durationsFT = [durationsFT; zeros(60,1)];
        
-end
-
-
-
-destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subject)], ['beh'], [model_version]);
-
-if ~exist(destination,'dir')
-    mkdir(destination)
 end
 
 end
@@ -107,18 +99,25 @@ pmod(3).poly{1}  = 1;
 pmod(4).param{1} = rpesA;
 pmod(4).poly{1}  = 1;
 
-onsets{1} = events.onset(choiceIdx);
-durations{1} = events.duration(choiceIdx);
-onsets{2} = events.onset(feedbackIdx);
-durations{2} = events.duration(feedbackIdx);
+onsets{1} = onsetsCT;
+durations{1} = durationsCT;
+onsets{2} = onsetsFT;
+durations{2} = durationsFT;
+onsets{3} = onsetsCA;
+durations{3} = durationsCA;
+onsets{4} = onsetsFA;
+durations{4} = durationsFA;
 
 orth{1} = false;
 orth{2} = false;
 orth{3} = false;
 orth{4} = false;
 
+destination = fullfile(['/data/ds-mlearn/derivatives/fmriprep/sub-' num2str(subject)], ['beh'], [model_version]);
 
-
+if ~exist(destination,'dir')
+    mkdir(destination)
+end
 
 save(fullfile(destination, '/PPI_conditions.mat'), 'names', 'onsets', 'durations', 'pmod', 'orth')
 end

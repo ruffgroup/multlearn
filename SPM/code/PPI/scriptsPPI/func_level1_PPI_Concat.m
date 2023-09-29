@@ -1,4 +1,4 @@
-function func_level1_ROI(folder_processed, bids_folder, SPM_folder, sub, model_version, ROI_folder, splitting, ROI)
+function func_level1_PPI_Concat(folder_processed, SPM_folder, sub, model_version, ROI_folder, ROI)
 
 spm('defaults', 'fMRI');
 
@@ -10,7 +10,7 @@ ROI_name = split(ROI.name,'_');
 ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
 
 %path of results
-data.destination = string(fullfile(SPM_folder,'/results',model_version,'ROI_analysis', ROI_folder, ROI_name, splitting, sub));
+data.destination = string(fullfile(SPM_folder,'/results',model_version,'PPI', ROI_folder, ROI_name, sub));
 
 %% start spm 1stLvL model
 if ~exist(data.destination,'dir')
@@ -36,37 +36,26 @@ run_name = run_name(sortOrder, 2);
 matlabbatch{1}.spm.stats.fmri_spec.dir = {data.destination};
 matlabbatch{1}.spm.stats.fmri_spec.timing.units = 'secs';
 
-
-
 %%
+motion_param = [];
+other_param = [];
+R = [];
+physio = [];
+names = [];
+if ~exist(fullfile(folder_processed,sub, ['beh'],['nuisance_' sub '_PPI.mat']))
 
-for nrun = 1:numel(data.source)
-    
-    % FIND CONSTANTS
-%     info_scan = dir(strcat(bids_folder, sub, '/func/', sub, '_*_run-' ,num2str(nrun), '_bold.json'));
-%     info_scan = read_json(fullfile(info_scan(end).folder, info_scan(end).name));
-%     TR = info_scan.RepetitionTime;
-%     Nslices = info_scan.MaxSlices;
-%     refSlice = round(Nslices/2); % IMPORTANT: CHANGE THIS VALUE DEPENDING ON THE REFERENCE SLICE
-    TR = 2.3338400000000004;
-    Nslices = 40;
-    refSlice = round(Nslices/2);
-    
-    motion_param = [];
-    other_param = [];
-    R = [];
-    physio = [];
+    for nrun = 1:numel(data.source)
     % LOAD physio data
     physioR_file = (fullfile(folder_processed,sub, ['beh/physio/RegPhysio_' sub '_run_' num2str(nrun) '.mat']));
     if ~exist(physioR_file, 'file')
         physio.model.R_column_names = [];
-        physio.model.R = [];        
+        physio.model.R = [];      
     else
         load(fullfile(folder_processed,sub, ['beh/physio/RegPhysio_' sub '_run_' num2str(nrun) '.mat']));
     end
     
     %% Load motion regressors
-    if ~exist(fullfile(folder_processed,sub, ['beh'],['nuisance_' sub '_run_' num2str(nrun) '.mat']))
+    
     file_confounds = dir(fullfile(folder_processed,sub, ['func/' sub '*_run-' num2str(nrun) '*confounds_timeseries.tsv']));
     confounds_raw = tdfread(fullfile(file_confounds.folder,file_confounds.name));
     
@@ -87,33 +76,50 @@ for nrun = 1:numel(data.source)
         add_other_names = [add_other_names; 'aCompCor_', num2str(ii)];
     end
     add_other_names = cellstr(add_other_names)';
-
+    
+    if isempty(names)
     names = [physio.model.R_column_names add_motion_names add_other_names]  ;
-    R = [physio.model.R motion_param other_param] ;
-    %%
-    save(fullfile(folder_processed,sub, ['beh'],['nuisance_' sub '_run_' num2str(nrun) '.mat']),'names', 'R');
     end
-    file_nuisance = dir([fullfile(folder_processed,sub, ['beh'],['nuisance_' sub '_run_' num2str(nrun) '.mat'])]);
-    
-    %% SCAN PARAMS
-    matlabbatch{1}.spm.stats.fmri_spec.timing.RT = TR;
-    matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t = Nslices;
-    matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t0 = refSlice;
-    
-    %% SCANS
-    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).scans = cellstr([spm_select('expand',[fullfile(data.source(nrun).folder, run_name{nrun})])]);
+
+    R = [R;physio.model.R motion_param other_param] ;
     %%
     
-    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).cond = struct('name', {}, 'onset', {}, 'duration', {}, 'tmod', {}, 'pmod', {}, 'orth', {});
-
-    multicondition_file=fullfile(folder_processed, sub,['beh'],model_version,filesep,['run_', num2str(nrun), '_conditions.mat']);
-    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = cellstr(string(multicondition_file));
-    %matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = {cellstr(fullfile(folder_processed, sub,['beh'],model_version, ['run_' num2str(nrun) '_conditions.mat']))};
-    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).regress = struct('name', {}, 'val', {});
-    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {[fullfile(file_nuisance.folder,file_nuisance.name)]}; %note there should be always one file here
-    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).hpf = filter_thr;
-    
+    end
+save(fullfile(folder_processed,sub, ['beh'],['nuisance_' sub '_PPI.mat']),'names', 'R');
+else
+    file_nuisance = dir([fullfile(folder_processed,sub, ['beh'],['nuisance_' sub '_PPI.mat'])]);
 end
+
+
+
+% FIND CONSTANTS
+%info_scan = dir(strcat(bids_folder, sub, '/func/', sub, '_*_run-' ,num2str(1), '_bold.json'));
+%info_scan = read_json(fullfile(info_scan(end).folder, info_scan(end).name));
+TR = 2.3338400000000004;
+Nslices = 40;
+refSlice = round(Nslices/2); % IMPORTANT: CHANGE THIS VALUE DEPENDING ON THE REFERENCE SLICE
+
+%% SCAN PARAMS
+matlabbatch{1}.spm.stats.fmri_spec.timing.RT = TR;
+matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t = Nslices;
+matlabbatch{1}.spm.stats.fmri_spec.timing.fmri_t0 = refSlice;
+
+%% SCANS
+allScans = [];
+for nrun = 1:numel(data.source)
+    allScans = [allScans;fullfile(data.source(nrun).folder, run_name{nrun})];
+end
+matlabbatch{1}.spm.stats.fmri_spec.sess(1).scans = cellstr([spm_select('expand',allScans)]);
+%%
+
+matlabbatch{1}.spm.stats.fmri_spec.sess(1).cond = struct('name', {}, 'onset', {}, 'duration', {}, 'tmod', {}, 'pmod', {}, 'orth', {});
+
+multicondition_file=fullfile(folder_processed, sub,['beh'],model_version,filesep,['PPI_conditions.mat']);
+matlabbatch{1}.spm.stats.fmri_spec.sess(1).multi = cellstr(string(multicondition_file));
+%matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = {cellstr(fullfile(folder_processed, sub,['beh'],model_version, ['run_' num2str(nrun) '_conditions.mat']))};
+matlabbatch{1}.spm.stats.fmri_spec.sess(1).regress = struct('name', {}, 'val', {});
+matlabbatch{1}.spm.stats.fmri_spec.sess(1).multi_reg = {[fullfile(file_nuisance.folder,file_nuisance.name)]}; %note there should be always one file here
+matlabbatch{1}.spm.stats.fmri_spec.sess(1).hpf = filter_thr;
 
 
 matlabbatch{1}.spm.stats.fmri_spec.fact = struct('name', {}, 'levels', {});

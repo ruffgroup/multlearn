@@ -1,10 +1,8 @@
-function func_SnPM_inference(path, splitting, contrast_num, model_version, tVal)
+function func_SnPM_inference_PPI(path, splitting, contrast_num, model_version, tVal, ROI_folder, ROI)
 tValSplit = split(num2str(tVal),'.');
-if ischar(splitting) && splitting ~= string(model_version)
-    data.destination = fullfile(path.SPM_folder,'/results', splitting, model_version, strcat('Second_level_SnPM_con', num2str(contrast_num )) );
-elseif ischar(splitting) && splitting == string(model_version) || ~ischar(splitting)
-    data.destination = fullfile(path.SPM_folder,'/results', model_version,strcat('Second_level_SnPM_con', num2str(contrast_num )) );
-end
+ROI_name = split(ROI.name,'_');
+ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
+data.destination = fullfile(path.SPM_folder,'/results',splitting,'PPI', ROI_folder, ROI_name,strcat(ROI_name,'_SnPM_con', num2str(contrast_num )), filesep );
 
 spm_jobman('initcfg');
 matlabbatch{1}.spm.tools.snpm.inference.SnPMmat = cellstr(string(fullfile(data.destination, filesep, 'SnPM.mat')));
