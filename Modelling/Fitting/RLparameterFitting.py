@@ -116,7 +116,10 @@ class Fitting:
         NLL_array = np.empty((max(self.subjectData.runNumber), self.gridCount, 12))
         NLL_array[:] = np.nan
 
-        RPE = np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials))
+        (
+            trial_alphas, 
+            RPE,
+            ) = (np.empty((max(self.subjectData.runNumber), self.mainTrials + self.additionalTrials)) for i in range(2))
 
         V0 = np.empty(
             (
@@ -130,7 +133,7 @@ class Fitting:
                 self.mainTrials + self.additionalTrials,
             )
         )
-        RPE[:], V0[:], V1[:] = (np.nan for i in range(3))
+        trial_alphas[:], RPE[:], V0[:], V1[:] = (np.nan for i in range(4))
 
         for run in range(0, max(self.subjectData.runNumber)):
             alphaGrid = np.random.rand(self.gridCount, 1)
@@ -161,10 +164,10 @@ class Fitting:
                 V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape((self.gridCount, 3, 3))
 
             runData = self.subjectData[self.subjectData.runNumber == run + 1].reset_index()
-            run_RPEs = np.empty((self.gridCount, self.mainTrials + self.additionalTrials))
+            run_trialwise_alphas, run_RPEs = (np.empty((self.gridCount, self.mainTrials + self.additionalTrials)) for i in range(2))
             run_V0, run_V1 = (np.empty((self.gridCount, self.mainTrials + self.additionalTrials)) for i in range(2))
 
-            run_RPEs[:], run_V0[:], run_V1[:] = (np.nan for i in range(3))
+            run_trialwise_alphas, run_RPEs[:], run_V0[:], run_V1[:] = (np.nan for i in range(4))
 
             # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
             for j in range(0, self.gridCount):
@@ -252,7 +255,7 @@ class Fitting:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega * (rewardPE[(t,) + runData.stimulusPair[t]])
-
+                                run_trialwise_alphas[j,t] = omega
                                 if transfer:
                                     for pair in otherPairs:
                                         V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K1Check * omega * (
@@ -293,7 +296,7 @@ class Fitting:
                                 V_option0[(t + 1,) + runData.stimulusPair[t]] = V_option0[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega3 * (rewardPE[(t,) + runData.stimulusPair[t]])
-
+                                run_trialwise_alphas[j,t] = omega3
                                 if transfer:
                                     for pair in otherPairs:
                                         V_option0[(t + 1,) + pair] = V_option0[(t,) + pair] - K3Check * omega3 * (
@@ -345,7 +348,7 @@ class Fitting:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega2 * (rewardPE[(t,) + runData.stimulusPair[t]])
-
+                                run_trialwise_alphas[j,t] = omega2
                                 if transfer:
                                     for pair in otherPairs:
                                         V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K2Check * omega2 * (
@@ -387,7 +390,7 @@ class Fitting:
                                 V_option1[(t + 1,) + runData.stimulusPair[t]] = V_option1[
                                     (t,) + runData.stimulusPair[t]
                                 ] + omega4 * (rewardPE[(t,) + runData.stimulusPair[t]])
-
+                                run_trialwise_alphas[j,t] = omega4
                                 if transfer:
                                     for pair in otherPairs:
                                         V_option1[(t + 1,) + pair] = V_option1[(t,) + pair] - K4Check * omega4 * (
@@ -502,6 +505,7 @@ class Fitting:
             RPE[run] = run_RPEs[minIndex]
             V0[run] = run_V0[minIndex]
             V1[run] = run_V1[minIndex]
+            trial_alphas[run] = run_trialwise_alphas[minIndex]
 
         if self.plotting:
             self.Plot.plots_modelFitting(
@@ -537,6 +541,14 @@ class Fitting:
 
         with open(newPath + "/V1_" + saveAs + ".npy", "wb") as f:
             np.save(f, V1)
+
+        if pearce:
+            with open(newPath + "/trialwise_alphas_" + saveAs + ".npy", "wb") as f:
+                np.save(f, trial_alphas)
+            scipy.io.savemat(
+            newPath + "/trialwise_alphas_" + saveAs + ".mat".format(self.ID),
+            mdict={"trialwise_alphas": trial_alphas},
+        )
 
     # Statistical learning
     def statisticalLearning(self, statLearnPar=1):
@@ -640,61 +652,61 @@ class Fitting:
 # You can only run ONE model fitting at a time
 
 configurations = [
-#    "01",
-#    "02",
-#    "03",
-#    "04",
-#    "05",
-#    "06",
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
 #     "07",
-#    "09",
-#    "10",
+    "09",
+    "10",
 #     "11",
-#    "12",
-#    "14",
+    "12",
+    "14",
 #     "15",
-#    "17",
-#    "18",
+    "17",
+    "18",
 #    "19",
 #     "20",
 #     "21",
-#    "22",
-#    "23",
-#    "24",
-#    "25",
-#    "26",
-#    "27",
+    "22",
+    "23",
+    "24",
+    "25",
+    "26",
+    "27",
 #     "28",
 #    "29",
 #   "30",
-#   "33",
+   "33",
 #    "34",
 #    "35",
 #    "36",
 #     "37",
-#    "38",
-#    "39",
-#    "40",
+    "38",
+    "39",
+    "40",
 #     "41",
 #     "42",
 #     "43",
-#    "45",
-#    "46",
-#    "47",
-#    "48",
-#    "49",
-#    "50",
-#    "51",
-#    "52",
+    "45",
+    "46",
+    "47",
+    "48",
+    "49",
+    "50",
+    "51",
+    "52",
 #     "53",
-#   "54",
+   "54",
 #    "55",
-#   "56",
-#   "57",
-    "58",
+   "56",
+   "57",
+#    "58",
 #     "59",
-#   "60",
-#   "61",
+   "60",
+   "61",
 #     "62",
 #    "63",
 #    "64",
@@ -723,13 +735,13 @@ def handle_ctrl_c(func):
 @handle_ctrl_c
 def use_fitting(IDnr):
     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
-    fitted.modelFitting(saveAs="Asym", asym=True)
+    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
 
 
-# @handle_ctrl_c
-# def use_fitting2(IDnr):
-#     fitted = Fitting(60, 0, 5000, ID="30", plotting=True)
-#     fitted.modelFitting(saveAs="Transfer", transfer=True)
+@handle_ctrl_c
+def use_fitting2(IDnr):
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
+    fitted.modelFitting(saveAs="Pearce", pearce=True)
 
 
 # @handle_ctrl_c
@@ -771,12 +783,12 @@ def main():
     pool.close()
     pool.join()
 
-    # pool2 = Pool(8, initializer=init_pool)
-    # results2 = pool2.map(use_fitting2, configurations)
-    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
-    #     print("Ctrl-C was entered.")
-    # pool2.close()
-    # pool2.join()
+    pool2 = Pool(8, initializer=init_pool)
+    results2 = pool2.map(use_fitting2, ['34', '35', '63'])
+    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
+        print("Ctrl-C was entered.")
+    pool2.close()
+    pool2.join()
 
     # pool3 = Pool(8, initializer=init_pool)
     # results3 = pool3.map(use_fitting3, configurations)
