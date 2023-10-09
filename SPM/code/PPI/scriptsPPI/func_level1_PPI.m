@@ -8,11 +8,14 @@ param_smoothing = 6; % what was the smoothing parameter?
 
 ROI_name = split(ROI.name,'_');
 ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
+ROI_name = split(ROI_name,'.');
+ROI_name = ROI_name(1,1);
 
 mask_file = {fullfile(SPM_folder,'/mask_ICV.nii,1')};
 
 %path of results
 data.destination = string(fullfile(SPM_folder,'/results',model_version,'PPI', ROI_folder, ROI_name, sub));
+
 SPMfolder = string(fullfile(SPM_folder, '/results', model_version, sub));
 
 
@@ -117,12 +120,12 @@ for nrun = 1:numel(data.source)
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).regress = struct('name', {}, 'val', {});
     if contains(splitting,'spe')
         matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {
-                                                                   char(fullfile(strcat(SPMfolder,'\PPI_spe','_',char(ROI_folder),'_',char(ROI_name),'_',num2str(nrun),'.mat')))
+                                                                   char(fullfile(strcat(SPMfolder,'\PPI_',char(ROI_name),'_',num2str(nrun),'.mat')))
                                                                    char(fullfile(file_nuisance.folder,file_nuisance.name))
                                                                     };
     elseif contains(splitting,'rpe')
         matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {
-                                                               char(fullfile(strcat(SPMfolder,'\PPI_rpe','_',char(ROI_folder),'_',char(ROI_name),'_',num2str(nrun),'.mat')))
+                                                               char(fullfile(strcat(SPMfolder,'\PPI_',char(ROI_name),'_',num2str(nrun),'.mat')))
                                                                char(fullfile(file_nuisance.folder,file_nuisance.name))
                                                                 };
     end

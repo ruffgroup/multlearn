@@ -121,6 +121,15 @@ matlabbatch{1}.spm.stats.con.consess{15}.tcon.name = 'feedback';
 matlabbatch{1}.spm.stats.con.consess{15}.tcon.weights = contrasts_feedback;
 matlabbatch{1}.spm.stats.con.consess{15}.tcon.sessrep = 'none';
 
+matlabbatch{1}.spm.stats.con.consess{16}.tcon.name = 'choice-feedback';
+matlabbatch{1}.spm.stats.con.consess{16}.tcon.weights = contrasts_choice - contrasts_feedback;
+matlabbatch{1}.spm.stats.con.consess{16}.tcon.sessrep = 'none';
+
+matlabbatch{1}.spm.stats.con.consess{17}.tcon.name = 'feedback-choice';
+matlabbatch{1}.spm.stats.con.consess{17}.tcon.weights = contrasts_feedback - contrasts_choice;
+matlabbatch{1}.spm.stats.con.consess{17}.tcon.sessrep = 'none';
+
+
 
 
 matlabbatch{1}.spm.stats.con.delete = del_old_con;

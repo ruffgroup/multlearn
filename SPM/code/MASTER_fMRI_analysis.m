@@ -7,7 +7,7 @@ ISrun_level1_ROI = 0;
 ISrun_contrasts = 0;
 ISrun_contrasts_ROI = 0;
 ISrun_level2SPM = 0;
-ISrun_level2SnPM = 0;
+ISrun_level2SnPM = 1;
 ISrun_level2Inference = 1;
 del_old_con = 0; % delete old contrasts if you re-run only second level analyses
 ISrun_level2_ROI = 0;
@@ -140,9 +140,9 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
     else
         splitting = model_version;
         model = split(model_version, "_");
-        num_contrasts1 = 7;
-        num_contrasts2 = 7;
-        num_contrasts3 = 15;
+        num_contrasts1 = 0;
+        num_contrasts2 = 0;
+        num_contrasts3 = 17;
         ROI_audio_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
                     'ROIclusters/audio/*.img'));
         ROI_tactile_folder = dir(fullfile(path.SPM_folder,'results',splitting, ...
@@ -563,7 +563,7 @@ for i = models % spe, rpeSimple (Init, ...), spe_rpeSimple (same Init, ...)
             end
         end
 
-        parfor (k = 1:num_contrasts3,M)
+        parfor (k = 16:num_contrasts3,M)
             if ISrun_level2SPM == 1
                 func_level2(path,subs, model_version, k, splitting);
             end

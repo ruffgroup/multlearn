@@ -3,6 +3,9 @@ spm_figure('GetWin','Graphics');
 % path of data
 ROI_name = split(ROI.name,'_');
 ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
+ROI_name = split(ROI_name,'.');
+ROI_name = ROI_name(1,1);
+
 data.destination = fullfile(path.SPM_folder,'/results',splitting,'PPI', ROI_folder, ROI_name,strcat(ROI_name,'_SnPM_con', num2str(contrast_num )), filesep );
 
 

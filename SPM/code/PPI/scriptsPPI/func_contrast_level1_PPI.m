@@ -3,6 +3,8 @@ function func_contrast_level1_PPI(path, sub, model_version, del_old_con, splitti
 %path of results
 ROI_name = split(ROI.name,'_');
 ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
+ROI_name = split(ROI_name,'.');
+ROI_name = ROI_name(1,1);
 
 data.destination = fullfile(path.SPM_folder,'/results', splitting, 'PPI', ROI_folder, ROI_name, sub);
 

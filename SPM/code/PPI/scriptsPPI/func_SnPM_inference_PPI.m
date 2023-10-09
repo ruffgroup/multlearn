@@ -1,7 +1,11 @@
 function func_SnPM_inference_PPI(path, splitting, contrast_num, model_version, tVal, ROI_folder, ROI)
 tValSplit = split(num2str(tVal),'.');
+
 ROI_name = split(ROI.name,'_');
 ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
+ROI_name = split(ROI_name,'.');
+ROI_name = ROI_name(1,1);
+
 data.destination = fullfile(path.SPM_folder,'/results',splitting,'PPI', ROI_folder, ROI_name,strcat(ROI_name,'_SnPM_con', num2str(contrast_num )), filesep );
 
 spm_jobman('initcfg');
