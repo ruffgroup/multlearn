@@ -8,10 +8,16 @@ param_smoothing = 6; % what was the smoothing parameter?
 
 ROI_name = split(ROI.name,'_');
 ROI_name = strcat(ROI_name(1,1), '_',ROI_name(2,1));
+ROI_name = split(ROI_name,'.');
+ROI_name = ROI_name(1,1);
+
+mask_file = {fullfile(SPM_folder,'/mask_ICV.nii,1')};
 
 %path of results
 data.destination = string(fullfile(SPM_folder,'/results',model_version,'PPI', ROI_folder, ROI_name, sub));
-VOIfolder = string(fullfile(SPM_folder, '/results', model_version, 'ROI_analysis', ROI_folder, ROI_name, splitting,sub));
+
+
+SPMfolder = string(fullfile(SPM_folder, '/results', model_version, sub));
 
 
 %% start spm 1stLvL model
@@ -113,9 +119,17 @@ for nrun = 1:numel(data.source)
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = cellstr(string(multicondition_file));
     %matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = {cellstr(fullfile(folder_processed, sub,['beh'],model_version, ['run_' num2str(nrun) '_conditions.mat']))};
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).regress = struct('name', {}, 'val', {});
-    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {fullfile(strcat(VOIfolder,'\PPI_',num2str(nrun)))
-                                                               fullfile(file_nuisance.folder,file_nuisance.name)
+    if contains(splitting,'spe')
+        matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {
+                                                                   char(fullfile(strcat(SPMfolder,'\PPI_',char(ROI_name),'_',num2str(nrun),'.mat')))
+                                                                   char(fullfile(file_nuisance.folder,file_nuisance.name))
+                                                                    };
+    elseif contains(splitting,'rpe')
+        matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {
+                                                               char(fullfile(strcat(SPMfolder,'\PPI_',char(ROI_name),'_',num2str(nrun),'.mat')))
+                                                               char(fullfile(file_nuisance.folder,file_nuisance.name))
                                                                 };
+    end
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).hpf = filter_thr;
     
 end
@@ -126,7 +140,7 @@ matlabbatch{1}.spm.stats.fmri_spec.bases.hrf.derivs = [0 0];
 matlabbatch{1}.spm.stats.fmri_spec.volt = 1;
 matlabbatch{1}.spm.stats.fmri_spec.global = 'None';
 matlabbatch{1}.spm.stats.fmri_spec.mthresh = 0.8;
-matlabbatch{1}.spm.stats.fmri_spec.mask = {strcat(ROI.folder,filesep, ROI.name, ',1')};
+matlabbatch{1}.spm.stats.fmri_spec.mask = mask_file;
 matlabbatch{1}.spm.stats.fmri_spec.cvi = 'AR(1)';
 
 %% fMRI model estimation

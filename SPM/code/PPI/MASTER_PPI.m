@@ -5,8 +5,8 @@ clear all
 ISrun_VOI = 0;
 ISrun_PPI = 0;
 ISrun_level1_PPI = 1;
-ISrun_contrasts_PPI = 1;
-del_old_con = 1; % delete old contrasts if you re-run only second level analyses
+ISrun_contrasts_PPI = 0;
+del_old_con = 0; % delete old contrasts if you re-run only second level analyses
 ISrun_level2SnPM_PPI = 0;
 ISrun_level2Inference_PPI = 0;
 
@@ -22,8 +22,8 @@ path.neurosynth_folder = dir(fullfile(path.SPM_folder,'neurosynth/*.img'));
 
 subs = dir(fullfile(path.folder_processed, 'sub-*'));
 subs = subs([subs.isdir]');
-subs = subs(~contains({subs.name},{'sub-08','sub-13','sub-44'}));
-%subs = subs(contains({subs.name},{'sub-63'}));
+%subs = subs(~contains({subs.name},{'sub-08','sub-13','sub-44', 'sub-64'}));
+subs = subs(contains({subs.name},{'sub-64'}));
 %, ...
 %      'sub-09', 'sub-10', 'sub-11', 'sub-12', 
      %'sub-14', 'sub-15', 'sub-16', 'sub-17', 'sub-18', ...
@@ -53,31 +53,31 @@ for i = models
     if ISrun_VOI == 1
 
         parfor (sub = 1:numSubs,M)
-       
-            for ROI = ROI_choice_folder'
-                %try
-                    func_VOI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, 'choice', ROI, 0)
-                %catch
-                %end
-            end
-            for ROI = ROI_feedback_folder'
-                %try
-                    func_VOI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, 'feedback', ROI, 0)
-                %catch
-                %end
-            end
-            for ROI = ROI_pmod1_folder'
-                %try
-                    func_VOI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, char(model(1,1)), ROI, 0)
-                %catch
-                %end
-            end
-            for ROI = ROI_pmod2_folder'
-                %try
-                    func_VOI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, char(model(2,1)), ROI, 0)
-                %catch
-                %end
-            end
+            func_VOI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, 'feedback', ROI_feedback_folder(1), 0)
+%             for ROI = ROI_choice_folder'
+%                 %try
+%                     func_VOI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, 'choice', ROI, 0)
+%                 %catch
+%                 %end
+%             end
+%             for ROI = ROI_feedback_folder'
+%                 %try
+%                     func_VOI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, 'feedback', ROI, 0)
+%                 %catch
+%                 %end
+%             end
+%             for ROI = ROI_pmod1_folder'
+%                 %try
+%                     func_VOI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, char(model(1,1)), ROI, 0)
+%                 %catch
+%                 %end
+%             end
+%             for ROI = ROI_pmod2_folder'
+%                 %try
+%                     func_VOI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, char(model(2,1)), ROI, 0)
+%                 %catch
+%                 %end
+%             end
           end
 
     end
@@ -85,67 +85,67 @@ for i = models
     if ISrun_PPI == 1
 
         parfor (sub = 1:numSubs,M)
-            %func_get_PPI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, 'feedback', ROI_feedback_folder(2),0)
-             for ROI = ROI_choice_folder'
-%                 %try
-                     func_get_PPI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, 'choice', ROI,0)
-%                 %catch
-%                 %end
-            end
-            for ROI = ROI_feedback_folder'
-                try
-                    func_get_PPI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, 'feedback', ROI,0)
-                catch
-                end
-            end
-            for ROI = ROI_pmod1_folder'
-                try
-                    func_get_PPI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, char(model(1,1)), ROI,0)
-                catch
-                end
-            end
-            for ROI = ROI_pmod2_folder'
-                try
-
-                    func_get_PPI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, char(model(2,1)), ROI,0)
-                catch
-                end
-
-            end
+            func_get_PPI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, 'feedback', ROI_feedback_folder(1),0)
+%              for ROI = ROI_choice_folder'
+% %                 %try
+%                      func_get_PPI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, 'choice', ROI,0)
+% %                 %catch
+% %                 %end
+%             end
+%             for ROI = ROI_feedback_folder'
+%                 try
+%                     func_get_PPI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, 'feedback', ROI,0)
+%                 catch
+%                 end
+%             end
+%             for ROI = ROI_pmod1_folder'
+%                 try
+%                     func_get_PPI(path.SPM_folder, model_version, char(model(1,1)),subs(sub).name, char(model(1,1)), ROI,0)
+%                 catch
+%                 end
+%             end
+%             for ROI = ROI_pmod2_folder'
+%                 try
+% 
+%                     func_get_PPI(path.SPM_folder, model_version, char(model(2,1)),subs(sub).name, char(model(2,1)), ROI,0)
+%                 catch
+%                 end
+% 
+%             end
         end
     end
 
             if ISrun_level1_PPI == 1
             
             parfor (sub = 1:numSubs,M)
-                   %func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), 'choice', ROI_choice_folder(2))
-                for ROI = ROI_choice_folder'
-                    try
-                    func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), 'choice', ROI)
-                    catch
-                    end
-                end
-                for ROI = ROI_feedback_folder'
-                try
-                    func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), 'feedback', ROI)
-                catch
-                end
-                end
-                for ROI = ROI_pmod1_folder'
-                    try
-
-                    func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), char(model(1,1)), ROI)
-                    catch
-                    end
-                end
-                for ROI = ROI_pmod2_folder'
-                    try
-
-                    func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), char(model(2,1)), ROI)
-                    catch
-                    end
-
-                end
+                func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), 'feedback', ROI_feedback_folder(1))
+%                 for ROI = ROI_choice_folder'
+%                     try
+%                     func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), 'choice', ROI)
+%                     catch
+%                     end
+%                 end
+%                 for ROI = ROI_feedback_folder'
+%                 try
+%                     func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), 'feedback', ROI)
+%                 catch
+%                 end
+%                 end
+%                 for ROI = ROI_pmod1_folder'
+%                     try
+% 
+%                     func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), char(model(1,1)), ROI)
+%                     catch
+%                     end
+%                 end
+%                 for ROI = ROI_pmod2_folder'
+%                     try
+% 
+%                     func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)), char(model(2,1)), ROI)
+%                     catch
+%                     end
+% 
+%                 end
             end
             end
 

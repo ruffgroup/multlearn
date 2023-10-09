@@ -167,7 +167,7 @@ class Fitting:
             run_trialwise_alphas, run_RPEs = (np.empty((self.gridCount, self.mainTrials + self.additionalTrials)) for i in range(2))
             run_V0, run_V1 = (np.empty((self.gridCount, self.mainTrials + self.additionalTrials)) for i in range(2))
 
-            run_trialwise_alphas, run_RPEs[:], run_V0[:], run_V1[:] = (np.nan for i in range(4))
+            run_trialwise_alphas[:], run_RPEs[:], run_V0[:], run_V1[:] = (np.nan for i in range(4))
 
             # Simulating from the grid to recover the sum of negative log likelihood of actions from parameters corresponding to each grid value
             for j in range(0, self.gridCount):

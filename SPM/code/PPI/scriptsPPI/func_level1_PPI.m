@@ -118,19 +118,16 @@ for nrun = 1:numel(data.source)
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = cellstr(string(multicondition_file));
     %matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi = {cellstr(fullfile(folder_processed, sub,['beh'],model_version, ['run_' num2str(nrun) '_conditions.mat']))};
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).regress = struct('name', {}, 'val', {});
-    if contains(splitting,'spe')
-        matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {
-                                                                   char(fullfile(strcat(SPMfolder,'\PPI_',char(ROI_name),'_',num2str(nrun),'.mat')))
-                                                                   char(fullfile(file_nuisance.folder,file_nuisance.name))
-                                                                    };
-    elseif contains(splitting,'rpe')
-        matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {
-                                                               char(fullfile(strcat(SPMfolder,'\PPI_',char(ROI_name),'_',num2str(nrun),'.mat')))
-                                                               char(fullfile(file_nuisance.folder,file_nuisance.name))
-                                                                };
-    end
+
+    matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).multi_reg = {
+        char(fullfile(strcat(SPMfolder,'\PPI_',char(ROI_name),'_',num2str(nrun),'.mat')))
+        char(fullfile(file_nuisance.folder,file_nuisance.name))
+        };
+
+
+
     matlabbatch{1}.spm.stats.fmri_spec.sess(nrun).hpf = filter_thr;
-    
+
 end
 
 
