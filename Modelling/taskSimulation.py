@@ -9,6 +9,10 @@ import pickle
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+# Set a white background for the entire figure
+plt.rcParams['axes.facecolor'] = 'white'
+# Set a high DPI for high-quality images
+plt.rcParams['figure.dpi'] = 300
 
 ## Have to be multiples of 60
 mainTrials = 60
@@ -24,6 +28,66 @@ taskSimulation.taskStructure()
 taskSimulation.RLloops()
 taskSimulation.statisticalLearning()
  
+
+# Create a figure with a white background
+fig, ax = plt.subplots(figsize=(8, 6), facecolor='white')
+# Plot the Statistical surprise signal
+plt.plot(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)], color='b', linewidth=2)
+
+# Customize plot elements
+plt.grid(False)
+plt.xlabel("Trials", fontsize=28, weight='bold')
+plt.ylabel("Surprise", fontsize=28, weight='bold')
+plt.title("Statistical Surprise Signal", fontsize=26, weight='bold')
+
+
+# Make x and y axis spines and labels visible
+ax.spines['top'].set_visible(True)
+ax.spines['right'].set_visible(True)
+ax.xaxis.set_ticks_position('bottom')
+ax.yaxis.set_ticks_position('left')
+ax.spines['bottom'].set_color('black')
+ax.spines['left'].set_color('black')
+# Save the figure with a white background
+plt.savefig("statistical_surprise_signal.png", dpi=300, bbox_inches="tight")
+
+# Show the plot
+plt.show()
+
+# Create a new figure for the RPE signal
+fig, ax = plt.subplots(figsize=(8, 6), facecolor='white')
+
+# Plot the RPE signal
+plt.plot(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)][1:], color='b', linewidth=2)
+
+# Customize plot elements
+plt.grid(False)
+
+# Set x and y labels and titles
+plt.xlabel("Trials", fontsize=28, weight='bold')
+plt.ylabel("Reward Prediction Error", fontsize=28, weight='bold')
+plt.title("RPE Signal", fontsize=22, weight='bold')
+
+# Make x and y axis spines and labels visible
+ax.spines['top'].set_visible(True)
+ax.spines['right'].set_visible(True)
+ax.xaxis.set_ticks_position('bottom')
+ax.yaxis.set_ticks_position('left')
+ax.spines['bottom'].set_color('black')
+ax.spines['left'].set_color('black')
+# Save the figure with a white background
+plt.savefig("rpe_signal.png", dpi=300, bbox_inches="tight")
+
+# Show the plot
+plt.show()
+
+ax.spines['top'].set_visible(True)
+ax.spines['right'].set_visible(True)
+ax.xaxis.set_ticks_position('bottom')
+ax.yaxis.set_ticks_position('left')
+ax.spines['bottom'].set_color('black')
+ax.spines['left'].set_color('black')
+
 # """1000 subjects correlation plots"""
 # # SubjectNum = 1000
 # # PearsonCorr = np.empty((SubjectNum, 2))
@@ -75,11 +139,12 @@ taskSimulation.statisticalLearning()
 # # plt.show()
 
 # # #
-plt.plot(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)])
-plt.xlabel("trials")
-plt.ylabel("Total surprise")
-plt.title("Statistical surprise signal")
-plt.show()
+# plt.plot(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)])
+# plt.grid(False)
+# plt.xlabel("Trials", fontsize=22, weight='bold')
+# plt.ylabel("Surprise", fontsize=22, weight='bold')
+# plt.title("Statistical surprise signal", fontsize=22, weight='bold')
+# plt.show()
 # # #
 # # #
 # # # # print(taskSimulation.statSurprise[~np.isnan(taskSimulation.statSurprise)])
@@ -201,8 +266,12 @@ plt.show()
 # print(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)])
 # print(np.diff(taskSimulation.alphaPearce))
 
-#plt.scatter(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)][1:], np.diff(taskSimulation.alphaPearce))
-#plt.show()
+# plt.scatter(taskSimulation.rewardPE[~np.isnan(taskSimulation.rewardPE)][1:], np.diff(taskSimulation.alphaPearce))
+# plt.grid(False)
+# plt.xlabel("Trials", fontsize=22, weight='bold')
+# plt.ylabel("Reward Prediction Error", fontsize=22, weight='bold')
+# plt.title("RPE signal", fontsize=22, weight='bold')
+# plt.show()
 
 
 # plt.plot(range(0, taskSimulation.mainTrials+1), taskSimulation.V_option1[:, 0, 0], label="1A")
@@ -411,18 +480,18 @@ plt.show()
 
 
 # # All cells
-PearsonCorr = scipy.stats.pearsonr(taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :][~np.isnan(
-     taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :])], taskSimulation.rewardPE[:, :, :][~np.isnan(taskSimulation.rewardPE[:, :, :])])
-print("pearson", PearsonCorr)
+# PearsonCorr = scipy.stats.pearsonr(taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :][~np.isnan(
+#      taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :])], taskSimulation.rewardPE[:, :, :][~np.isnan(taskSimulation.rewardPE[:, :, :])])
+# print("pearson", PearsonCorr)
 
 # SpearmanCorr = scipy.stats.spearmanr(ma.masked_invalid(
 #     taskSimulation.statSurprise[taskSimulation.additionalTrials:, :, :]), ma.masked_invalid(taskSimulation.rewardPE[:, :, :]), nan_policy='omit')
 # print("spearman", SpearmanCorr)
 
-regr = scipy.stats.linregress(taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2][~np.isnan(
-    taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2])], taskSimulation.rewardPE[:, 2, 2][~np.isnan(taskSimulation.rewardPE[:, 2, 2])])
-print("regression", regr)
-print(regr[1])
+# regr = scipy.stats.linregress(taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2][~np.isnan(
+#     taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2])], taskSimulation.rewardPE[:, 2, 2][~np.isnan(taskSimulation.rewardPE[:, 2, 2])])
+# print("regression", regr)
+# print(regr[1])
 
 # r22 = scipy.stats.spearmanr((taskSimulation.statSurprise[taskSimulation.additionalTrials:, 2, 2], taskSimulation.rewardPE[:, 2, 2]))
 # print("r", r22)
@@ -436,24 +505,24 @@ print(regr[1])
 # print(taskSimulation.simulatedData)
 
 #
-plt.scatter(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
-PearsonCorr = scipy.stats.pearsonr(
-    taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
-SpearmanCorr = scipy.stats.spearmanr(
-    taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
-regr = scipy.stats.linregress(
-    taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
-x = np.linspace(np.min(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2]), np.max(
-    taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2]), 500)
-plt.plot(x, regr[0]*x+regr[1], '-',  color='k')
-plt.xlabel("Reward prediction errors")
-plt.ylabel("Statistical surprise")
-plt.title("All cells - PearsonCorr:{:.4f}, p-value :{:.4f}\nalpha = {}, beta = {}, error% = {:.1f}".format(
-    PearsonCorr[0], PearsonCorr[1], taskSimulation.alphaPos, taskSimulation.beta, taskSimulation.errorPercentage), fontweight="bold", fontsize=15)
-fig1 = plt.gcf()
-plt.show()
-plt.draw()
-fig1.savefig('corr.png', dpi=300, bbox_inches='tight')
+# plt.scatter(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
+# PearsonCorr = scipy.stats.pearsonr(
+#     taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
+# SpearmanCorr = scipy.stats.spearmanr(
+#     taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
+# regr = scipy.stats.linregress(
+#     taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2], taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3])
+# x = np.linspace(np.min(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2]), np.max(
+#     taskSimulation.simulatedData[taskSimulation.additionalTrials:, 2]), 500)
+# plt.plot(x, regr[0]*x+regr[1], '-',  color='k')
+# plt.xlabel("Reward prediction errors")
+# plt.ylabel("Statistical surprise")
+# plt.title("All cells - PearsonCorr:{:.4f}, p-value :{:.4f}\nalpha = {}, beta = {}, error% = {:.1f}".format(
+#     PearsonCorr[0], PearsonCorr[1], taskSimulation.alphaPos, taskSimulation.beta, taskSimulation.errorPercentage), fontweight="bold", fontsize=15)
+# fig1 = plt.gcf()
+# plt.show()
+# plt.draw()
+# fig1.savefig('corr.png', dpi=300, bbox_inches='tight')
 
 # """Value vs surprise"""
 # # plt.scatter(taskSimulation.simulatedData[taskSimulation.additionalTrials:, 3], taskSimulation.V_option1[1:, 0, 0])
