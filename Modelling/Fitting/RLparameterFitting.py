@@ -722,7 +722,7 @@ def handle_ctrl_c(func):
 
 @handle_ctrl_c
 def use_fitting(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
+    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
     fitted.modelFitting(saveAs="Asym", asym=True)
 
 
