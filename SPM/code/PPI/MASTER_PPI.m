@@ -4,11 +4,12 @@ clear all
 % SETTINGS:
 ISrun_VOI = 0;
 ISrun_PPI = 0;
-ISrun_level1_PPI = 1;
+ISrun_level1_PPI = 0;
 ISrun_contrasts_PPI = 0;
 del_old_con = 0; % delete old contrasts if you re-run only second level analyses
 ISrun_level2SnPM_PPI = 0;
 ISrun_level2Inference_PPI = 0;
+ISrun_betas = 1;
 
 path.folder_processed = dir(fullfile('../../../../data/ds-mlearn/derivatives/fmriprep'));
 path.folder_processed = [path.folder_processed(1).folder '/'];
@@ -22,8 +23,8 @@ path.neurosynth_folder = dir(fullfile(path.SPM_folder,'neurosynth/*.img'));
 
 subs = dir(fullfile(path.folder_processed, 'sub-*'));
 subs = subs([subs.isdir]');
-%subs = subs(~contains({subs.name},{'sub-08','sub-13','sub-44', 'sub-64'}));
-subs = subs(contains({subs.name},{'sub-64'}));
+subs = subs(~contains({subs.name},{'sub-08','sub-13','sub-44'}));
+%subs = subs(contains({subs.name},{'sub-18'}));
 %, ...
 %      'sub-09', 'sub-10', 'sub-11', 'sub-12', 
      %'sub-14', 'sub-15', 'sub-16', 'sub-17', 'sub-18', ...
@@ -118,7 +119,8 @@ for i = models
             if ISrun_level1_PPI == 1
             
             parfor (sub = 1:numSubs,M)
-                func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), 'feedback', ROI_feedback_folder(1))
+                %func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)),'choice', ROI_choice_folder(6))
+                func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(2,1)),char(model(2,1)), ROI_pmod2_folder(8))
 %                 for ROI = ROI_choice_folder'
 %                     try
 %                     func_level1_PPI(path.folder_processed, path.SPM_folder, subs(sub).name, model_version, char(model(1,1)), 'choice', ROI)
@@ -153,7 +155,7 @@ for i = models
             if ISrun_contrasts_PPI == 1
             parfor (sub = 1:numSubs,M)
             
-
+% 
                 for ROI = ROI_choice_folder'
                 
                     func_contrast_level1_PPI(path, subs(sub).name, char(model(1,1)), del_old_con, splitting, 'choice',ROI);
@@ -229,6 +231,24 @@ for i = models
                     end
                 
                 end
+            end
+
+            if ISrun_betas == 1
+                parfor (sub = 1:numSubs,M)
+                for ROI = ROI_feedback_folder'
+                    GetBetas(path.SPM_folder,model_version,subs(sub).name, 'feedback', ROI);
+                end
+                for ROI = ROI_choice_folder'
+                    GetBetas(path.SPM_folder,model_version,subs(sub).name, 'choice', ROI);
+                end
+                for ROI = ROI_pmod1_folder'
+                    GetBetas(path.SPM_folder,model_version,subs(sub).name, char(model(1,1)), ROI);
+                end
+                for ROI = ROI_pmod2_folder'
+                    GetBetas(path.SPM_folder,model_version,subs(sub).name, char(model(2,1)), ROI);
+                end
+                end
+
             end
 end
 

@@ -144,6 +144,7 @@ matlabbatch{1}.spm.stats.fmri_spec.cvi = 'AR(1)';
 %matlabbatch{2}.spm.stats.review.spmmat =  {[fullfile(data.destination, 'SPM.mat')]};
 %matlabbatch{2}.spm.stats.review.display.orth = 1;
 %matlabbatch{2}.spm.stats.review.print = 'png';
+
 matlabbatch{2}.spm.stats.fmri_est.spmmat(1) = cfg_dep('fMRI model specification: SPM.mat File', substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}), substruct('.','spmmat'));
 matlabbatch{2}.spm.stats.fmri_est.write_residuals = 0;
 matlabbatch{2}.spm.stats.fmri_est.method.Classical = 1;
