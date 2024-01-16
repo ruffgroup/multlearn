@@ -24,3 +24,6 @@ Modelling/Fitting/*/
 #*.npy
 #*.tsv
 !Modelling/Fitting/bestFittingVals/*.pdf
+fMRI/
+!fMRI/preprocess_cluster/
+!fMRI/preprocess_data/
