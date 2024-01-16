@@ -6,8 +6,8 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-# Ignore spm results folder
-SPM/results/
+# Ignore spm folder
+SPM/
 # Ignore plot folders in fitting
 Modelling/Fitting/*/
 !Modelling/Fitting/bestFittingVals/
@@ -24,6 +24,7 @@ Modelling/Fitting/*/
 #*.npy
 #*.tsv
 !Modelling/Fitting/bestFittingVals/*.pdf
-fMRI/
-!fMRI/preprocess_cluster/
-!fMRI/preprocess_data/
+Modelling/Decoding/run_encoding/
+Modelling/Decoding/run_glms/
+Modelling/Decoding/run_surf2img/
+Modelling/Decoding/braincoder/
