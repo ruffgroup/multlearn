@@ -8,6 +8,7 @@
 /dataSources.local.xml
 # Ignore spm folder
 SPM/
+!SPM/code/
 # Ignore plot folders in fitting
 Modelling/Fitting/*/
 !Modelling/Fitting/bestFittingVals/

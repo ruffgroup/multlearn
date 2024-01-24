@@ -71,7 +71,7 @@ def get_events(
     subject,
     nruns=6,
     ntrials=60,
-    data_folder="/mnt/ddata",
+    data_folder="/mnt/data",
     rpe_folder="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals",
 ):
     runs = np.arange(1, nruns + 1)
