@@ -1,0 +1,49 @@
+[
+    {
+        "group": 1,
+        "imports": [],
+        "name": "0_getsubjectinfo",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "0_getsubjectinfo"
+        ],
+        "name": "1_getcontrasts",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "0_getsubjectinfo"
+        ],
+        "name": "2_modelspec",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "2_modelspec"
+        ],
+        "name": "3_level1design",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "3_level1design"
+        ],
+        "name": "4_level1estimate",
+        "size": 1
+    },
+    {
+        "group": 1,
+        "imports": [
+            "1_getcontrasts",
+            "3_level1design"
+        ],
+        "name": "5_level1conest",
+        "size": 1
+    }
+]

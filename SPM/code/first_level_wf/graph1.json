@@ -1,0 +1,87 @@
+{
+    "groups": [
+        {
+            "name": "Group_00001",
+            "procs": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5
+            ],
+            "total": 6
+        }
+    ],
+    "links": [
+        {
+            "source": 0,
+            "target": 1,
+            "value": 1
+        },
+        {
+            "source": 0,
+            "target": 2,
+            "value": 1
+        },
+        {
+            "source": 2,
+            "target": 3,
+            "value": 1
+        },
+        {
+            "source": 3,
+            "target": 4,
+            "value": 1
+        },
+        {
+            "source": 1,
+            "target": 5,
+            "value": 1
+        },
+        {
+            "source": 3,
+            "target": 5,
+            "value": 1
+        }
+    ],
+    "maxN": 6,
+    "nodes": [
+        {
+            "group": 1,
+            "name": "0_getsubjectinfo",
+            "report": "/tmp/tmpizpqkkoz/getsubjectinfo/_report/report.rst",
+            "result": "/tmp/tmpizpqkkoz/getsubjectinfo/result_getsubjectinfo.pklz"
+        },
+        {
+            "group": 1,
+            "name": "1_getcontrasts",
+            "report": "/tmp/tmpeh8faeip/getcontrasts/_report/report.rst",
+            "result": "/tmp/tmpeh8faeip/getcontrasts/result_getcontrasts.pklz"
+        },
+        {
+            "group": 1,
+            "name": "2_modelspec",
+            "report": "/tmp/tmp_jp43wu5/first_level_wf/modelspec/_report/report.rst",
+            "result": "/tmp/tmp_jp43wu5/first_level_wf/modelspec/result_modelspec.pklz"
+        },
+        {
+            "group": 1,
+            "name": "3_level1design",
+            "report": "/tmp/tmpnt3ud5cs/first_level_wf/level1design/_report/report.rst",
+            "result": "/tmp/tmpnt3ud5cs/first_level_wf/level1design/result_level1design.pklz"
+        },
+        {
+            "group": 1,
+            "name": "4_level1estimate",
+            "report": "/tmp/tmpczr66bpi/first_level_wf/level1estimate/_report/report.rst",
+            "result": "/tmp/tmpczr66bpi/first_level_wf/level1estimate/result_level1estimate.pklz"
+        },
+        {
+            "group": 1,
+            "name": "5_level1conest",
+            "report": "/tmp/tmp94o8uqhe/first_level_wf/level1conest/_report/report.rst",
+            "result": "/tmp/tmp94o8uqhe/first_level_wf/level1conest/result_level1conest.pklz"
+        }
+    ]
+}

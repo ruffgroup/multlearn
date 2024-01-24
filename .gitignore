@@ -7,8 +7,9 @@
 /dataSources/
 /dataSources.local.xml
 # Ignore spm folder
-SPM/
-!SPM/code/*
+SPM/neurosynth/
+SPM/results/
+SPM/nipype/
 # Ignore plot folders in fitting
 Modelling/Fitting/*/
 !Modelling/Fitting/bestFittingVals/
