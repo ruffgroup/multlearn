@@ -169,7 +169,7 @@ class SnpmOneSampleTTest(BaseInterface):
 
     def _run_interface(self, runtime):
         # Construct the SnPM command based on input specifications
-        snpm_command = "function SnPM_script()\n"
+        snpm_command = "function SnPM_2ndlevel_script()\n"
         snpm_command += "addpath('~/spm12');\n"
         snpm_command += "spm_jobman('initcfg');\n"
         snpm_command += "matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';\n"
@@ -220,7 +220,7 @@ class SnpmOneSampleTTest(BaseInterface):
         snpm_command += "clear matlabbatch\n"
 
         # Write the SnPM command to a temporary script
-        script_path = "/mnt/d/multlearn-sns/SPM/nipype/SnPM_script.m"
+        script_path = "/mnt/d/multlearn-sns/SPM/nipype/SnPM_2ndlevel_script.m"
         with open(script_path, "w") as script_file:
             script_file.write(snpm_command)
 
@@ -234,452 +234,151 @@ class SnpmOneSampleTTest(BaseInterface):
         return runtime
 
     def _list_outputs(self):
-        return self._results
-
-def get_subject_info(subject):
-    from glob import glob
-    import numpy as np
-    import pandas as pd
-    from scipy import io, stats
-    from nipype.interfaces.base import Bunch
-
-    subject_info = []
-    rpe_path = (
-        f"/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/sub-{subject}/rpe*.mat"
+        return self.outputs.results
+    
+class SnpmInferenceInputSpec(BaseInterfaceInputSpec):
+    snpm_mat_file = File(
+        exists=True,
+        field="SnPMmat",
+        mandatory=True,
+        desc="Absolute path to SnPM.mat",
     )
-    fn = glob(rpe_path)
-
-    assert len(fn) == 1
-    fn = fn[0]
-
-    rpe_data = np.nan_to_num(
-        stats.zscore(io.loadmat(fn)["rpe"], nan_policy="omit", axis=1)
+    cluster_threshold = traits.Float(
+        field="Thr.Clus.ClusSize.CFth",
+        desc="Cluster-forming threshold",
     )
-
-    rpe = (
-        pd.DataFrame(
-            rpe_data,
-            index=pd.Index(np.arange(1, 6 + 1), name="run"),
-            columns=pd.Index(np.arange(1, 60 + 1), name="trial_nr"),
-        )
-        .stack()
-        .to_frame("rpe")
+    fwe_threshold = traits.Float(
+        0.05,
+        field="Thr.Clus.ClusSize.ClusSig.FWEthC",
+        usedefault=True,
+        desc="Family-wise error threshold",
     )
-
-    surprise_path = (
-        f"/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/sub-{subject}/spe*.mat"
+    t_sign = traits.Int(
+        1,
+        field="Tsign",
+        desc="T-value sign (1 for positive, -1 for negative)",
     )
-    fn2 = glob(surprise_path)
-    assert len(fn2) == 1
-    fn2 = fn2[0]
-    surprise_data = np.nan_to_num(
-        stats.zscore(io.loadmat(fn2)["spe"], nan_policy="omit", axis=1)
+    filtered_img_name = File(
+        field="WriteFiltImg.name",
+        xor=["no_filtered_img"],
+        desc="Output file name for filtered image",
     )
-    surprise = (
-        pd.DataFrame(
-            surprise_data,
-            index=pd.Index(np.arange(1, 6 + 1), name="run"),
-            columns=pd.Index(np.arange(1, 60 + 1), name="trial_nr"),
-        )
-        .stack()
-        .to_frame("spe")
+    no_filtered_img = traits.Int(
+        0,
+        field="WriteFiltImg.WF_no",
+        xor=["filtered_img_name"],
+        desc="Do not write filtered image",
+    )
+    report_type = traits.Enum(
+        "MIPtable",
+        "FWEreport",
+        "FDRreport",
+        field="Report",
+        desc="Report type (e.g., 'MIPtable')",
     )
 
-    functional_runs = []
+class SnpmInferenceOutputSpec(TraitedSpec):
+    results = traits.List(traits.File, desc="List of SnPM result files")
 
-    for run in range(1, 7):
-        onsets = []
-        durations = []
-        conditions = []
+class SnpmInference(BaseInterface):
+    input_spec = SnpmInferenceInputSpec
+    #output_spec = SnpmInferenceOutputSpec
+    _jobtype = "tools.snpm.inference"
 
-        events_file = pd.read_csv(
-            f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject}/func/sub-{subject}_task-learn_run-{run}_events.tsv",
-            delimiter="\t",
-        )
-        events_file_sorted = events_file.sort_values(by=["onset"])
-        events_file_sorted["trial_nr"] = events_file_sorted["trial_nr"].ffill()
-        events_file_sorted["runType"] = events_file_sorted["runType"].ffill()
-        run_type = events_file_sorted["runType"][0]
+    def _run_interface(self, runtime):
+        # Construct the SnPM inference command based on input specifications
+        snpm_command = "function SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_script()\n"
+        snpm_command += "addpath('~/spm12');\n"
+        snpm_command += "spm_jobman('initcfg');\n"
+        snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.SnPMmat = cellstr('{self.inputs.snpm_mat_file}');\n"
+        snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Thr.Clus.ClusSize.CFth = {self.inputs.cluster_threshold};\n"
+        snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Thr.Clus.ClusSize.ClusSig.FWEthC = {self.inputs.fwe_threshold};\n"
+        snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Tsign = {self.inputs.t_sign};\n"
+        if self.inputs.filtered_img_name:
+            snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.WriteFiltImg.name = '{self.inputs.filtered_img_name}';\n"
+        elif self.inputs.no_filtered_img:
+            snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.WriteFiltImg.WF_no = {self.inputs.no_filtered_img};\n"
+        snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Report = '{self.inputs.report_type}';\n"
+        snpm_command += "spm('defaults', 'fMRI');\n"
+        snpm_command += "spm_jobman('run', matlabbatch);\n"
+        snpm_command += "clear matlabbatch\n"
 
-        confounds = pd.read_csv(
-            f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject}/func/sub-{subject}_task-learn_run-{run}_desc-confounds_timeseries.tsv",
-            delimiter="\t",
-        )
+        script_path_inf = "/mnt/d/multlearn-sns/SPM/nipype/SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_script.m"
+        with open(script_path_inf, "w") as script_file:
+            script_file.write(snpm_command)
 
-        confounds = confounds.loc[
-            :,
-            [
-                "trans_x",
-                "trans_y",
-                "trans_z",
-                "rot_x",
-                "rot_y",
-                "rot_z",
-                "a_comp_cor_00",
-                "a_comp_cor_01",
-                "a_comp_cor_02",
-                "a_comp_cor_03",
-                "a_comp_cor_04",
-            ],
-        ]
-
-        physio_path = f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject}/beh/physio/RegPhysio_sub-{subject}_run_{run}.mat"
-        fn3 = glob(physio_path)
-        assert len(fn3) == 1
-        fn3 = fn3[0]
-
-        physio = io.loadmat(fn3, simplify_cells=True)["physio"]["model"]
-        physio = pd.DataFrame(
-            data=physio["R"],
-            columns=physio["R_column_names"],
+        # Run the SnPM inference command using subprocess
+        subprocess.run(
+            f"matlab -nodisplay -nosplash -r \"run('{script_path_inf}'); exit;\"",
+            shell=True,
+            check=True,
         )
 
-        regressors = pd.concat([confounds, physio], axis=1)
-        regressor_names = regressors.columns.values.tolist()
-
-        for group in events_file_sorted.groupby("trial_type"):
-            conditions.append(str(group[0].capitalize() + run_type.capitalize()))
-            onsets.append(group[1]["onset"].tolist())
-            durations.append(group[1]["duration"].tolist())
-        run_rpe = rpe.xs(run)
-        run_surprise = surprise.xs(run)
-        pmod = [
-            Bunch(name=["surprise"], param=[run_surprise.values.tolist()], poly=[1]),
-            Bunch(name=["rpe"], param=[run_rpe.values.tolist()], poly=[1]),
-        ]
-
-        subject_info.insert(
-            run - 1,
-            Bunch(
-                conditions=conditions,
-                onsets=onsets,
-                durations=durations,
-                pmod=pmod,
-                tmod=None,
-                orth=["No"] * len(conditions),
-                regressors=regressors.values.T.tolist(),
-                regressor_names=regressor_names,
-            ),
-        )
-
-        functional_run = glob(
-            f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject}/func/s6.sub-{subject}_task-learn_run-{run}_space-MNI152NLin2009cAsym_desc-preproc_bold.nii"
-        )[0]
-        functional_runs.append(functional_run)
-
-    return subject_info, functional_runs
+        return runtime
 
 
-def get_contrasts(subject_info):
-    from nipype.interfaces.spm import EstimateContrast
-    import os
-
-    condition_names = [
-        "ChoiceAudio",
-        "ChoiceTactile",
-        "FeedbackAudio",
-        "FeedbackTactile",
-        "ChoiceAudioxsurprise^1",
-        "ChoiceTactilexsurprise^1",
-        "FeedbackAudioxrpe^1",
-        "FeedbackTactilexrpe^1",
-    ]
-
-    con01 = ["rpe", "T", condition_names[6:], [1 / 6.0, 1 / 6.0]]
-    con02 = ["rpe_audio", "T", [condition_names[6]], [1 / 3.0]]
-    con03 = ["rpe_tactile", "T", [condition_names[7]], [1 / 3.0]]
-    con04 = [
-        "rpe_audio < rpe_tactile",
-        "T",
-        [condition_names[6], condition_names[7]],
-        [-1 / 3.0, 1 / 3.0],
-    ]
-    con05 = [
-        "rpe_tactile < rpe_audio",
-        "T",
-        [condition_names[6], condition_names[7]],
-        [1 / 3.0, -1 / 3.0],
-    ]
-
-    con06 = ["surprise", "T", condition_names[4:6], [1 / 6.0, 1 / 6.0]]
-    con07 = ["surprise_audio", "T", [condition_names[4]], [1 / 3.0]]
-    con08 = ["surprise_tactile", "T", [condition_names[5]], [1 / 3.0]]
-    con09 = [
-        "surprise_audio < surprise_tactile",
-        "T",
-        [condition_names[4], condition_names[5]],
-        [-1 / 3.0, 1 / 3.0],
-    ]
-    con10 = [
-        "surprise_tactile < surprise_audio",
-        "T",
-        [condition_names[4], condition_names[5]],
-        [1 / 3.0, -1 / 3.0],
-    ]
-
-    con11 = [
-        "rpe < surprise",
-        "T",
-        condition_names[4:],
-        [-1 / 6.0, 1 / 6.0, -1 / 6.0, 1 / 6.0, -1 / 6.0, 1 / 6.0],
-    ]
-    con12 = [
-        "surprise < rpe",
-        "T",
-        condition_names[4:],
-        [1 / 6.0, -1 / 6.0, 1 / 6.0, -1 / 6.0, 1 / 6.0, -1 / 6.0],
-    ]
-    con13 = [
-        "rpe_audio < surprise_audio",
-        "T",
-        [condition_names[4], condition_names[6]],
-        [1 / 3.0, -1 / 3.0],
-    ]
-    con14 = [
-        "surprise_audio < rpe_audio",
-        "T",
-        [condition_names[4], condition_names[6]],
-        [-1 / 3.0, 1 / 3.0],
-    ]
-    con15 = [
-        "rpe_tactile < surprise_tactile",
-        "T",
-        [condition_names[5], condition_names[7]],
-        [1 / 3.0, -1 / 3.0],
-    ]
-    con16 = [
-        "surprise_tactile < rpe_tactile",
-        "T",
-        [condition_names[5], condition_names[7]],
-        [-1 / 3.0, 1 / 3.0],
-    ]
-
-    con17 = [
-        "pmods",
-        "T",
-        condition_names[4:8],
-        [1 / 12.0, 1 / 12.0, 1 / 12.0, 1 / 12.0],
-    ]
-    con18 = [
-        "pmods_audio",
-        "T",
-        [condition_names[4], condition_names[6]],
-        [1 / 6.0, 1 / 6.0],
-    ]
-    con19 = [
-        "pmods_tactile",
-        "T",
-        [condition_names[5], condition_names[7]],
-        [1 / 6.0, 1 / 6.0],
-    ]
-    con20 = [
-        "pmods_audio-pmods_tactile",
-        "T",
-        condition_names[4:8],
-        [-1 / 6.0, 1 / 6.0, -1 / 6.0, 1 / 6.0],
-    ]
-    con21 = [
-        "pmods_tactile-pmods_audio",
-        "T",
-        condition_names[4:8],
-        [1 / 6.0, -1 / 6.0, 1 / 6.0, -1 / 6.0],
-    ]
-
-    con22 = ["feedback", "T", condition_names[2:4], [1 / 6.0, 1 / 6.0]]
-    con23 = ["choice", "T", condition_names[0:2], [1 / 6.0, 1 / 6.0]]
-    con24 = [
-        "feedback < choice",
-        "T",
-        condition_names[0:4],
-        [1 / 6.0, 1 / 6.0, -1 / 6.0, -1 / 6.0],
-    ]
-    con25 = [
-        "choice < feedback",
-        "T",
-        condition_names[0:4],
-        [-1 / 6.0, -1 / 6.0, 1 / 6.0, 1 / 6.0],
-    ]
-
-    con_list = [
-        con01,
-        con02,
-        con03,
-        con04,
-        con05,
-        con06,
-        con07,
-        con08,
-        con09,
-        con10,
-        con11,
-        con12,
-        con13,
-        con14,
-        con15,
-        con16,
-        con17,
-        con18,
-        con19,
-        con20,
-        con21,
-        con22,
-        con23,
-        con24,
-        con25,
-    ]
-
-    return con_list
-
-
-def main(BIDS="/mnt/d/data/ds-mlearn/", Nslices=40, refSlice=20):
+def main(contrast, tVal=[3.1], BIDS="/mnt/d/data/ds-mlearn/"):
     layout = BIDSLayout(BIDS, derivatives=True)
     # list of subject identifiers
     subject_list = layout.get_subjects()
     subject_list = [sub for sub in subject_list if int(sub) not in [8, 13, 16, 31, 32, 44]]
-    with open(
-    "/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-01/func/sub-01_task-learn_run-1_space-T1w_desc-preproc_bold.json",
-    "rt",
-    ) as fp:
-        task_info = json.load(fp)
 
-    TR = task_info["RepetitionTime"]
+    SnPM_2nd = Node(SnpmOneSampleTTest(), name='SnPM')
+    sub_contrasts = list()
+    for sub in subject_list:
+        path_1stlevel = f'/mnt/d/multlearn-sns/SPM/nipype/model1/1stLevel/sub-{sub}/con_{contrast:04d}.nii'
+        sub_contrasts.append(path_1stlevel)
+    SnPM_2nd.inputs.contrasts = sub_contrasts
+    destination = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast)
+    if not os.path.exists(destination):
+        os.makedirs(destination)
+    SnPM_2nd.inputs.destination = destination
+    SnPM_2nd.inputs.n_perms = 5000
+    SnPM_2nd.inputs.var_smoothing = [0, 0, 0]
+    SnPM_2nd.inputs.memory_usage = False
+    SnPM_2nd.inputs.cluster_inference_later = -1
+    SnPM_2nd.inputs.masking_none = 1
+    SnPM_2nd.inputs.implicit_mask = 1
+    SnPM_2nd.inputs.global_calc_omit = 1
+    SnPM_2nd.inputs.no_grand_mean_scaling = 1
+    SnPM_2nd.inputs.global_normalization = 1
 
-    infosource = Node(
-        IdentityInterface(
-            fields=[
-                "subject_id",
-            ],
-        ),
-        name="infosource",
-    )
-    infosource.iterables = [
-        ("subject_id", subject_list),
-    ]
+    #SnPM_2nd.run()
+    for i in range(len(tVal)):
+        SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
+        SnPM_inf.inputs.snpm_mat_file = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM.mat'
+        SnPM_inf.inputs.cluster_threshold = tVal[i]
+        SnPM_inf.inputs.fwe_threshold = 0.05
 
-    getsubjectinfo = Node(
-        Function(
-            input_names=["subject"],
-            output_names=["subject_info", "functional_runs"],
-            function=get_subject_info,
-        ),
-        name="getsubjectinfo",
-    )
-    getcontrasts = Node(
-        Function(
-            input_names=["subject_info"],
-            output_names=["contrasts"],
-            function=get_contrasts,
-        ),
-        name="getcontrasts",
-    )
-    modelspec = Node(
-        SpecifySPMModel(
-            concatenate_runs=False,
-            input_units="secs",
-            output_units="secs",
-            time_repetition=TR,
-            high_pass_filter_cutoff=128,
-        ),
-        name="modelspec",
-    )
+        # t_sign = -1
+        SnPM_inf.inputs.t_sign = -1
+        SnPM_inf.inputs.filtered_img_name = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_sign-1'
+        SnPM_inf.inputs.report_type = 'MIPtable'
+        SnPM_inf.run()
+        if not os.path.isfile('/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_sign-1'):
+            break
 
-    level1design = Node(
-        Level1Design(
-            bases={"hrf": {"derivs": [0, 0]}},
-            timing_units="secs",
-            interscan_interval=TR,
-            model_serial_correlations="AR(1)",
-            microtime_resolution=Nslices,
-            microtime_onset=refSlice,
-            flags={"mthresh": 0.8, "globalnorm": "None"},
-            mask_image="/mnt/d/multlearn-sns/SPM/mask_ICV.nii",
-            volterra_expansion_order=1,
-        ),
-        name="level1design",
-    )
-    level1estimate = Node(
-        EstimateModel(estimation_method={"Classical": 1}, write_residuals=False),
-        name="level1estimate",
-    )
-    level1conest = Node(EstimateContrast(), name="level1conest")
+    for i in range(len(tVal)):
+        SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
+        SnPM_inf.inputs.snpm_mat_file = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM.mat'
+        SnPM_inf.inputs.cluster_threshold = tVal[i]
+        SnPM_inf.inputs.fwe_threshold = 0.05
 
-    base_dir = "/mnt/d/multlearn-sns/SPM/nipype"
-    output_dir = 'model1'
-    working_dir = 'workingdir'
-    
-    if not os.path.exists(base_dir):
-        os.makedirs(base_dir)
-
-    datasink = Node(DataSink(base_directory=base_dir,
-                         container=output_dir),
-                name="datasink")
-    substitutions = [('_subject_id_', 'sub-')]
-    subjFolders = [('_sub-%s' % (sub), 'sub-%s' % (sub))
-                for sub in subject_list]
-    substitutions.extend(subjFolders)
-    datasink.inputs.substitutions = substitutions
-    
-    first_level_wf = Workflow(name="first_level_wf", base_dir=os.path.join(base_dir, working_dir))
-
-
-    # Connect the nodes
-    first_level_wf.connect(
-        [
-            (infosource, getsubjectinfo, [("subject_id", "subject")]),
-            (
-                getsubjectinfo,
-                modelspec,
-                [
-                    ("subject_info", "subject_info"),
-                    ("functional_runs", "functional_runs"),
-                ],
-            ),
-            (modelspec, level1design, [("session_info", "session_info")]),
-            (
-                level1design,
-                level1estimate,
-                [("spm_mat_file", "spm_mat_file")],
-            ),
-            (getsubjectinfo, getcontrasts, [("subject_info", "subject_info")]),
-              # Connect level1design to level1estimate
-            (
-                getcontrasts,
-                level1conest,
-                [("contrasts", "contrasts")],
-            ),  # Connect the contrasts to EstimateContrast
-            (
-                level1estimate,
-                level1conest,
-                [
-                    ("spm_mat_file", "spm_mat_file"),
-                    ("beta_images", "beta_images"),
-                    ("residual_image", "residual_image"),
-                ],
-            ),
-            (level1conest, datasink, [('spm_mat_file', '1stLevel.@spm_mat'),
-                                              ('spmT_images', '1stLevel.@T'),
-                                              ('con_images', '1stLevel.@con'),
-                                              ]),
-        ]
-    )
-
-    first_level_wf.config["logging"] = {
-        "workflow_level": "DEBUG",
-        "filemanip_level": "DEBUG",
-        "interface_level": "DEBUG",
-        "log_to_file": "True",
-        "log_directory": "/output/log_folder",
-    }
-
-    first_level_wf.run('MultiProc', plugin_args={'n_procs': 2})
-
+        # t_sign = 1
+        SnPM_inf.inputs.t_sign = 1
+        SnPM_inf.inputs.filtered_img_name = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_sign1'
+        SnPM_inf.inputs.report_type = 'MIPtable'
+        SnPM_inf.run()
+        if not os.path.isfile('/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_sign1'):
+            break
+        
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument("contrast", type=int, default=1)
     parser.add_argument("BIDS", type=str, default="/mnt/d/data/ds-mlearn/")
-    parser.add_argument("--Nslices", type=int, default=40)
-    parser.add_argument("--refSlice", type=int, default=20)
+    parser.add_argument("--tVal", type=float, nargs='+', default=[3.1])
 
     args = parser.parse_args()
 
-    main(args.BIDS, Nslices=args.Nslices, refSlice=args.refSlice)
+    main(contrast=args.contrast,BIDS=args.BIDS, tVal=args.tVal)

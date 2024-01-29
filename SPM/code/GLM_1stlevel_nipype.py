@@ -1,5 +1,6 @@
 from nilearn import plotting
 from os.path import join as opj
+import os.path as op
 import json
 import os
 from nipype.interfaces.base import Bunch
@@ -330,14 +331,14 @@ def get_contrasts(subject_info):
     return con_list
 
 
-def main(BIDS="/mnt/d/data/ds-mlearn/", Nslices=40, refSlice=20):
+def main(BIDS="/mnt/d/data/ds-mlearn/", base_dir="/mnt/d/multlearn-sns/SPM/nipype", Nslices=40, refSlice=20):
     layout = BIDSLayout(BIDS, derivatives=True)
     # list of subject identifiers
     subject_list = layout.get_subjects()
     subject_list = [sub for sub in subject_list if int(sub) not in [8, 13, 16, 31, 32, 44]]
-    with open(
-    "/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-01/func/sub-01_task-learn_run-1_space-T1w_desc-preproc_bold.json",
-    "rt",
+    with open(op.join(BIDS,
+    "derivatives/fmriprep/sub-01/func/sub-01_task-learn_run-1_space-T1w_desc-preproc_bold.json",
+    "rt"),
     ) as fp:
         task_info = json.load(fp)
 
@@ -402,7 +403,6 @@ def main(BIDS="/mnt/d/data/ds-mlearn/", Nslices=40, refSlice=20):
     )
     level1conest = Node(EstimateContrast(), name="level1conest")
 
-    base_dir = "/mnt/d/multlearn-sns/SPM/nipype"
     output_dir = 'model1'
     working_dir = 'workingdir'
     
@@ -476,9 +476,10 @@ def main(BIDS="/mnt/d/data/ds-mlearn/", Nslices=40, refSlice=20):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("BIDS", type=str, default="/mnt/d/data/ds-mlearn/")
+    parser.add_argument("--base_dir", type=str, default="/mnt/d/multlearn-sns/SPM/nipype")
     parser.add_argument("--Nslices", type=int, default=40)
     parser.add_argument("--refSlice", type=int, default=20)
 
     args = parser.parse_args()
 
-    main(args.BIDS, Nslices=args.Nslices, refSlice=args.refSlice)
+    main(args.BIDS, base_dir=args.base_dir,Nslices=args.Nslices, refSlice=args.refSlice)
