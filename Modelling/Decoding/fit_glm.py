@@ -119,7 +119,7 @@ if __name__ == "__main__":
 #     parser.add_argument("--n", type=int, default=222)
 #     parser.add_argument("--nruns", type=int, default=6)
 #     parser.add_argument("--trials", type=int, default=60)
-#     parser.add_argument('--space', default="MNI152NLin2009cAsym")
+#     parser.add_argument('--space', default="T1w")
 #     args = parser.parse_args()
 
 # main(

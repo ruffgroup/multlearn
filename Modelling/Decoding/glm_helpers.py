@@ -129,8 +129,8 @@ def get_conf_regressors(subject, bids_folder, nruns=6):
 
     for run in range(1,nruns+1):
 
-        confounds = pd.read_csv(
-            f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject:02d}/func/sub-{subject:02d}_task-learn_run-{run}_desc-confounds_timeseries.tsv",
+        confounds = pd.read_csv(op.join(bids_folder,
+            f"derivatives/fmriprep/sub-{subject:02d}/func/sub-{subject:02d}_task-learn_run-{run}_desc-confounds_timeseries.tsv"),
             delimiter="\t",
         )
 
@@ -151,7 +151,7 @@ def get_conf_regressors(subject, bids_folder, nruns=6):
             ],
         ]
 
-        physio_path = f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject:02d}/beh/physio/RegPhysio_sub-{subject:02d}_run_{run}.mat"
+        physio_path = op.join(bids_folder, f"derivatives/fmriprep/sub-{subject:02d}/beh/physio/RegPhysio_sub-{subject:02d}_run_{run}.mat")
         fn3 = glob.glob(physio_path)
         assert len(fn3) == 1
         fn3 = fn3[0]
