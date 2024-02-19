@@ -8,119 +8,8 @@ from scipy import io
 import os
 from glmsingle import GLM_single
 import argparse
-
-
-def get_fmri_data(subject, nruns=6, bids_folder="/mnt/d/data/ds-mlearn", space="T1w"):
-    runs = np.arange(1, nruns + 1)
-
-    data = []
-
-    for run in runs:
-        fn = op.join(
-            bids_folder,
-            "derivatives",
-            "fmriprep",
-            f"sub-{subject:02d}",
-            "func",
-            f"sub-{subject:02d}_task-learn_run-{run}_space-{space}_desc-preproc_bold.nii",
-        )
-
-        data.append(image.load_img(fn).get_fdata())
-
-    return data
-
-
-def get_template_image(subject, bids_folder="/mnt/d/data/ds-mlearn", space="T1w"):
-    run = 1
-    fn = op.join(
-        bids_folder,
-        "derivatives",
-        "fmriprep",
-        f"sub-{subject:02d}",
-        "func",
-        f"sub-{subject:02d}_task-learn_run-{run}_space-{space}_desc-preproc_bold.nii",
-    )
-
-    return image.load_img(fn)
-
-
-def get_rpe(
-    subject,
-    nruns=6,
-    ntrials=60,
-    rpe_folder="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals",
-):
-    template = op.join(rpe_folder, f"sub-{subject:02d}", "rpe*.mat")
-    fn = glob.glob(template)
-    print(fn)
-    assert len(fn) == 1
-    fn = fn[0]
-
-    return (
-        pd.DataFrame(
-            io.loadmat(fn)["rpe"],
-            index=pd.Index(np.arange(1, nruns + 1), name="run"),
-            columns=pd.Index(np.arange(1, ntrials + 1), name="trial_nr"),
-        )
-        .stack()
-        .to_frame("rpe")
-    )
-
-
-def get_events(
-    subject,
-    nruns=6,
-    ntrials=60,
-    data_folder="/mnt/data",
-    rpe_folder="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals",
-):
-    runs = np.arange(1, nruns + 1)
-
-    events = []
-
-    for run in runs:
-        fn = op.join(
-            data_folder,
-            "ds-mlearn",
-            "derivatives",
-            "fmriprep",
-            f"sub-{subject:02d}",
-            "func",
-            f"sub-{subject:02d}_task-learn_run-{run}_events.tsv",
-        )
-
-        e = pd.read_csv(fn, sep="\t").sort_values("onset")
-        e["trial_nr"] = e["trial_nr"].ffill().astype(int)
-        e = e.set_index(["trial_nr", "trial_type"])
-
-        events.append(e)
-
-    fn2 = op.join(
-        data_folder,
-        "sourcedata",
-        "behavior",
-        f"{subject:02d}",
-        f"participant{subject:02d}_savedValues.csv",
-    )
-
-    events = pd.concat(events, keys=runs, names=["run"])
-    stimulus_info = (
-        pd.read_csv(
-            fn2,
-            usecols=["trialNumber", "runNumber", "visual"],
-        )
-        .rename(columns={"trialNumber": "trial_nr", "runNumber": "run"})
-        .set_index(["run", "trial_nr"])
-        .sort_index()
-    )
-
-    events["visual_stimulus"] = np.repeat(
-        stimulus_info["visual"].map(lambda x: f"stimulus {x+1}").values, 2
-    )
-
-    events = events.join(get_rpe(subject, nruns, ntrials, rpe_folder))
-
-    return events
+import nibabel as nib
+from glm_helpers import get_template_image, get_rpe, get_events, get_fmri_data
 
 
 def main(subject, bids_folder, data_folder, rpe_folder, nruns, ntrials, tr, n, space):
@@ -221,26 +110,29 @@ def main(subject, bids_folder, data_folder, rpe_folder, nruns, ntrials, tr, n, s
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("subject", type=int)
-    parser.add_argument("--bids_folder", default="/mnt/d/data/ds-mlearn")
-    parser.add_argument("--data_folder", default="/mnt/d/data")
-    parser.add_argument("--rpe_folder", default="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals")
-    parser.add_argument("--tr", type=float, default=2.3)
-    parser.add_argument("--n", type=int, default=222)
-    parser.add_argument("--nruns", type=int, default=6)
-    parser.add_argument("--trials", type=int, default=60)
-    parser.add_argument('--space', default="T1w")
-    args = parser.parse_args()
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("subject", type=int)
+#     parser.add_argument("--bids_folder", default="/mnt/d/data/ds-mlearn")
+#     parser.add_argument("--data_folder", default="/mnt/d/data")
+#     parser.add_argument("--rpe_folder", default="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals")
+#     parser.add_argument("--tr", type=float, default=2.3)
+#     parser.add_argument("--n", type=int, default=222)
+#     parser.add_argument("--nruns", type=int, default=6)
+#     parser.add_argument("--trials", type=int, default=60)
+#     parser.add_argument('--space', default="T1w")
+#     args = parser.parse_args()
 
-main(
-    args.subject,
-    bids_folder=args.bids_folder,
-    data_folder=args.data_folder,
-    rpe_folder=args.rpe_folder,
-    nruns=args.nruns,
-    ntrials=args.trials,
-    tr=args.tr,
-    n=args.n,
-    space=args.space,
-)
+# main(
+#     args.subject,
+#     bids_folder=args.bids_folder,
+#     data_folder=args.data_folder,
+#     rpe_folder=args.rpe_folder,
+#     nruns=args.nruns,
+#     ntrials=args.trials,
+#     tr=args.tr,
+#     n=args.n,
+#     space=args.space,
+# )
+    subjects = range(1,2)
+    for sub in subjects:
+        main(sub, "/mnt/d/data/ds-mlearn", "/mnt/d/data", "/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals", 6, 60, 2.3, 222, "T1w")

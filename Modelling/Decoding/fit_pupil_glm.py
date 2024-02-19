@@ -2,194 +2,154 @@ from nilearn import image
 import numpy as np
 import os.path as op
 import pandas as pd
-from nilearn.glm.first_level import make_first_level_design_matrix, compute_regressor, FirstLevelModel
+from nilearn.glm.first_level import make_first_level_design_matrix
 import glob
 from scipy import io
 import os
 from glmsingle import GLM_single
 import argparse
 import nibabel as nib
-from nilearn import plotting
-from nilearn.image import resample_to_img
+from glm_helpers import get_fmri_data, get_events, get_template_image, create_dm
 
-def get_fmri_data(subject, nruns=6, bids_folder="/mnt/d/data/ds-mlearn", space="T1w"):
+
+def main(subject, bids_folder, data_folder, rpe_folder, nruns, ntrials, tr, n, space):
     runs = np.arange(1, nruns + 1)
+    events = get_events(subject, nruns, ntrials, data_folder, rpe_folder)
+    data = get_fmri_data(subject, nruns, bids_folder, space)
+    
+    all_pupil_dms = create_dm(subject, bids_folder, nruns, tr, n)
 
-    data = []
+    feedback_onsets = events.xs("feedback", 0, "trial_type")
 
-    for run in runs:
-        fn = op.join(
-            bids_folder,
-            "derivatives",
-            "fmriprep",
-            f"sub-{subject:02d}",
-            "func",
-            f"sub-{subject:02d}_task-learn_run-{run}_space-{space}_desc-preproc_bold.nii",
-        )
+    rpe_onsets = feedback_onsets.copy()
+    rpe_onsets["trial_type"] = "rpe"
 
-        data.append(nib.load(fn))
+    rpe_onsets["modulation"] = (
+        rpe_onsets["rpe"].groupby("run").transform(lambda x: x - x.mean())
+    )
 
-    return data
+    feedback_onsets["trial_type"] = "feedback"
+    feedback_onsets["modulation"] = 1.0
 
-def get_conf_regressors(subject, bids_folder, nruns=6):
-    regressors_all = []
+    glm_onsets = pd.concat((rpe_onsets, feedback_onsets))
+    frametimes = np.linspace(tr / 2.0, (n - 0.5) * tr, n)
 
-    for run in range(1,nruns+1):
+    glm_dm = [
+        make_first_level_design_matrix(
+            frametimes, glm_onsets.loc[run, slice(None)], oversampling=100.0, drift_order=0, drift_model=None
+        ).drop("constant", axis=1)
+        for run in runs
+    ]
 
-        confounds = pd.read_csv(
-            f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject:02d}/func/sub-{subject:02d}_task-learn_run-{run}_desc-confounds_timeseries.tsv",
-            delimiter="\t",
-        )
+    full_glm_dm = [pd.concat((glm_dm[run-1], all_pupil_dms[run-1]), axis=1) for run in runs]
 
-        confounds = confounds.loc[
-            :,
-            [
-                "trans_x",
-                "trans_y",
-                "trans_z",
-                "rot_x",
-                "rot_y",
-                "rot_z",
-                "a_comp_cor_00",
-                "a_comp_cor_01",
-                "a_comp_cor_02",
-                "a_comp_cor_03",
-                "a_comp_cor_04",
-            ],
-        ]
+    events["onset"] = ((events["onset"] + tr / 2.0) // 2.3) * 2.3
 
-        physio_path = f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject:02d}/beh/physio/RegPhysio_sub-{subject:02d}_run_{run}.mat"
-        fn3 = glob.glob(physio_path)
-        assert len(fn3) == 1
-        fn3 = fn3[0]
+    events["duration"] = 0.0
+    events["trial_type"] = events["visual_stimulus"]
 
-        physio = io.loadmat(fn3, simplify_cells=True)["physio"]["model"]
-        physio = pd.DataFrame(
-            data=physio["R"],
-            columns=physio["R_column_names"],
-        )
-        physio.columns = pd.MultiIndex.from_arrays([physio.columns, physio.columns.to_series().groupby(physio.columns).cumcount().astype(str)]).map('_'.join)
-        regressors = pd.concat([confounds, physio], axis=1)
+    dm = [
+        make_first_level_design_matrix(
+            frametimes,
+            events.loc[run, slice(None), "choice"],
+            hrf_model="fir",
+            oversampling=100.0,
+            drift_order=0,
+            drift_model=None,
+        ).drop("constant", axis=1)
+        for run in runs
+    ]
+
+    dm = pd.concat(dm, keys=runs, names=["run"]).fillna(0)
+    dm.columns = [c.replace("_delay_0", "") for c in dm.columns]
+    dm /= dm.max()
+
+    derivatives = op.join(bids_folder, "derivatives")
+    base_dir = "glmsingle"
+    base_dir = op.join(derivatives, base_dir, f"sub-{subject:02d}", "func", "pupil")
+
+    if not op.exists(base_dir):
+        os.makedirs(base_dir)
+
+    X = [dm.loc[run].values for run in runs]
+
+    # create a directory for saving GLMsingle outputs
+
+    opt = dict()
+
+    # set important fields for completeness (but these would be enabled by default)
+    opt["wantlibrary"] = 1
+    opt["wantglmdenoise"] = 1
+    opt["wantfracridge"] = 1
+
+    # for the purpose of this example we will keep the relevant outputs in memory
+    # and also save them to the disk
+    opt["wantfileoutputs"] = [0, 0, 0, 1]
+
+    opt["extra_regressors"] = [cf.values for cf in full_glm_dm]
+
+    print(opt)
+    # running python GLMsingle involves creating a GLM_single object
+    # and then running the procedure using the .fit() routine
+    glmsingle_obj = GLM_single(opt)
+
+    try:
+        results_glmsingle = glmsingle_obj.fit(X, data, 0.6, 2.3, outputdir=base_dir)
         
-        regressors_all.append(regressors)
-    
-    return regressors_all
 
-def get_pupil_data(subject, bids_folder, nruns=6, tr=2.3, n=222):
-    conditions_all = []
-    onsets_all = []
-    pupil_all = []
+        print("Keys in results_glmsingle:", results_glmsingle.keys())
+        print("Keys in results_glmsingle['typed']:", results_glmsingle['typed'].keys())
 
-    frametimes = np.linspace(tr / 2.0, (n - 0.5) * tr, n)
+        betas = results_glmsingle["typed"]["betasmd"]
+        
+        betas = image.new_img_like(get_template_image(subject, space=space), betas)
 
-    for run in range(1, nruns+1):
+        output_path = op.join(base_dir, f"sub-{subject:02d}_task-task_space-{space}_desc-visualstim.nii.gz")
 
-        blinks = pd.read_csv(op.join(bids_folder, "derivatives", "pupil_preproc", f"sub-{subject:02d}", "func", f"sub-{subject:02d}_run-{run}_blinks.tsv"), delimiter="\t")
-        blinks['trial_type'] = "blink"
-        conditions = blinks['trial_type'].values.tolist()
-        onsets = blinks['onset'].values.tolist()
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
 
-        saccades = pd.read_csv(op.join(bids_folder, "derivatives", "pupil_preproc", f"sub-{subject:02d}", "func", f"sub-{subject:02d}_run-{run}_saccades.tsv"), delimiter="\t")
-        saccades['trial_type'] = "saccade"
-        conditions += saccades['trial_type'].values.tolist()
-        onsets += saccades['onset'].values.tolist()
-
-        conditions_all.append(conditions)
-        onsets_all.append(onsets)
-
-        pupil = pd.read_csv(op.join(bids_folder, "derivatives", "pupil_preproc", f"sub-{subject:02d}", "func", f"sub-{subject:02d}_run-{run}_pupil_resampled.tsv"), delimiter="\t")
-        pupil['duration'] = 0
-        pupil_arr = pupil.loc[:, ["onset", "duration", "pupil"]]
-        missing_rows = frametimes.shape[0] - pupil_arr.shape[0]
-        missing_rows_arr = pd.DataFrame(np.zeros((int(missing_rows), 3)), columns=["onset", "duration", "pupil"])
-        pupil_arr = pd.concat([pupil_arr, missing_rows_arr], ignore_index=True).to_numpy().T
-
-        pupil_reg = compute_regressor(pupil_arr, frame_times=frametimes, hrf_model="spm")
-        pupil_all.append(pupil_reg)
-
-    return conditions_all, onsets_all, pupil_all
-    
-def create_dm(subject, bids_folder, nruns=6, tr=2.3, n=222):
-
-    conditions_all, onsets_all, pupil_all = get_pupil_data(subject, bids_folder, nruns, tr, n)
-    regressors_all = get_conf_regressors(subject, bids_folder, nruns)
-    frametimes = np.linspace(tr / 2.0, (n - 0.5) * tr, n)
-    all_design_matrices = []
-    for run in range(1, nruns+1):
-        events = pd.DataFrame({'trial_type': conditions_all[run-1], 'onset': onsets_all[run-1], 'duration': 0})
-        dm = make_first_level_design_matrix(frame_times=frametimes, events=events,add_regs=pd.concat([pd.DataFrame(pupil_all[run-1][0], columns=['pupil']),regressors_all[run-1]], axis=1), add_reg_names = ['pupil']+regressors_all[0].iloc[:,:-1].columns.values.tolist(), hrf_model='spm')
-        all_design_matrices.append(dm)
-
-    return all_design_matrices
-
-def main(subject, bids_folder, nruns=6, tr=2.3, n=222):
-    
-    all_design_matrices = create_dm(subject, bids_folder, nruns, tr, n)
-    data = get_fmri_data(subject, nruns, bids_folder)
-    brain_mask = nib.load(
-            op.join(
-                bids_folder,
-                "derivatives",
-                "fmriprep",
-                f"sub-{subject:02d}",
-                "func",
-                f"sub-{subject:02d}_task-learn_run-1_space-T1w_desc-brain_mask.nii.gz",
-            )
-        )
-    fmri_glm = FirstLevelModel(signal_scaling=False, t_r=tr, mask_img=brain_mask)
-    fmri_glm_multirun = fmri_glm.fit(data, design_matrices=all_design_matrices)
-
-    contrast_pupil = np.array([[1 if 'pupil' in col else 0 for col in all_design_matrices[0].columns]])
-    contrast_blinks = np.array([[1 if 'blink' in col else 0 for col in all_design_matrices[0].columns]])
-    contrast_saccades = np.array([[1 if 'saccade' in col else 0 for col in all_design_matrices[0].columns]])
-
-    z_map_pupil = fmri_glm_multirun.compute_contrast(contrast_pupil, stat_type='t', output_type='stat')
-    z_map_blinks = fmri_glm_multirun.compute_contrast(contrast_blinks, stat_type='t', output_type='stat')
-    z_map_saccades = fmri_glm_multirun.compute_contrast(contrast_saccades, stat_type='t', output_type='stat')
-
-    plotting_folder = op.join(bids_folder, "derivatives", "pupil_preproc", f"sub-{subject:02d}", "plots")
-    if not op.exists(plotting_folder):
-        os.makedirs(plotting_folder)
-
-    T1w = op.join(bids_folder, "derivatives", "fmriprep", f"sub-{subject:02d}", "anat", f"sub-{subject:02d}_desc-preproc_T1w.nii.gz")
-
-    plotting.plot_stat_map(
-    z_map_pupil,
-    bg_img=T1w,
-    threshold=3.1,
-    output_file=op.join(plotting_folder, "pupil.png"),
-    title='Pupil stat map')
-
-    plotting.plot_stat_map(
-    z_map_blinks,
-    bg_img=T1w,
-    threshold=3.1,
-    output_file=op.join(plotting_folder, "blinks.png"),
-    title='Blinks stat map')
-
-    plotting.plot_stat_map(
-    z_map_saccades,
-    bg_img=T1w,
-    threshold=3.1,
-    output_file=op.join(plotting_folder, "saccades.png"),
-    title='Saccades stat map')
-
+        betas.to_filename(output_path)
+        print(f"Saved betas to {output_path}")
+    except Exception as e:
+        print("An error occurred:", e)
 
 
 if __name__ == "__main__":
-    subjects = range(6,65)
-    bids_folder = '/mnt/d/data/ds-mlearn'
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument("subject", type=int)
+#     parser.add_argument("--bids_folder", default="/mnt/d/data/ds-mlearn")
+#     parser.add_argument("--data_folder", default="/mnt/d/data")
+#     parser.add_argument("--rpe_folder", default="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals")
+#     parser.add_argument("--tr", type=float, default=2.3)
+#     parser.add_argument("--n", type=int, default=222)
+#     parser.add_argument("--nruns", type=int, default=6)
+#     parser.add_argument("--trials", type=int, default=60)
+#     parser.add_argument('--space', default="T1w")
+#     args = parser.parse_args()
+
+# main(
+#     args.subject,
+#     bids_folder=args.bids_folder,
+#     data_folder=args.data_folder,
+#     rpe_folder=args.rpe_folder,
+#     nruns=args.nruns,
+#     ntrials=args.trials,
+#     tr=args.tr,
+#     n=args.n,
+#     space=args.space,
+# )
+    subjects = range(1,2)
+    space = "MNI152NLin2009cAsym"
+    bids_folder = "/mnt/d/data/ds-mlearn"
+    data_folder = "/mnt/d/data"
+    rpe_folder = "/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals"
+    nruns = 6
+    ntrials = 60
+    tr = 2.3
+    n = 222
+
 
     for sub in subjects:
         if sub not in [5, 8, 13, 16, 31, 32, 44]:
-            main(sub, bids_folder)
-
-    #parser = argparse.ArgumentParser(description="fit GLM to pupil data")
-    #parser.add_argument("subject", type=int, help="The subject id")
-    #parser.add_argument("bids_folder", type=str, help="The path to the BIDS folder")
-    #parser.add_argument("--nruns", type=int, default=6, help="The number of runs")
-    #parser.add_argument("--tr", type=float, default=2.3, help="The TR")
-    #parser.add_argument("--n", type=int, default=222, help="The number of volumes")
-    #args = parser.parse_args()
-
-    #main(args.subject, args.bids_folder, args.nruns, args.tr, args.n)
+            main(sub, space=space, bids_folder=bids_folder, data_folder=data_folder, rpe_folder=rpe_folder, nruns=nruns, ntrials=ntrials, tr=tr, n=n)
