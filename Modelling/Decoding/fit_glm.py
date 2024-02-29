@@ -69,6 +69,7 @@ def main(subject, bids_folder, data_folder, rpe_folder, nruns, ntrials, tr, n, s
 
     X = [dm.loc[run].values for run in runs]
 
+
     # create a directory for saving GLMsingle outputs
 
     opt = dict()
@@ -96,7 +97,7 @@ def main(subject, bids_folder, data_folder, rpe_folder, nruns, ntrials, tr, n, s
         print("Keys in results_glmsingle['typed']:", results_glmsingle['typed'].keys())
 
         betas = results_glmsingle["typed"]["betasmd"]
-        betas = image.new_img_like(get_template_image(subject, space=space), betas)
+        betas = image.new_img_like(get_template_image(subject, bids_folder=bids_folder, space=space), betas)
 
         output_path = op.join(base_dir, f"sub-{subject:02d}_task-task_space-{space}_desc-visualstim.nii.gz")
 
@@ -110,29 +111,29 @@ def main(subject, bids_folder, data_folder, rpe_folder, nruns, ntrials, tr, n, s
 
 
 if __name__ == "__main__":
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument("subject", type=int)
-#     parser.add_argument("--bids_folder", default="/mnt/d/data/ds-mlearn")
-#     parser.add_argument("--data_folder", default="/mnt/d/data")
-#     parser.add_argument("--rpe_folder", default="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals")
-#     parser.add_argument("--tr", type=float, default=2.3)
-#     parser.add_argument("--n", type=int, default=222)
-#     parser.add_argument("--nruns", type=int, default=6)
-#     parser.add_argument("--trials", type=int, default=60)
-#     parser.add_argument('--space', default="T1w")
-#     args = parser.parse_args()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("subject", type=int)
+    parser.add_argument("--bids_folder", default="/mnt/d/data/ds-mlearn")
+    parser.add_argument("--data_folder", default="/mnt/d/data")
+    parser.add_argument("--rpe_folder", default="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals")
+    parser.add_argument("--tr", type=float, default=2.3)
+    parser.add_argument("--n", type=int, default=222)
+    parser.add_argument("--nruns", type=int, default=6)
+    parser.add_argument("--trials", type=int, default=60)
+    parser.add_argument('--space', default="T1w")
+    args = parser.parse_args()
 
-# main(
-#     args.subject,
-#     bids_folder=args.bids_folder,
-#     data_folder=args.data_folder,
-#     rpe_folder=args.rpe_folder,
-#     nruns=args.nruns,
-#     ntrials=args.trials,
-#     tr=args.tr,
-#     n=args.n,
-#     space=args.space,
-# )
-    subjects = range(1,2)
-    for sub in subjects:
-        main(sub, "/mnt/d/data/ds-mlearn", "/mnt/d/data", "/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals", 6, 60, 2.3, 222, "T1w")
+main(
+    args.subject,
+    bids_folder=args.bids_folder,
+    data_folder=args.data_folder,
+    rpe_folder=args.rpe_folder,
+    nruns=args.nruns,
+    ntrials=args.trials,
+    tr=args.tr,
+    n=args.n,
+    space=args.space,
+)
+    # subjects = range(1,2)
+    # for sub in subjects:
+    #     main(sub, "/mnt/d/data/ds-mlearn", "/mnt/d/data", "/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals", 6, 60, 2.3, 222, "T1w")

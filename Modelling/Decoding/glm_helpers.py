@@ -26,8 +26,8 @@ def get_fmri_data(subject, nruns=6, bids_folder="/mnt/d/data/ds-mlearn", space="
             "func",
             f"sub-{subject:02d}_task-learn_run-{run}_space-{space}_desc-preproc_bold.nii",
         )
-
-        data.append(image.load_img(fn).get_fdata()) #data.append(nib.load(fn))
+         
+        data.append(nib.load(fn).get_fdata()) 
 
     return data
 
@@ -43,7 +43,7 @@ def get_template_image(subject, bids_folder="/mnt/d/data/ds-mlearn", space="T1w"
         f"sub-{subject:02d}_task-learn_run-{run}_space-{space}_desc-preproc_bold.nii",
     )
 
-    return nib.load(fn)
+    return image.load_img(fn)
 
 
 def get_rpe(
@@ -73,7 +73,7 @@ def get_events(
     subject,
     nruns=6,
     ntrials=60,
-    data_folder="/mnt/data",
+    data_folder="/mnt/d/data",
     rpe_folder="/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals",
 ):
     runs = np.arange(1, nruns + 1)
@@ -90,7 +90,6 @@ def get_events(
             "func",
             f"sub-{subject:02d}_task-learn_run-{run}_events.tsv",
         )
-
         e = pd.read_csv(fn, sep="\t").sort_values("onset")
         e["trial_nr"] = e["trial_nr"].ffill().astype(int)
         e = e.set_index(["trial_nr", "trial_type"])
@@ -210,7 +209,7 @@ def create_dm(subject, bids_folder, nruns=6, tr=2.3, n=222):
     all_design_matrices = []
     for run in range(1, nruns+1):
         events = pd.DataFrame({'trial_type': conditions_all[run-1], 'onset': onsets_all[run-1], 'duration': 0})
-        dm = make_first_level_design_matrix(frame_times=frametimes, events=events,add_regs=pd.concat([pd.DataFrame(pupil_all[run-1][0], columns=['pupil']),regressors_all[run-1]], axis=1), add_reg_names = ['pupil']+regressors_all[0].iloc[:,:-1].columns.values.tolist(), hrf_model='spm')
+        dm = make_first_level_design_matrix(frame_times=frametimes, events=events,add_regs=pd.concat([pd.DataFrame(pupil_all[run-1][0], columns=['pupil']),regressors_all[run-1]], axis=1), add_reg_names = ['pupil']+regressors_all[0].iloc[:,:-1].columns.values.tolist(), hrf_model='spm', drift_model=None, oversampling=100)
         all_design_matrices.append(dm)
 
     return all_design_matrices
