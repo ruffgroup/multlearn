@@ -4,7 +4,7 @@ import numpy as np
 
 script_name = '/mnt/d/multlearn-sns/Modelling/Decoding/fit_encoding.py'
 output_prefix = '/mnt/d/multlearn-sns/Modelling/Decoding/run_encoding/out_'
-IDs = range(2,65)
+IDs = range(1,2)
 spaces = ['T1w']
 
 for space in spaces:

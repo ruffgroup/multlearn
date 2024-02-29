@@ -4,8 +4,8 @@ import os
 
 script_name = '/mnt/d/multlearn-sns/Modelling/Decoding/fit_glm.py'
 output_prefix = '/mnt/d/multlearn-sns/Modelling/Decoding/run_glms/out_'
-IDs = range(40,65)
-spaces = ['MNI152NLin2009cAsym']
+IDs = range(1,2)
+spaces = ['T1w']
 
 for space in spaces:
     for i in IDs:
