@@ -29,316 +29,22 @@ import pytest as pt
 import nibabel as nb
 import nipype
 import argparse
-
-MatlabCommand.set_default_paths("~/spm12")
-MatlabCommand.set_default_matlab_cmd("/usr/local/MATLAB/R2022b/bin/matlab")
-fs_dir = "/mnt/d/data/ds-mlearn/derivatives/freesurfer"
-FSCommand.set_default_subjects_dir(fs_dir)
+import nipype_helpers
 
 
-def get_subject_info(subject):
-    from glob import glob
-    import numpy as np
-    import pandas as pd
-    from scipy import io, stats
-    from nipype.interfaces.base import Bunch
-
-    subject_info = []
-    rpe_path = (
-        f"/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/sub-{subject}/rpe*.mat"
-    )
-    fn = glob(rpe_path)
-
-    assert len(fn) == 1
-    fn = fn[0]
-
-    rpe_data = np.nan_to_num(
-        stats.zscore(io.loadmat(fn)["rpe"], nan_policy="omit", axis=1)
-    )
-
-    rpe = (
-        pd.DataFrame(
-            rpe_data,
-            index=pd.Index(np.arange(1, 6 + 1), name="run"),
-            columns=pd.Index(np.arange(1, 60 + 1), name="trial_nr"),
-        )
-        .stack()
-        .to_frame("rpe")
-    )
-
-    surprise_path = (
-        f"/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/sub-{subject}/spe*.mat"
-    )
-    fn2 = glob(surprise_path)
-    assert len(fn2) == 1
-    fn2 = fn2[0]
-    surprise_data = np.nan_to_num(
-        stats.zscore(io.loadmat(fn2)["spe"], nan_policy="omit", axis=1)
-    )
-    surprise = (
-        pd.DataFrame(
-            surprise_data,
-            index=pd.Index(np.arange(1, 6 + 1), name="run"),
-            columns=pd.Index(np.arange(1, 60 + 1), name="trial_nr"),
-        )
-        .stack()
-        .to_frame("spe")
-    )
-
-    functional_runs = []
-
-    for run in range(1, 7):
-        onsets = []
-        durations = []
-        conditions = []
-
-        events_file = pd.read_csv(
-            f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject}/func/sub-{subject}_task-learn_run-{run}_events.tsv",
-            delimiter="\t",
-        )
-        events_file_sorted = events_file.sort_values(by=["onset"])
-        events_file_sorted["trial_nr"] = events_file_sorted["trial_nr"].ffill()
-        events_file_sorted["runType"] = events_file_sorted["runType"].ffill()
-        run_type = events_file_sorted["runType"][0]
-
-        confounds = pd.read_csv(
-            f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject}/func/sub-{subject}_task-learn_run-{run}_desc-confounds_timeseries.tsv",
-            delimiter="\t",
-        )
-
-        confounds = confounds.loc[
-            :,
-            [
-                "trans_x",
-                "trans_y",
-                "trans_z",
-                "rot_x",
-                "rot_y",
-                "rot_z",
-                "a_comp_cor_00",
-                "a_comp_cor_01",
-                "a_comp_cor_02",
-                "a_comp_cor_03",
-                "a_comp_cor_04",
-            ],
-        ]
-
-        physio_path = f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject}/beh/physio/RegPhysio_sub-{subject}_run_{run}.mat"
-        fn3 = glob(physio_path)
-        assert len(fn3) == 1
-        fn3 = fn3[0]
-
-        physio = io.loadmat(fn3, simplify_cells=True)["physio"]["model"]
-        physio = pd.DataFrame(
-            data=physio["R"],
-            columns=physio["R_column_names"],
-        )
-
-        regressors = pd.concat([confounds, physio], axis=1)
-        regressor_names = regressors.columns.values.tolist()
-
-        for group in events_file_sorted.groupby("trial_type"):
-            conditions.append(str(group[0].capitalize() + run_type.capitalize()))
-            onsets.append(group[1]["onset"].tolist())
-            durations.append(group[1]["duration"].tolist())
-        run_rpe = rpe.xs(run)
-        run_surprise = surprise.xs(run)
-        pmod = [
-            Bunch(name=["surprise"], param=[run_surprise.values.tolist()], poly=[1]),
-            Bunch(name=["rpe"], param=[run_rpe.values.tolist()], poly=[1]),
-        ]
-
-        subject_info.insert(
-            run - 1,
-            Bunch(
-                conditions=conditions,
-                onsets=onsets,
-                durations=durations,
-                pmod=pmod,
-                tmod=None,
-                orth=["No"] * len(conditions),
-                regressors=regressors.values.T.tolist(),
-                regressor_names=regressor_names,
-            ),
-        )
-
-        functional_run = glob(
-            f"/mnt/d/data/ds-mlearn/derivatives/fmriprep/sub-{subject}/func/s6.sub-{subject}_task-learn_run-{run}_space-MNI152NLin2009cAsym_desc-preproc_bold.nii"
-        )[0]
-        functional_runs.append(functional_run)
-
-    return subject_info, functional_runs
-
-
-def get_contrasts(subject_info):
-    from nipype.interfaces.spm import EstimateContrast
-    import os
-
-    condition_names = [
-        "ChoiceAudio",
-        "ChoiceTactile",
-        "FeedbackAudio",
-        "FeedbackTactile",
-        "ChoiceAudioxsurprise^1",
-        "ChoiceTactilexsurprise^1",
-        "FeedbackAudioxrpe^1",
-        "FeedbackTactilexrpe^1",
-    ]
-
-    con01 = ["rpe", "T", condition_names[6:], [1 / 6.0, 1 / 6.0]]
-    con02 = ["rpe_audio", "T", [condition_names[6]], [1 / 3.0]]
-    con03 = ["rpe_tactile", "T", [condition_names[7]], [1 / 3.0]]
-    con04 = [
-        "rpe_audio < rpe_tactile",
-        "T",
-        [condition_names[6], condition_names[7]],
-        [-1 / 3.0, 1 / 3.0],
-    ]
-    con05 = [
-        "rpe_tactile < rpe_audio",
-        "T",
-        [condition_names[6], condition_names[7]],
-        [1 / 3.0, -1 / 3.0],
-    ]
-
-    con06 = ["surprise", "T", condition_names[4:6], [1 / 6.0, 1 / 6.0]]
-    con07 = ["surprise_audio", "T", [condition_names[4]], [1 / 3.0]]
-    con08 = ["surprise_tactile", "T", [condition_names[5]], [1 / 3.0]]
-    con09 = [
-        "surprise_audio < surprise_tactile",
-        "T",
-        [condition_names[4], condition_names[5]],
-        [-1 / 3.0, 1 / 3.0],
-    ]
-    con10 = [
-        "surprise_tactile < surprise_audio",
-        "T",
-        [condition_names[4], condition_names[5]],
-        [1 / 3.0, -1 / 3.0],
-    ]
-
-    con11 = [
-        "rpe < surprise",
-        "T",
-        condition_names[4:],
-        [-1 / 6.0, 1 / 6.0, -1 / 6.0, 1 / 6.0, -1 / 6.0, 1 / 6.0],
-    ]
-    con12 = [
-        "surprise < rpe",
-        "T",
-        condition_names[4:],
-        [1 / 6.0, -1 / 6.0, 1 / 6.0, -1 / 6.0, 1 / 6.0, -1 / 6.0],
-    ]
-    con13 = [
-        "rpe_audio < surprise_audio",
-        "T",
-        [condition_names[4], condition_names[6]],
-        [1 / 3.0, -1 / 3.0],
-    ]
-    con14 = [
-        "surprise_audio < rpe_audio",
-        "T",
-        [condition_names[4], condition_names[6]],
-        [-1 / 3.0, 1 / 3.0],
-    ]
-    con15 = [
-        "rpe_tactile < surprise_tactile",
-        "T",
-        [condition_names[5], condition_names[7]],
-        [1 / 3.0, -1 / 3.0],
-    ]
-    con16 = [
-        "surprise_tactile < rpe_tactile",
-        "T",
-        [condition_names[5], condition_names[7]],
-        [-1 / 3.0, 1 / 3.0],
-    ]
-
-    con17 = [
-        "pmods",
-        "T",
-        condition_names[4:8],
-        [1 / 12.0, 1 / 12.0, 1 / 12.0, 1 / 12.0],
-    ]
-    con18 = [
-        "pmods_audio",
-        "T",
-        [condition_names[4], condition_names[6]],
-        [1 / 6.0, 1 / 6.0],
-    ]
-    con19 = [
-        "pmods_tactile",
-        "T",
-        [condition_names[5], condition_names[7]],
-        [1 / 6.0, 1 / 6.0],
-    ]
-    con20 = [
-        "pmods_audio-pmods_tactile",
-        "T",
-        condition_names[4:8],
-        [-1 / 6.0, 1 / 6.0, -1 / 6.0, 1 / 6.0],
-    ]
-    con21 = [
-        "pmods_tactile-pmods_audio",
-        "T",
-        condition_names[4:8],
-        [1 / 6.0, -1 / 6.0, 1 / 6.0, -1 / 6.0],
-    ]
-
-    con22 = ["feedback", "T", condition_names[2:4], [1 / 6.0, 1 / 6.0]]
-    con23 = ["choice", "T", condition_names[0:2], [1 / 6.0, 1 / 6.0]]
-    con24 = [
-        "feedback < choice",
-        "T",
-        condition_names[0:4],
-        [1 / 6.0, 1 / 6.0, -1 / 6.0, -1 / 6.0],
-    ]
-    con25 = [
-        "choice < feedback",
-        "T",
-        condition_names[0:4],
-        [-1 / 6.0, -1 / 6.0, 1 / 6.0, 1 / 6.0],
-    ]
-
-    con_list = [
-        con01,
-        con02,
-        con03,
-        con04,
-        con05,
-        con06,
-        con07,
-        con08,
-        con09,
-        con10,
-        con11,
-        con12,
-        con13,
-        con14,
-        con15,
-        con16,
-        con17,
-        con18,
-        con19,
-        con20,
-        con21,
-        con22,
-        con23,
-        con24,
-        con25,
-    ]
-
-    return con_list
-
-
-def main(BIDS="/mnt/d/data/ds-mlearn/", base_dir="/mnt/d/multlearn-sns/SPM/nipype", Nslices=40, refSlice=20):
-    layout = BIDSLayout(BIDS, derivatives=True)
+def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="/mnt/d/multlearn-sns/SPM/mask_ICV.nii", ppi_mask=None, model="model1", bestfitting_path='/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/', Nslices=40, refSlice=20, mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12"):
+    MatlabCommand.set_default_paths(spm_path)
+    MatlabCommand.set_default_matlab_cmd(mlab_path)
+    FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
+    layout = BIDSLayout(op.join(data_folder,"ds-mlearn/"), derivatives=True)
     # list of subject identifiers
     subject_list = layout.get_subjects()
     subject_list = [sub for sub in subject_list if int(sub) not in [8, 13, 16, 31, 32, 44]]
-    with open(op.join(BIDS,
-    "derivatives/fmriprep/sub-01/func/sub-01_task-learn_run-1_space-T1w_desc-preproc_bold.json",
-    "rt"),
+
+
+    with open((opj(data_folder,
+    "ds-mlearn/derivatives/fmriprep/sub-01/func/sub-01_task-learn_run-1_space-T1w_desc-preproc_bold.json")),
+    "rt",
     ) as fp:
         task_info = json.load(fp)
 
@@ -355,15 +61,41 @@ def main(BIDS="/mnt/d/data/ds-mlearn/", base_dir="/mnt/d/multlearn-sns/SPM/nipyp
     infosource.iterables = [
         ("subject_id", subject_list),
     ]
+    if model == "ROI" or model == "neurosynth_ROI":
+        get_subject_info = getattr(nipype_helpers, 'get_subject_info_model2')
+    elif model == "PPI" or model == "neurosynth_PPI":
+        get_subject_info = getattr(nipype_helpers, 'get_subject_info_PPI')
+    else:
+        get_subject_info = getattr(nipype_helpers, 'get_subject_info_'+model) 
 
-    getsubjectinfo = Node(
-        Function(
-            input_names=["subject"],
-            output_names=["subject_info", "functional_runs"],
-            function=get_subject_info,
-        ),
-        name="getsubjectinfo",
-    )
+    if model == "PPI" or model == "neurosynth_PPI":
+        getsubjectinfo = Node(
+            Function(
+                input_names=["subject", "data_folder", "roi_mask", "bestfitting_path"],
+                output_names=["subject_info", "functional_runs"],
+                function=get_subject_info,
+            ),
+            name="getsubjectinfo",
+        )
+        getsubjectinfo.inputs.roi_mask = ppi_mask
+    else:
+        getsubjectinfo = Node(
+            Function(
+                input_names=["subject", "data_folder", "bestfitting_path"],
+                output_names=["subject_info", "functional_runs"],
+                function=get_subject_info,
+            ),
+            name="getsubjectinfo",
+        )
+    getsubjectinfo.inputs.data_folder = data_folder
+    getsubjectinfo.inputs.bestfitting_path = bestfitting_path
+    
+    if model == "neurosynth_ROI":
+        get_contrasts = getattr(nipype_helpers, 'get_contrasts_ROI')
+    elif model == "neurosynth_PPI":
+        get_contrasts = getattr(nipype_helpers, 'get_contrasts_PPI')
+    else:
+        get_contrasts = getattr(nipype_helpers, 'get_contrasts_'+model)
     getcontrasts = Node(
         Function(
             input_names=["subject_info"],
@@ -391,8 +123,8 @@ def main(BIDS="/mnt/d/data/ds-mlearn/", base_dir="/mnt/d/multlearn-sns/SPM/nipyp
             model_serial_correlations="AR(1)",
             microtime_resolution=Nslices,
             microtime_onset=refSlice,
-            flags={"mthresh": 0.8, "globalnorm": "None"},
-            mask_image="/mnt/d/multlearn-sns/SPM/mask_ICV.nii",
+            flags={"mthresh": 0.8, "global": "None"},
+            mask_image=mask,
             volterra_expansion_order=1,
         ),
         name="level1design",
@@ -403,9 +135,20 @@ def main(BIDS="/mnt/d/data/ds-mlearn/", base_dir="/mnt/d/multlearn-sns/SPM/nipyp
     )
     level1conest = Node(EstimateContrast(), name="level1conest")
 
-    output_dir = 'model1'
-    working_dir = 'workingdir'
+    if model == "ROI":
+        output_dir = ''.join(mask.split("/")[-1].split("_")[2])+"/"+''.join(mask.split("/")[-1].split("_")[:2])+'_'+mask.split("/")[-1].split("_")[-1].split(".")[0]
+        working_dir = "workingdir_"+''.join(mask.split("/")[-1].split("_")[:3])+"_"+mask.split("_")[-1].split(".")[0]
+    elif model == "PPI":
+        output_dir = op.join(ppi_mask.split("/")[-3], "PPI",''.join(ppi_mask.split("/")[-1].split("_")[2])+"/"+''.join(ppi_mask.split("/")[-1].split("_")[:2])+'_'+ppi_mask.split("/")[-1].split("_")[-1].split(".")[0])
+        working_dir = op.join(ppi_mask.split("/")[-3], "PPI", "workingdir_"+''.join(ppi_mask.split("/")[-1].split("_")[:3])+"_"+ppi_mask.split("_")[-1].split(".")[0])
+    elif model == "neurosynth_ROI":
+        output_dir = op.join("neurosynth",''.join(mask.split(".nii")[0].split("/")[-1].split("_")[:2]))
+        working_dir = op.join("neurosynth",'workingdir_'+''.join(mask.split(".nii")[0].split("/")[-1].split("_")[:2]))
+    else:
+        output_dir = model
+        working_dir = 'workingdir_'+model
     
+    base_dir=opj(base_dir,"nipype")
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
 
@@ -475,11 +218,17 @@ def main(BIDS="/mnt/d/data/ds-mlearn/", base_dir="/mnt/d/multlearn-sns/SPM/nipyp
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("BIDS", type=str, default="/mnt/d/data/ds-mlearn/")
+    parser.add_argument("data_folder", type=str, default="/mnt/d/data/")
     parser.add_argument("--base_dir", type=str, default="/mnt/d/multlearn-sns/SPM/nipype")
+    parser.add_argument("--mask", type=str, default="/mnt/d/multlearn-sns/SPM/mask_ICV.nii")
+    parser.add_argument("--ppi_mask", type=str, default=None)
+    parser.add_argument("--model", type=str, default="model1")
+    parser.add_argument("--bestfitting_path", type=str, default='/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/')
+    parser.add_argument("--mlab_path", type=str, default="/usr/local/MATLAB/R2022b/bin/matlab")
+    parser.add_argument("--spm_path", type=str, default="~/spm12")
     parser.add_argument("--Nslices", type=int, default=40)
     parser.add_argument("--refSlice", type=int, default=20)
 
     args = parser.parse_args()
 
-    main(args.BIDS, base_dir=args.base_dir,Nslices=args.Nslices, refSlice=args.refSlice)
+    main(args.data_folder, base_dir=args.base_dir, mask=args.mask, ppi_mask=args.ppi_mask, model=args.model, bestfitting_path=args.bestfitting_path, mlab_path=args.mlab_path, spm_path=args.spm_path, Nslices=args.Nslices, refSlice=args.refSlice)

@@ -10,4 +10,4 @@ module load anaconda3
 source /home/${USER}/.bashrc
 source activate multlearn-decoding
 
-python $HOME/git/multlearn-sns/Modelling/Decoding/fit_encoding_pupil.py $PARTICIPANT_LABEL --bids_folder /shares/zne.uzh/multlearn/ds-mlearn --data_folder /shares/zne.uzh/multlearn --mask 'visual'
+python $HOME/git/multlearn-sns/Modelling/Decoding/fit_encoding_pupil.py $PARTICIPANT_LABEL --bids_folder /shares/zne.uzh/multlearn/ds-mlearn --data_folder /shares/zne.uzh/multlearn

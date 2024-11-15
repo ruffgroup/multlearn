@@ -2,6 +2,7 @@ from nilearn import plotting
 from os.path import join as opj
 import json
 import os
+import re
 from nipype.interfaces.base import (
     Bunch,
     BaseInterface,
@@ -21,7 +22,7 @@ from nipype.interfaces.spm import (
     model,
 )
 import subprocess
-from nipype.interfaces.matlab import MatlabCommand
+from nipype.interfaces.matlab import MatlabCommand, MatlabInputSpec
 from nipype.interfaces.freesurfer import FSCommand
 from nipype.algorithms.modelgen import SpecifySPMModel, SpecifyModel
 from nipype.interfaces.utility import Function, IdentityInterface
@@ -38,15 +39,18 @@ import nibabel as nb
 import nipype
 import argparse
 
-MatlabCommand.set_default_paths("~/spm12")
-MatlabCommand.set_default_matlab_cmd("/usr/local/MATLAB/R2022b/bin/matlab")
-fs_dir = "/mnt/d/data/ds-mlearn/derivatives/freesurfer"
-FSCommand.set_default_subjects_dir(fs_dir)
-
 
 class SnpmOneSampleTTestInputSpec(BaseInterfaceInputSpec):
     destination = traits.Directory(
         exists=True, desc="Output directory for SnPM results"
+    )
+
+    base_dir = traits.Directory(
+        exists=True, desc="nipype base directory"
+    )
+
+    spm_path = traits.Directory(
+        exists=True, desc="spm directory"
     )
 
     contrasts = traits.List(traits.Any, desc="List of contrast files")
@@ -157,20 +161,15 @@ class SnpmOneSampleTTestInputSpec(BaseInterfaceInputSpec):
     )
 
 
-class SnpmOneSampleTTestOutputSpec(TraitedSpec):
-    results = traits.List(traits.File, desc="List of SnPM result files")
-
-
 class SnpmOneSampleTTest(BaseInterface):
     input_spec = SnpmOneSampleTTestInputSpec
-    output_spec = SnpmOneSampleTTestOutputSpec
     _jobtype = "tools.snpm.des"
     _jobname = "OneSampT"
 
     def _run_interface(self, runtime):
         # Construct the SnPM command based on input specifications
         snpm_command = "function SnPM_2ndlevel_script()\n"
-        snpm_command += "addpath('~/spm12');\n"
+        snpm_command += f"addpath('{self.inputs.spm_path}');\n"
         snpm_command += "spm_jobman('initcfg');\n"
         snpm_command += "matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignName = 'MultiSub: One Sample T test on diffs/contrasts';\n"
         snpm_command += "matlabbatch{1}.spm.tools.snpm.des.OneSampT.DesignFile = 'snpm_bch_ui_OneSampT';\n"
@@ -199,7 +198,7 @@ class SnpmOneSampleTTest(BaseInterface):
             snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.des.OneSampT.masking.tm.tmr.rthresh = {self.inputs.thresh_mask_rel};\n"
         snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.des.OneSampT.masking.im = {self.inputs.implicit_mask};\n"
         if self.inputs.explicit_mask:
-            snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.des.OneSampT.masking.em = {self.inputs.explicit_mask};\n"
+            snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.des.OneSampT.masking.em = cellstr('{self.inputs.explicit_mask}');\n"
         else:
             snpm_command += "matlabbatch{1}.spm.tools.snpm.des.OneSampT.masking.em = cellstr('');\n"
         if self.inputs.global_calc_omit:
@@ -218,11 +217,12 @@ class SnpmOneSampleTTest(BaseInterface):
         snpm_command += "spm('defaults', 'fMRI');\n"
         snpm_command += "spm_jobman('run', matlabbatch);\n"
         snpm_command += "clear matlabbatch\n"
+        snpm_command += "end"
 
-        # Write the SnPM command to a temporary script
-        script_path = "/mnt/d/multlearn-sns/SPM/nipype/SnPM_2ndlevel_script.m"
+        script_path = opj(self.inputs.base_dir, "SnPM_2ndlevel_script.m")
         with open(script_path, "w") as script_file:
             script_file.write(snpm_command)
+
 
         # Run the SnPM command using subprocess
         subprocess.run(
@@ -232,9 +232,6 @@ class SnpmOneSampleTTest(BaseInterface):
         )
 
         return runtime
-
-    def _list_outputs(self):
-        return self.outputs.results
     
 class SnpmInferenceInputSpec(BaseInterfaceInputSpec):
     snpm_mat_file = File(
@@ -277,18 +274,27 @@ class SnpmInferenceInputSpec(BaseInterfaceInputSpec):
         desc="Report type (e.g., 'MIPtable')",
     )
 
-class SnpmInferenceOutputSpec(TraitedSpec):
-    results = traits.List(traits.File, desc="List of SnPM result files")
+    base_dir = traits.Directory(
+        exists=True, desc="nipype base directory"
+    )
+
+    spm_path = traits.Directory(
+        exists=True, desc="spm directory"
+    )
+
+    contrast = traits.Int(
+        exists=True, desc="contrast nr"
+    )
+
 
 class SnpmInference(BaseInterface):
     input_spec = SnpmInferenceInputSpec
-    #output_spec = SnpmInferenceOutputSpec
     _jobtype = "tools.snpm.inference"
 
     def _run_interface(self, runtime):
         # Construct the SnPM inference command based on input specifications
         snpm_command = "function SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_script()\n"
-        snpm_command += "addpath('~/spm12');\n"
+        snpm_command += f"addpath('{self.inputs.spm_path}');\n"
         snpm_command += "spm_jobman('initcfg');\n"
         snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.SnPMmat = cellstr('{self.inputs.snpm_mat_file}');\n"
         snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Thr.Clus.ClusSize.CFth = {self.inputs.cluster_threshold};\n"
@@ -301,13 +307,18 @@ class SnpmInference(BaseInterface):
         snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Report = '{self.inputs.report_type}';\n"
         snpm_command += "spm('defaults', 'fMRI');\n"
         snpm_command += "spm_jobman('run', matlabbatch);\n"
+        if self.inputs.filtered_img_name:
+            snpm_command += f"savefig('{self.inputs.filtered_img_name}.fig')\n"
         snpm_command += "clear matlabbatch\n"
+        snpm_command += "end"
 
-        script_path_inf = "/mnt/d/multlearn-sns/SPM/nipype/SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_script.m"
+        if self.inputs.t_sign == 1:
+            script_path_inf = opj(self.inputs.base_dir,"2ndLevel/SnPM_SecondLevel_con"+str(self.inputs.contrast), "SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_pos_script.m")
+        else:
+            script_path_inf = opj(self.inputs.base_dir,"2ndLevel/SnPM_SecondLevel_con"+str(self.inputs.contrast), "SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_neg_script.m")
         with open(script_path_inf, "w") as script_file:
             script_file.write(snpm_command)
 
-        # Run the SnPM inference command using subprocess
         subprocess.run(
             f"matlab -nodisplay -nosplash -r \"run('{script_path_inf}'); exit;\"",
             shell=True,
@@ -317,8 +328,11 @@ class SnpmInference(BaseInterface):
         return runtime
 
 
-def main(contrast, tVal=[3.1], BIDS="/mnt/d/data/ds-mlearn/"):
-    layout = BIDSLayout(BIDS, derivatives=True)
+def main(contrast, tVal=[3.1], data_folder="/mnt/d/data/",model="fmri", base_dir="/mnt/d/multlearn-sns/SPM/nipype/", mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12"):
+    MatlabCommand.set_default_paths(spm_path)
+    MatlabCommand.set_default_matlab_cmd(mlab_path)
+    FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
+    layout = BIDSLayout(opj(data_folder,"ds-mlearn/"), derivatives=True)
     # list of subject identifiers
     subject_list = layout.get_subjects()
     subject_list = [sub for sub in subject_list if int(sub) not in [8, 13, 16, 31, 32, 44]]
@@ -326,59 +340,84 @@ def main(contrast, tVal=[3.1], BIDS="/mnt/d/data/ds-mlearn/"):
     SnPM_2nd = Node(SnpmOneSampleTTest(), name='SnPM')
     sub_contrasts = list()
     for sub in subject_list:
-        path_1stlevel = f'/mnt/d/multlearn-sns/SPM/nipype/model1/1stLevel/sub-{sub}/con_{contrast:04d}.nii'
-        sub_contrasts.append(path_1stlevel)
+        path_1stlevel = opj(base_dir,f'1stLevel/sub-{sub}/con_{contrast:04d}.nii')
+        if os.path.exists(path_1stlevel):
+            sub_contrasts.append(path_1stlevel)
     SnPM_2nd.inputs.contrasts = sub_contrasts
-    destination = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast)
+    destination = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast)
     if not os.path.exists(destination):
         os.makedirs(destination)
     SnPM_2nd.inputs.destination = destination
+    SnPM_2nd.inputs.base_dir = base_dir
+    SnPM_2nd.inputs.spm_path = spm_path
     SnPM_2nd.inputs.n_perms = 5000
     SnPM_2nd.inputs.var_smoothing = [0, 0, 0]
     SnPM_2nd.inputs.memory_usage = False
     SnPM_2nd.inputs.cluster_inference_later = -1
     SnPM_2nd.inputs.masking_none = 1
-    SnPM_2nd.inputs.implicit_mask = 1
+    SnPM_2nd.inputs.implicit_mask = 1      
+    if model == "ROI":
+        con_cluster = base_dir.split("/")[-2:]
+        temp = re.compile("([a-zA-Z]+)([0-9]+)")
+        con = temp.match(con_cluster[0]).groups()[1]
+        cluster = temp.match(con_cluster[1]).groups()[1]
+        label = con_cluster[-1].split("_")[-1]
+        mask = glob("/shares/zne.uzh/multlearn/nipype/model2/ROI/"+"cluster_"+str(cluster)+"_con"+str(con)+"*"+str(label)+".nii")[0]
+        SnPM_2nd.inputs.explicit_mask = str(mask)+",1"
+    elif model == "neurosynth_ROI":
+        mask = glob(base_dir.split("cluster")[0]+"cluster_"+base_dir.split("cluster")[-1]+".nii")[0]
+        SnPM_2nd.inputs.explicit_mask = str(mask)+",1"
     SnPM_2nd.inputs.global_calc_omit = 1
     SnPM_2nd.inputs.no_grand_mean_scaling = 1
     SnPM_2nd.inputs.global_normalization = 1
 
-    #SnPM_2nd.run()
+    SnPM_2nd.run()
     for i in range(len(tVal)):
         SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
-        SnPM_inf.inputs.snpm_mat_file = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM.mat'
+        SnPM_inf.inputs.base_dir = base_dir
+        SnPM_inf.inputs.spm_path = spm_path
+        SnPM_inf.inputs.contrast = contrast
+        SnPM_inf.inputs.snpm_mat_file = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast) + '/SnPM.mat'
         SnPM_inf.inputs.cluster_threshold = tVal[i]
         SnPM_inf.inputs.fwe_threshold = 0.05
 
         # t_sign = -1
         SnPM_inf.inputs.t_sign = -1
-        SnPM_inf.inputs.filtered_img_name = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_sign-1'
+        SnPM_inf.inputs.filtered_img_name = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_neg'
         SnPM_inf.inputs.report_type = 'MIPtable'
         SnPM_inf.run()
-        if not os.path.isfile('/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_sign-1'):
+
+        if not os.path.exists(opj(base_dir,'2ndLevel/SnPM_SecondLevel_con')+ str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_neg.nii'):
             break
 
     for i in range(len(tVal)):
         SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
-        SnPM_inf.inputs.snpm_mat_file = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM.mat'
+        SnPM_inf.inputs.base_dir = base_dir
+        SnPM_inf.inputs.spm_path = spm_path
+        SnPM_inf.inputs.contrast = contrast
+        SnPM_inf.inputs.snpm_mat_file = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast) + '/SnPM.mat'
         SnPM_inf.inputs.cluster_threshold = tVal[i]
         SnPM_inf.inputs.fwe_threshold = 0.05
 
         # t_sign = 1
         SnPM_inf.inputs.t_sign = 1
-        SnPM_inf.inputs.filtered_img_name = '/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_sign1'
+        SnPM_inf.inputs.filtered_img_name = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_pos'
         SnPM_inf.inputs.report_type = 'MIPtable'
         SnPM_inf.run()
-        if not os.path.isfile('/mnt/d/multlearn-sns/SPM/nipype/model1/2ndLevel/SnPM_SecondLevel_con' + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_sign1'):
+
+        if not os.path.exists(opj(base_dir,'2ndLevel/SnPM_SecondLevel_con')+ str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_pos.nii'):
             break
-        
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("contrast", type=int, default=1)
-    parser.add_argument("BIDS", type=str, default="/mnt/d/data/ds-mlearn/")
+    parser.add_argument("data_folder", type=str, default="/mnt/d/data/")
+    parser.add_argument("--model", type=str, default="fmri")
+    parser.add_argument("--base_dir", type=str, default="/mnt/d/multlearn-sns/SPM/nipype/")
+    parser.add_argument("--mlab_path", type=str, default="/usr/local/MATLAB/R2022b/bin/matlab")
+    parser.add_argument("--spm_path", type=str, default="~/spm12")
     parser.add_argument("--tVal", type=float, nargs='+', default=[3.1])
 
     args = parser.parse_args()
 
-    main(contrast=args.contrast,BIDS=args.BIDS, tVal=args.tVal)
+    main(contrast=args.contrast, model=args.model,data_folder=args.data_folder, base_dir=args.base_dir, mlab_path=args.mlab_path, spm_path=args.spm_path, tVal=args.tVal)

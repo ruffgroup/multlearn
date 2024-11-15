@@ -31,6 +31,7 @@ def main(
     baseline=0.0,
     alpha=1.0,
     plotting=0,
+    nvoxels=100,
 ):
     
     fn = op.join(
@@ -61,10 +62,14 @@ def main(
             base_dir, f"sub-{subject:02d}_task-task_space-{space}_desc-visualstim.nii.gz"
         )
     )
-    if mask == 'visual':
-        print('Using visual mask')
+    if mask == 'v1':
+        print('Using v1 mask')
         brain_mask = nib.load(op.join(derivatives,'encoding_model',f'sub-{subject:02d}','anat', f'sub-{subject:02d}_surf2img_v1.nii.gz'))
         brain_mask = math_img('img == 1', img=brain_mask)
+    elif mask == 'v123':
+        print('Using v123 mask')
+        brain_mask = nib.load(op.join(derivatives,'encoding_model',f'sub-{subject:02d}','anat', f'sub-{subject:02d}_surf2img_v1.nii.gz'))
+        brain_mask = math_img('(img == 1) | (img == 2) | (img == 3)', img=brain_mask)
     else:
         brain_mask = nib.load(
             op.join(
@@ -97,29 +102,30 @@ def main(
         train_data = data.loc[train,:]
         test_data = data.loc[test,:]
         model = VonMisesPRF(parameters=parameters, paradigm=paradigm.loc[train].astype(np.float32))
-        fitter = WeightFitter(model=model, paradigm=paradigm.loc[train].astype(np.float32), parameters=parameters, data=train_data.astype(np.float32))
-        weights = pd.DataFrame(fitter.fit(1.0).numpy(), columns=data_columns, index=parameters.index)
-        pred = model.predict(paradigm=paradigm.loc[test].astype(np.float32), weights=weights).astype(np.float32)
-        r2 = get_rsq(test_data, pred.values)
-        r2.dropna(inplace=True)
+        fitter = WeightFitter(model=model, paradigm=paradigm.loc[train].astype(np.float32), 
+                                parameters=parameters, data=train_data.astype(np.float32))
+        weights = fitter.fit(1.0).astype(np.float32)
+        weights.columns = data_columns
+        weights.index = parameters.index
+        pred = model.predict(paradigm=paradigm.loc[train].astype(np.float32), weights=weights).astype(np.float32)
+        r2 = get_rsq(train_data, pred)
         rsq.append(r2)
-        best_100 = r2.sort_values(ascending=False).index[:100]
-        train_best100 = train_data.loc[:,best_100].astype(np.float32)
-        test_best100 = test_data.loc[:,best_100].astype(np.float32)
+        best_voxels = r2.sort_values(ascending=False).index[:nvoxels]
+        train_best_voxels = train_data.loc[:,best_voxels].astype(np.float32)
+        test_best_voxels = test_data.loc[:,best_voxels].astype(np.float32)
         truth = stimulus_info['visual'].values[test].astype(np.float32)
-        resid_fitter = ResidualFitter(model, train_best100, paradigm=paradigm.loc[train].astype(np.float32),
-                                      parameters=parameters, weights=weights.loc[:,best_100].astype(np.float32))
+        resid_fitter = ResidualFitter(model, train_best_voxels, paradigm=paradigm.loc[train].astype(np.float32),
+                                      parameters=parameters, weights=weights.loc[:,best_voxels].astype(np.float32))
 
-        omega, dof = resid_fitter.fit()
+        omega, dof = resid_fitter.fit(method='t')
         stimulus_range = np.linspace(0,2*np.pi,100) # posterior + posterior_stats
-        posterior = model.get_stimulus_pdf(test_best100, mapping.astype(np.float32), parameters=parameters, omega=omega, dof=dof, weights=weights.loc[:,best_100].astype(np.float32))
-        print(posterior)
+        posterior = model.get_stimulus_pdf(test_best_voxels, mapping.astype(np.float32), parameters=parameters, omega=omega, dof=dof, weights=weights.loc[:,best_voxels].astype(np.float32))
         posterior_stat = get_posterior_stats(posterior, ground_truth=truth)
-        posterior_pupil_range = model.get_stimulus_pdf(test_best100, stimulus_range.astype(np.float32), parameters=parameters, omega=omega, dof=dof, weights=weights.loc[:,best_100].astype(np.float32))
-        posterior_pupil_range_stat = get_posterior_stats(posterior_pupil_range, ground_truth=truth)
-        posterior['prediction'] = mapping[np.argmax(posterior,axis=1)]
+        posterior_full_range = model.get_stimulus_pdf(test_best_voxels, stimulus_range.astype(np.float32), parameters=parameters, omega=omega, dof=dof, weights=weights.loc[:,best_voxels].astype(np.float32))
+        posterior_full_range_stat = get_posterior_stats(posterior_full_range, ground_truth=truth)
+        posterior['prediction'] = mapping[np.argmax(posterior,axis=1)].astype(np.float32)
         posterior['truth'] = truth
-        posterior_stat = posterior_stat.join(posterior_pupil_range_stat, lsuffix='', rsuffix='_full_range')
+        posterior_stat = posterior_stat.join(posterior_full_range_stat, lsuffix='', rsuffix='_full_range')
         posteriors.append(posterior)
         posterior_stats.append(posterior_stat)
 
@@ -157,18 +163,24 @@ def main(
         with open(op.join(target_dir,'MNI152NLin2009cAsym_r2_pars.npy'), 'wb') as f:
             np.save(f, r2)
 
-    if mask == 'visual':
-        r2_img.to_filename(op.join(target_dir, f"sub-{subject:02d}_space-{space}_desc-r2_visual_pars.nii.gz"))
-        posteriors.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_visual_posterior.csv'),index=True)
-        posterior_stats.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_visual_posterior_stats.csv'),index=True)
-        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_visual_postcorrelation_matrix.npy'), postcorrelation_matrix.values)
-        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_visual_summary_stats.npy'), np.array([accuracy, uncertainty]))
+    if mask == 'v1':
+        r2_img.to_filename(op.join(target_dir, f"sub-{subject:02d}_space-{space}_n-{nvoxels}_desc-r2_v1_pars.nii.gz"))
+        posteriors.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_v1_posterior.csv'),index=True)
+        posterior_stats.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_v1_posterior_stats.csv'),index=True)
+        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_v1_postcorrelation_matrix.npy'), postcorrelation_matrix.values)
+        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_v1_summary_stats.npy'), np.array([accuracy, uncertainty]))
+    elif mask == 'v123':
+        r2_img.to_filename(op.join(target_dir, f"sub-{subject:02d}_space-{space}_n-{nvoxels}_desc-r2_v123_pars.nii.gz"))
+        posteriors.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_v123_posterior.csv'),index=True)
+        posterior_stats.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_v123_posterior_stats.csv'),index=True)
+        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_v123_postcorrelation_matrix.npy'), postcorrelation_matrix.values)
+        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_v123_summary_stats.npy'), np.array([accuracy, uncertainty]))
     else:
-        r2_img.to_filename(op.join(target_dir, f"sub-{subject:02d}_space-{space}_desc-r2_pars.nii.gz"))
-        posteriors.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_posterior.csv'),index=True)
-        posterior_stats.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_posterior_stats.csv'),index=True)
-        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_postcorrelation_matrix.npy'), postcorrelation_matrix.values)
-        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_summary_stats.npy'), np.array([accuracy, uncertainty]))
+        r2_img.to_filename(op.join(target_dir, f"sub-{subject:02d}_space-{space}_n-{nvoxels}_desc-r2_pars.nii.gz"))
+        posteriors.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_posterior.csv'),index=True)
+        posterior_stats.to_csv(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_posterior_stats.csv'),index=True)
+        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_postcorrelation_matrix.npy'), postcorrelation_matrix.values)
+        np.save(op.join(stats_dir, f'sub-{subject:02d}_space-{space}_n-{nvoxels}_summary_stats.npy'), np.array([accuracy, uncertainty]))
     
     
 
@@ -178,7 +190,8 @@ if __name__ == "__main__":
     parser.add_argument("subject", type=int)
     parser.add_argument("--bids_folder", default="/mnt/d/data/ds-mlearn")
     parser.add_argument("--data_folder", default="/mnt/d/data")
-    parser.add_argument("--mu", default=[0.0, 0.5 * np.pi, 1 * np.pi, 1.5 * np.pi]) #[0.0, 0.25 * np.pi, 0.5 * np.pi, 0.75 * np.pi]
+    parser.add_argument("--mu", default=[0.0, 0.5 * np.pi, 1 * np.pi, 1.5 * np.pi])
+    #parser.add_argument("--mu", default=[0.0, 0.25 * np.pi, 0.5 * np.pi, 0.75 * np.pi])
     parser.add_argument("--amplitude", type=np.float32, default=1.)
     parser.add_argument("--kappa", type=np.float32, default=1.)
     parser.add_argument("--baseline", type=np.float32, default=0.0)
@@ -186,6 +199,7 @@ if __name__ == "__main__":
     parser.add_argument("--plotting", default=0, type=int)
     parser.add_argument('--space', default="T1w")
     parser.add_argument('--mask', default=None)
+    parser.add_argument('--nvoxels', type=int, default=100)
     args = parser.parse_args()
 
 main(
@@ -200,4 +214,5 @@ main(
     space=args.space,
     plotting=args.plotting,
     mask=args.mask,
+    nvoxels=args.nvoxels,
 )

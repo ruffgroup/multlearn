@@ -213,3 +213,6 @@ def create_dm(subject, bids_folder, nruns=6, tr=2.3, n=222):
         all_design_matrices.append(dm)
 
     return all_design_matrices
+
+
+
