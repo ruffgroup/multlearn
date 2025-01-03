@@ -11,9 +11,7 @@ from pathlib import Path
 import platform
 import ast
 from RLparameterPlotting import Plotting
-from multiprocessing import Pool
-import signal
-from functools import wraps
+import argparse
 
 sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
@@ -29,14 +27,35 @@ class Fitting:
         plotting=False,
         ww=5,
         method="valid",
-        reps=50,
+        reps=50, 
+        extra=False, 
+        pearce=False, 
+        init=False, 
+        asym=False, 
+        transfer=False, 
+        pearce_init=False
     ):
+        """
+        extra: False or True for separate alpha for V1
+        pearce: False or True for Pearce Hall implementation
+        init: False or True for initial V0 and V1
+        asym : False or True for separate alphas based on reward
+        transfer: False or True indicating the amount of discount free parameters for pairs that share a stimulus (depends on extra and asym)
+        pearce_init: False or True for initial omega
+        """
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
         self.gridCount = gridCount
         self.ID = ID
         self.statLearnPar = 1
         self.plotting = plotting
+        self.extra = extra
+        self.asym = asym
+        self.transfer = transfer
+        self.pearce = pearce
+        self.gridCount = gridCount
+        self.pearce_init = pearce_init
+        self.init = init
 
         if self.plotting:
             self.Plot = Plotting(
@@ -49,10 +68,7 @@ class Fitting:
                 reps=reps,
             )
 
-        if platform.system() == "Windows":
-            wanted_dir = "/data/sourcedata/behavior/modified_files"
-        else:
-            wanted_dir = "/Volumes/SDrive/data/sourcedata/behavior/modified_files"
+        wanted_dir = "/shares/zne.uzh/multlearn/sourcedata/behavior/modified_files"
 
         # Get savedVals file
         self.savedValsFile = glob.glob(
@@ -63,29 +79,163 @@ class Fitting:
             ast.literal_eval
         )
 
+        if not self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "basic"
+            self.params = ["alpha", "beta"]
+        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "pearce"
+            self.params = ["alpha", "beta"]
+        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "pearce_init"
+            self.params = ["alpha", "beta", "omega"]
+        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "extra"
+            self.params = ["alpha attract", "beta", "alpha not attract"]
+        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "asym"
+            self.params = ["pos alpha", "beta", "neg alpha"]
+        elif not self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "transfer"
+            self.params = ["alpha", "beta", "K1"]
+        elif self.v_init and not self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer:
+            self.modelFolder = "v_init"
+            self.params = ["alpha", "beta", "V0_init", "V1_init"]
+        elif self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "pearceExtra"
+            self.params = ["alpha attract", "beta", "alpha not attract"]
+        elif self.pearce_init and not self.pearce and self.extra and not self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "pearce_initExtra"
+            self.params = ["alpha attract", "beta", "alpha not attract", "omega"]
+        elif self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "pearceExtraAsym"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract"]
+        elif self.pearce_init and not self.pearce and self.extra and self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "pearce_initExtraAsym"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega"]
+        elif self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "pearceExtraTransfer"
+            self.params = ["alpha attract", "beta", "alpha not attract", "K1", "K2"]
+        elif self.pearce_init and not self.pearce and self.extra and not self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "pearce_initExtraTransfer"
+            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "K1", "K2"]
+        elif self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "pearceExtraAsymTransfer"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "K1", "K2", "K3", "K4"]
+        elif self.pearce_init and not self.pearce and self.extra and self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "pearce_initExtraAsymTransfer"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "K1", "K2", "K3", "K4"]
+        elif self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "pearceAsym"
+            self.params = ["pos alpha", "beta", "neg alpha"]
+        elif self.pearce_init and not self.pearce and not self.extra and self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "pearce_initAsym"
+            self.params = ["pos alpha", "beta", "neg alpha", "omega"]
+        elif self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "pearceAsymTransfer"
+            self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
+        elif self.pearce_init and not self.pearce and not self.extra and self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "pearce_initAsymTransfer"
+            self.params = ["pos alpha", "beta", "neg alpha", "omega", "K1", "K2"]
+        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "pearceTransfer"
+            self.params = ["alpha", "beta", "K1"]
+        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "pearce_initTransfer"
+            self.params = ["alpha", "beta", "omega", "K1"]
+        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "extraTransfer"
+            self.params = ["alpha attract", "beta", "alpha not attract", "K1", "K2"]
+        elif not self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "extraAsym"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract"]
+        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "asymTransfer"
+            self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
+        elif not self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "extraAsymTransfer"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "K1", "K2", "K3", "K4"]
+
+
+        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "pearceV_init"
+            self.params = ["alpha", "beta", "V0_init", "V1_init"]
+        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "pearce_initV_init"
+            self.params = ["alpha", "beta", "omega", "V0_init", "V1_init"]
+        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "extraV_init"
+            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init"]
+        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "asymV_init"
+            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
+        elif not self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and self.v_init:
+            self.modelFolder = "transferV_init"
+            self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
+        elif self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "pearceExtraV_init"
+            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init"]
+        elif self.pearce_init and not self.pearce and self.extra and not self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "pearce_initExtraV_init"
+            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "V0_init", "V1_init"]
+        elif self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "pearceExtraAsymV_init"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init"]
+        elif self.pearce_init and not self.pearce and self.extra and self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "pearce_initExtraAsymV_init"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "V0_init", "V1_init"]
+        elif self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and self.v_init:
+            self.modelFolder = "pearceExtraTransferV_init"
+            self.params = ["alpha attract", "beta", "alpha not attract","V0_init", "V1_init", "K1", "K2"]
+        elif self.pearce_init and not self.pearce and self.extra and not self.asym and self.transfer and self.v_init:
+            self.modelFolder = "pearce_initExtraTransferV_init"
+            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "V0_init", "V1_init", "K1", "K2"]
+        elif self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and self.v_init:
+            self.modelFolder = "pearceExtraAsymTransferV_init"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
+        elif self.pearce_init and not self.pearce and self.extra and self.asym and self.transfer and self.v_init:
+            self.modelFolder = "pearce_initExtraAsymTransferV_init"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
+        elif self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "pearceAsym"
+            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
+        elif self.pearce_init and not self.pearce and not self.extra and self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "pearce_initAsymV_init"
+            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
+        elif self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and self.v_init:
+            self.modelFolder = "pearceAsymTransferV_init"
+            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
+        elif self.pearce_init and not self.pearce and not self.extra and self.asym and self.transfer and self.v_init:
+            self.modelFolder = "pearce_initAsymTransferV_init"
+            self.params = ["pos alpha", "beta", "neg alpha", "omega", "V0_init", "V1_init", "K1", "K2"]
+        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and self.v_init:
+            self.modelFolder = "pearceTransferV_init"
+            self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
+        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and self.transfer and self.v_init:
+            self.modelFolder = "pearce_initTransferV_init"
+            self.params = ["alpha", "beta", "omega", "V0_init", "V1_init", "K1"]
+        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and self.v_init:
+            self.modelFolder = "extraTransferV_init"
+            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init", "K1", "K2"]
+        elif not self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "extraAsymV_init"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init"]
+        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and self.v_init:
+            self.modelFolder = "asymTransferV_init"
+            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
+        elif not self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and self.v_init:
+            self.modelFolder = "extraAsymTransferV_init"
+            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
+
     ##
 
     def modelFitting(
-        self, saveAs, extra=False, pearce=False, init=False, asym=False, transfer=False
+        self
     ):
-        """
-        extra: False or True for separate alpha for V1
-        pearce: False or True for Pearce Hall implementation
-        init: False or True for initial V0 and V1
-        asym : False or True for separate alphas based on reward
-        transfer: False or True indicating the amount of discount free parameters for pairs that share a stimulus (depends on extra and asym)
-        """
-        if platform.system() == "Windows":
-            newPath = os.path.join(
-                pathlib.Path(__file__).resolve().parents[3],
-                "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
-            )
-
-        else:
-            newPath = os.path.join(
-                str(pathlib.Path(__file__).resolve().parents[3])
-                + "/data/fittedParameters/sub-{0}/{1}".format(self.ID, saveAs),
-            )
+        bestFitting_dir = "/shares/zne.uzh/multlearn/parameterFitting"
+        newPath = os.path.join(
+            bestFitting_dir, "sub-{0}".format(self.ID), self.modelFolder
+        )
+       
         Path(newPath).mkdir(parents=True, exist_ok=True)
 
         (
@@ -98,8 +248,9 @@ class Fitting:
             fitted_K3,
             fitted_K4,
             fitted_betas,
+            fitted_omegas,
             best_LLs,
-        ) = (np.empty((max(self.subjectData.runNumber))) for i in range(10))
+        ) = (np.empty((max(self.subjectData.runNumber))) for i in range(11))
         (
             fitted_alphasPos[:],
             fitted_alphasNeg[:],
@@ -110,8 +261,9 @@ class Fitting:
             fitted_K3[:],
             fitted_K4[:],
             fitted_betas[:],
+            fitted_omegas[:],
             best_LLs[:],
-        ) = (np.nan for i in range(10))
+        ) = (np.nan for i in range(11))
 
         fitted_V_option0Inits, fitted_V_option1Inits = (
             np.empty((max(self.subjectData.runNumber), 3, 3)) for i in range(2)
@@ -135,7 +287,7 @@ class Fitting:
                     self.mainTrials + self.additionalTrials,
                 )
             )
-            for i in range(5)
+            for i in range(6)
         )
 
         V0 = np.empty(
@@ -161,38 +313,41 @@ class Fitting:
         ) = (np.nan for i in range(7))
 
         for run in range(0, max(self.subjectData.runNumber)):
-            alphaGrid = np.random.rand(self.gridCount, 1)
-            if extra and asym:
+            alphaGrid = np.random.rand(self.gridCount)
+            if self.extra and self.asym:
                 alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
-                    np.random.rand(self.gridCount, 1) for i in range(3)
+                    np.random.rand(self.gridCount) for i in range(3)
                 )
-            elif extra and not asym:
-                alpha2Grid = np.random.rand(self.gridCount, 1)
-            elif asym and not extra:
-                alphaNegGrid = np.random.rand(self.gridCount, 1)
+            elif self.extra and not self.asym:
+                alpha2Grid = np.random.rand(self.gridCount)
+            elif self.asym and not self.extra:
+                alphaNegGrid = np.random.rand(self.gridCount)
 
-            if transfer:
-                K1Grid = np.random.rand(self.gridCount, 1)
-                if extra and asym:
+            if self.transfer:
+                K1Grid = np.random.rand(self.gridCount)
+                if self.extra and self.asym:
                     K3Grid, K4Grid, K2Grid = (
-                        np.random.rand(self.gridCount, 1) for i in range(3)
+                        np.random.rand(self.gridCount) for i in range(3)
                     )
-                elif extra and not asym:
-                    K2Grid = np.random.rand(self.gridCount, 1)
-                elif asym and not extra:
-                    K3Grid = np.random.rand(self.gridCount, 1)
+                elif self.extra and not self.asym:
+                    K2Grid = np.random.rand(self.gridCount)
+                elif self.asym and not self.extra:
+                    K3Grid = np.random.rand(self.gridCount)
 
-            betaGrid = 0 + 15 * np.random.rand(self.gridCount, 1)
+            if self.pearce_init:
+                omegaGrid = np.random.rand(self.gridCount)
+
+            betaGrid = 0 + 14.0 * np.random.rand(self.gridCount)
             LL_array = np.empty((self.gridCount, 1))
             LL_array[:] = np.nan
-            if init:
-                V_option0_rand = np.random.rand(self.gridCount, 1)
-                V_option0Init_Grid = np.repeat(V_option0_rand, 9, axis=1).reshape(
+            if self.init:
+                V_option0_randGrid = np.random.rand(self.gridCount, 1)
+                V_option0Init_Grid = np.repeat(V_option0_randGrid, 9, axis=1).reshape(
                     (self.gridCount, 3, 3)
                 )
 
-                V_option1_rand = np.random.rand(self.gridCount, 1)
-                V_option1Init_Grid = np.repeat(V_option1_rand, 9, axis=1).reshape(
+                V_option1_randGrid = np.random.rand(self.gridCount, 1)
+                V_option1Init_Grid = np.repeat(V_option1_randGrid, 9, axis=1).reshape(
                     (self.gridCount, 3, 3)
                 )
 
@@ -231,13 +386,13 @@ class Fitting:
 
                 choiceProb = np.empty((max(runData.trialNumber), 2))
                 choiceProb[:] = np.nan
-                actionProb = np.empty((max(runData.trialNumber), 1))
+                actionProb = np.empty((max(runData.trialNumber)))
                 actionProb[:] = np.nan
                 V_option0, V_option1 = (
                     np.empty((max(runData.trialNumber) + 1, 3, 3)) for i in range(2)
                 )
                 V_option0[:], V_option1[:] = (np.nan for i in range(2))
-                if init:
+                if self.init:
                     V_option0[0, :] = V_option0Init_Grid[j]
                     V_option1[0, :] = V_option1Init_Grid[j]
                 else:
@@ -248,13 +403,13 @@ class Fitting:
                 rewardPE[:] = np.nan
 
                 # Checking parameters from the grid
-                if extra and not asym:
+                if self.extra and not self.asym:
                     alphaPosCheck = alphaNegCheck = alphaGrid[j]
                     alpha2PosCheck = alpha2NegCheck = alpha2Grid[j]
-                elif asym and not extra:
+                elif self.asym and not self.extra:
                     alphaPosCheck = alpha2PosCheck = alphaGrid[j]
                     alphaNegCheck = alpha2NegCheck = alphaNegGrid[j]
-                elif extra and asym:
+                elif self.extra and self.asym:
                     alphaPosCheck = alphaGrid[j]
                     alpha2PosCheck = alpha2PosGrid[j]
                     alphaNegCheck = alphaNegGrid[j]
@@ -264,14 +419,14 @@ class Fitting:
                         alpha2PosCheck
                     ) = alphaNegCheck = alpha2NegCheck = alphaGrid[j]
 
-                if transfer:
-                    if extra and not asym:
+                if self.transfer:
+                    if self.extra and not self.asym:
                         K1Check = K3Check = K1Grid[j]
                         K2Check = K4Check = K2Grid[j]
-                    elif asym and not extra:
+                    elif self.asym and not self.extra:
                         K1Check = K2Check = K1Grid[j]
                         K3Check = K4Check = K3Grid[j]
-                    elif asym and extra:
+                    elif self.asym and self.extra:
                         K1Check = K1Grid[j]
                         K2Check = K2Grid[j]
                         K3Check = K3Grid[j]
@@ -283,8 +438,10 @@ class Fitting:
                 # run_V0[j, 0] = V_option0[0, 0, 0]
                 # run_V1[j, 0] = V_option1[0, 0, 0]
 
-                if pearce:
-                    omega = omega2 = omega3 = omega4 = 1
+                if self.pearce:
+                    omega = omega2 = omega3 = omega4 = 0
+                if self.pearce_init:
+                    omega = omega2 = omega3 = omega4 = omegaGrid[j]
 
                 for t in range(0, max(runData.trialNumber)):
                     otherPairs = [
@@ -311,7 +468,7 @@ class Fitting:
                     )
                     choiceProb[t, 1] = 1 - choiceProb[t, 0]
 
-                    actionProb[t, :] = (
+                    actionProb[t] = (
                         choiceProb[t, int(runData.action[t])]
                         if ~np.isnan(runData.action[t])
                         else np.nan
@@ -325,7 +482,7 @@ class Fitting:
                         V_option0[t + 1, :] = V_option0[t, :]
 
                         if runData.reward[t] == 1:
-                            if pearce:
+                            if self.pearce:
                                 omega = (
                                     omega
                                     + (
@@ -342,7 +499,7 @@ class Fitting:
                                     rewardPE[(t,) + runData.stimulusPair[t]]
                                 )
                                 run_trialwise_alphasPos[j, t] = omega
-                                if transfer:
+                                if self.transfer:
                                     for pair in otherPairs:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
@@ -364,7 +521,7 @@ class Fitting:
 
                                 run_trialwise_alphasPos[j, t] = alphaPosCheck
 
-                                if transfer:
+                                if self.transfer:
                                     for pair in otherPairs:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
@@ -376,16 +533,16 @@ class Fitting:
                                             V_option0[(t + 1,) + pair] = 1
                                         elif V_option0[(t + 1,) + pair] < 0:
                                             V_option0[(t + 1,) + pair] = 0
-                            if pearce:
-                                if not asym and not extra:
+                            if self.pearce:
+                                if not self.asym and not self.extra:
                                     omega2 = omega3 = omega4 = omega
-                                elif asym and not extra:
+                                elif self.asym and not self.extra:
                                     omega2 = omega
-                                elif extra and not asym:
+                                elif self.extra and not self.asym:
                                     omega3 = omega
 
                         else:
-                            if pearce:
+                            if self.pearce:
                                 omega3 = (
                                     omega3
                                     + (
@@ -402,7 +559,7 @@ class Fitting:
                                     rewardPE[(t,) + runData.stimulusPair[t]]
                                 )
                                 run_trialwise_alphasNeg[j, t] = omega3
-                                if transfer:
+                                if self.transfer:
                                     for pair in otherPairs:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
@@ -425,7 +582,7 @@ class Fitting:
 
                                 run_trialwise_alphasNeg[j, t] = alphaNegCheck
 
-                                if transfer:
+                                if self.transfer:
                                     for pair in otherPairs:
                                         V_option0[(t + 1,) + pair] = V_option0[
                                             (t,) + pair
@@ -438,12 +595,12 @@ class Fitting:
                                         elif V_option0[(t + 1,) + pair] < 0:
                                             V_option0[(t + 1,) + pair] = 0
 
-                            if pearce:
-                                if not asym and not extra:
+                            if self.pearce:
+                                if not self.asym and not self.extra:
                                     omega2 = omega = omega4 = omega3
-                                elif asym and not extra:
+                                elif self.asym and not self.extra:
                                     omega4 = omega3
-                                elif extra and not asym:
+                                elif self.extra and not self.asym:
                                     omega = omega3
 
                         V_option1[t + 1, :] = V_option1[t, :]
@@ -457,7 +614,7 @@ class Fitting:
                         V_option1[t + 1, :] = V_option1[t, :]
 
                         if runData.reward[t] == 1:
-                            if pearce:
+                            if self.pearce:
                                 omega2 = (
                                     omega2
                                     + (
@@ -474,7 +631,7 @@ class Fitting:
                                     rewardPE[(t,) + runData.stimulusPair[t]]
                                 )
                                 run_trialwise_alphas2Pos[j, t] = omega2
-                                if transfer:
+                                if self.transfer:
                                     for pair in otherPairs:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
@@ -497,7 +654,7 @@ class Fitting:
 
                                 run_trialwise_alphas2Pos[j, t] = alpha2PosCheck
 
-                                if transfer:
+                                if self.transfer:
                                     for pair in otherPairs:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
@@ -509,16 +666,16 @@ class Fitting:
                                             V_option1[(t + 1,) + pair] = 1
                                         elif V_option1[(t + 1,) + pair] < 0:
                                             V_option1[(t + 1,) + pair] = 0
-                            if pearce:
-                                if not asym and not extra:
+                            if self.pearce:
+                                if not self.asym and not self.extra:
                                     omega3 = omega = omega4 = omega2
-                                elif asym and not extra:
+                                elif self.asym and not self.extra:
                                     omega = omega2
-                                elif extra and not asym:
+                                elif self.extra and not self.asym:
                                     omega4 = omega2
 
                         else:
-                            if pearce:
+                            if self.pearce:
                                 omega4 = (
                                     omega4
                                     + (
@@ -535,7 +692,7 @@ class Fitting:
                                     rewardPE[(t,) + runData.stimulusPair[t]]
                                 )
                                 run_trialwise_alphas2Neg[j, t] = omega4
-                                if transfer:
+                                if self.transfer:
                                     for pair in otherPairs:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
@@ -558,7 +715,7 @@ class Fitting:
 
                                 run_trialwise_alphas2Neg[j, t] = alpha2NegCheck
 
-                                if transfer:
+                                if self.transfer:
                                     for pair in otherPairs:
                                         V_option1[(t + 1,) + pair] = V_option1[
                                             (t,) + pair
@@ -570,12 +727,12 @@ class Fitting:
                                             V_option1[(t + 1,) + pair] = 1
                                         elif V_option1[(t + 1,) + pair] < 0:
                                             V_option1[(t + 1,) + pair] = 0
-                            if pearce:
-                                if not asym and not extra:
+                            if self.pearce:
+                                if not self.asym and not self.extra:
                                     omega2 = omega = omega3 = omega4
-                                elif asym and not extra:
+                                elif self.asym and not self.extra:
                                     omega3 = omega4
-                                elif extra and not asym:
+                                elif self.extra and not self.asym:
                                     omega2 = omega4
 
                         V_option0[t + 1, :] = V_option0[t, :]
@@ -593,117 +750,120 @@ class Fitting:
                 NLL_array[run, j, 0] = negativeLogLikelihood
                 NLL_array[run, j, 1] = alphaPosCheck
                 NLL_array[run, j, 2] = betaCheck
-                if asym and not extra:
+                if self.asym and not self.extra:
                     NLL_array[run, j, 3] = alphaNegCheck
-                elif extra and not asym:
+                elif self.extra and not self.asym:
                     NLL_array[run, j, 4] = alpha2PosCheck
-                elif extra and asym:
+                elif self.extra and self.asym:
                     NLL_array[run, j, 3] = alphaNegCheck
                     NLL_array[run, j, 4] = alpha2PosCheck
                     NLL_array[run, j, 5] = alpha2NegCheck
-                if init:
-                    NLL_array[run, j, 6] = V_option0Init_Grid[j][0][0]
-                    NLL_array[run, j, 7] = V_option1Init_Grid[j][0][0]
-                if transfer:
-                    NLL_array[run, j, 8] = K1Check
-                    if extra and not asym:
-                        NLL_array[run, j, 9] = K2Check
-                    elif asym and not extra:
-                        NLL_array[run, j, 10] = K3Check
-                    elif asym and extra:
-                        NLL_array[run, j, 9] = K2Check
-                        NLL_array[run, j, 10] = K3Check
-                        NLL_array[run, j, 11] = K4Check
+                if self.pearce_init:
+                    NLL_array[run, j, 6] = omegaGrid[j]
+                if self.init:
+                    NLL_array[run, j, 7] = V_option0Init_Grid[j][0][0]
+                    NLL_array[run, j, 8] = V_option1Init_Grid[j][0][0]
+                if self.transfer:
+                    NLL_array[run, j, 9] = K1Check
+                    if self.extra and not self.asym:
+                        NLL_array[run, j, 10] = K2Check
+                    elif self.asym and not self.extra:
+                        NLL_array[run, j, 11] = K3Check
+                    elif self.asym and self.extra:
+                        NLL_array[run, j, 10] = K2Check
+                        NLL_array[run, j, 11] = K3Check
+                        NLL_array[run, j, 12] = K4Check
 
                 LL_array[j, 0] = Likelihood
 
             minIndex = np.argmin(NLL_array[run, :, 0])
             maxIndex = np.nanargmax(LL_array[:, 0])
-            newPath = "bestFittingVals/sub-{0}".format(self.ID)
-            Path(newPath).mkdir(parents=True, exist_ok=True)
             fitted_alphasPos[run] = NLL_array[run, minIndex, 1]
             np.savetxt(
-                fname=newPath + "/alphasPos_" + saveAs + ".tsv",
+                fname=newPath + "/alphasPos_" + self.modelFolder + ".tsv",
                 X=fitted_alphasPos,
                 delimiter=",",
             )
-            if asym and not extra:
+            if self.asym and not self.extra:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
                 np.savetxt(
-                    fname=newPath + "/alphasNeg_" + saveAs + ".tsv",
+                    fname=newPath + "/alphasNeg_" + self.modelFolder + ".tsv",
                     X=fitted_alphasNeg,
                     delimiter=",",
                 )
-            elif extra and not asym:
+            elif self.extra and not self.asym:
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
                 np.savetxt(
-                    fname=newPath + "/alphas2Pos_" + saveAs + ".tsv",
+                    fname=newPath + "/alphas2Pos_" + self.modelFolder + ".tsv",
                     X=fitted_alphas2Pos,
                     delimiter=",",
                 )
-            elif extra and asym:
+            elif self.extra and self.asym:
                 fitted_alphasNeg[run] = NLL_array[run, minIndex, 3]
                 np.savetxt(
-                    fname=newPath + "/alphasNeg_" + saveAs + ".tsv",
+                    fname=newPath + "/alphasNeg_" + self.modelFolder + ".tsv",
                     X=fitted_alphasNeg,
                     delimiter=",",
                 )
                 fitted_alphas2Pos[run] = NLL_array[run, minIndex, 4]
                 np.savetxt(
-                    fname=newPath + "/alphas2Pos_" + saveAs + ".tsv",
+                    fname=newPath + "/alphas2Pos_" + self.modelFolder + ".tsv",
                     X=fitted_alphas2Pos,
                     delimiter=",",
                 )
                 fitted_alphas2Neg[run] = NLL_array[run, minIndex, 5]
                 np.savetxt(
-                    fname=newPath + "/alphas2Neg_" + saveAs + ".tsv",
+                    fname=newPath + "/alphas2Neg_" + self.modelFolder + ".tsv",
                     X=fitted_alphas2Neg,
                     delimiter=",",
                 )
             fitted_betas[run] = NLL_array[run, minIndex, 2]
             np.savetxt(
-                fname=newPath + "/betas_" + saveAs + ".tsv",
+                fname=newPath + "/betas_" + self.modelFolder + ".tsv",
                 X=fitted_betas,
                 delimiter=",",
             )
-            if init:
-                fitted_V_option0Inits[run] = V_option0Init_Grid[minIndex]
-                fitted_V_option1Inits[run] = V_option1Init_Grid[minIndex]
-            if transfer:
-                fitted_K1[run] = NLL_array[run, minIndex, 8]
+            if self.init:
+                fitted_V_option0Inits[run] = NLL_array[run, minIndex, 7]
+                fitted_V_option1Inits[run] = NLL_array[run, minIndex, 8]
+
+            if self.pearce_init:
+                fitted_omegas[run] = NLL_array[run, minIndex, 6]
+            if self.transfer:
+                fitted_K1[run] = NLL_array[run, minIndex, 9]
                 np.savetxt(
-                    fname=newPath + "/K1_" + saveAs + ".tsv", X=fitted_K1, delimiter=","
+                    fname=newPath + "/K1_" + self.modelFolder + ".tsv", X=fitted_K1, delimiter=","
                 )
-                if extra and not asym:
-                    fitted_K2[run] = NLL_array[run, minIndex, 9]
+                if self.extra and not self.asym:
+                    fitted_K2[run] = NLL_array[run, minIndex, 10]
                     np.savetxt(
-                        fname=newPath + "/K2_" + saveAs + ".tsv",
+                        fname=newPath + "/K2_" + self.modelFolder + ".tsv",
                         X=fitted_K2,
                         delimiter=",",
                     )
-                elif asym and not extra:
-                    fitted_K3[run] = NLL_array[run, minIndex, 10]
+                elif self.asym and not self.extra:
+                    fitted_K3[run] = NLL_array[run, minIndex, 11]
                     np.savetxt(
-                        fname=newPath + "/K3_" + saveAs + ".tsv",
+                        fname=newPath + "/K3_" + self.modelFolder + ".tsv",
                         X=fitted_K3,
                         delimiter=",",
                     )
-                elif extra and asym:
-                    fitted_K2[run] = NLL_array[run, minIndex, 9]
+                elif self.extra and self.asym:
+                    fitted_K2[run] = NLL_array[run, minIndex, 10]
                     np.savetxt(
-                        fname=newPath + "/K2_" + saveAs + ".tsv",
+                        fname=newPath + "/K2_" + self.modelFolder + ".tsv",
                         X=fitted_K2,
                         delimiter=",",
                     )
-                    fitted_K3[run] = NLL_array[run, minIndex, 10]
+                    fitted_K3[run] = NLL_array[run, minIndex, 11]
                     np.savetxt(
-                        fname=newPath + "/K3_" + saveAs + ".tsv",
+                        fname=newPath + "/K3_" + self.modelFolder + ".tsv",
                         X=fitted_K3,
                         delimiter=",",
                     )
-                    fitted_K4[run] = NLL_array[run, minIndex, 11]
+                    fitted_K4[run] = NLL_array[run, minIndex, 12]
                     np.savetxt(
-                        fname=newPath + "/K4_" + saveAs + ".tsv",
+                        fname=newPath + "/K4_" + self.modelFolder + ".tsv",
                         X=fitted_K4,
                         delimiter=",",
                     )
@@ -724,59 +884,61 @@ class Fitting:
                 alphasNeg=fitted_alphasNeg,
                 alphas2Neg=fitted_alphas2Neg,
                 betas=fitted_betas,
-                pearce=pearce,
+                omega=fitted_omegas,
                 V_option0Inits=fitted_V_option0Inits,
                 V_option1Inits=fitted_V_option1Inits,
                 K1=fitted_K1,
                 K2=fitted_K2,
                 K3=fitted_K3,
                 K4=fitted_K4,
-                saveAs=saveAs,
-                extra=extra,
-                asym=asym,
-                transfer=transfer,
+                saveAs=self.modelFolder,
+                extra=self.extra,
+                asym=self.asym,
+                transfer=self.transfer,
+                pearce=self.pearce,
+                pearce_init=self.pearce_init
             )
 
         scipy.io.savemat(
-            newPath + "/rpe" + saveAs + ".mat".format(self.ID),
+            newPath + "/rpe" + self.modelFolder + ".mat".format(self.ID),
             mdict={"rpe": RPE},
         )
 
-        with open(newPath + "/BIC_" + saveAs + ".npy", "wb") as f:
+        with open(newPath + "/BIC_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, best_LLs)
 
-        with open(newPath + "/V0_" + saveAs + ".npy", "wb") as f:
+        with open(newPath + "/V0_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, V0)
 
-        with open(newPath + "/V1_" + saveAs + ".npy", "wb") as f:
+        with open(newPath + "/V1_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, V1)
 
         
-        with open(newPath + "/trialwise_alphasPos_" + saveAs + ".npy", "wb") as f:
+        with open(newPath + "/trialwise_alphasPos_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, trial_alphasPos)
         scipy.io.savemat(
-            newPath + "/trialwise_alphasPos_" + saveAs + ".mat".format(self.ID),
+            newPath + "/trialwise_alphasPos_" + self.modelFolder + ".mat".format(self.ID),
             mdict={"trialwise_alphasPos": trial_alphasPos},
         )
 
-        with open(newPath + "/trialwise_alphasNeg_" + saveAs + ".npy", "wb") as f:
+        with open(newPath + "/trialwise_alphasNeg_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, trial_alphasNeg)
         scipy.io.savemat(
-            newPath + "/trialwise_alphasNeg_" + saveAs + ".mat".format(self.ID),
+            newPath + "/trialwise_alphasNeg_" + self.modelFolder + ".mat".format(self.ID),
             mdict={"trialwise_alphasNeg": trial_alphasNeg},
         )
 
-        with open(newPath + "/trialwise_alphas2Pos_" + saveAs + ".npy", "wb") as f:
+        with open(newPath + "/trialwise_alphas2Pos_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, trial_alphas2Pos)
         scipy.io.savemat(
-            newPath + "/trialwise_alphas2Pos_" + saveAs + ".mat".format(self.ID),
+            newPath + "/trialwise_alphas2Pos_" + self.modelFolder + ".mat".format(self.ID),
             mdict={"trialwise_alphas2Pos": trial_alphas2Pos},
         )
 
-        with open(newPath + "/trialwise_alphas2Neg_" + saveAs + ".npy", "wb") as f:
+        with open(newPath + "/trialwise_alphas2Neg_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, trial_alphas2Neg)
         scipy.io.savemat(
-            newPath + "/trialwise_alphas2Neg_" + saveAs + ".mat".format(self.ID),
+            newPath + "/trialwise_alphas2Neg_" + self.modelFolder + ".mat".format(self.ID),
             mdict={"trialwise_alphas2Neg": trial_alphas2Neg},
         )
 
@@ -896,206 +1058,33 @@ class Fitting:
                 trial_surprise[i] = statSurprise[(i,) + runData.stimulusPair[i]]
             ID_surprise[run] = trial_surprise
 
+
+        bestFitting_dir = "/shares/zne.uzh/multlearn/parameterFitting"
         newPath = os.path.join(
-            str(pathlib.Path(__file__).resolve().parents[3])
-            + "/data/fittedParameters/sub-{}".format(self.ID),
+            bestFitting_dir, "sub-{0}".format(self.ID), self.modelFolder
         )
-        newPath2 = "bestFittingVals/sub-{0}".format(self.ID)
+       
         Path(newPath).mkdir(parents=True, exist_ok=True)
-        Path(newPath2).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(
             newPath + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise}
         )
-        scipy.io.savemat(
-            newPath2 + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise}
-        )
-        with open(newPath2 + "/spe.npy", "wb") as f:
+        
+        with open(newPath + "/spe.npy", "wb") as f:
             np.save(f, ID_surprise)
         return ID_beliefs, ID_surprise
 
 
-# Calls for different fitting and plotting functions
-# You can only run ONE model fitting at a time
-
-configurations = [
-    "01",
-    "02",
-    "03",
-    "04",
-    "05",
-    "06",
-    #     "07",
-    "09",
-    "10",
-    #     "11",
-    "12",
-    "14",
-    #     "15",
-    "17",
-    "18",
-    #    "19",
-    #     "20",
-    #     "21",
-    "22",
-    "23",
-    "24",
-    "25",
-    "26",
-    "27",
-    #     "28",
-    #    "29",
-    #   "30",
-    "33",
-    #    "34",
-    #    "35",
-    #    "36",
-    #     "37",
-    "38",
-    "39",
-    "40",
-    #     "41",
-    #     "42",
-    #     "43",
-    "45",
-    "46",
-    "47",
-    "48",
-    "49",
-    "50",
-    "51",
-    "52",
-    #     "53",
-    "54",
-    #    "55",
-    "56",
-    "57",
-    #    "58",
-    #     "59",
-    "60",
-    "61",
-    #     "62",
-    #    "63",
-    #    "64",
-]
-
-
-def handle_ctrl_c(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        global ctrl_c_entered
-        if not ctrl_c_entered:
-            signal.signal(signal.SIGINT, default_sigint_handler)  # the default
-            try:
-                return func(*args, **kwargs)
-            except KeyboardInterrupt:
-                ctrl_c_entered = True
-                return KeyboardInterrupt()
-            finally:
-                signal.signal(signal.SIGINT, pool_ctrl_c_handler)
-        else:
-            return KeyboardInterrupt()
-
-    return wrapper
-
-
-@handle_ctrl_c
-def use_fitting(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
-    fitted.modelFitting(saveAs="PearceExtra", pearce=True, extra=True)
-
-
-@handle_ctrl_c
-def use_fitting2(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
-    fitted.modelFitting(saveAs="Pearce", pearce=True)
-
-
-@handle_ctrl_c
-def use_fitting3(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="Basic")
-
-
-@handle_ctrl_c
-def use_fitting4(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="Transfer", transfer=True)
-
-
-@handle_ctrl_c
-def use_fitting5(IDnr):
-    fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-    fitted.modelFitting(saveAs="Asym", asym=True)
-
-
-# @handle_ctrl_c
-# def use_fitting4(IDnr):
-#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=True)
-#     fitted.modelFitting(saveAs="PearceInitAsymTransfer", init=True, asym=True, pearce=True, transfer=True)
-
-# @handle_ctrl_c
-# def use_surprise(IDnr):
-#     fitted = Fitting(60, 0, 5000, ID=IDnr, plotting=False)
-#     fitted.statisticalLearning()
-
-
-def pool_ctrl_c_handler(*args, **kwargs):
-    global ctrl_c_entered
-    ctrl_c_entered = True
-
-
-def init_pool():
-    global ctrl_c_entered
-    global default_sigint_handler
-    ctrl_c_entered = False
-    default_sigint_handler = signal.signal(signal.SIGINT, pool_ctrl_c_handler)
-
-
-def main():
-    signal.signal(signal.SIGINT, signal.SIG_IGN)
-    pool = Pool(8, initializer=init_pool)
-    results = pool.map(use_fitting, configurations)
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
-        print("Ctrl-C was entered.")
-    pool.close()
-    pool.join()
-
-    pool2 = Pool(8, initializer=init_pool)
-    results2 = pool2.map(use_fitting2, ["34", "35", "63"])
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results2)):
-        print("Ctrl-C was entered.")
-    pool2.close()
-    pool2.join()
-
-    pool3 = Pool(8, initializer=init_pool)
-    results3 = pool3.map(use_fitting3, ["07", "11", "15", "20", "21", "28", "29", "37", "41", "42", "43", "53", "59", "62"])
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results3)):
-        print("Ctrl-C was entered.")
-    pool3.close()
-    pool3.join()
-
-    pool4 = Pool(8, initializer=init_pool)
-    results4 = pool4.map(use_fitting4, ["19", "30", "36", "55", "64"])
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results4)):
-        print("Ctrl-C was entered.")
-    pool4.close()
-    pool4.join()
-
-    pool5 = Pool(8, initializer=init_pool)
-    results5 = pool5.map(use_fitting5, ["58"])
-    if any(map(lambda x: isinstance(x, KeyboardInterrupt), results5)):
-        print("Ctrl-C was entered.")
-    pool5.close()
-    pool5.join()
-
-    # signal.signal(signal.SIGINT, signal.SIG_IGN)
-    # pool = Pool(8, initializer=init_pool)
-    # results = pool.map(use_surprise, configurations)
-    # if any(map(lambda x: isinstance(x, KeyboardInterrupt), results)):
-    #     print("Ctrl-C was entered.")
-    # pool.close()
-    # pool.join()
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Recovery of RL parameters")
+    parser.add_argument("--mainTrials", type=int, default=60)
+    parser.add_argument("--simulations", type=int, default=100)
+    parser.add_argument("--gridsize", type=int, default=100)
+    parser.add_argument("--extra", action='store_true')
+    parser.add_argument("--asym", action='store_true')
+    parser.add_argument("--transfer", action='store_true')
+    parser.add_argument("--pearce", action='store_true')
+    parser.add_argument("--pearce_init", action='store_true')
+    parser.add_argument("--v_init", action='store_true')
+    args = parser.parse_args()

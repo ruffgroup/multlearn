@@ -22,12 +22,14 @@ class task_Design:
         K2=None,
         K3=None,
         K4=None,
+        omegaInit=None,
         V_option0Init=None,
         V_option1Init=None,
         pearce=False,
         extra=False,
         asym=False,
         transfer=False,
+        pearce_init=False
     ):
         """How task is conducted"""
 
@@ -49,9 +51,6 @@ class task_Design:
         self.rewardMag = 1.0
         self.punishProb = 0.0
         self.punishMag = 0.0
-
-        if pearce:
-            self.omegaPearce = np.empty(self.mainTrials)
 
         ## Making vectors of reward with 0.8 probability
         tempFeedbackAccuracy = np.repeat(
@@ -76,6 +75,7 @@ class task_Design:
         self.transfer = transfer
         self.asym = asym
         self.extra = extra
+        self.pearce_init = pearce_init
 
         self.alphaPos = np.random.uniform(0, 1) if alphaPos is None else alphaPos
         self.alphaNeg = np.random.uniform(0, 1) if alphaNeg is None else alphaNeg
@@ -83,7 +83,7 @@ class task_Design:
         self.alpha2Neg = np.random.uniform(0, 1) if alpha2Neg is None else alphaNeg
 
         if beta is None:
-            self.beta = 0 + 15.0 * random()
+            self.beta = 0 + 14.0 * random()
         else:
             self.beta = beta  # 2.0
         if self.transfer:
@@ -93,7 +93,9 @@ class task_Design:
             self.K4 = np.random.uniform(0, 1) if K4 is None else K4
 
         if self.pearce:
-            self.omega = self.omega2 = self.omega3 = self.omega4 = 1
+            self.omega = self.omega2 = self.omega3 = self.omega4 = 0
+        if self.pearce_init:
+            self.omega = self.omega2 = self.omega3 = self.omega4 = omegaInit
 
         self.statLearnPar = 1  # Bayesian parameter
 
@@ -126,17 +128,17 @@ class task_Design:
         self.beliefsStat[:] = np.nan
         self.stimulusPair = np.empty((self.mainTrials + self.additionalTrials, 2))
         self.stimulusPair[:] = np.nan
-        self.correctResponse = np.empty((self.mainTrials, 1))
+        self.correctResponse = np.empty((self.mainTrials))
         self.reward = np.empty((self.mainTrials, 3, 3))
         self.reward[:] = np.nan
         self.rewardPE = np.empty((self.mainTrials, 3, 3))
         self.rewardPE[:] = np.nan
-        self.action = np.empty((self.mainTrials, 1))
+        self.action = np.empty((self.mainTrials))
         self.action[:] = np.nan
         self.choiceProb = np.empty((self.mainTrials, 2))
         self.choiceProb[:] = np.nan
         self.reshapedV_option0 = np.empty((self.mainTrials + 1, 9))
-        self.accurate = np.empty((self.mainTrials, 1))
+        self.accurate = np.empty((self.mainTrials))
         self.errorPercentage = np.nan
         self.simulatedData = np.empty((self.mainTrials + self.additionalTrials, 4))
         self.simulatedData[:] = np.nan
@@ -173,19 +175,22 @@ class task_Design:
             self.taskStruct = taskStruct
             self.greenCells = green[0], green[1], green[2]
             self.feedbackAccuracy = feedbackAcc
+        
+        visual = self.taskStruct[:, 0]
+        audio = self.taskStruct[:, 1]
+
+        self.stimulusPair[:, 0] = visual
+        self.stimulusPair[:, 1] = audio
+        self.stimulusPair = self.stimulusPair.astype(int)
+        self.simulatedData[:, 0] = self.stimulusPair[:, 0]
+        self.simulatedData[:, 1] = self.stimulusPair[:, 1]
 
         for i in range(0, self.mainTrials + self.additionalTrials):
-            visual = self.taskStruct[i, 0]
-            audio = self.taskStruct[i, 1]
-            self.stimulusPair[i, :] = visual, audio
-            self.stimulusPair = self.stimulusPair.astype(int)
             self.statCount[i + 1, :] = self.statCount[i, :]
             self.statCount[(i + 1,) + tuple(self.stimulusPair[i, :])] = (
                 self.statCount[(i,) + tuple(self.stimulusPair[i, :])] + 1
             )
-
-            self.simulatedData[i, 0] = self.stimulusPair[i, 0]
-            self.simulatedData[i, 1] = self.stimulusPair[i, 1]
+        
 
         # print("stimulus", self.stimulusPair)
         # print(self.statCount)
@@ -206,6 +211,7 @@ class task_Design:
             )
             self.choiceProb[i, 1] = 1 - self.choiceProb[i, 0]
             rand3 = random()
+            
             if rand3 < self.choiceProb[i, 0]:
                 self.action[i] = 0
             else:
@@ -261,7 +267,7 @@ class task_Design:
                 self.V_option0[i + 1, :] = self.V_option0[i, :]
 
                 if self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] == 1:
-                    if self.pearce:
+                    if self.pearce or self.pearce_init:
                         self.omega = (
                             self.omega
                             + (
@@ -305,7 +311,7 @@ class task_Design:
                                     self.V_option0[(i + 1,) + tuple(p2)] = 1
                                 elif self.V_option0[(i + 1,) + tuple(p2)] < 0:
                                     self.V_option0[(i + 1,) + tuple(p2)] = 0
-                    if self.pearce:
+                    if self.pearce or self.pearce_init:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega3 = self.omega4 = self.omega
                         elif self.asym and not self.extra:
@@ -314,7 +320,7 @@ class task_Design:
                             self.omega3 = self.omega
 
                 else:
-                    if self.pearce:
+                    if self.pearce or self.pearce_init:
                         self.omega3 = (
                             self.omega3
                             + (
@@ -359,7 +365,7 @@ class task_Design:
                                     self.V_option0[(i + 1,) + tuple(p2)] = 1
                                 elif self.V_option0[(i + 1,) + tuple(p2)] < 0:
                                     self.V_option0[(i + 1,) + tuple(p2)] = 0
-                    if self.pearce:
+                    if self.pearce or self.pearce_init:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega = self.omega4 = self.omega3
                         elif self.asym and not self.extra:
@@ -376,7 +382,7 @@ class task_Design:
                 self.V_option1[i + 1, :] = self.V_option1[i, :]
 
                 if self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] == 1:
-                    if self.pearce:
+                    if self.pearce or self.pearce_init:
                         self.omega2 = (
                             self.omega2
                             + (
@@ -422,7 +428,7 @@ class task_Design:
                                     self.V_option1[(i + 1,) + tuple(p2)] = 1
                                 elif self.V_option1[(i + 1,) + tuple(p2)] < 0:
                                     self.V_option1[(i + 1,) + tuple(p2)] = 0
-                    if self.pearce:
+                    if self.pearce or self.pearce_init:
                         if not self.asym and not self.extra:
                             self.omega3 = self.omega = self.omega4 = self.omega2
                         elif self.asym and not self.extra:
@@ -431,7 +437,7 @@ class task_Design:
                             self.omega4 = self.omega2
 
                 else:
-                    if self.pearce:
+                    if self.pearce or self.pearce_init:
                         self.omega4 = (
                             self.omega4
                             + (
@@ -476,7 +482,7 @@ class task_Design:
                                     self.V_option1[(i + 1,) + tuple(p2)] = 1
                                 elif self.V_option1[(i + 1,) + tuple(p2)] < 0:
                                     self.V_option1[(i + 1,) + tuple(p2)] = 0
-                    if self.pearce:
+                    if self.pearce or self.pearce_init:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega = self.omega3 = self.omega4
                         elif self.asym and not self.extra:
@@ -489,9 +495,6 @@ class task_Design:
             self.simulatedData[i + self.additionalTrials, 2] = self.rewardPE[
                 (i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])
             ]
-
-            if self.pearce:
-                self.omegaPearce[i] = self.omega
 
         self.errorPercentage = (error / self.mainTrials) * 100
 

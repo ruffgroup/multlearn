@@ -33,12 +33,12 @@ class Plotting:
         self.method = method
         self.reps = reps
 
-        if platform.system() == "Windows":
-            wanted_dir = "/data/sourcedata/behavior/modified_files"
-        else:
-            wanted_dir = "/Volumes/SDrive/data/sourcedata/behavior/modified_files"
+        wanted_dir = "/shares/zne.uzh/multlearn/sourcedata/behavior/modified_files"
+
         # Get savedVals file
-        self.savedValsFile = glob.glob(os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID))[0]
+        self.savedValsFile = glob.glob(
+            os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID)
+        )[0]
 
     def plots_modelFitting(
         self,
@@ -48,7 +48,7 @@ class Plotting:
         alphasNeg,
         alphas2Neg,
         betas,
-        pearce,
+        omega,
         V_option0Inits,
         V_option1Inits,
         K1,
@@ -58,7 +58,8 @@ class Plotting:
         saveAs,
         extra,
         asym,
-        transfer
+        transfer,
+        pearce
     ):
         saving_folder = saveAs
         subjectData = pd.read_csv(self.savedValsFile)
