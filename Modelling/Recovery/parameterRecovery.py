@@ -424,7 +424,7 @@ class Recovery:
                         V_option0[t + 1, :] = V_option0[t, :]
 
                         if taskSimulation.reward[(t,) + tuple(taskSimulation.stimulusPair[t,:])] == 1:
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 omega = (
                                     omega
                                     + (
@@ -475,7 +475,7 @@ class Recovery:
                                             V_option0[(t + 1,) + tuple(pair)] = 1
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega3 = omega4 = omega
                                 elif self.asym and not self.extra:
@@ -484,7 +484,7 @@ class Recovery:
                                     omega3 = omega
 
                         else:
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 omega3 = (
                                     omega3
                                     + (
@@ -536,7 +536,7 @@ class Recovery:
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
 
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega4 = omega3
                                 elif self.asym and not self.extra:
@@ -555,7 +555,7 @@ class Recovery:
                         V_option1[t + 1, :] = V_option1[t, :]
 
                         if taskSimulation.reward[(t,) + tuple(taskSimulation.stimulusPair[t,:])] == 1:
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 omega2 = (
                                     omega2
                                     + (
@@ -605,7 +605,7 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 if not self.asym and not self.extra:
                                     omega3 = omega = omega4 = omega2
                                 elif self.asym and not self.extra:
@@ -614,7 +614,7 @@ class Recovery:
                                     omega4 = omega2
 
                         else:
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 omega4 = (
                                     omega4
                                     + (
@@ -664,7 +664,7 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega3 = omega4
                                 elif self.asym and not self.extra:
