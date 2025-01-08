@@ -55,7 +55,7 @@ class Fitting:
         self.pearce = pearce
         self.gridCount = gridCount
         self.pearce_init = pearce_init
-        self.init = init
+        self.v_init = init
 
         if self.plotting:
             self.Plot = Plotting(
@@ -340,7 +340,7 @@ class Fitting:
             betaGrid = 0 + 14.0 * np.random.rand(self.gridCount)
             LL_array = np.empty((self.gridCount, 1))
             LL_array[:] = np.nan
-            if self.init:
+            if self.v_init:
                 V_option0_randGrid = np.random.rand(self.gridCount, 1)
                 V_option0Init_Grid = np.repeat(V_option0_randGrid, 9, axis=1).reshape(
                     (self.gridCount, 3, 3)
@@ -392,7 +392,7 @@ class Fitting:
                     np.empty((max(runData.trialNumber) + 1, 3, 3)) for i in range(2)
                 )
                 V_option0[:], V_option1[:] = (np.nan for i in range(2))
-                if self.init:
+                if self.v_init:
                     V_option0[0, :] = V_option0Init_Grid[j]
                     V_option1[0, :] = V_option1Init_Grid[j]
                 else:
@@ -760,7 +760,7 @@ class Fitting:
                     NLL_array[run, j, 5] = alpha2NegCheck
                 if self.pearce_init:
                     NLL_array[run, j, 6] = omegaGrid[j]
-                if self.init:
+                if self.v_init:
                     NLL_array[run, j, 7] = V_option0Init_Grid[j][0][0]
                     NLL_array[run, j, 8] = V_option1Init_Grid[j][0][0]
                 if self.transfer:
@@ -823,7 +823,7 @@ class Fitting:
                 X=fitted_betas,
                 delimiter=",",
             )
-            if self.init:
+            if self.v_init:
                 fitted_V_option0Inits[run] = NLL_array[run, minIndex, 7]
                 fitted_V_option1Inits[run] = NLL_array[run, minIndex, 8]
 

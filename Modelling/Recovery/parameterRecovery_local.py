@@ -814,6 +814,7 @@ class Recovery:
             fig.suptitle("correlation {:.2f}, p-value {:.2f}".format(corrParam[0], corrParam[1]), fontsize=12)
             destination = "/mnt/d/multlearn-sns/Modelling/Recovery/"+self.modelFolder
             if not os.path.exists(destination):
+                ("made destination")
                 os.makedirs(destination)
             plt.savefig(os.path.join(destination,param.replace(" ", "_")+"Recovery.png"))
         
@@ -825,7 +826,7 @@ if __name__ == "__main__":
     gridsize = 5000
     pearce = False
     pearce_init = True
-    extra = False
+    extra = True
     asym = False
     transfer = False
     v_init = False

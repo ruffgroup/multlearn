@@ -234,6 +234,7 @@ class Fitting:
     def modelFitting(
         self
     ):
+        print("ID: "+str(self.ID))
         bestFitting_dir = "/mnt/d/data/fittedParametersRecoveredModels"
         newPath = os.path.join(
             bestFitting_dir, "sub-{0}".format(self.ID), self.modelFolder
@@ -290,7 +291,7 @@ class Fitting:
                     self.mainTrials + self.additionalTrials,
                 )
             )
-            for i in range(6)
+            for i in range(5)
         )
 
         V0 = np.empty(
@@ -316,6 +317,7 @@ class Fitting:
         ) = (np.nan for i in range(7))
 
         for run in range(0, max(self.subjectData.runNumber)):
+            print("run: "+str(run))
             alphaGrid = np.random.rand(self.gridCount)
             if self.extra and self.asym:
                 alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
@@ -485,7 +487,7 @@ class Fitting:
                         V_option0[t + 1, :] = V_option0[t, :]
 
                         if runData.reward[t] == 1:
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 omega = (
                                     omega
                                     + (
@@ -536,7 +538,7 @@ class Fitting:
                                             V_option0[(t + 1,) + pair] = 1
                                         elif V_option0[(t + 1,) + pair] < 0:
                                             V_option0[(t + 1,) + pair] = 0
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega3 = omega4 = omega
                                 elif self.asym and not self.extra:
@@ -545,7 +547,7 @@ class Fitting:
                                     omega3 = omega
 
                         else:
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 omega3 = (
                                     omega3
                                     + (
@@ -598,7 +600,7 @@ class Fitting:
                                         elif V_option0[(t + 1,) + pair] < 0:
                                             V_option0[(t + 1,) + pair] = 0
 
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega4 = omega3
                                 elif self.asym and not self.extra:
@@ -617,7 +619,7 @@ class Fitting:
                         V_option1[t + 1, :] = V_option1[t, :]
 
                         if runData.reward[t] == 1:
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 omega2 = (
                                     omega2
                                     + (
@@ -669,7 +671,7 @@ class Fitting:
                                             V_option1[(t + 1,) + pair] = 1
                                         elif V_option1[(t + 1,) + pair] < 0:
                                             V_option1[(t + 1,) + pair] = 0
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 if not self.asym and not self.extra:
                                     omega3 = omega = omega4 = omega2
                                 elif self.asym and not self.extra:
@@ -678,7 +680,7 @@ class Fitting:
                                     omega4 = omega2
 
                         else:
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 omega4 = (
                                     omega4
                                     + (
@@ -730,7 +732,7 @@ class Fitting:
                                             V_option1[(t + 1,) + pair] = 1
                                         elif V_option1[(t + 1,) + pair] < 0:
                                             V_option1[(t + 1,) + pair] = 0
-                            if self.pearce:
+                            if self.pearce or self.pearce_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega3 = omega4
                                 elif self.asym and not self.extra:
@@ -1062,9 +1064,9 @@ class Fitting:
             ID_surprise[run] = trial_surprise
 
 
-        bestFitting_dir = "/shares/zne.uzh/multlearn/parameterFitting"
+        bestFitting_dir = "/mnt/d/data/fittedParametersRecoveredModels"
         newPath = os.path.join(
-            bestFitting_dir, "sub-{0}".format(self.ID), self.modelFolder
+            bestFitting_dir, "sub-{0}".format(self.ID)
         )
        
         Path(newPath).mkdir(parents=True, exist_ok=True)
@@ -1080,14 +1082,17 @@ class Fitting:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Recovery of RL parameters")
-    parser.add_argument("--mainTrials", type=int, default=60)
-    parser.add_argument("--simulations", type=int, default=100)
-    parser.add_argument("--gridsize", type=int, default=100)
-    parser.add_argument("--extra", action='store_true')
-    parser.add_argument("--asym", action='store_true')
-    parser.add_argument("--transfer", action='store_true')
-    parser.add_argument("--pearce", action='store_true')
-    parser.add_argument("--pearce_init", action='store_true')
-    parser.add_argument("--v_init", action='store_true')
-    args = parser.parse_args()
+    mainTrials = 60
+    additionalTrials = 0
+    gridsize = 5000
+    extra=False 
+    pearce=False
+    init=False
+    asym=False
+    transfer=False
+    pearce_init=False
+    IDs = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
+    for ID in IDs:
+        fitting = Fitting(mainTrials, additionalTrials, gridsize, ID, extra=extra, pearce=pearce, init=init, asym=asym, transfer=transfer, pearce_init=pearce_init)
+        fitting.statisticalLearning()
+    
