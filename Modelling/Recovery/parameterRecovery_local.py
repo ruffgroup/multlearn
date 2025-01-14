@@ -58,11 +58,11 @@ class Recovery:
             self.params = ["alpha", "beta", "V0_init", "V1_init"]
         elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and not self.v_init and self.pearce:
             self.modelFolder = "pearce"
-            self.params = ["alpha", "beta"]
+            self.params = ["alpha", "beta", "omega"]
         elif self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "dynaAsym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-       elif self.dyna and not self.dyna_init and not self.extra and self.asym and self.transfer and not self.v_init and not self.pearce:
+        elif self.dyna and not self.dyna_init and not self.extra and self.asym and self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "dynaAsymTransfer"
             self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
         elif self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and not self.v_init and not self.pearce:
@@ -440,7 +440,7 @@ class Recovery:
                                             V_option0[(t + 1,) + tuple(pair)] = 1
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
-                            if self.dyna or self.dyna_init or self.pearce:
+                            if self.dyna or self.dyna_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega3 = omega4 = omega
                                 elif self.asym and not self.extra:
@@ -531,7 +531,7 @@ class Recovery:
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
 
-                            if self.dyna or self.dyna_init or self.pearce:
+                            if self.dyna or self.dyna_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega4 = omega3
                                 elif self.asym and not self.extra:
@@ -629,7 +629,7 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
-                            if self.dyna or self.dyna_init or self.pearce:
+                            if self.dyna or self.dyna_init:
                                 if not self.asym and not self.extra:
                                     omega3 = omega = omega4 = omega2
                                 elif self.asym and not self.extra:
@@ -718,7 +718,7 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
-                            if self.dyna or self.dyna_init or self.pearce:
+                            if self.dyna or self.dyna_init:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega3 = omega4
                                 elif self.asym and not self.extra:
@@ -879,12 +879,12 @@ if __name__ == "__main__":
     simulations = 200
     gridsize = 5000
     dyna = False
-    dyna_init = True
+    dyna_init = False
     extra = False
     asym = False
     transfer = False
     v_init = False
-    pearce = False
+    pearce = True
     recovery = Recovery(mainTrials, simulations, gridsize, extra, asym, transfer, dyna, pearce, dyna_init, v_init)
     simParams, recParams, NLL = recovery.recovery()
     recovery.recoveryPlot(simParams, recParams)
