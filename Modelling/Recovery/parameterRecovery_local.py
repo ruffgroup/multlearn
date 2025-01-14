@@ -207,7 +207,7 @@ class Recovery:
                 V_option0Init = V_option0Init_Arr[i]
                 V_option1Init = V_option1Init_Arr[i]
 
-            taskSimulation = task_Design(self.mainTrials, 0, asym=self.asym, extra=self.extra, dyna=self.dyna, transfer=self.transfer, alphaPos=alphaPosSim, alphaNeg=alphaNegSim, alpha2Pos=alpha2PosSim, alpha2Neg=alpha2NegSim, K1=K1Sim, K2=K2Sim, K3=K3Sim, K4=K4Sim, beta=betaSim, V_option0Init=V_option0Init, V_option1Init=V_option1Init, dyna_init=self.dyna_init, omegaInit=omegaSim)
+            taskSimulation = task_Design(self.mainTrials, 0, asym=self.asym, extra=self.extra, dyna=self.dyna, transfer=self.transfer, alphaPos=alphaPosSim, alphaNeg=alphaNegSim, alpha2Pos=alpha2PosSim, alpha2Neg=alpha2NegSim, K1=K1Sim, K2=K2Sim, K3=K3Sim, K4=K4Sim, beta=betaSim, V_option0Init=V_option0Init, V_option1Init=V_option1Init, dyna_init=self.dyna_init, omegaInit=omegaSim, pearce=self.pearce)
             taskSimulation.taskStructure()
             taskSimulation.RLloops()
             taskSimulation.statisticalLearning()
@@ -370,6 +370,10 @@ class Recovery:
                                     )
                                     * alphaPosCheck
                                 )
+                                if omega > 1:
+                                    omega = 1
+                                elif omega < 0:
+                                    omega = 0
                                 V_option0[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option0[
@@ -397,6 +401,10 @@ class Recovery:
                                     )
                                     * alphaPosCheck
                                 )
+                                if omega > 1:
+                                    omega = 1
+                                elif omega < 0:
+                                    omega = 0
                                 V_option0[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option0[
@@ -457,6 +465,10 @@ class Recovery:
                                     )
                                     * alphaNegCheck
                                 )
+                                if omega3 > 1:
+                                    omega3 = 1
+                                elif omega3 < 0:
+                                    omega3 = 0
                                 V_option0[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option0[
@@ -486,6 +498,10 @@ class Recovery:
                                     )
                                     * alphaNegCheck
                                 )
+                                if omega3 > 1:
+                                    omega3 = 1
+                                elif omega3 < 0:
+                                    omega3 = 0
                                 V_option0[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option0[
@@ -559,6 +575,10 @@ class Recovery:
                                     )
                                     * alpha2PosCheck
                                 )
+                                if omega2 > 1:
+                                    omega2 = 1
+                                elif omega2 < 0:
+                                    omega2 = 0
                                 V_option1[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option1[
@@ -587,6 +607,10 @@ class Recovery:
                                     )
                                     * alpha2PosCheck
                                 )
+                                if omega2 > 1:
+                                    omega2 = 1
+                                elif omega2 < 0:
+                                    omega2 = 0
                                 V_option1[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option1[
@@ -647,6 +671,10 @@ class Recovery:
                                     )
                                     * alpha2NegCheck
                                 )
+                                if omega4 > 1:
+                                    omega4 = 1
+                                elif omega4 < 0:
+                                    omega4 = 0
                                 V_option1[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option1[
@@ -675,6 +703,10 @@ class Recovery:
                                     )
                                     * alpha2NegCheck
                                 )
+                                if omega4 > 1:
+                                    omega4 = 1
+                                elif omega4 < 0:
+                                    omega4 = 0
                                 V_option1[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option1[
