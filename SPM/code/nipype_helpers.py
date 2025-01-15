@@ -10,15 +10,15 @@ def get_subject_info_model1(subject, data_folder, bestfitting_path='/mnt/d/multl
 
     subject_info = []
     rpe_path = (
-        op.join(bestfitting_path,f"sub-{subject}/rpe*.mat")
+        op.join(bestfitting_path,f"sub-{subject}/rpeBest.mat")
     )
     fn = glob(rpe_path)
-
+    print(fn)
     assert len(fn) == 1
     fn = fn[0]
 
     rpe_data = np.nan_to_num(
-        io.loadmat(fn)["rpe"]
+        io.loadmat(fn, simplify_cells=True)["rpe"]["rpe"]
     )
 
     rpe = (
@@ -32,11 +32,12 @@ def get_subject_info_model1(subject, data_folder, bestfitting_path='/mnt/d/multl
     )
 
     rpe["rpe"] = rpe["rpe"].groupby("run").transform(lambda x: stats.zscore(x - x.mean()))
-
+    print(rpe)
     surprise_path = (
         op.join(bestfitting_path,f"sub-{subject}/spe*.mat")
     )
     fn2 = glob(surprise_path)
+    
     assert len(fn2) == 1
     fn2 = fn2[0]
     surprise_data = np.nan_to_num(
@@ -53,7 +54,7 @@ def get_subject_info_model1(subject, data_folder, bestfitting_path='/mnt/d/multl
     )
 
     surprise["spe"] = surprise["spe"].groupby("run").transform(lambda x: stats.zscore(x - x.mean()))
-
+    print(surprise)
     functional_runs = []
 
     for run in range(1, 7):
@@ -149,15 +150,16 @@ def get_subject_info_model2(subject, data_folder, bestfitting_path='/mnt/d/multl
 
     subject_info = []
     rpe_path = (
-        op.join(bestfitting_path,f"sub-{subject}/rpe*.mat")
+        op.join(bestfitting_path,f"sub-{subject}/rpeBest.mat")
     )
     fn = glob(rpe_path)
+    print(fn)
 
     assert len(fn) == 1
     fn = fn[0]
 
     rpe_data = np.nan_to_num(
-        io.loadmat(fn)["rpe"]
+        io.loadmat(fn, simplify_cells=True)["rpe"]["rpe"]
     )
 
     rpe = (
@@ -177,6 +179,7 @@ def get_subject_info_model2(subject, data_folder, bestfitting_path='/mnt/d/multl
         op.join(bestfitting_path,f"sub-{subject}/spe*.mat")
     )
     fn2 = glob(surprise_path)
+    print(fn2)
     assert len(fn2) == 1
     fn2 = fn2[0]
     surprise_data = io.loadmat(fn2)["spe"]
@@ -197,6 +200,7 @@ def get_subject_info_model2(subject, data_folder, bestfitting_path='/mnt/d/multl
         op.join(bestfitting_path,f"sub-{subject}/V0*.npy")
     )
     fn3 = glob(V0_path)
+    print(fn3)
     assert len(fn3) == 1
     fn3 = fn3[0]
     V0_data = np.load(fn3)
@@ -213,7 +217,9 @@ def get_subject_info_model2(subject, data_folder, bestfitting_path='/mnt/d/multl
     V1_path = (
         op.join(bestfitting_path,f"sub-{subject}/V1*.npy")
     )
+
     fn4 = glob(V1_path)
+    print(fn4)
     assert len(fn4) == 1
     fn4 = fn4[0]
     V1_data = np.load(fn4)
@@ -314,6 +320,8 @@ def get_subject_info_model2(subject, data_folder, bestfitting_path='/mnt/d/multl
             Bunch(name=["rpe"], param=[run_rpe.values.tolist()], poly=[1]),
         ]
 
+        print(pmod)
+
         subject_info.insert(
             run - 1,
             Bunch(
@@ -332,6 +340,8 @@ def get_subject_info_model2(subject, data_folder, bestfitting_path='/mnt/d/multl
             f"ds-mlearn/derivatives/fmriprep/sub-{subject}/func/s6.sub-{subject}_task-learn_run-{run}_space-MNI152NLin2009cAsym_desc-preproc_bold.nii"
         ))[0]
         functional_runs.append(functional_run)
+
+    print(subject_info)
 
     return subject_info, functional_runs #, V_df, rpe, surprise
 

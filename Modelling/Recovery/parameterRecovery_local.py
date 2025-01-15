@@ -122,15 +122,26 @@ class Recovery:
         taskSimulationList = []
         NLL_array_list = []
 
-        alphaSimArr = np.random.rand(self.simulations)
-        if self.extra and self.asym:
-            alphaNegSimArr, alpha2PosSimArr, alpha2NegSimArr = (
-                np.random.rand(self.simulations) for i in range(3)
-            )
-        elif self.extra and not self.asym:
-            alpha2SimArr = np.random.rand(self.simulations)
-        elif self.asym and not self.extra:
-            alphaNegSimArr = np.random.rand(self.simulations)
+        if self.pearce:
+            alphaSimArr = -20 + 40 * np.random.rand(self.simulations)
+            if self.extra and self.asym:
+                alphaNegSimArr, alpha2PosSimArr, alpha2NegSimArr = (
+                    (-20 + 40 * np.random.rand(self.simulations)) for i in range(3)
+                )
+            elif self.extra and not self.asym:
+                alpha2SimArr = -20 + 40 * np.random.rand(self.simulations)
+            elif self.asym and not self.extra:
+                alphaNegSimArr = -20 + 40 * np.random.rand(self.simulations)
+        else:
+            alphaSimArr = np.random.rand(self.simulations)
+            if self.extra and self.asym:
+                alphaNegSimArr, alpha2PosSimArr, alpha2NegSimArr = (
+                    np.random.rand(self.simulations) for i in range(3)
+                )
+            elif self.extra and not self.asym:
+                alpha2SimArr = np.random.rand(self.simulations)
+            elif self.asym and not self.extra:
+                alphaNegSimArr = np.random.rand(self.simulations)
 
         if self.transfer:
             K1SimArr = np.random.rand(self.simulations)
@@ -143,8 +154,10 @@ class Recovery:
             elif self.asym and not self.extra:
                 K3SimArr = np.random.rand(self.simulations)
 
-        if self.dyna_init or self.pearce:
+        if self.dyna_init:
             omegaArr = np.random.rand(self.simulations)
+        elif self.pearce:
+            omegaArr = -10 + 20 * np.random.rand(self.simulations)
 
         if self.v_init:
             V_option0_rand = np.random.rand(self.simulations, 1)
@@ -214,16 +227,26 @@ class Recovery:
 
             taskSimulationList.append(taskSimulation)
 
-
-            alphaGrid = np.random.rand(self.gridsize)
-            if self.extra and self.asym:
-                alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
-                    np.random.rand(self.gridsize) for i in range(3)
-                )
-            elif self.extra and not self.asym:
-                alpha2Grid = np.random.rand(self.gridsize)
-            elif self.asym and not self.extra:
-                alphaNegGrid = np.random.rand(self.gridsize)
+            if self.pearce:
+                alphaGrid = -20 + 40 * np.random.rand(self.gridsize)
+                if self.extra and self.asym:
+                    alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
+                        (-20 + 40 * np.random.rand(self.gridsize)) for i in range(3)
+                    )
+                elif self.extra and not self.asym:
+                    alpha2Grid = -20 + 40 * np.random.rand(self.gridsize)
+                elif self.asym and not self.extra:
+                    alphaNegGrid = -20 + 40 * np.random.rand(self.gridsize)
+            else:
+                alphaGrid = np.random.rand(self.gridsize)
+                if self.extra and self.asym:
+                    alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
+                        np.random.rand(self.gridsize) for i in range(3)
+                    )
+                elif self.extra and not self.asym:
+                    alpha2Grid = np.random.rand(self.gridsize)
+                elif self.asym and not self.extra:
+                    alphaNegGrid = np.random.rand(self.gridsize)
 
             if self.transfer:
                 K1Grid = np.random.rand(self.gridsize)
@@ -236,8 +259,10 @@ class Recovery:
                 elif self.asym and not self.extra:
                     K3Grid = np.random.rand(self.gridsize)
 
-            if self.dyna_init or self.pearce:
+            if self.dyna_init:
                 omegaGrid = np.random.rand(self.gridsize)
+            elif self.pearce:
+                omegaGrid = -10 + 20 * np.random.rand(self.gridsize)
 
             if self.v_init:
                 V_option0_randGrid = np.random.rand(self.gridsize, 1)

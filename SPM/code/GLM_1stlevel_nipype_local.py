@@ -220,15 +220,13 @@ if __name__ == "__main__":
     
     data_folder="/mnt/d/data/"
     base_dir="/mnt/d/multlearn-sns/SPM/nipype"
-    mask"/mnt/d/multlearn-sns/SPM/mask_ICV.nii"
-    #ppi_mask=None
+    mask="/mnt/d/multlearn-sns/SPM/mask_ICV.nii"
+    ppi_mask=None
     model="model2"
-    bestfitting_path='/mnt/d/multlearn-sns/Modelling/Fitting//'
-    parser.add_argument("--mlab_path", type=str, default="/usr/local/MATLAB/R2022b/bin/matlab")
-    parser.add_argument("--spm_path", type=str, default="~/spm12")
-    parser.add_argument("--Nslices", type=int, default=40)
-    parser.add_argument("--refSlice", type=int, default=20)
+    bestfitting_path='/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals'
+    mlab_path="/usr/local/MATLAB/R2022b/bin/matlab"
+    spm_path="~/spm12"
+    Nslices=40
+    refSlice=20
 
-    args = parser.parse_args()
-
-    main(args.data_folder, base_dir=args.base_dir, mask=args.mask, ppi_mask=args.ppi_mask, model=args.model, bestfitting_path=args.bestfitting_path, mlab_path=args.mlab_path, spm_path=args.spm_path, Nslices=args.Nslices, refSlice=args.refSlice)
+    main(data_folder, base_dir=base_dir, mask=mask, ppi_mask=ppi_mask, model=model, bestfitting_path=bestfitting_path, mlab_path=mlab_path, spm_path=spm_path, Nslices=Nslices, refSlice=refSlice)

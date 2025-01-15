@@ -71,7 +71,7 @@ def main(t_val, con, sign, base_dir, source):
         text_file = pd.read_csv('stdout.nipype', sep="\t")
         text_file.to_csv("stdout.csv", sep="\t")
         shutil.copy("stdout.csv", opj(base_dir,'ROI/stats_con'+str(con)+'_'+str(t_val).replace('.', '_')+'_'+sign+'.csv'))
-        
+    
             
 
         ext_b = maths.Threshold()
@@ -98,5 +98,5 @@ def main(t_val, con, sign, base_dir, source):
 
 
 if __name__ == "__main__":
-    main(8.0,1, 'pos', '/shares/zne.uzh/multlearn/nipype/model1', source="fmri")
+    main(3.1,1, 'pos', '/mnt/d/multlearn-sns/SPM/nipype/nipype/model2', source="fmri")
 

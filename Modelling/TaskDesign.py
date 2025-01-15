@@ -79,10 +79,16 @@ class task_Design:
         self.dyna_init = dyna_init
         self.pearce = pearce
 
-        self.alphaPos = np.random.uniform(0, 1) if alphaPos is None else alphaPos
-        self.alphaNeg = np.random.uniform(0, 1) if alphaNeg is None else alphaNeg
-        self.alpha2Pos = np.random.uniform(0, 1) if alpha2Pos is None else alphaPos
-        self.alpha2Neg = np.random.uniform(0, 1) if alpha2Neg is None else alphaNeg
+        if self.pearce:
+            self.alphaPos = (-20 + 40 * np.random.uniform(0, 1)) if alphaPos is None else alphaPos
+            self.alphaNeg = (-20 + 40 * np.random.uniform(0, 1)) if alphaNeg is None else alphaNeg
+            self.alpha2Pos = (-20 + 40 * np.random.uniform(0, 1)) if alpha2Pos is None else alphaPos
+            self.alpha2Neg = (-20 + 40 * np.random.uniform(0, 1)) if alpha2Neg is None else alphaNeg
+        else:
+            self.alphaPos = np.random.uniform(0, 1) if alphaPos is None else alphaPos
+            self.alphaNeg = np.random.uniform(0, 1) if alphaNeg is None else alphaNeg
+            self.alpha2Pos = np.random.uniform(0, 1) if alpha2Pos is None else alphaPos
+            self.alpha2Neg = np.random.uniform(0, 1) if alpha2Neg is None else alphaNeg
 
         if beta is None:
             self.beta = 0 + 14.0 * random()

@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import os
 import pathlib
+from pathlib import Path
 import scipy
 import csv
 import collections
@@ -74,9 +75,9 @@ models = [
     "v_init",
     "asym",
     "transfer",
-    "pearce",
-    "pearceAsym",
-    "pearceTransfer",
+    #"pearce",
+    #"pearceAsym",
+    #"pearceTransfer",
     "transferV_init"
 ]
 
@@ -86,24 +87,24 @@ BIC_basic = np.zeros(58)
 BIC_v_init = np.zeros(58)
 BIC_asym = np.zeros(58)
 BIC_transfer = np.zeros(58)
-BIC_pearce = np.zeros(58)
-BIC_pearceAsym = np.zeros(58)
-BIC_pearceTransfer = np.zeros(58)
+#BIC_pearce = np.zeros(58)
+#BIC_pearceAsym = np.zeros(58)
+#BIC_pearceTransfer = np.zeros(58)
 BIC_transferV_init = np.zeros(58)
 
 winning_model = {key: [0, 0] for key in models}
 
 for idx, IDnr in enumerate(IDs):
-    newPath = "/mnt/d/data/fittedParametersRecoveredModels/sub-{0}".format(IDnr)
+    newPath = f"/mnt/d/data/fittedParametersRecoveredModels/sub-{int(IDnr):02d}"
     LL_basic = np.load(newPath + "/basic/BIC_basic.npy")
     LL_v_init = np.load(newPath + "/v_init/BIC_v_init.npy")
     LL_asym = np.load(newPath + "/asym/BIC_asym.npy")
     LL_transfer = np.load(newPath + "/transfer/BIC_transfer.npy")
     LL_transferV_init = np.load(newPath + "/transferV_init/BIC_transferV_init.npy")
     
-    LL_pearce = np.load(newPath + "/pearce/BIC_pearce.npy")
-    LL_pearceAsym = np.load(newPath + "/pearceAsym/BIC_pearceAsym.npy")
-    LL_pearceTransfer = np.load(newPath + "/pearceTransfer/BIC_pearceTransfer.npy")
+    #LL_pearce = np.load(newPath + "/pearce/BIC_pearce.npy")
+    #LL_pearceAsym = np.load(newPath + "/pearceAsym/BIC_pearceAsym.npy")
+    #LL_pearceTransfer = np.load(newPath + "/pearceTransfer/BIC_pearceTransfer.npy")
 
     BIC_basic[idx] = np.mean([2 * np.log(60) - 2 * np.log(LL_basic[run]) for run in range(6)])
     BIC_v_init[idx] = np.mean([4 * np.log(60) - 2 * np.log(LL_v_init[run]) for run in range(6)])
@@ -111,9 +112,9 @@ for idx, IDnr in enumerate(IDs):
     BIC_transfer[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_transfer[run]) for run in range(6)])
     BIC_transferV_init[idx] = np.mean([5 * np.log(60) - 2 * np.log(LL_transferV_init[run]) for run in range(6)])
     
-    BIC_pearce[idx] = np.mean([2 * np.log(60) - 2 * np.log(LL_pearce[run]) for run in range(6)])
-    BIC_pearceAsym[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_pearceAsym[run]) for run in range(6)])
-    BIC_pearceTransfer[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_pearceTransfer[run]) for run in range(6)])
+    #BIC_pearce[idx] = np.mean([2 * np.log(60) - 2 * np.log(LL_pearce[run]) for run in range(6)])
+    #BIC_pearceAsym[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_pearceAsym[run]) for run in range(6)])
+    #BIC_pearceTransfer[idx] = np.mean([3 * np.log(60) - 2 * np.log(LL_pearceTransfer[run]) for run in range(6)])
     
     best_fitting_arr = [
             BIC_basic[idx],
@@ -121,9 +122,9 @@ for idx, IDnr in enumerate(IDs):
             BIC_asym[idx],
             BIC_transfer[idx],
             BIC_transferV_init[idx],
-            BIC_pearce[idx],
-            BIC_pearceAsym[idx],
-            BIC_pearceTransfer[idx],
+            #BIC_pearce[idx],
+            #BIC_pearceAsym[idx],
+            #BIC_pearceTransfer[idx],
         ]
     
     best_fitting = np.argmin(best_fitting_arr)
@@ -141,6 +142,15 @@ for idx, IDnr in enumerate(IDs):
             newPath + "/rpeBest.mat",
             mdict={"rpe": rpeBest},
         )
+    
+    bestFittingPath = f"/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals/sub-{int(IDnr):02d}"
+    Path(bestFittingPath).mkdir(parents=True, exist_ok=True)
+    scipy.io.savemat(
+            bestFittingPath + "/rpeBest.mat",
+            mdict={"rpe": rpeBest},
+        )
+    V0 = shutil.copy(newPath + "/" + models[best_fitting] + "/V0_" + models[best_fitting] + ".npy", bestFittingPath)
+    V1 = shutil.copy(newPath + "/" + models[best_fitting] + "/V1_" + models[best_fitting] + ".npy", bestFittingPath) 
 
     winning_model[models[best_fitting]][0] += 1
     for i in range(len(best_fitting_arr)):
@@ -156,13 +166,21 @@ with open("BestFitting.tsv", "w", newline="") as f:
 final = dict(sorted(winning_model.items(), key=lambda x: -x[1][0]))
 
 for idx, IDnr in enumerate(IDs):
-    newPath = "/mnt/d/data/fittedParametersRecoveredModels/sub-{0}".format(IDnr)
+    newPath = f"/mnt/d/data/fittedParametersRecoveredModels/sub-{int(IDnr):02d}"
     rpeBestOverall = scipy.io.loadmat(
         newPath + "/" + str(list(final.keys())[0]) + "/rpe" + str(list(final.keys())[0]) + ".mat"
     )
 
     scipy.io.savemat(
             newPath + "/rpeBestOverall.mat",
+            mdict={"rpe": rpeBestOverall},
+        )
+
+    bestFittingPath = f"/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals/sub-{int(IDnr):02d}"
+    Path(bestFittingPath).mkdir(parents=True, exist_ok=True)
+
+    scipy.io.savemat(
+            bestFittingPath + "/rpeBestOverall.mat",
             mdict={"rpe": rpeBestOverall},
         )
 
