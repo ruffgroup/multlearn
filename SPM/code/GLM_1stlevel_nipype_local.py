@@ -36,10 +36,8 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
     MatlabCommand.set_default_paths(spm_path)
     MatlabCommand.set_default_matlab_cmd(mlab_path)
     FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
-    layout = BIDSLayout(op.join(data_folder,"ds-mlearn/"), derivatives=True)
-    # list of subject identifiers
-    subject_list = layout.get_subjects()
-    subject_list = [sub for sub in subject_list if int(sub) not in [8, 13, 16, 31, 32, 44]]
+    subject_list = range(1,65)
+    subject_list = [str(sub).zfill(2) for sub in subject_list if not in [8, 13, 16, 31, 32, 44]]
 
 
     with open((opj(data_folder,

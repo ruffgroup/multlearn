@@ -9,66 +9,8 @@ import collections
 import shutil
 
 dataPath = "/mnt/d/data/fittedParametersRecoveredModels"
-IDs = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "9",
-    "10",
-    "11",
-    "12",
-    "14",
-    "15",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-    "22",
-    "23",
-    "24",
-    "25",
-    "26",
-    "27",
-    "28",
-    "29",
-    "30",
-    "33",
-    "34",
-    "35",
-    "36",
-    "37",
-    "38",
-    "39",
-    "40",
-    "41",
-    "42",
-    "43",
-    "45",
-    "46",
-    "47",
-    "48",
-    "49",
-    "50",
-    "51",
-    "52",
-    "53",
-    "54",
-    "55",
-    "56",
-    "57",
-    "58",
-    "59",
-    "60",
-    "61",
-    "62",
-    "63",
-    "64",
-]
+subject_list = range(1,65)
+subject_list = [str(sub).zfill(2) for sub in subject_list if not in [8, 13, 16, 31, 32, 44]]
 
 models = [
     "basic",
@@ -94,8 +36,8 @@ BIC_transferV_init = np.zeros(58)
 
 winning_model = {key: [0, 0] for key in models}
 
-for idx, IDnr in enumerate(IDs):
-    newPath = f"/mnt/d/data/fittedParametersRecoveredModels/sub-{int(IDnr):02d}"
+for idx, ID in subject_list:
+    newPath = "/mnt/d/data/fittedParametersRecoveredModels/sub-{}".format(ID)
     LL_basic = np.load(newPath + "/basic/BIC_basic.npy")
     LL_v_init = np.load(newPath + "/v_init/BIC_v_init.npy")
     LL_asym = np.load(newPath + "/asym/BIC_asym.npy")
@@ -131,8 +73,8 @@ for idx, IDnr in enumerate(IDs):
     best_fitting_val = best_fitting_arr[best_fitting]
 
     #for i in range(5):
-    #    shutil.copy(models[best_fitting] + "/" + IDnr + "_" + str(i) + "_" + models[best_fitting] + "_Plots.pdf",
-    #                "bestFittingVals/sub-" + IDnr)
+    #    shutil.copy(models[best_fitting] + "/" + ID + "_" + str(i) + "_" + models[best_fitting] + "_Plots.pdf",
+    #                "bestFittingVals/sub-" + ID)
 
     rpeBest = scipy.io.loadmat(
         newPath + "/" + models[best_fitting] + "/rpe" + models[best_fitting] + ".mat"
@@ -143,7 +85,7 @@ for idx, IDnr in enumerate(IDs):
             mdict={"rpe": rpeBest},
         )
     
-    bestFittingPath = f"/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals/sub-{int(IDnr):02d}"
+    bestFittingPath = "/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals/sub-sub-{}".format(ID)
     Path(bestFittingPath).mkdir(parents=True, exist_ok=True)
     scipy.io.savemat(
             bestFittingPath + "/rpeBest.mat",
@@ -156,7 +98,7 @@ for idx, IDnr in enumerate(IDs):
     for i in range(len(best_fitting_arr)):
         winning_model[models[i]][1] += best_fitting_arr[i]
     #winning_model[models[best_fitting]][1] += best_fitting_val
-    listBestFits.append([IDnr, models[best_fitting], best_fitting_val])
+    listBestFits.append([ID, models[best_fitting], best_fitting_val])
 
 
 with open("BestFitting.tsv", "w", newline="") as f:
@@ -165,8 +107,8 @@ with open("BestFitting.tsv", "w", newline="") as f:
 
 final = dict(sorted(winning_model.items(), key=lambda x: -x[1][0]))
 
-for idx, IDnr in enumerate(IDs):
-    newPath = f"/mnt/d/data/fittedParametersRecoveredModels/sub-{int(IDnr):02d}"
+for idx, ID in subject_list:
+    newPath = "/mnt/d/data/fittedParametersRecoveredModels/sub-{}".format(ID)
     rpeBestOverall = scipy.io.loadmat(
         newPath + "/" + str(list(final.keys())[0]) + "/rpe" + str(list(final.keys())[0]) + ".mat"
     )
@@ -176,7 +118,7 @@ for idx, IDnr in enumerate(IDs):
             mdict={"rpe": rpeBestOverall},
         )
 
-    bestFittingPath = f"/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals/sub-{int(IDnr):02d}"
+    bestFittingPath = "/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals/sub-{}".format(ID)
     Path(bestFittingPath).mkdir(parents=True, exist_ok=True)
 
     scipy.io.savemat(
