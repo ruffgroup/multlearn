@@ -22,7 +22,7 @@ sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
 
 class Recovery:
-    def __init__(self, mainTrials, simulations, gridsize, extra, asym, transfer, pearce, pearce_init, v_init):
+    def __init__(self, mainTrials, simulations, gridsize, extra, asym, transfer, pearce, dyna, v_init):
             
         self.mainTrials = mainTrials
         self.simulations = simulations
@@ -31,155 +31,66 @@ class Recovery:
         self.transfer = transfer
         self.pearce = pearce
         self.gridsize = gridsize
-        self.pearce_init = pearce_init
+        self.dyna = dyna
         self.v_init = v_init
 
-        if not self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and not self.v_init:
+        if not self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "basic"
             self.params = ["alpha", "beta"]
-        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce"
-            self.params = ["alpha", "beta"]
-        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce_init"
+        elif self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
+            self.modelFolder = "dyna"
             self.params = ["alpha", "beta", "omega"]
-        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and not self.v_init:
+        elif not self.dyna and self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "extra"
             self.params = ["alpha attract", "beta", "alpha not attract"]
-        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "asym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif not self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "transfer"
             self.params = ["alpha", "beta", "K1"]
-        elif self.v_init and not self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer:
+        elif self.v_init and not self.dyna and not self.extra and not self.asym and not self.transfer and not self.pearce:
             self.modelFolder = "v_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init"]
-        elif self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearceExtra"
-            self.params = ["alpha attract", "beta", "alpha not attract"]
-        elif self.pearce_init and not self.pearce and self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initExtra"
-            self.params = ["alpha attract", "beta", "alpha not attract", "omega"]
-        elif self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearceExtraAsym"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract"]
-        elif self.pearce_init and not self.pearce and self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initExtraAsym"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega"]
-        elif self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearceExtraTransfer"
-            self.params = ["alpha attract", "beta", "alpha not attract", "K1", "K2"]
-        elif self.pearce_init and not self.pearce and self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initExtraTransfer"
-            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "K1", "K2"]
-        elif self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearceExtraAsymTransfer"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "K1", "K2", "K3", "K4"]
-        elif self.pearce_init and not self.pearce and self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initExtraAsymTransfer"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "K1", "K2", "K3", "K4"]
-        elif self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init and self.pearce:
+            self.modelFolder = "pearce"
+            self.params = ["alpha", "beta", "omega"]
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init and self.pearce:
             self.modelFolder = "pearceAsym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif self.pearce_init and not self.pearce and not self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initAsym"
-            self.params = ["pos alpha", "beta", "neg alpha", "omega"]
-        elif self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and self.asym and self.transfer and not self.v_init and self.pearce:
             self.modelFolder = "pearceAsymTransfer"
             self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
-        elif self.pearce_init and not self.pearce and not self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initAsymTransfer"
-            self.params = ["pos alpha", "beta", "neg alpha", "omega", "K1", "K2"]
-        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init and self.pearce:
             self.modelFolder = "pearceTransfer"
             self.params = ["alpha", "beta", "K1"]
-        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initTransfer"
-            self.params = ["alpha", "beta", "omega", "K1"]
-        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "extraTransfer"
-            self.params = ["alpha attract", "beta", "alpha not attract", "K1", "K2"]
-        elif not self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "extraAsym"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract"]
-        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and self.asym and self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "asymTransfer"
             self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
-        elif not self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "extraAsymTransfer"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "K1", "K2", "K3", "K4"]
 
 
-        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearceV_init"
-            self.params = ["alpha", "beta", "V0_init", "V1_init"]
-        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearce_initV_init"
-            self.params = ["alpha", "beta", "omega", "V0_init", "V1_init"]
-        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "extraV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init"]
-        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and self.v_init:
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "asymV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
-        elif not self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "transferV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
-        elif self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearceExtraV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init"]
-        elif self.pearce_init and not self.pearce and self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearce_initExtraV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "V0_init", "V1_init"]
-        elif self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearceExtraAsymV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init"]
-        elif self.pearce_init and not self.pearce and self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearce_initExtraAsymV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "V0_init", "V1_init"]
-        elif self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearceExtraTransferV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract","V0_init", "V1_init", "K1", "K2"]
-        elif self.pearce_init and not self.pearce and self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearce_initExtraTransferV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "V0_init", "V1_init", "K1", "K2"]
-        elif self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearceExtraAsymTransferV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
-        elif self.pearce_init and not self.pearce and self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearce_initExtraAsymTransferV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
-        elif self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and self.v_init:
+        
+        elif not self.dyna and not self.extra and not self.asym and not self.transfer and self.v_init and self.pearce:
+            self.modelFolder = "pearceV_init"
+            self.params = ["alpha", "beta", "V0_init", "V1_init"]
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and self.v_init and self.pearce:
             self.modelFolder = "pearceAsymV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
-        elif self.pearce_init and not self.pearce and not self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearce_initAsymV_init"
-            self.params = ["pos alpha", "beta", "neg alpha", "omega", "V0_init", "V1_init"]
-        elif self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and self.v_init:
+        elif not self.dyna and not self.extra and self.asym and self.transfer and self.v_init and self.pearce:
             self.modelFolder = "pearceAsymTransferV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
-        elif self.pearce_init and not self.pearce and not self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearce_initAsymTransferV_init"
-            self.params = ["pos alpha", "beta", "neg alpha", "omega", "V0_init", "V1_init", "K1", "K2"]
-        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and self.v_init and self.pearce:
             self.modelFolder = "pearceTransferV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
-        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearce_initTransferV_init"
-            self.params = ["alpha", "beta", "omega", "V0_init", "V1_init", "K1"]
-        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "extraTransferV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init", "K1", "K2"]
-        elif not self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "extraAsymV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init"]
-        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and self.v_init:
+        elif not self.dyna and not self.extra and self.asym and self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "asymTransferV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
-        elif not self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "extraAsymTransferV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
 
 
     def recovery(self):
@@ -187,15 +98,26 @@ class Recovery:
         taskSimulationList = []
         NLL_array_list = []
 
-        alphaSimArr = np.random.rand(self.simulations)
-        if self.extra and self.asym:
-            alphaNegSimArr, alpha2PosSimArr, alpha2NegSimArr = (
-                np.random.rand(self.simulations) for i in range(3)
-            )
-        elif self.extra and not self.asym:
-            alpha2SimArr = np.random.rand(self.simulations)
-        elif self.asym and not self.extra:
-            alphaNegSimArr = np.random.rand(self.simulations)
+        if self.pearce:
+            alphaSimArr = -20 + 40 * np.random.rand(self.simulations)
+            if self.extra and self.asym:
+                alphaNegSimArr, alpha2PosSimArr, alpha2NegSimArr = (
+                    (-20 + 40 * np.random.rand(self.simulations)) for i in range(3)
+                )
+            elif self.extra and not self.asym:
+                alpha2SimArr = -20 + 40 * np.random.rand(self.simulations)
+            elif self.asym and not self.extra:
+                alphaNegSimArr = -20 + 40 * np.random.rand(self.simulations)
+        else:
+            alphaSimArr = np.random.rand(self.simulations)
+            if self.extra and self.asym:
+                alphaNegSimArr, alpha2PosSimArr, alpha2NegSimArr = (
+                    np.random.rand(self.simulations) for i in range(3)
+                )
+            elif self.extra and not self.asym:
+                alpha2SimArr = np.random.rand(self.simulations)
+            elif self.asym and not self.extra:
+                alphaNegSimArr = np.random.rand(self.simulations)
 
         if self.transfer:
             K1SimArr = np.random.rand(self.simulations)
@@ -208,8 +130,10 @@ class Recovery:
             elif self.asym and not self.extra:
                 K3SimArr = np.random.rand(self.simulations)
 
-        if self.pearce_init:
+        if self.dyna:
             omegaArr = np.random.rand(self.simulations)
+        elif self.pearce:
+            omegaArr = -10 + 20 * np.random.rand(self.simulations)
 
         if self.v_init:
             V_option0_rand = np.random.rand(self.simulations, 1)
@@ -265,30 +189,40 @@ class Recovery:
 
             betaSim = betaSimArr[i]
 
-            if self.pearce_init:
+            if self.dyna or self.pearce:
                 omegaSim = omegaArr[i]
 
             if self.v_init:
                 V_option0Init = V_option0Init_Arr[i]
                 V_option1Init = V_option1Init_Arr[i]
 
-            taskSimulation = task_Design(self.mainTrials, 0, asym=self.asym, extra=self.extra, pearce=self.pearce, transfer=self.transfer, alphaPos=alphaPosSim, alphaNeg=alphaNegSim, alpha2Pos=alpha2PosSim, alpha2Neg=alpha2NegSim, K1=K1Sim, K2=K2Sim, K3=K3Sim, K4=K4Sim, beta=betaSim, V_option0Init=V_option0Init, V_option1Init=V_option1Init, pearce_init=self.pearce_init, omegaInit=omegaSim)
+            taskSimulation = task_Design(self.mainTrials, 0, asym=self.asym, extra=self.extra, dyna=self.dyna, transfer=self.transfer, alphaPos=alphaPosSim, alphaNeg=alphaNegSim, alpha2Pos=alpha2PosSim, alpha2Neg=alpha2NegSim, K1=K1Sim, K2=K2Sim, K3=K3Sim, K4=K4Sim, beta=betaSim, V_option0Init=V_option0Init, V_option1Init=V_option1Init, dyna=self.dyna, omegaInit=omegaSim, pearce=self.pearce)
             taskSimulation.taskStructure()
             taskSimulation.RLloops()
             taskSimulation.statisticalLearning()
 
             taskSimulationList.append(taskSimulation)
 
-
-            alphaGrid = np.random.rand(self.gridsize)
-            if self.extra and self.asym:
-                alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
-                    np.random.rand(self.gridsize) for i in range(3)
-                )
-            elif self.extra and not self.asym:
-                alpha2Grid = np.random.rand(self.gridsize)
-            elif self.asym and not self.extra:
-                alphaNegGrid = np.random.rand(self.gridsize)
+            if self.pearce:
+                alphaGrid = -20 + 40 * np.random.rand(self.gridsize)
+                if self.extra and self.asym:
+                    alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
+                        (-20 + 40 * np.random.rand(self.gridsize)) for i in range(3)
+                    )
+                elif self.extra and not self.asym:
+                    alpha2Grid = -20 + 40 * np.random.rand(self.gridsize)
+                elif self.asym and not self.extra:
+                    alphaNegGrid = -20 + 40 * np.random.rand(self.gridsize)
+            else:
+                alphaGrid = np.random.rand(self.gridsize)
+                if self.extra and self.asym:
+                    alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
+                        np.random.rand(self.gridsize) for i in range(3)
+                    )
+                elif self.extra and not self.asym:
+                    alpha2Grid = np.random.rand(self.gridsize)
+                elif self.asym and not self.extra:
+                    alphaNegGrid = np.random.rand(self.gridsize)
 
             if self.transfer:
                 K1Grid = np.random.rand(self.gridsize)
@@ -301,8 +235,10 @@ class Recovery:
                 elif self.asym and not self.extra:
                     K3Grid = np.random.rand(self.gridsize)
 
-            if self.pearce_init:
+            if self.dyna:
                 omegaGrid = np.random.rand(self.gridsize)
+            elif self.pearce:
+                omegaGrid = -10 + 20 * np.random.rand(self.gridsize)
 
             if self.v_init:
                 V_option0_randGrid = np.random.rand(self.gridsize, 1)
@@ -379,10 +315,10 @@ class Recovery:
                 # run_V0[j, 0] = V_option0[0, 0, 0]
                 # run_V1[j, 0] = V_option1[0, 0, 0]
 
-                if self.pearce:
-                    omega = omega2 = omega3 = omega4 = 0
-                if self.pearce_init:
+                if self.dyna:
                     omega = omega2 = omega3 = omega4 = omegaGrid[j]
+                if self.pearce:
+                    eta = omegaGrid[j]
 
 
                 for t in range(0, taskSimulation.mainTrials):
@@ -424,7 +360,7 @@ class Recovery:
                         V_option0[t + 1, :] = V_option0[t, :]
 
                         if taskSimulation.reward[(t,) + tuple(taskSimulation.stimulusPair[t,:])] == 1:
-                            if self.pearce or self.pearce_init:
+                            if self.dyna:
                                 omega = (
                                     omega
                                     + (
@@ -433,6 +369,10 @@ class Recovery:
                                     )
                                     * alphaPosCheck
                                 )
+                                if omega > 1:
+                                    omega = 1
+                                elif omega < 0:
+                                    omega = 0
                                 V_option0[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option0[
@@ -452,6 +392,38 @@ class Recovery:
                                             V_option0[(t + 1,) + tuple(pair)] = 1
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
+                            elif self.pearce:
+                                omega = (
+                                    eta
+                                    + (
+                                        abs(rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])])
+                                    )
+                                    * alphaPosCheck
+                                )
+                                if omega > 1:
+                                    omega = 1
+                                elif omega < 0:
+                                    omega = 0
+                                V_option0[
+                                    (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
+                                ] = V_option0[
+                                    (t,) + tuple(taskSimulation.stimulusPair[t,:])
+                                ] + omega * (
+                                    rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])]
+                                )
+                                
+                                if self.transfer:
+                                    for pair in otherPairs:
+                                        V_option0[(t + 1,) + tuple(pair)] = V_option0[
+                                            (t,) + tuple(pair)
+                                        ] - K1Check * omega * (
+                                            rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])]
+                                        )
+                                        if V_option0[(t + 1,) + tuple(pair)] > 1:
+                                            V_option0[(t + 1,) + tuple(pair)] = 1
+                                        elif V_option0[(t + 1,) + tuple(pair)] < 0:
+                                            V_option0[(t + 1,) + tuple(pair)] = 0
+                            
                             else:
                                 V_option0[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
@@ -475,7 +447,7 @@ class Recovery:
                                             V_option0[(t + 1,) + tuple(pair)] = 1
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
-                            if self.pearce or self.pearce_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega3 = omega4 = omega
                                 elif self.asym and not self.extra:
@@ -484,15 +456,18 @@ class Recovery:
                                     omega3 = omega
 
                         else:
-                            if self.pearce or self.pearce_init:
+                            if self.pearce:
                                 omega3 = (
-                                    omega3
+                                    eta
                                     + (
                                         abs(rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])])
-                                        - omega3
                                     )
                                     * alphaNegCheck
                                 )
+                                if omega3 > 1:
+                                    omega3 = 1
+                                elif omega3 < 0:
+                                    omega3 = 0
                                 V_option0[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option0[
@@ -513,6 +488,41 @@ class Recovery:
                                             V_option0[(t + 1,) + tuple(pair)] = 1
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
+                            elif self.dyna:
+                                omega3 = (
+                                    omega3
+                                    + (
+                                        abs(rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])])
+                                        - omega3
+                                    )
+                                    * alphaNegCheck
+                                )
+                                if omega3 > 1:
+                                    omega3 = 1
+                                elif omega3 < 0:
+                                    omega3 = 0
+                                V_option0[
+                                    (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
+                                ] = V_option0[
+                                    (t,) + tuple(taskSimulation.stimulusPair[t,:])
+                                ] + omega3 * (
+                                    rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])]
+                                )
+                                
+                                if self.transfer:
+                                    for pair in otherPairs:
+                                        V_option0[(t + 1,) + tuple(pair)] = V_option0[
+                                            (t,) + tuple(pair)
+                                        ] - K3Check * omega3 * (
+                                            rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])]
+                                        )
+
+                                        if V_option0[(t + 1,) + tuple(pair)] > 1:
+                                            V_option0[(t + 1,) + tuple(pair)] = 1
+                                        elif V_option0[(t + 1,) + tuple(pair)] < 0:
+                                            V_option0[(t + 1,) + tuple(pair)] = 0
+                            
+                            
                             else:
                                 V_option0[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
@@ -536,7 +546,7 @@ class Recovery:
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
 
-                            if self.pearce or self.pearce_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega4 = omega3
                                 elif self.asym and not self.extra:
@@ -555,7 +565,7 @@ class Recovery:
                         V_option1[t + 1, :] = V_option1[t, :]
 
                         if taskSimulation.reward[(t,) + tuple(taskSimulation.stimulusPair[t,:])] == 1:
-                            if self.pearce or self.pearce_init:
+                            if self.dyna:
                                 omega2 = (
                                     omega2
                                     + (
@@ -564,6 +574,10 @@ class Recovery:
                                     )
                                     * alpha2PosCheck
                                 )
+                                if omega2 > 1:
+                                    omega2 = 1
+                                elif omega2 < 0:
+                                    omega2 = 0
                                 V_option1[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option1[
@@ -584,6 +598,39 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
+                            elif self.pearce:
+                                omega2 = (
+                                    eta
+                                    + (
+                                        abs(rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])])
+                                    )
+                                    * alpha2PosCheck
+                                )
+                                if omega2 > 1:
+                                    omega2 = 1
+                                elif omega2 < 0:
+                                    omega2 = 0
+                                V_option1[
+                                    (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
+                                ] = V_option1[
+                                    (t,) + tuple(taskSimulation.stimulusPair[t,:])
+                                ] + omega2 * (
+                                    rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])]
+                                )
+
+                                if self.transfer:
+                                    for pair in otherPairs:
+                                        V_option1[(t + 1,) + tuple(pair)] = V_option1[
+                                            (t,) + tuple(pair)
+                                        ] - K2Check * omega2 * (
+                                            rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])]
+                                        )
+
+                                        if V_option1[(t + 1,) + tuple(pair)] > 1:
+                                            V_option1[(t + 1,) + tuple(pair)] = 1
+                                        elif V_option1[(t + 1,) + tuple(pair)] < 0:
+                                            V_option1[(t + 1,) + tuple(pair)] = 0
+                            
                             else:
                                 V_option1[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
@@ -605,7 +652,7 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
-                            if self.pearce or self.pearce_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega3 = omega = omega4 = omega2
                                 elif self.asym and not self.extra:
@@ -614,7 +661,7 @@ class Recovery:
                                     omega4 = omega2
 
                         else:
-                            if self.pearce or self.pearce_init:
+                            if self.dyna:
                                 omega4 = (
                                     omega4
                                     + (
@@ -623,6 +670,10 @@ class Recovery:
                                     )
                                     * alpha2NegCheck
                                 )
+                                if omega4 > 1:
+                                    omega4 = 1
+                                elif omega4 < 0:
+                                    omega4 = 0
                                 V_option1[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
                                 ] = V_option1[
@@ -643,6 +694,40 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
+                            elif self.pearce:
+                                omega4 = (
+                                    eta
+                                    + (
+                                        abs(rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])])
+                                    )
+                                    * alpha2NegCheck
+                                )
+                                if omega4 > 1:
+                                    omega4 = 1
+                                elif omega4 < 0:
+                                    omega4 = 0
+                                V_option1[
+                                    (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
+                                ] = V_option1[
+                                    (t,) + tuple(taskSimulation.stimulusPair[t,:])
+                                ] + omega4 * (
+                                    rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])]
+                                )
+                           
+                                if self.transfer:
+                                    for pair in otherPairs:
+                                        V_option1[(t + 1,) + tuple(pair)] = V_option1[
+                                            (t,) + tuple(pair)
+                                        ] - K4Check * omega4 * (
+                                            rewardPE[(t,) + tuple(taskSimulation.stimulusPair[t,:])]
+                                        )
+
+                                        if V_option1[(t + 1,) + tuple(pair)] > 1:
+                                            V_option1[(t + 1,) + tuple(pair)] = 1
+                                        elif V_option1[(t + 1,) + tuple(pair)] < 0:
+                                            V_option1[(t + 1,) + tuple(pair)] = 0
+                            
+                            
                             else:
                                 V_option1[
                                     (t + 1,) + tuple(taskSimulation.stimulusPair[t,:])
@@ -664,7 +749,7 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
-                            if self.pearce or self.pearce_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega3 = omega4
                                 elif self.asym and not self.extra:
@@ -690,7 +775,7 @@ class Recovery:
                     NLL_array[j, 3] = alphaNegCheck
                     NLL_array[j, 4] = alpha2PosCheck
                     NLL_array[j, 5] = alpha2NegCheck
-                if self.pearce_init:
+                if self.dyna or self.pearce:
                     NLL_array[j, 6] = omegaGrid[j]
                 if self.v_init:
                     NLL_array[j, 7] = V_option0_randGrid[j, 0]
@@ -717,7 +802,7 @@ class Recovery:
                 recoveredAlphaNeg = alphaNegGrid[minIndex]
                 recoveredAlpha2Pos = alpha2PosGrid[minIndex]
                 recoveredAlpha2Neg = alpha2NegGrid[minIndex]
-            if self.pearce_init:
+            if self.dyna or self.pearce:
                 recoveredOmega = omegaGrid[minIndex]
             if self.v_init:
                 recovered_V0 = V_option0_randGrid[minIndex, 0]
@@ -751,7 +836,7 @@ class Recovery:
                 recoveredRLParams[i, 3] = recoveredAlpha2Pos
                 recoveredRLParams[i, 4] = recoveredAlpha2Neg
             
-            if self.pearce_init:
+            if self.dyna or self.pearce:
                 simulatedRLParams[i, 5] = omegaSim
                 recoveredRLParams[i, 5] = recoveredOmega
             

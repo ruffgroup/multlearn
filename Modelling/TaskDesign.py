@@ -29,7 +29,6 @@ class task_Design:
         extra=False,
         asym=False,
         transfer=False,
-        dyna_init=False,
         pearce=False
     ):
         """How task is conducted"""
@@ -76,7 +75,6 @@ class task_Design:
         self.transfer = transfer
         self.asym = asym
         self.extra = extra
-        self.dyna_init = dyna_init
         self.pearce = pearce
 
         if self.pearce:
@@ -101,8 +99,6 @@ class task_Design:
             self.K4 = np.random.uniform(0, 1) if K4 is None else K4
 
         if self.dyna:
-            self.omega = self.omega2 = self.omega3 = self.omega4 = 0
-        if self.dyna_init:
             self.omega = self.omega2 = self.omega3 = self.omega4 = omegaInit
         if self.pearce:
             self.eta = omegaInit
@@ -277,7 +273,7 @@ class task_Design:
                 self.V_option0[i + 1, :] = self.V_option0[i, :]
 
                 if self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] == 1:
-                    if self.dyna or self.dyna_init:
+                    if self.dyna:
                         self.omega = (
                             self.omega
                             + (
@@ -352,7 +348,7 @@ class task_Design:
                                     self.V_option0[(i + 1,) + tuple(p2)] = 1
                                 elif self.V_option0[(i + 1,) + tuple(p2)] < 0:
                                     self.V_option0[(i + 1,) + tuple(p2)] = 0
-                    if self.dyna or self.dyna_init:
+                    if self.dyna:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega3 = self.omega4 = self.omega
                         elif self.asym and not self.extra:
@@ -361,7 +357,7 @@ class task_Design:
                             self.omega3 = self.omega
 
                 else:
-                    if self.dyna or self.dyna_init:
+                    if self.dyna:
                         self.omega3 = (
                             self.omega3
                             + (
@@ -438,7 +434,7 @@ class task_Design:
                                     self.V_option0[(i + 1,) + tuple(p2)] = 1
                                 elif self.V_option0[(i + 1,) + tuple(p2)] < 0:
                                     self.V_option0[(i + 1,) + tuple(p2)] = 0
-                    if self.dyna or self.dyna_init:
+                    if self.dyna:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega = self.omega4 = self.omega3
                         elif self.asym and not self.extra:
@@ -455,7 +451,7 @@ class task_Design:
                 self.V_option1[i + 1, :] = self.V_option1[i, :]
 
                 if self.reward[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] == 1:
-                    if self.dyna or self.dyna_init:
+                    if self.dyna:
                         self.omega2 = (
                             self.omega2
                             + (
@@ -533,7 +529,7 @@ class task_Design:
                                     self.V_option1[(i + 1,) + tuple(p2)] = 1
                                 elif self.V_option1[(i + 1,) + tuple(p2)] < 0:
                                     self.V_option1[(i + 1,) + tuple(p2)] = 0
-                    if self.dyna or self.dyna_init:
+                    if self.dyna:
                         if not self.asym and not self.extra:
                             self.omega3 = self.omega = self.omega4 = self.omega2
                         elif self.asym and not self.extra:
@@ -542,7 +538,7 @@ class task_Design:
                             self.omega4 = self.omega2
 
                 else:
-                    if self.dyna or self.dyna_init:
+                    if self.dyna:
                         self.omega4 = (
                             self.omega4
                             + (
@@ -619,7 +615,7 @@ class task_Design:
                                     self.V_option1[(i + 1,) + tuple(p2)] = 1
                                 elif self.V_option1[(i + 1,) + tuple(p2)] < 0:
                                     self.V_option1[(i + 1,) + tuple(p2)] = 0
-                    if self.dyna or self.dyna_init:
+                    if self.dyna:
                         if not self.asym and not self.extra:
                             self.omega2 = self.omega = self.omega3 = self.omega4
                         elif self.asym and not self.extra:
