@@ -22,7 +22,7 @@ sys.path.append(sys.path[0] + "/..")
 from TaskDesign import task_Design
 
 class Recovery:
-    def __init__(self, mainTrials, simulations, gridsize, extra, asym, transfer, dyna, pearce, dyna_init, v_init):
+    def __init__(self, mainTrials, simulations, gridsize, extra, asym, transfer, dyna, pearce, v_init):
             
         self.mainTrials = mainTrials
         self.simulations = simulations
@@ -32,88 +32,84 @@ class Recovery:
         self.dyna = dyna
         self.pearce = pearce
         self.gridsize = gridsize
-        self.dyna_init = dyna_init
         self.v_init = v_init
 
-        if not self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
+        if not self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "basic"
             self.params = ["alpha", "beta"]
-        elif self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
+        elif self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "dyna"
             self.params = ["alpha", "beta"]
-        elif self.dyna_init and not self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
-            self.modelFolder = "dyna_init"
-            self.params = ["alpha", "beta", "omega"]
-        elif not self.dyna and not self.dyna_init and self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
+        elif not self.dyna and self.extra and not self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "extra"
             self.params = ["alpha attract", "beta", "alpha not attract"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and not self.v_init and not self.pearce:
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "asym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and not self.v_init and not self.pearce:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "transfer"
             self.params = ["alpha", "beta", "K1"]
-        elif self.v_init and not self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and not self.pearce:
+        elif self.v_init and not self.dyna and not self.extra and not self.asym and not self.transfer and not self.pearce:
             self.modelFolder = "v_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init"]
-        elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and not self.v_init and self.pearce:
+        elif not self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init and self.pearce:
             self.modelFolder = "pearce"
             self.params = ["alpha", "beta", "omega"]
-        elif self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and not self.v_init and not self.pearce:
+        elif self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "dynaAsym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif self.dyna and not self.dyna_init and not self.extra and self.asym and self.transfer and not self.v_init and not self.pearce:
+        elif self.dyna and not self.extra and self.asym and self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "dynaAsymTransfer"
             self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
-        elif self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and not self.v_init and not self.pearce:
+        elif self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "dynaTransfer"
             self.params = ["alpha", "beta", "K1"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and not self.v_init and self.pearce:
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init and self.pearce:
             self.modelFolder = "pearceAsym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and self.transfer and not self.v_init and self.pearce:
+        elif not self.dyna and not self.extra and self.asym and self.transfer and not self.v_init and self.pearce:
             self.modelFolder = "pearceAsymTransfer"
             self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
-        elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and not self.v_init and self.pearce:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init and self.pearce:
             self.modelFolder = "pearceTransfer"
             self.params = ["alpha", "beta", "K1"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and self.transfer and not self.v_init and not self.pearce:
+        elif not self.dyna and not self.extra and self.asym and self.transfer and not self.v_init and not self.pearce:
             self.modelFolder = "asymTransfer"
             self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
         
 
-        elif self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and self.v_init and not self.pearce:
+        elif self.dyna and not self.extra and not self.asym and not self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "dynaV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and self.v_init and not self.pearce:
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "asymV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
-        elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and self.v_init and not self.pearce:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "transferV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
-        elif self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and self.v_init and not self.pearce:
+        elif self.dyna and not self.extra and self.asym and not self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "dynaAsymV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
-        elif self.dyna and not self.dyna_init and not self.extra and self.asym and self.transfer and self.v_init and not self.pearce:
+        elif self.dyna and not self.extra and self.asym and self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "dynaAsymTransferV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
-        elif self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and self.v_init and not self.pearce:
+        elif self.dyna and not self.extra and not self.asym and self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "dynaTransferV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
         
-        elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and self.v_init and self.pearce:
+        elif not self.dyna and not self.extra and not self.asym and not self.transfer and self.v_init and self.pearce:
             self.modelFolder = "pearceV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and self.v_init and self.pearce:
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and self.v_init and self.pearce:
             self.modelFolder = "pearceAsymV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and self.transfer and self.v_init and self.pearce:
+        elif not self.dyna and not self.extra and self.asym and self.transfer and self.v_init and self.pearce:
             self.modelFolder = "pearceAsymTransferV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
-        elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and self.v_init and self.pearce:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and self.v_init and self.pearce:
             self.modelFolder = "pearceTransferV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and self.transfer and self.v_init and not self.pearce:
+        elif not self.dyna and not self.extra and self.asym and self.transfer and self.v_init and not self.pearce:
             self.modelFolder = "asymTransferV_init"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
 
@@ -154,7 +150,7 @@ class Recovery:
             elif self.asym and not self.extra:
                 K3SimArr = np.random.rand(self.simulations)
 
-        if self.dyna_init:
+        if self.dyna:
             omegaArr = np.random.rand(self.simulations)
         elif self.pearce:
             omegaArr = -10 + 20 * np.random.rand(self.simulations)
@@ -213,14 +209,14 @@ class Recovery:
 
             betaSim = betaSimArr[i]
 
-            if self.dyna_init or self.pearce:
+            if self.dyna or self.pearce:
                 omegaSim = omegaArr[i]
 
             if self.v_init:
                 V_option0Init = V_option0Init_Arr[i]
                 V_option1Init = V_option1Init_Arr[i]
 
-            taskSimulation = task_Design(self.mainTrials, 0, asym=self.asym, extra=self.extra, dyna=self.dyna, transfer=self.transfer, alphaPos=alphaPosSim, alphaNeg=alphaNegSim, alpha2Pos=alpha2PosSim, alpha2Neg=alpha2NegSim, K1=K1Sim, K2=K2Sim, K3=K3Sim, K4=K4Sim, beta=betaSim, V_option0Init=V_option0Init, V_option1Init=V_option1Init, dyna_init=self.dyna_init, omegaInit=omegaSim, pearce=self.pearce)
+            taskSimulation = task_Design(self.mainTrials, 0, asym=self.asym, extra=self.extra, dyna=self.dyna, transfer=self.transfer, alphaPos=alphaPosSim, alphaNeg=alphaNegSim, alpha2Pos=alpha2PosSim, alpha2Neg=alpha2NegSim, K1=K1Sim, K2=K2Sim, K3=K3Sim, K4=K4Sim, beta=betaSim, V_option0Init=V_option0Init, V_option1Init=V_option1Init, omegaInit=omegaSim, pearce=self.pearce)
             taskSimulation.taskStructure()
             taskSimulation.RLloops()
             taskSimulation.statisticalLearning()
@@ -259,7 +255,7 @@ class Recovery:
                 elif self.asym and not self.extra:
                     K3Grid = np.random.rand(self.gridsize)
 
-            if self.dyna_init:
+            if self.dyna:
                 omegaGrid = np.random.rand(self.gridsize)
             elif self.pearce:
                 omegaGrid = -10 + 20 * np.random.rand(self.gridsize)
@@ -340,8 +336,6 @@ class Recovery:
                 # run_V1[j, 0] = V_option1[0, 0, 0]
 
                 if self.dyna:
-                    omega = omega2 = omega3 = omega4 = 0
-                if self.dyna_init:
                     omega = omega2 = omega3 = omega4 = omegaGrid[j]
                 if self.pearce:
                     eta = omegaGrid[j]
@@ -386,7 +380,7 @@ class Recovery:
                         V_option0[t + 1, :] = V_option0[t, :]
 
                         if taskSimulation.reward[(t,) + tuple(taskSimulation.stimulusPair[t,:])] == 1:
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 omega = (
                                     omega
                                     + (
@@ -473,7 +467,7 @@ class Recovery:
                                             V_option0[(t + 1,) + tuple(pair)] = 1
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega3 = omega4 = omega
                                 elif self.asym and not self.extra:
@@ -514,7 +508,7 @@ class Recovery:
                                             V_option0[(t + 1,) + tuple(pair)] = 1
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
-                            elif self.dyna or self.dyna_init:
+                            elif self.dyna:
                                 omega3 = (
                                     omega3
                                     + (
@@ -572,7 +566,7 @@ class Recovery:
                                         elif V_option0[(t + 1,) + tuple(pair)] < 0:
                                             V_option0[(t + 1,) + tuple(pair)] = 0
 
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega4 = omega3
                                 elif self.asym and not self.extra:
@@ -591,7 +585,7 @@ class Recovery:
                         V_option1[t + 1, :] = V_option1[t, :]
 
                         if taskSimulation.reward[(t,) + tuple(taskSimulation.stimulusPair[t,:])] == 1:
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 omega2 = (
                                     omega2
                                     + (
@@ -678,7 +672,7 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega3 = omega = omega4 = omega2
                                 elif self.asym and not self.extra:
@@ -687,7 +681,7 @@ class Recovery:
                                     omega4 = omega2
 
                         else:
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 omega4 = (
                                     omega4
                                     + (
@@ -775,7 +769,7 @@ class Recovery:
                                             V_option1[(t + 1,) + tuple(pair)] = 1
                                         elif V_option1[(t + 1,) + tuple(pair)] < 0:
                                             V_option1[(t + 1,) + tuple(pair)] = 0
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega3 = omega4
                                 elif self.asym and not self.extra:
@@ -801,7 +795,7 @@ class Recovery:
                     NLL_array[j, 3] = alphaNegCheck
                     NLL_array[j, 4] = alpha2PosCheck
                     NLL_array[j, 5] = alpha2NegCheck
-                if self.dyna_init or self.pearce:
+                if self.dyna or self.pearce:
                     NLL_array[j, 6] = omegaGrid[j]
                 if self.v_init:
                     NLL_array[j, 7] = V_option0_randGrid[j, 0]
@@ -828,7 +822,7 @@ class Recovery:
                 recoveredAlphaNeg = alphaNegGrid[minIndex]
                 recoveredAlpha2Pos = alpha2PosGrid[minIndex]
                 recoveredAlpha2Neg = alpha2NegGrid[minIndex]
-            if self.dyna_init or self.pearce:
+            if self.dyna or self.pearce:
                 recoveredOmega = omegaGrid[minIndex]
             if self.v_init:
                 recovered_V0 = V_option0_randGrid[minIndex, 0]
@@ -862,7 +856,7 @@ class Recovery:
                 recoveredRLParams[i, 3] = recoveredAlpha2Pos
                 recoveredRLParams[i, 4] = recoveredAlpha2Neg
             
-            if self.dyna_init or self.pearce:
+            if self.dyna or self.pearce:
                 simulatedRLParams[i, 5] = omegaSim
                 recoveredRLParams[i, 5] = recoveredOmega
             
@@ -936,13 +930,12 @@ if __name__ == "__main__":
     simulations = 200
     gridsize = 5000
     dyna = False
-    dyna_init = False
     extra = False
     asym = False
     transfer = False
     v_init = False
     pearce = True
-    recovery = Recovery(mainTrials, simulations, gridsize, extra, asym, transfer, dyna, pearce, dyna_init, v_init)
+    recovery = Recovery(mainTrials, simulations, gridsize, extra, asym, transfer, dyna, pearce, v_init)
     simParams, recParams, NLL = recovery.recovery()
     recovery.recoveryPlot(simParams, recParams)
 

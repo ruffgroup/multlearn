@@ -307,10 +307,7 @@ class task_Design:
                             )
                             * self.alphaPos
                         )
-                        if self.omega > 1:
-                            self.omega = 1
-                        elif self.omega < 0:
-                            self.omega = 0
+                        self.omega = 1/(1 + np.exp(-self.omega))
                         self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -393,10 +390,7 @@ class task_Design:
                             )
                             * self.alphaNeg
                         )
-                        if self.omega3 > 1:
-                            self.omega3 = 1
-                        elif self.omega3 < 0:
-                            self.omega3 = 0
+                        self.omega3 = 1/(1 + np.exp(-self.omega3))
                         self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega3 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -486,10 +480,7 @@ class task_Design:
                             )
                             * self.alpha2Pos
                         )
-                        if self.omega2 > 1:
-                            self.omega2 = 1
-                        elif self.omega2 < 0:
-                            self.omega2 = 0
+                        self.omega2 = 1/(1 + np.exp(-self.omega2))
                         self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega2 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -573,10 +564,7 @@ class task_Design:
                             )
                             * self.alpha2Neg
                         )
-                        if self.omega4 > 1:
-                            self.omega4 = 1
-                        elif self.omega4 < 0:
-                            self.omega4 = 0
+                        self.omega4 = 1/(1 + np.exp(-self.omega4))
                         self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega4 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]

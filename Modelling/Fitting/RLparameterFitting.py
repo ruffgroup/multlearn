@@ -29,19 +29,20 @@ class Fitting:
         method="valid",
         reps=50, 
         extra=False, 
-        pearce=False, 
+        dyna=False, 
         init=False, 
         asym=False, 
         transfer=False, 
-        pearce_init=False
+        pearce=False,
     ):
         """
         extra: False or True for separate alpha for V1
+        dyna: False or True for dynamic learning rate model
         pearce: False or True for Pearce Hall implementation
         init: False or True for initial V0 and V1
         asym : False or True for separate alphas based on reward
         transfer: False or True indicating the amount of discount free parameters for pairs that share a stimulus (depends on extra and asym)
-        pearce_init: False or True for initial omega
+
         """
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
@@ -52,10 +53,10 @@ class Fitting:
         self.extra = extra
         self.asym = asym
         self.transfer = transfer
-        self.pearce = pearce
+        self.dyna = dyna
         self.gridCount = gridCount
-        self.pearce_init = pearce_init
         self.v_init = init
+        self.pearce = pearce
 
         if self.plotting:
             self.Plot = Plotting(
@@ -79,153 +80,36 @@ class Fitting:
             ast.literal_eval
         )
 
-        if not self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and not self.v_init:
+        if not self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init:
             self.modelFolder = "basic"
             self.params = ["alpha", "beta"]
-        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce"
+        elif self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "dyna"
             self.params = ["alpha", "beta"]
-        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce_init"
-            self.params = ["alpha", "beta", "omega"]
-        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "extra"
-            self.params = ["alpha attract", "beta", "alpha not attract"]
-        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init:
             self.modelFolder = "asym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif not self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init:
             self.modelFolder = "transfer"
             self.params = ["alpha", "beta", "K1"]
-        elif self.v_init and not self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer:
+        elif self.v_init and not self.dyna and not self.extra and not self.asym and not self.transfer:
             self.modelFolder = "v_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init"]
-        elif self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearceExtra"
-            self.params = ["alpha attract", "beta", "alpha not attract"]
-        elif self.pearce_init and not self.pearce and self.extra and not self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initExtra"
-            self.params = ["alpha attract", "beta", "alpha not attract", "omega"]
-        elif self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearceExtraAsym"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract"]
-        elif self.pearce_init and not self.pearce and self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initExtraAsym"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega"]
-        elif self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearceExtraTransfer"
-            self.params = ["alpha attract", "beta", "alpha not attract", "K1", "K2"]
-        elif self.pearce_init and not self.pearce and self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initExtraTransfer"
-            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "K1", "K2"]
-        elif self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearceExtraAsymTransfer"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "K1", "K2", "K3", "K4"]
-        elif self.pearce_init and not self.pearce and self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initExtraAsymTransfer"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "K1", "K2", "K3", "K4"]
-        elif self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearceAsym"
+        elif self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init:
+            self.modelFolder = "dynaAsym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif self.pearce_init and not self.pearce and not self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initAsym"
-            self.params = ["pos alpha", "beta", "neg alpha", "omega"]
-        elif self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearceAsymTransfer"
-            self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
-        elif self.pearce_init and not self.pearce and not self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initAsymTransfer"
-            self.params = ["pos alpha", "beta", "neg alpha", "omega", "K1", "K2"]
-        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearceTransfer"
+        elif self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init:
+            self.modelFolder = "dynaTransfer"
             self.params = ["alpha", "beta", "K1"]
-        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "pearce_initTransfer"
-            self.params = ["alpha", "beta", "omega", "K1"]
-        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "extraTransfer"
-            self.params = ["alpha attract", "beta", "alpha not attract", "K1", "K2"]
-        elif not self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and not self.v_init:
-            self.modelFolder = "extraAsym"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract"]
-        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "asymTransfer"
-            self.params = ["pos alpha", "beta", "neg alpha", "K1", "K2"]
-        elif not self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and not self.v_init:
-            self.modelFolder = "extraAsymTransfer"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "K1", "K2", "K3", "K4"]
 
-
-        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearceV_init"
-            self.params = ["alpha", "beta", "V0_init", "V1_init"]
-        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearce_initV_init"
-            self.params = ["alpha", "beta", "omega", "V0_init", "V1_init"]
-        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "extraV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init"]
-        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "asymV_init"
-            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
-        elif not self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and self.v_init:
             self.modelFolder = "transferV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
-        elif self.pearce and not self.pearce_init and self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearceExtraV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init"]
-        elif self.pearce_init and not self.pearce and self.extra and not self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearce_initExtraV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "V0_init", "V1_init"]
-        elif self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearceExtraAsymV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init"]
-        elif self.pearce_init and not self.pearce and self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearce_initExtraAsymV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "V0_init", "V1_init"]
-        elif self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearceExtraTransferV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract","V0_init", "V1_init", "K1", "K2"]
-        elif self.pearce_init and not self.pearce and self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearce_initExtraTransferV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "omega", "V0_init", "V1_init", "K1", "K2"]
-        elif self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearceExtraAsymTransferV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
-        elif self.pearce_init and not self.pearce and self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearce_initExtraAsymTransferV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "omega", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
-        elif self.pearce and not self.pearce_init and not self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearceAsym"
+        elif self.dyna and not self.extra and self.asym and not self.transfer and self.v_init:
+            self.modelFolder = "dynaAsym"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
-        elif self.pearce_init and not self.pearce and not self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "pearce_initAsymV_init"
-            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
-        elif self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearceAsymTransferV_init"
-            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
-        elif self.pearce_init and not self.pearce and not self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearce_initAsymTransferV_init"
-            self.params = ["pos alpha", "beta", "neg alpha", "omega", "V0_init", "V1_init", "K1", "K2"]
-        elif self.pearce and not self.pearce_init and not self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearceTransferV_init"
-            self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
-        elif self.pearce_init and not self.pearce and not self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "pearce_initTransferV_init"
-            self.params = ["alpha", "beta", "omega", "V0_init", "V1_init", "K1"]
-        elif not self.pearce and not self.pearce_init and self.extra and not self.asym and self.transfer and self.v_init:
-            self.modelFolder = "extraTransferV_init"
-            self.params = ["alpha attract", "beta", "alpha not attract", "V0_init", "V1_init", "K1", "K2"]
-        elif not self.pearce and not self.pearce_init and self.extra and self.asym and not self.transfer and self.v_init:
-            self.modelFolder = "extraAsymV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init"]
-        elif not self.pearce and not self.pearce_init and not self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "asymTransferV_init"
-            self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init", "K1", "K2"]
-        elif not self.pearce and not self.pearce_init and self.extra and self.asym and self.transfer and self.v_init:
-            self.modelFolder = "extraAsymTransferV_init"
-            self.params = ["pos alpha attract", "beta", "neg alpha attract", "pos alpha not attract", "neg alpha not attract", "V0_init", "V1_init", "K1", "K2", "K3", "K4"]
-
+        
+        
     ##
 
     def modelFitting(
@@ -334,7 +218,7 @@ class Fitting:
                 elif self.asym and not self.extra:
                     K3Grid = np.random.rand(self.gridCount)
 
-            if self.pearce_init:
+            if self.pearce:
                 omegaGrid = np.random.rand(self.gridCount)
 
             betaGrid = 0 + 14.0 * np.random.rand(self.gridCount)

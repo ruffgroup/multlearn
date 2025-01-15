@@ -33,9 +33,7 @@ class Fitting:
         init=False, 
         asym=False, 
         transfer=False, 
-        dyna_init=False,
         pearce=False,
-        pearce_init=False
     ):
         """
         extra: False or True for separate alpha for V1
@@ -44,7 +42,6 @@ class Fitting:
         init: False or True for initial V0 and V1
         asym : False or True for separate alphas based on reward
         transfer: False or True indicating the amount of discount free parameters for pairs that share a stimulus (depends on extra and asym)
-        pearce_init: False or True for initial omega
         """
         self.mainTrials = mainTrials
         self.additionalTrials = additionalTrials
@@ -57,10 +54,8 @@ class Fitting:
         self.transfer = transfer
         self.dyna = dyna
         self.gridCount = gridCount
-        self.dyna_init = dyna_init
         self.v_init = init
         self.pearce = pearce
-        self.pearce_init = pearce_init
 
         if self.plotting:
             self.Plot = Plotting(
@@ -84,32 +79,32 @@ class Fitting:
             ast.literal_eval
         )
 
-        if not self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and not self.v_init:
+        if not self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init:
             self.modelFolder = "basic"
             self.params = ["alpha", "beta"]
-        elif self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer and not self.v_init:
+        elif self.dyna and not self.extra and not self.asym and not self.transfer and not self.v_init:
             self.modelFolder = "dyna"
             self.params = ["alpha", "beta"]
-        elif not self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init:
             self.modelFolder = "asym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and not self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init:
             self.modelFolder = "transfer"
             self.params = ["alpha", "beta", "K1"]
-        elif self.v_init and not self.dyna and not self.dyna_init and not self.extra and not self.asym and not self.transfer:
+        elif self.v_init and not self.dyna and not self.extra and not self.asym and not self.transfer:
             self.modelFolder = "v_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init"]
-        elif self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and not self.v_init:
+        elif self.dyna and not self.extra and self.asym and not self.transfer and not self.v_init:
             self.modelFolder = "dynaAsym"
             self.params = ["pos alpha", "beta", "neg alpha"]
-        elif self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and not self.v_init:
+        elif self.dyna and not self.extra and not self.asym and self.transfer and not self.v_init:
             self.modelFolder = "dynaTransfer"
             self.params = ["alpha", "beta", "K1"]
 
-        elif not self.dyna and not self.dyna_init and not self.extra and not self.asym and self.transfer and self.v_init:
+        elif not self.dyna and not self.extra and not self.asym and self.transfer and self.v_init:
             self.modelFolder = "transferV_init"
             self.params = ["alpha", "beta", "V0_init", "V1_init", "K1"]
-        elif self.dyna and not self.dyna_init and not self.extra and self.asym and not self.transfer and self.v_init:
+        elif self.dyna and not self.extra and self.asym and not self.transfer and self.v_init:
             self.modelFolder = "dynaAsym"
             self.params = ["pos alpha", "beta", "neg alpha", "V0_init", "V1_init"]
         
@@ -223,7 +218,7 @@ class Fitting:
                 elif self.asym and not self.extra:
                     K3Grid = np.random.rand(self.gridCount)
 
-            if self.dyna_init:
+            if self.dyna or self.pearce:
                 omegaGrid = np.random.rand(self.gridCount)
 
             betaGrid = 0 + 14.0 * np.random.rand(self.gridCount)
