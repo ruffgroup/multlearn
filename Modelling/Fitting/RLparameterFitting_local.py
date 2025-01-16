@@ -10,7 +10,7 @@ import pathlib
 from pathlib import Path
 import platform
 import ast
-from RLparameterPlotting import Plotting
+from RLparameterPlotting_local import Plotting
 import argparse
 
 sys.path.append(sys.path[0] + "/..")
@@ -72,7 +72,7 @@ class Fitting:
 
         # Get savedVals file
         self.savedValsFile = glob.glob(
-            os.path.abspath(wanted_dir) + "/*{}_savedValues.csv".format(self.ID)
+            os.path.abspath(wanted_dir) + "/modified_participant{:02d}_savedValues.csv".format(self.ID)
         )[0]
         self.subjectData = pd.read_csv(self.savedValsFile)
         self.subjectData["stimulusPair"] = self.subjectData["stimulusPair"].apply(
@@ -116,7 +116,7 @@ class Fitting:
         print("ID: "+str(self.ID))
         bestFitting_dir = "/mnt/d/data/fittedParametersRecoveredModels"
         newPath = os.path.join(
-            bestFitting_dir, "sub-{0}".format(self.ID), self.modelFolder
+            bestFitting_dir, "sub-{:02d}".format(self.ID), self.modelFolder
         )
        
         Path(newPath).mkdir(parents=True, exist_ok=True)
@@ -197,15 +197,27 @@ class Fitting:
 
         for run in range(0, max(self.subjectData.runNumber)):
             print("run: "+str(run))
-            alphaGrid = np.random.rand(self.gridCount)
-            if self.extra and self.asym:
-                alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
-                    np.random.rand(self.gridCount) for i in range(3)
-                )
-            elif self.extra and not self.asym:
-                alpha2Grid = np.random.rand(self.gridCount)
-            elif self.asym and not self.extra:
-                alphaNegGrid = np.random.rand(self.gridCount)
+
+            if pearce:
+                alphaGrid = -20 + 40 * np.random.rand(self.gridCount)
+                if self.extra and self.asym:
+                    alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
+                        (-20 + 40 * np.random.rand(self.gridCount)) for i in range(3)
+                    )
+                elif self.extra and not self.asym:
+                    alpha2Grid = -20 + 40 * np.random.rand(self.gridCount)
+                elif self.asym and not self.extra:
+                    alphaNegGrid = -20 + 40 * np.random.rand(self.gridCount)
+            else:
+                alphaGrid = np.random.rand(self.gridCount)
+                if self.extra and self.asym:
+                    alphaNegGrid, alpha2PosGrid, alpha2NegGrid = (
+                        np.random.rand(self.gridCount) for i in range(3)
+                    )
+                elif self.extra and not self.asym:
+                    alpha2Grid = np.random.rand(self.gridCount)
+                elif self.asym and not self.extra:
+                    alphaNegGrid = np.random.rand(self.gridCount)
 
             if self.transfer:
                 K1Grid = np.random.rand(self.gridCount)
@@ -218,8 +230,10 @@ class Fitting:
                 elif self.asym and not self.extra:
                     K3Grid = np.random.rand(self.gridCount)
 
-            if self.dyna or self.pearce:
+            if self.dyna:
                 omegaGrid = np.random.rand(self.gridCount)
+            elif self.pearce:
+                omegaGrid = -10 + 20 * np.random.rand(self.gridCount)
 
             betaGrid = 0 + 14.0 * np.random.rand(self.gridCount)
             LL_array = np.empty((self.gridCount, 1))
@@ -323,9 +337,9 @@ class Fitting:
                 # run_V1[j, 0] = V_option1[0, 0, 0]
 
                 if self.dyna:
-                    omega = omega2 = omega3 = omega4 = 0
-                if self.dyna_init:
                     omega = omega2 = omega3 = omega4 = omegaGrid[j]
+                if self.pearce:
+                    eta = omegaGrid[j]
 
                 for t in range(0, max(runData.trialNumber)):
                     otherPairs = [
@@ -366,7 +380,7 @@ class Fitting:
                         V_option0[t + 1, :] = V_option0[t, :]
 
                         if runData.reward[t] == 1:
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 omega = (
                                     omega
                                     + (
@@ -375,6 +389,7 @@ class Fitting:
                                     )
                                     * alphaPosCheck
                                 )
+                                omega = 1/(1 + np.exp(-omega))
                                 V_option0[
                                     (t + 1,) + runData.stimulusPair[t]
                                 ] = V_option0[
@@ -394,6 +409,35 @@ class Fitting:
                                             V_option0[(t + 1,) + pair] = 1
                                         elif V_option0[(t + 1,) + pair] < 0:
                                             V_option0[(t + 1,) + pair] = 0
+                            if self.pearce:
+                                omega = (
+                                    eta
+                                    + (
+                                        abs(rewardPE[(t,) + runData.stimulusPair[t]])
+                                    )
+                                    * alphaPosCheck
+                                )
+                                omega = 1/(1 + np.exp(-omega))
+                                V_option0[
+                                    (t + 1,) + runData.stimulusPair[t]
+                                ] = V_option0[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega * (
+                                    rewardPE[(t,) + runData.stimulusPair[t]]
+                                )
+                                run_trialwise_alphasPos[j, t] = omega
+                                if self.transfer:
+                                    for pair in otherPairs:
+                                        V_option0[(t + 1,) + pair] = V_option0[
+                                            (t,) + pair
+                                        ] - K1Check * omega * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
+                                        if V_option0[(t + 1,) + pair] > 1:
+                                            V_option0[(t + 1,) + pair] = 1
+                                        elif V_option0[(t + 1,) + pair] < 0:
+                                            V_option0[(t + 1,) + pair] = 0
+                            
                             else:
                                 V_option0[
                                     (t + 1,) + runData.stimulusPair[t]
@@ -417,7 +461,7 @@ class Fitting:
                                             V_option0[(t + 1,) + pair] = 1
                                         elif V_option0[(t + 1,) + pair] < 0:
                                             V_option0[(t + 1,) + pair] = 0
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega3 = omega4 = omega
                                 elif self.asym and not self.extra:
@@ -426,7 +470,7 @@ class Fitting:
                                     omega3 = omega
 
                         else:
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 omega3 = (
                                     omega3
                                     + (
@@ -435,6 +479,7 @@ class Fitting:
                                     )
                                     * alphaNegCheck
                                 )
+                                omega3 = 1/(1 + np.exp(-omega3))
                                 V_option0[
                                     (t + 1,) + runData.stimulusPair[t]
                                 ] = V_option0[
@@ -455,6 +500,36 @@ class Fitting:
                                             V_option0[(t + 1,) + pair] = 1
                                         elif V_option0[(t + 1,) + pair] < 0:
                                             V_option0[(t + 1,) + pair] = 0
+                            if self.pearce:
+                                omega3 = (
+                                    eta
+                                    + (
+                                        abs(rewardPE[(t,) + runData.stimulusPair[t]])
+                                    )
+                                    * alphaNegCheck
+                                )
+                                omega3 = 1/(1 + np.exp(-omega3))
+                                V_option0[
+                                    (t + 1,) + runData.stimulusPair[t]
+                                ] = V_option0[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega3 * (
+                                    rewardPE[(t,) + runData.stimulusPair[t]]
+                                )
+                                run_trialwise_alphasNeg[j, t] = omega3
+                                if self.transfer:
+                                    for pair in otherPairs:
+                                        V_option0[(t + 1,) + pair] = V_option0[
+                                            (t,) + pair
+                                        ] - K3Check * omega3 * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
+
+                                        if V_option0[(t + 1,) + pair] > 1:
+                                            V_option0[(t + 1,) + pair] = 1
+                                        elif V_option0[(t + 1,) + pair] < 0:
+                                            V_option0[(t + 1,) + pair] = 0
+                            
                             else:
                                 V_option0[
                                     (t + 1,) + runData.stimulusPair[t]
@@ -479,7 +554,7 @@ class Fitting:
                                         elif V_option0[(t + 1,) + pair] < 0:
                                             V_option0[(t + 1,) + pair] = 0
 
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega4 = omega3
                                 elif self.asym and not self.extra:
@@ -498,7 +573,7 @@ class Fitting:
                         V_option1[t + 1, :] = V_option1[t, :]
 
                         if runData.reward[t] == 1:
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 omega2 = (
                                     omega2
                                     + (
@@ -507,6 +582,7 @@ class Fitting:
                                     )
                                     * alpha2PosCheck
                                 )
+                                omega2 = 1/(1 + np.exp(-omega2))
                                 V_option1[
                                     (t + 1,) + runData.stimulusPair[t]
                                 ] = V_option1[
@@ -527,6 +603,36 @@ class Fitting:
                                             V_option1[(t + 1,) + pair] = 1
                                         elif V_option1[(t + 1,) + pair] < 0:
                                             V_option1[(t + 1,) + pair] = 0
+                            if self.pearce:
+                                omega2 = (
+                                    eta
+                                    + (
+                                        abs(rewardPE[(t,) + runData.stimulusPair[t]])
+                                    )
+                                    * alpha2PosCheck
+                                )
+                                omega2 = 1/(1 + np.exp(-omega2))
+                                V_option1[
+                                    (t + 1,) + runData.stimulusPair[t]
+                                ] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega2 * (
+                                    rewardPE[(t,) + runData.stimulusPair[t]]
+                                )
+                                run_trialwise_alphas2Pos[j, t] = omega2
+                                if self.transfer:
+                                    for pair in otherPairs:
+                                        V_option1[(t + 1,) + pair] = V_option1[
+                                            (t,) + pair
+                                        ] - K2Check * omega2 * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
+
+                                        if V_option1[(t + 1,) + pair] > 1:
+                                            V_option1[(t + 1,) + pair] = 1
+                                        elif V_option1[(t + 1,) + pair] < 0:
+                                            V_option1[(t + 1,) + pair] = 0
+                            
                             else:
                                 V_option1[
                                     (t + 1,) + runData.stimulusPair[t]
@@ -550,7 +656,7 @@ class Fitting:
                                             V_option1[(t + 1,) + pair] = 1
                                         elif V_option1[(t + 1,) + pair] < 0:
                                             V_option1[(t + 1,) + pair] = 0
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega3 = omega = omega4 = omega2
                                 elif self.asym and not self.extra:
@@ -559,7 +665,7 @@ class Fitting:
                                     omega4 = omega2
 
                         else:
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 omega4 = (
                                     omega4
                                     + (
@@ -568,6 +674,7 @@ class Fitting:
                                     )
                                     * alpha2NegCheck
                                 )
+                                omega4 = 1/(1 + np.exp(-omega4))
                                 V_option1[
                                     (t + 1,) + runData.stimulusPair[t]
                                 ] = V_option1[
@@ -588,6 +695,36 @@ class Fitting:
                                             V_option1[(t + 1,) + pair] = 1
                                         elif V_option1[(t + 1,) + pair] < 0:
                                             V_option1[(t + 1,) + pair] = 0
+                            if self.pearce:
+                                omega4 = (
+                                    eta
+                                    + (
+                                        abs(rewardPE[(t,) + runData.stimulusPair[t]])
+                                    )
+                                    * alpha2NegCheck
+                                )
+                                omega4 = 1/(1 + np.exp(-omega4))
+                                V_option1[
+                                    (t + 1,) + runData.stimulusPair[t]
+                                ] = V_option1[
+                                    (t,) + runData.stimulusPair[t]
+                                ] + omega4 * (
+                                    rewardPE[(t,) + runData.stimulusPair[t]]
+                                )
+                                run_trialwise_alphas2Neg[j, t] = omega4
+                                if self.transfer:
+                                    for pair in otherPairs:
+                                        V_option1[(t + 1,) + pair] = V_option1[
+                                            (t,) + pair
+                                        ] - K4Check * omega4 * (
+                                            rewardPE[(t,) + runData.stimulusPair[t]]
+                                        )
+
+                                        if V_option1[(t + 1,) + pair] > 1:
+                                            V_option1[(t + 1,) + pair] = 1
+                                        elif V_option1[(t + 1,) + pair] < 0:
+                                            V_option1[(t + 1,) + pair] = 0
+                            
                             else:
                                 V_option1[
                                     (t + 1,) + runData.stimulusPair[t]
@@ -611,7 +748,7 @@ class Fitting:
                                             V_option1[(t + 1,) + pair] = 1
                                         elif V_option1[(t + 1,) + pair] < 0:
                                             V_option1[(t + 1,) + pair] = 0
-                            if self.dyna or self.dyna_init:
+                            if self.dyna:
                                 if not self.asym and not self.extra:
                                     omega2 = omega = omega3 = omega4
                                 elif self.asym and not self.extra:
@@ -642,7 +779,7 @@ class Fitting:
                     NLL_array[run, j, 3] = alphaNegCheck
                     NLL_array[run, j, 4] = alpha2PosCheck
                     NLL_array[run, j, 5] = alpha2NegCheck
-                if self.dyna_init:
+                if self.dyna or self.pearce:
                     NLL_array[run, j, 6] = omegaGrid[j]
                 if self.v_init:
                     NLL_array[run, j, 7] = V_option0Init_Grid[j][0][0]
@@ -711,7 +848,7 @@ class Fitting:
                 fitted_V_option0Inits[run] = NLL_array[run, minIndex, 7]
                 fitted_V_option1Inits[run] = NLL_array[run, minIndex, 8]
 
-            if self.dyna_init:
+            if self.dyna or self.pearce:
                 fitted_omegas[run] = NLL_array[run, minIndex, 6]
             if self.transfer:
                 fitted_K1[run] = NLL_array[run, minIndex, 9]
@@ -780,11 +917,11 @@ class Fitting:
                 asym=self.asym,
                 transfer=self.transfer,
                 dyna=self.dyna,
-                dyna_init=self.dyna_init
+                pearce=self.pearce
             )
 
         scipy.io.savemat(
-            newPath + "/rpe" + self.modelFolder + ".mat".format(self.ID),
+            newPath + "/rpe" + self.modelFolder + ".mat",
             mdict={"rpe": RPE},
         )
 
@@ -801,28 +938,28 @@ class Fitting:
         with open(newPath + "/trialwise_alphasPos_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, trial_alphasPos)
         scipy.io.savemat(
-            newPath + "/trialwise_alphasPos_" + self.modelFolder + ".mat".format(self.ID),
+            newPath + "/trialwise_alphasPos_" + self.modelFolder + ".mat",
             mdict={"trialwise_alphasPos": trial_alphasPos},
         )
 
         with open(newPath + "/trialwise_alphasNeg_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, trial_alphasNeg)
         scipy.io.savemat(
-            newPath + "/trialwise_alphasNeg_" + self.modelFolder + ".mat".format(self.ID),
+            newPath + "/trialwise_alphasNeg_" + self.modelFolder + ".mat",
             mdict={"trialwise_alphasNeg": trial_alphasNeg},
         )
 
         with open(newPath + "/trialwise_alphas2Pos_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, trial_alphas2Pos)
         scipy.io.savemat(
-            newPath + "/trialwise_alphas2Pos_" + self.modelFolder + ".mat".format(self.ID),
+            newPath + "/trialwise_alphas2Pos_" + self.modelFolder + ".mat",
             mdict={"trialwise_alphas2Pos": trial_alphas2Pos},
         )
 
         with open(newPath + "/trialwise_alphas2Neg_" + self.modelFolder + ".npy", "wb") as f:
             np.save(f, trial_alphas2Neg)
         scipy.io.savemat(
-            newPath + "/trialwise_alphas2Neg_" + self.modelFolder + ".mat".format(self.ID),
+            newPath + "/trialwise_alphas2Neg_" + self.modelFolder + ".mat",
             mdict={"trialwise_alphas2Neg": trial_alphas2Neg},
         )
 
@@ -945,12 +1082,12 @@ class Fitting:
 
         bestFitting_dir = "/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals"
         newPath = os.path.join(
-            bestFitting_dir, "sub-{0}".format(self.ID)
+            bestFitting_dir, "sub-{:02d}".format(self.ID)
         )
        
         Path(newPath).mkdir(parents=True, exist_ok=True)
         scipy.io.savemat(
-            newPath + "/spe.mat".format(self.ID), mdict={"spe": ID_surprise}
+            newPath + "/spe.mat", mdict={"spe": ID_surprise}
         )
         
         with open(newPath + "/spe.npy", "wb") as f:
@@ -969,9 +1106,10 @@ if __name__ == "__main__":
     init=False
     asym=False
     transfer=False
-    dyna_init=False
+    pearce=False
     IDs = [1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 14, 15, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64]
     for ID in IDs:
-        fitting = Fitting(mainTrials, additionalTrials, gridsize, ID, extra=extra, dyna=dyna, init=init, asym=asym, transfer=transfer, dyna_init=dyna_init)
+        fitting = Fitting(mainTrials, additionalTrials, gridsize, ID, plotting=True, extra=extra, dyna=dyna, init=init, asym=asym, transfer=transfer, pearce=pearce)
+        fitting.modelFitting()
         fitting.statisticalLearning()
     

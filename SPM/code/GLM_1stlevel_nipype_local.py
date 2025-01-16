@@ -37,7 +37,7 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
     MatlabCommand.set_default_matlab_cmd(mlab_path)
     FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
     subject_list = range(1,65)
-    subject_list = [str(sub).zfill(2) for sub in subject_list if not in [8, 13, 16, 31, 32, 44]]
+    subject_list = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
 
 
     with open((opj(data_folder,
@@ -217,7 +217,7 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
 if __name__ == "__main__":
     
     data_folder="/mnt/d/data/"
-    base_dir="/mnt/d/multlearn-sns/SPM/nipype"
+    base_dir="/mnt/d/multlearn-sns/SPM"
     mask="/mnt/d/multlearn-sns/SPM/mask_ICV.nii"
     ppi_mask=None
     model="model2"

@@ -176,13 +176,13 @@ def get_subject_info_model2(subject, data_folder, bestfitting_path='/mnt/d/multl
     rpe["rpe"] = np.nan_to_num(rpe["rpe"])
 
     surprise_path = (
-        op.join(bestfitting_path,f"sub-{subject}/spe*.mat")
+        op.join(bestfitting_path,f"sub-{subject}/spe*.npy")
     )
     fn2 = glob(surprise_path)
     print(fn2)
     assert len(fn2) == 1
     fn2 = fn2[0]
-    surprise_data = io.loadmat(fn2)["spe"]
+    surprise_data = np.load(fn2)
     
     surprise = (
         pd.DataFrame(

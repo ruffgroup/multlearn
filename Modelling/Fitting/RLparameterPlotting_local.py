@@ -251,7 +251,7 @@ class Plotting:
                     (8, K1run, "V0 Pos Kappa"),
                     (9, K2run, "V1 Pos Kappa"),
                     (10, K3run, "V0 Neg Kappa"),
-                    (11, K4run, "V1 Neg Kappa")
+                    (11, K4run, "V1 Neg Kappa"),
                     (12, omegaRun, "omega")
                 ]:
                     if var[1] is not None:

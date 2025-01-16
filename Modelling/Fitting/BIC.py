@@ -10,7 +10,7 @@ import shutil
 
 dataPath = "/mnt/d/data/fittedParametersRecoveredModels"
 subject_list = range(1,65)
-subject_list = [str(sub).zfill(2) for sub in subject_list if not in [8, 13, 16, 31, 32, 44]]
+subject_list = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
 
 models = [
     "basic",
@@ -35,8 +35,7 @@ BIC_transfer = np.zeros(58)
 BIC_transferV_init = np.zeros(58)
 
 winning_model = {key: [0, 0] for key in models}
-
-for idx, ID in subject_list:
+for idx, ID in enumerate(subject_list):
     newPath = "/mnt/d/data/fittedParametersRecoveredModels/sub-{}".format(ID)
     LL_basic = np.load(newPath + "/basic/BIC_basic.npy")
     LL_v_init = np.load(newPath + "/v_init/BIC_v_init.npy")
@@ -85,14 +84,15 @@ for idx, ID in subject_list:
             mdict={"rpe": rpeBest},
         )
     
-    bestFittingPath = "/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals/sub-sub-{}".format(ID)
+    bestFittingPath = "/mnt/d/data/fittedParametersRecoveredModels/bestFittingVals/sub-{}".format(ID)
     Path(bestFittingPath).mkdir(parents=True, exist_ok=True)
     scipy.io.savemat(
             bestFittingPath + "/rpeBest.mat",
             mdict={"rpe": rpeBest},
         )
     V0 = shutil.copy(newPath + "/" + models[best_fitting] + "/V0_" + models[best_fitting] + ".npy", bestFittingPath)
-    V1 = shutil.copy(newPath + "/" + models[best_fitting] + "/V1_" + models[best_fitting] + ".npy", bestFittingPath) 
+    V1 = shutil.copy(newPath + "/" + models[best_fitting] + "/V1_" + models[best_fitting] + ".npy", bestFittingPath)
+    spe = shutil.copy(newPath + "/spe.npy", bestFittingPath) 
 
     winning_model[models[best_fitting]][0] += 1
     for i in range(len(best_fitting_arr)):
@@ -107,7 +107,7 @@ with open("BestFitting.tsv", "w", newline="") as f:
 
 final = dict(sorted(winning_model.items(), key=lambda x: -x[1][0]))
 
-for idx, ID in subject_list:
+for idx, ID in enumerate(subject_list):
     newPath = "/mnt/d/data/fittedParametersRecoveredModels/sub-{}".format(ID)
     rpeBestOverall = scipy.io.loadmat(
         newPath + "/" + str(list(final.keys())[0]) + "/rpe" + str(list(final.keys())[0]) + ".mat"

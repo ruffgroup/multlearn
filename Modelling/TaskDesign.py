@@ -282,6 +282,7 @@ class task_Design:
                             )
                             * self.alphaPos
                         )
+                        self.omega = 1/(1 + np.exp(-self.omega))
                         self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -363,6 +364,7 @@ class task_Design:
                             )
                             * self.alphaNeg
                         )
+                        self.omega3 = 1/(1 + np.exp(-self.omega3))
                         self.V_option0[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option0[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega3 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -454,6 +456,7 @@ class task_Design:
                             )
                             * self.alpha2Pos
                         )
+                        self.omega2 = 1/(1 + np.exp(-self.omega2))
                         self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega2 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
@@ -538,6 +541,7 @@ class task_Design:
                             )
                             * self.alpha2Neg
                         )
+                        self.omega4 = 1/(1 + np.exp(-self.omega4))
                         self.V_option1[(i + 1,) + tuple(self.stimulusPair[i + self.additionalTrials, :])] = (
                             self.V_option1[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]
                             + self.omega4 * self.rewardPE[(i,) + tuple(self.stimulusPair[i + self.additionalTrials, :])]

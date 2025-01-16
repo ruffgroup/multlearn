@@ -332,10 +332,8 @@ def main(contrast, tVal=[3.1], data_folder="/mnt/d/data/",model="fmri", base_dir
     MatlabCommand.set_default_paths(spm_path)
     MatlabCommand.set_default_matlab_cmd(mlab_path)
     FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
-    layout = BIDSLayout(opj(data_folder,"ds-mlearn/"), derivatives=True)
-    # list of subject identifiers
-    subject_list = layout.get_subjects()
-    subject_list = [sub for sub in subject_list if int(sub) not in [8, 13, 16, 31, 32, 44]]
+    subject_list = range(1,65)
+    subject_list = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
 
     SnPM_2nd = Node(SnpmOneSampleTTest(), name='SnPM')
     sub_contrasts = list()
@@ -411,7 +409,7 @@ def main(contrast, tVal=[3.1], data_folder="/mnt/d/data/",model="fmri", base_dir
 if __name__ == "__main__":
 
     data_folder="/mnt/d/data/"
-    base_dir="/mnt/d/multlearn-sns/SPM/nipype/nipype/model2"
+    base_dir="/mnt/d/multlearn-sns/SPM/nipype/model2"
     contrast=12
     model="fmri"
     mlab_path='/usr/local/MATLAB/R2022b/bin/matlab'
