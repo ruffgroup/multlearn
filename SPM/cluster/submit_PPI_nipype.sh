@@ -11,4 +11,4 @@ module load matlab
 source /home/${USER}/.bashrc
 source activate nipype
 
-python $HOME/git/multlearn-sns/SPM/code/PPI_nipype.py /shares/zne.uzh/multlearn/nipype/model1/ROI/cluster_7_con1_8_0_pos.nii --model model1 --data_folder /shares/zne.uzh/multlearn --mlab_path /apps/opt/containers/bin/matlab/r2023b/matlab --spm_path ~/data/spm12
+python $HOME/git/multlearn-sns/SPM/code/PPI_nipype.py /shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_4_con1_4_0_neg.nii --model model2 --data_folder /shares/zne.uzh/multlearn --mlab_path /apps/opt/containers/bin/matlab/r2023b/matlab --spm_path ~/data/spm12

@@ -52,6 +52,9 @@ class SnpmOneSampleTTestInputSpec(BaseInterfaceInputSpec):
     spm_path = traits.Directory(
         exists=True, desc="spm directory"
     )
+    inference = traits.Any(
+        traits.Any, field="inference", desc="cluster or voxel-wise inference"
+    )
 
     contrasts = traits.List(traits.Any, desc="List of contrast files")
     covariates = InputMultiPath(
@@ -219,7 +222,8 @@ class SnpmOneSampleTTest(BaseInterface):
         snpm_command += "clear matlabbatch\n"
         snpm_command += "end"
 
-        script_path = opj(self.inputs.base_dir, "SnPM_2ndlevel_script.m")
+        
+        script_path = opj(self.inputs.base_dir,self.inputs.inference+"_SnPM_2ndlevel_script.m")
         with open(script_path, "w") as script_file:
             script_file.write(snpm_command)
 
@@ -240,6 +244,11 @@ class SnpmInferenceInputSpec(BaseInterfaceInputSpec):
         mandatory=True,
         desc="Absolute path to SnPM.mat",
     )
+
+    inference = traits.Any(
+        traits.Any, field="inference", desc="cluster or voxel-wise inference"
+    )
+
     cluster_threshold = traits.Float(
         field="Thr.Clus.ClusSize.CFth",
         desc="Cluster-forming threshold",
@@ -247,6 +256,12 @@ class SnpmInferenceInputSpec(BaseInterfaceInputSpec):
     fwe_threshold = traits.Float(
         0.05,
         field="Thr.Clus.ClusSize.ClusSig.FWEthC",
+        usedefault=True,
+        desc="Family-wise error threshold",
+    )
+    voxel_fwe_threshold = traits.Float(
+        0.05,
+        field="Thr.Vox.VoxSig.FWEth",
         usedefault=True,
         desc="Family-wise error threshold",
     )
@@ -293,12 +308,18 @@ class SnpmInference(BaseInterface):
 
     def _run_interface(self, runtime):
         # Construct the SnPM inference command based on input specifications
-        snpm_command = "function SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_script()\n"
+        if self.inputs.cluster_threshold:
+            snpm_command = "function SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_script()\n"
+        elif self.inputs.voxel_fwe_threshold:
+            snpm_command = "function SnPM_inference_"+str(self.inputs.voxel_fwe_threshold).replace('.','_')+"_script()\n"
         snpm_command += f"addpath('{self.inputs.spm_path}');\n"
         snpm_command += "spm_jobman('initcfg');\n"
         snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.SnPMmat = cellstr('{self.inputs.snpm_mat_file}');\n"
-        snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Thr.Clus.ClusSize.CFth = {self.inputs.cluster_threshold};\n"
-        snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Thr.Clus.ClusSize.ClusSig.FWEthC = {self.inputs.fwe_threshold};\n"
+        if self.inputs.cluster_threshold:
+            snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Thr.Clus.ClusSize.CFth = {self.inputs.cluster_threshold};\n"
+            snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Thr.Clus.ClusSize.ClusSig.FWEthC = {self.inputs.fwe_threshold};\n"
+        elif self.inputs.voxel_fwe_threshold:
+            snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Thr.Vox.VoxSig.FWEth = {self.inputs.voxel_fwe_threshold};\n"
         snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.Tsign = {self.inputs.t_sign};\n"
         if self.inputs.filtered_img_name:
             snpm_command += f"matlabbatch{{1}}.spm.tools.snpm.inference.WriteFiltImg.name = '{self.inputs.filtered_img_name}';\n"
@@ -312,12 +333,20 @@ class SnpmInference(BaseInterface):
         snpm_command += "clear matlabbatch\n"
         snpm_command += "end"
 
-        if self.inputs.t_sign == 1:
-            script_path_inf = opj(self.inputs.base_dir,"2ndLevel/SnPM_SecondLevel_con"+str(self.inputs.contrast), "SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_pos_script.m")
-        else:
-            script_path_inf = opj(self.inputs.base_dir,"2ndLevel/SnPM_SecondLevel_con"+str(self.inputs.contrast), "SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_neg_script.m")
-        with open(script_path_inf, "w") as script_file:
-            script_file.write(snpm_command)
+        if self.inputs.cluster_threshold:
+            if self.inputs.t_sign == 1:
+                script_path_inf = opj(self.inputs.base_dir,"2ndLevel",self.inputs.inference+"_SnPM_SecondLevel_con"+str(self.inputs.contrast), "SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_pos_script.m")
+            else:
+                script_path_inf = opj(self.inputs.base_dir,"2ndLevel",self.inputs.inference+"_SnPM_SecondLevel_con"+str(self.inputs.contrast), "SnPM_inference_"+str(self.inputs.cluster_threshold).replace('.','_')+"_neg_script.m")
+            with open(script_path_inf, "w") as script_file:
+                script_file.write(snpm_command)
+        elif self.inputs.voxel_fwe_threshold:
+            if self.inputs.t_sign == 1:
+                script_path_inf = opj(self.inputs.base_dir,"2ndLevel",self.inputs.inference+"_SnPM_SecondLevel_con"+str(self.inputs.contrast), "SnPM_inference_"+str(self.inputs.voxel_fwe_threshold).replace('.','_')+"_pos_script.m")
+            else:
+                script_path_inf = opj(self.inputs.base_dir,"2ndLevel",self.inputs.inference+"_SnPM_SecondLevel_con"+str(self.inputs.contrast), "SnPM_inference_"+str(self.inputs.voxel_fwe_threshold).replace('.','_')+"_neg_script.m")
+            with open(script_path_inf, "w") as script_file:
+                script_file.write(snpm_command)
 
         subprocess.run(
             f"matlab -nodisplay -nosplash -r \"run('{script_path_inf}'); exit;\"",
@@ -328,13 +357,12 @@ class SnpmInference(BaseInterface):
         return runtime
 
 
-def main(contrast, tVal=[3.1], data_folder="/mnt/d/data/",model="fmri", base_dir="/mnt/d/multlearn-sns/SPM/nipype/", mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12"):
+def main(contrast, tVal=[3.1], data_folder="/mnt/d/data/",model="fmri",inference="cluster", base_dir="/mnt/d/multlearn-sns/SPM/nipype/", mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12"):
     MatlabCommand.set_default_paths(spm_path)
     MatlabCommand.set_default_matlab_cmd(mlab_path)
     FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
     subject_list = range(1,65)
     subject_list = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
-
     SnPM_2nd = Node(SnpmOneSampleTTest(), name='SnPM')
     sub_contrasts = list()
     for sub in subject_list:
@@ -342,16 +370,20 @@ def main(contrast, tVal=[3.1], data_folder="/mnt/d/data/",model="fmri", base_dir
         if os.path.exists(path_1stlevel):
             sub_contrasts.append(path_1stlevel)
     SnPM_2nd.inputs.contrasts = sub_contrasts
-    destination = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast)
+    destination = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast)
+    if inference == "cluster":
+        SnPM_2nd.inputs.cluster_inference_later = -1
+    elif inference == "voxel":
+        SnPM_2nd.inputs.cluster_inference_none = 0
     if not os.path.exists(destination):
         os.makedirs(destination)
+    SnPM_2nd.inputs.inference = inference
     SnPM_2nd.inputs.destination = destination
     SnPM_2nd.inputs.base_dir = base_dir
     SnPM_2nd.inputs.spm_path = spm_path
     SnPM_2nd.inputs.n_perms = 5000
     SnPM_2nd.inputs.var_smoothing = [0, 0, 0]
     SnPM_2nd.inputs.memory_usage = False
-    SnPM_2nd.inputs.cluster_inference_later = -1
     SnPM_2nd.inputs.masking_none = 1
     SnPM_2nd.inputs.implicit_mask = 1      
     if model == "ROI":
@@ -370,47 +402,78 @@ def main(contrast, tVal=[3.1], data_folder="/mnt/d/data/",model="fmri", base_dir
     SnPM_2nd.inputs.global_normalization = 1
 
     SnPM_2nd.run()
-    for i in range(len(tVal)):
+    if inference == "cluster":
+        for i in range(len(tVal)):
+            SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
+            SnPM_inf.inputs.inference = inference
+            SnPM_inf.inputs.base_dir = base_dir
+            SnPM_inf.inputs.spm_path = spm_path
+            SnPM_inf.inputs.contrast = contrast
+            SnPM_inf.inputs.snpm_mat_file = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast) + '/SnPM.mat'
+            SnPM_inf.inputs.cluster_threshold = tVal[i]
+            SnPM_inf.inputs.fwe_threshold = 0.05
+
+            # t_sign = -1
+            SnPM_inf.inputs.t_sign = -1
+            SnPM_inf.inputs.filtered_img_name = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_neg'
+            SnPM_inf.inputs.report_type = 'MIPtable'
+            SnPM_inf.run()
+
+            if not os.path.exists(opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con')+ str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_neg.nii'):
+                break
+
+        for i in range(len(tVal)):
+            SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
+            SnPM_inf.inputs.inference = inference
+            SnPM_inf.inputs.base_dir = base_dir
+            SnPM_inf.inputs.spm_path = spm_path
+            SnPM_inf.inputs.contrast = contrast
+            SnPM_inf.inputs.snpm_mat_file = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast) + '/SnPM.mat'
+            SnPM_inf.inputs.cluster_threshold = tVal[i]
+            SnPM_inf.inputs.fwe_threshold = 0.05
+
+            # t_sign = 1
+            SnPM_inf.inputs.t_sign = 1
+            SnPM_inf.inputs.filtered_img_name = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_pos'
+            SnPM_inf.inputs.report_type = 'MIPtable'
+            SnPM_inf.run()
+
+            if not os.path.exists(opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con')+ str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_pos.nii'):
+                break
+    elif inference == "voxel":
         SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
+        SnPM_inf.inputs.inference = inference
         SnPM_inf.inputs.base_dir = base_dir
         SnPM_inf.inputs.spm_path = spm_path
         SnPM_inf.inputs.contrast = contrast
-        SnPM_inf.inputs.snpm_mat_file = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast) + '/SnPM.mat'
-        SnPM_inf.inputs.cluster_threshold = tVal[i]
-        SnPM_inf.inputs.fwe_threshold = 0.05
+        SnPM_inf.inputs.snpm_mat_file = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast) + '/SnPM.mat'
+        SnPM_inf.inputs.voxel_fwe_threshold = 0.05
 
-        # t_sign = -1
-        SnPM_inf.inputs.t_sign = -1
-        SnPM_inf.inputs.filtered_img_name = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_neg'
-        SnPM_inf.inputs.report_type = 'MIPtable'
-        SnPM_inf.run()
-
-        if not os.path.exists(opj(base_dir,'2ndLevel/SnPM_SecondLevel_con')+ str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_neg.nii'):
-            break
-
-    for i in range(len(tVal)):
-        SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
-        SnPM_inf.inputs.base_dir = base_dir
-        SnPM_inf.inputs.spm_path = spm_path
-        SnPM_inf.inputs.contrast = contrast
-        SnPM_inf.inputs.snpm_mat_file = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast) + '/SnPM.mat'
-        SnPM_inf.inputs.cluster_threshold = tVal[i]
-        SnPM_inf.inputs.fwe_threshold = 0.05
-
-        # t_sign = 1
         SnPM_inf.inputs.t_sign = 1
-        SnPM_inf.inputs.filtered_img_name = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con') + str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_pos'
+        SnPM_inf.inputs.filtered_img_name = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast) + '/SnPM_filtered_pos'
         SnPM_inf.inputs.report_type = 'MIPtable'
         SnPM_inf.run()
 
-        if not os.path.exists(opj(base_dir,'2ndLevel/SnPM_SecondLevel_con')+ str(contrast) + '/SnPM_filtered_t'+str(tVal[i]).replace('.', '_')+'_pos.nii'):
-            break
+        SnPM_inf = Node(SnpmInference(), name='SnPM_inf')
+
+        SnPM_inf.inputs.inference = inference
+        SnPM_inf.inputs.base_dir = base_dir
+        SnPM_inf.inputs.spm_path = spm_path
+        SnPM_inf.inputs.contrast = contrast
+        SnPM_inf.inputs.snpm_mat_file = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast) + '/SnPM.mat'
+        SnPM_inf.inputs.voxel_fwe_threshold = 0.05
+        
+        SnPM_inf.inputs.t_sign = -1
+        SnPM_inf.inputs.filtered_img_name = opj(base_dir,'2ndLevel',inference+'_SnPM_SecondLevel_con') + str(contrast) + '/SnPM_filtered_neg'
+        SnPM_inf.inputs.report_type = 'MIPtable'
+        SnPM_inf.run()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("contrast", type=int, default=1)
     parser.add_argument("data_folder", type=str, default="/mnt/d/data/")
     parser.add_argument("--model", type=str, default="fmri")
+    parser.add_argument("--inference", type=str, default="cluster")
     parser.add_argument("--base_dir", type=str, default="/mnt/d/multlearn-sns/SPM/nipype/")
     parser.add_argument("--mlab_path", type=str, default="/usr/local/MATLAB/R2022b/bin/matlab")
     parser.add_argument("--spm_path", type=str, default="~/spm12")
@@ -418,4 +481,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(contrast=args.contrast, model=args.model,data_folder=args.data_folder, base_dir=args.base_dir, mlab_path=args.mlab_path, spm_path=args.spm_path, tVal=args.tVal)
+    main(contrast=args.contrast, model=args.model,inference=args.inference,data_folder=args.data_folder, base_dir=args.base_dir, mlab_path=args.mlab_path, spm_path=args.spm_path, tVal=args.tVal)

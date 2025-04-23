@@ -16,6 +16,7 @@ from nipype.interfaces.base import BaseInterface, BaseInterfaceInputSpec, traits
 import nipype.interfaces.matlab as matlab
 from nipype.interfaces.matlab import MatlabCommand
 from nipype import Node, Workflow
+import shutil
 
 class SpmVOIInputSpec(BaseInterfaceInputSpec):
     spm_path = Directory(exists=True, desc='SPM directory', mandatory=True)
@@ -137,14 +138,22 @@ def main(roi_mask, model="model2", data_folder="/shares/zne.uzh/multlearn", mlab
     
     output_dir = ''.join(roi_mask.split("/")[-1].split("_")[2])+"/"+''.join(roi_mask.split("/")[-1].split("_")[:2])+'_'+roi_mask.split("/")[-1].split("_")[-1].split(".")[0]
 
-    layout = BIDSLayout(op.join(data_folder,"ds-mlearn/"), derivatives=True)
-    # list of subject identifiers
-    subject_ids = layout.get_subjects()
-    subject_ids = [sub for sub in subject_ids if int(sub) not in [8, 13, 16, 31, 32, 44]]
+    subject_list = range(1,65)
+    subject_ids = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
+
     #subject_ids = ["46"]
     # Iterate over individual subject fMRI images
     for subject_id in subject_ids:
-        
+        check_betas = op.join(data_folder, "nipype", model, "1stLevel/sub-"+subject_id,"beta*.nii")
+        fn_check = glob(check_betas)
+        if len(fn_check) == 0:
+            betas_path = (
+            op.join(data_folder,'nipype',f"workingdir_{model}","first_level_wf",f"_subject_id_{subject_id}/","level1estimate","beta*.nii")
+            )
+            fn = glob(betas_path)
+            for f in fn:
+                shutil.copy(f, op.join(data_folder, "nipype", model, "1stLevel/sub-"+subject_id+"/"))
+
         output_path = op.join(data_folder, 'nipype', 'PPI',model, output_dir, f'sub-{subject_id}')
         if not op.exists(output_path):
                 os.makedirs(output_path)

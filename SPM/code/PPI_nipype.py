@@ -113,16 +113,15 @@ def main(roi_mask, model="model2", data_folder="/shares/zne.uzh/multlearn", mlab
     con_nr = temp.match(con).groups()[1]
 
     output_dir = ''.join(roi_mask.split("/")[-1].split("_")[2])+"/"+''.join(roi_mask.split("/")[-1].split("_")[:2])+'_'+roi_mask.split("/")[-1].split("_")[-1].split(".")[0]
-    layout = BIDSLayout(op.join(data_folder,"ds-mlearn/"), derivatives=True)
-    # list of subject identifiers
-    subject_ids = layout.get_subjects()
-    subject_ids = [sub for sub in subject_ids if int(sub) not in [8, 13, 16, 31, 32, 44]]
+    subject_list = range(1,65)
+    subject_ids = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
+
     for subject_id in subject_ids:
         output_path = op.join(data_folder, 'nipype', model, 'PPI', output_dir, f'sub-{subject_id}')
         for run_id in range(1,7):
             if op.exists(op.join(data_folder, "nipype", model, "1stLevel/sub-"+subject_id,"VOI_"+roi_mask.split("/")[-1].split(".")[-2]+"_"+str(run_id)+'.mat')):
 
-                if int(con_nr) in [1, 22]:
+                if int(con_nr) == 1 or 14:
                     PPI_node = Node(SpmPPI(spm_path=spm_path,
                                 spm_mat_file=op.join(data_folder, "nipype",model, "1stLevel/sub-"+subject_id,"SPM.mat"),
                                 voi_file=op.join(data_folder, "nipype",model,"1stLevel/sub-"+subject_id,"VOI_"+roi_mask.split("/")[-1].split(".")[-2]+"_"+str(run_id)+'.mat'),
@@ -131,7 +130,7 @@ def main(roi_mask, model="model2", data_folder="/shares/zne.uzh/multlearn", mlab
                                 ppi_name=roi_mask.split("/")[-1].split(".")[-2]+"_"+str(run_id),
                                  model=model), name='ppi_node')
                     
-                else:
+                elif int(con_nr) == 5 or 15:
                     PPI_node = Node(SpmPPI(spm_path=spm_path,
                                 spm_mat_file=op.join(data_folder, "nipype",model, "1stLevel/sub-"+subject_id,"SPM.mat"),
                                 voi_file=op.join(data_folder, "nipype",model, "1stLevel/sub-"+subject_id,"VOI_"+roi_mask.split("/")[-1].split(".")[-2]+"_"+str(run_id)+'.mat'),

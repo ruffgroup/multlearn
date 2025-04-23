@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import shutil
 
-def main(t_val, con, sign, base_dir, source):
+def main(t_val, con, cluster_idx, sign, base_dir, source, model=None):
 
     if source == "neurosynth":
         if not os.path.exists(opj(base_dir,'neurosynth')):
@@ -57,10 +57,11 @@ def main(t_val, con, sign, base_dir, source):
         cl = Cluster()
         cl.terminal_output = "file_stdout"
         cl.inputs.threshold = t_val
-        if sign == "pos":
-            cl.inputs.in_file = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con')+ str(con) + '/snpmT+.img' #'/SnPM_filtered_t'+str(t_val).replace('.', '_')+'_'+sign+'.nii'
+        cl.inputs.connectivity = 18
+        if model == "PPI":
+            cl.inputs.in_file = opj(base_dir,'2ndLevel/cluster_SnPM_SecondLevel_con')+ str(con) + '/SnPM_filtered_t'+str(t_val).replace('.', '_')+'_'+sign+'.nii'
         else:
-            cl.inputs.in_file = opj(base_dir,'2ndLevel/SnPM_SecondLevel_con')+ str(con) + '/snpmT-.img' 
+            cl.inputs.in_file = opj(base_dir,'2ndLevel/cluster_SnPM_SecondLevel_con')+ str(con) + '/SnPM_filtered_t'+str(t_val).replace('.', '_')+'_'+sign+'.nii' #/snpmT+.img
         cl.inputs.out_localmax_txt_file = opj(base_dir,'ROI/localmax_stats_con'+str(con)+'_'+str(t_val).replace('.', '_')+'_'+sign+'.txt')
         cl.inputs.out_index_file = opj(base_dir,'ROI/cluster_index_con'+str(con)+'_'+str(t_val).replace('.', '_')+'_'+sign)
         cl.inputs.use_mm = True
@@ -72,8 +73,7 @@ def main(t_val, con, sign, base_dir, source):
         text_file.to_csv("stdout.csv", sep="\t")
         shutil.copy("stdout.csv", opj(base_dir,'ROI/stats_con'+str(con)+'_'+str(t_val).replace('.', '_')+'_'+sign+'.csv'))
     
-            
-
+        
         ext_b = maths.Threshold()
         ext_a = maths.Threshold()
 
@@ -81,22 +81,21 @@ def main(t_val, con, sign, base_dir, source):
         ext_b.inputs.internal_datatype = "int"
         ext_a.inputs.internal_datatype = "int"
         ext_a.args = 'bin'
-        for idx,cluster in enumerate(range(max(text_file["Cluster Index"]))):
-            if int(text_file["Voxels"][idx]) >= 50:
-                print(text_file["Cluster Index"][cluster])
-                ext_b.inputs.thresh = text_file["Cluster Index"][cluster]
-                ext_b.inputs.out_file = opj(base_dir,'ROI/cluster_'+str(cluster)+"_con"+str(con)+'_'+str(t_val).replace('.', '_')+'_'+sign+'.nii')
+        print(text_file)
+        """
+        for idx, cluster in text_file.iterrows():
+            if idx in cluster_idx:
+                print(cluster["Cluster Index"])
+                ext_b.inputs.thresh = cluster["Cluster Index"]
+                ext_b.inputs.out_file = opj(base_dir,'ROI/cluster_'+str(idx)+"_con"+str(con)+'_'+str(t_val).replace('.', '_')+'_'+sign+'.nii')
                 ext_b.run()
 
                 ext_a.inputs.in_file = ext_b.inputs.out_file
-                ext_a.inputs.thresh = text_file["Cluster Index"][cluster]
+                ext_a.inputs.thresh = cluster["Cluster Index"]
                 ext_a.inputs.direction = "above"
                 ext_a.inputs.out_file = ext_b.inputs.out_file
                 ext_a.run()
-
-
-
-
+        """
 if __name__ == "__main__":
-    main(3.1,1, 'pos', '/mnt/d/multlearn-sns/SPM/nipype/nipype/model2', source="fmri")
+    main(3.1, 1,[0, 1], 'pos', '/shares/zne.uzh/multlearn/nipype/model2/PPI/con1/cluster1_neg', source="fmri", model="PPI")
 
