@@ -127,11 +127,15 @@ def main(roi_mask, model="model2", data_folder="/shares/zne.uzh/multlearn", mlab
 
     # Load the group-level ROI mask and group-level t-contrast image
 
+    # cluster_1_con17_3_1_neg.nii.gz
+
+
     con = roi_mask.split("/")[-1].split("_")[-4]
     temp = re.compile("([a-zA-Z]+)([0-9]+)")
     con_nr = temp.match(con).groups()[1]
     t_val = roi_mask.split("/")[-1].split(str(con)+'_')[-1]
-    group_t_img = nib.load(op.join(data_folder, "nipype", model, "2ndLevel/SnPM_SecondLevel_con"+str(con_nr)+"/SnPM_filtered_t"+str(t_val)))
+    print(t_val)
+    group_t_img = nib.load(op.join(data_folder, "nipype", model, "2ndLevel/cluster_SnPM_SecondLevel_con"+str(con_nr)+"/SnPM_filtered_t"+str(t_val)))
     # Find the peak coordinate within the group-level ROI
     # Find the peak coordinate within the group-level ROI masked t-contrast image
     peak_coord = find_peak_coordinate_within_mask(group_roi_img, group_t_img)
