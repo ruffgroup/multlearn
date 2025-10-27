@@ -30,15 +30,28 @@ import nibabel as nb
 import nipype
 import argparse
 import nipype_helpers
+from pathlib import Path
 
-
-def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="/mnt/d/multlearn-sns/SPM/mask_ICV.nii", ppi_mask=None, model="model1", bestfitting_path='/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/', Nslices=40, refSlice=20, mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12"):
+def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="/mnt/d/multlearn-sns/SPM/mask_ICV.nii",
+         ppi_roi=None, ppi_variable=None,
+         model="model1", bestfitting_path='/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/', Nslices=40, refSlice=20, mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12",
+         subject=None,
+         working_dir='/tmp/workflow_folders'):
     MatlabCommand.set_default_paths(spm_path)
     MatlabCommand.set_default_matlab_cmd(mlab_path)
     FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
-    subject_list = range(1,65)
-    subject_list = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
 
+    if 'PPI' in model:
+        assert(ppi_roi is not None), "PPI needs an ROI definition!"
+        assert(ppi_variable is not None), "PPI need a variable definition!"
+
+    print(f'SUBJECT: {subject}')
+    
+    if subject is None:
+        subject_list = range(1,65)
+        subject_list = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
+    else:
+        subject_list = [subject]
 
     with open((opj(data_folder,
     "ds-mlearn/derivatives/fmriprep/sub-01/func/sub-01_task-learn_run-1_space-T1w_desc-preproc_bold.json")),
@@ -69,13 +82,14 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
     if model == "PPI" or model == "neurosynth_PPI":
         getsubjectinfo = Node(
             Function(
-                input_names=["subject", "data_folder", "roi_mask", "bestfitting_path"],
+                input_names=["subject", "data_folder", "roi", "variable", "bestfitting_path"],
                 output_names=["subject_info", "functional_runs"],
                 function=get_subject_info,
             ),
             name="getsubjectinfo",
         )
-        getsubjectinfo.inputs.roi_mask = ppi_mask
+        getsubjectinfo.inputs.roi = ppi_roi
+        getsubjectinfo.inputs.variable = ppi_variable
     else:
         getsubjectinfo = Node(
             Function(
@@ -137,14 +151,12 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
         output_dir = ''.join(mask.split("/")[-1].split("_")[2])+"/"+''.join(mask.split("/")[-1].split("_")[:2])+'_'+mask.split("/")[-1].split("_")[-1].split(".")[0]
         working_dir = "workingdir_"+''.join(mask.split("/")[-1].split("_")[:3])+"_"+mask.split("_")[-1].split(".")[0]
     elif model == "PPI":
-        output_dir = op.join(ppi_mask.split("/")[-3], "PPI",''.join(ppi_mask.split("/")[-1].split("_")[2])+"/"+''.join(ppi_mask.split("/")[-1].split("_")[:2])+'_'+ppi_mask.split("/")[-1].split("_")[-1].split(".")[0])
-        working_dir = op.join(ppi_mask.split("/")[-3], "PPI", "workingdir_"+''.join(ppi_mask.split("/")[-1].split("_")[:3])+"_"+ppi_mask.split("_")[-1].split(".")[0])
+        output_dir = str(Path(data_folder) / 'nipype' / "PPI" / f'{ppi_roi}_{ppi_variable}')
     elif model == "neurosynth_ROI":
         output_dir = op.join("neurosynth",''.join(mask.split(".nii")[0].split("/")[-1].split("_")[:2]))
         working_dir = op.join("neurosynth",'workingdir_'+''.join(mask.split(".nii")[0].split("/")[-1].split("_")[:2]))
     else:
         output_dir = model
-        working_dir = 'workingdir_'+model
     
     base_dir=opj(base_dir,"nipype")
     if not os.path.exists(base_dir):
@@ -158,9 +170,13 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
                 for sub in subject_list]
     substitutions.extend(subjFolders)
     datasink.inputs.substitutions = substitutions
-    
-    first_level_wf = Workflow(name="first_level_wf", base_dir=os.path.join(base_dir, working_dir))
 
+    wf_name = f'first_level_sub-{subject}_model-{model}'
+
+    if 'PPI' in model:
+        wf_name += f'_roi-{ppi_roi}_variable-{ppi_variable}'
+        
+    first_level_wf = Workflow(name=wf_name, base_dir=os.path.join(working_dir))
 
     # Connect the nodes
     first_level_wf.connect(
@@ -200,6 +216,8 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
                                               ('spmT_images', '1stLevel.@T'),
                                               ('con_images', '1stLevel.@con'),
                                               ]),
+            (level1estimate, datasink, [('beta_images', '1stLevel.@beta_images'),
+                                              ]),
         ]
     )
 
@@ -211,7 +229,7 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
         "log_directory": "/output/log_folder",
     }
 
-    first_level_wf.run('MultiProc', plugin_args={'n_procs': 2})
+    first_level_wf.run('MultiProc', plugin_args={'n_procs': 16})
 
 
 if __name__ == "__main__":
@@ -219,14 +237,20 @@ if __name__ == "__main__":
     parser.add_argument("data_folder", type=str, default="/mnt/d/data/")
     parser.add_argument("--base_dir", type=str, default="/mnt/d/multlearn-sns/SPM/nipype")
     parser.add_argument("--mask", type=str, default="/mnt/d/multlearn-sns/SPM/mask_ICV.nii")
-    parser.add_argument("--ppi_mask", type=str, default=None)
+    parser.add_argument("--ppi_roi", type=str, default=None)
+    parser.add_argument("--ppi_variable", type=str, default=None, choices=[None, 'rpe', 'urpe', 'surprise', 'choice', 'feedback'])
     parser.add_argument("--model", type=str, default="model1")
     parser.add_argument("--bestfitting_path", type=str, default='/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/')
     parser.add_argument("--mlab_path", type=str, default="/usr/local/MATLAB/R2022b/bin/matlab")
     parser.add_argument("--spm_path", type=str, default="~/spm12")
     parser.add_argument("--Nslices", type=int, default=40)
     parser.add_argument("--refSlice", type=int, default=20)
+    parser.add_argument("--participant_label", type=str, default=None, help="Specific participant label to process")
+    parser.add_argument("--work_dir", default=Path('/scratch') / os.environ['USER'] / 'working_dir')
 
     args = parser.parse_args()
 
-    main(args.data_folder, base_dir=args.base_dir, mask=args.mask, ppi_mask=args.ppi_mask, model=args.model, bestfitting_path=args.bestfitting_path, mlab_path=args.mlab_path, spm_path=args.spm_path, Nslices=args.Nslices, refSlice=args.refSlice)
+    main(args.data_folder, base_dir=args.base_dir, mask=args.mask, ppi_roi=args.ppi_roi,
+         ppi_variable=args.ppi_variable,
+         model=args.model, bestfitting_path=args.bestfitting_path, mlab_path=args.mlab_path, spm_path=args.spm_path, Nslices=args.Nslices, refSlice=args.refSlice,
+         subject=args.participant_label, working_dir=args.work_dir)

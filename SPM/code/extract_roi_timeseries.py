@@ -67,10 +67,12 @@ class SpmVOI(BaseInterface):
         """
 
         script_file = os.path.join(runtime.cwd, 'extract_voi.m')
+        log_file= os.path.join(runtime.cwd, 'matlab.log')
+
         with open(script_file, 'w') as f:
             f.write(matlab_script)
 
-        mlab = matlab.MatlabCommand(script=matlab_script, paths=[spm_path])
+        mlab = matlab.MatlabCommand(script=matlab_script, paths=[spm_path], logfile=log_file)
         result = mlab.run()
 
         return runtime
@@ -102,21 +104,42 @@ def get_peak_mni_coordinates(img):
 
     return peak_mni
 
-def main(subject, roi, model, contrast, data_folder, mlab_path, spm_path, direction, work_dir):
+def main(subject, roi, model, contrast, data_folder, mlab_path, spm_path, work_dir):
     MatlabCommand.set_default_paths(spm_path)
     MatlabCommand.set_default_matlab_cmd(mlab_path)
     data_folder = Path(data_folder)
 
+    if contrast is not None:
+        raise NotImplementedError('Contrast is automatically determined')
+
+    if model != 'model7':
+        raise NotImplementedError('Only model 7.')
+
+
+    if roi in ['A1_L', 'A1_R']:
+        contrast = 17
+    elif roi in ['S1_R']:
+        contrast = 23
+    elif roi in ['AG_S_L', 'AG_S_R', 'DLPFC_S_L']:
+        contrast = 5
+    elif roi in ['AG_RPE_L', 'V1_RPE_L']:
+        contrast = 19
+    else:
+        raise NotImplementedError(f'Roi {roi} unknown')
+
+    direction = 'pos'
+
+    # Model 2 is standard model and used for ROI definition!
     tmap = data_folder / 'nipype' / model / '2ndLevel' / f'cluster_SnPM_SecondLevel_con{contrast}' / f'SnPM_filtered_t2_8_{direction}.nii'
-    roi_mask = data_folder / 'nipype' / model / 'ROI' / f'{roi}.nii'
+    roi_mask = data_folder / 'nipype' / 'model2' / 'ROI' / f'{roi}.nii'
     spm_mat_file = data_folder / 'nipype' / model / '1stLevel' / f'sub-{subject:02d}' / 'SPM.mat'
 
+
     # Find the peak coordinate within the masked ROI
-    print(tmap)
+    print(tmap, roi_mask)
     masked_tmap = image.math_img("img1 * img2", img1=tmap, img2=roi_mask)
     peak_coords = get_peak_mni_coordinates(masked_tmap)
     print(f"Peak coordinates: {peak_coords}")
-
 
     target_dir = data_folder / 'nipype' / model / 'timeseries' / f'sub-{subject:02d}'
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -133,31 +156,28 @@ def main(subject, roi, model, contrast, data_folder, mlab_path, spm_path, direct
                     radius=6,
                     voi_name=f'{roi}_{contrast}_{run_id}'),
                     name=f'voi_node_subject_run_{run_id}')
+
+        voi_nodes.append(voi_node)
         
     # Create a workflow
     workflow = pe.Workflow(name=f'voi_workflow_subject-{subject}_roi-{roi}_contrast-{contrast}', base_dir=work_dir)
-    workflow.add_nodes([voi_node])
-    workflow.run() 
-
-
-
+    workflow.add_nodes(voi_nodes)
+    workflow.run(plugin='MultiProc', plugin_args={'n_procs': 8})
 
 if __name__ == '__main__':
 
     parser = argparser = argparse.ArgumentParser()
     parser.add_argument('subject', default=None, type=int)
-    parser.add_argument('--ROI', default='A1_L')
-    parser.add_argument('--model', default='model2')
-    parser.add_argument('--contrast', default=17)
-    # parser.add_argument("--data_folder", type=str, default="/shares/zne.uzh/multlearn")
-    parser.add_argument("--data_folder", type=str, default="/data/ds-mlearn")
+    parser.add_argument('--ROI', default='A1_L', choices=['A1_L', 'A1_R', 'S1_R', 'V1_RPE_L', 'AG_S_L', 'AG_S_R', 'AG_RPE_L', 'DLPFC_S_L'])
+    parser.add_argument('--model', default='model7')
+    parser.add_argument('--contrast', default=None)
+    parser.add_argument("--data_folder", type=str, default="/shares/zne.uzh/multlearn")
     parser.add_argument("--mlab_path", type=str, default="/apps/opt/containers/bin/matlab/r2023b/matlab")
     parser.add_argument("--spm_path", type=str, default=op.join(os.environ['HOME'], 'spm12'))
-    parser.add_argument("--direction", default="pos")
-    parser.add_argument("--work_dir", default="/tmp/working_dir")
+    parser.add_argument("--work_dir", default="/scratch/gdehol/working_dir")
 
     args = parser.parse_args()
 
 
     main(subject=args.subject, roi=args.ROI, model=args.model, contrast=args.contrast, data_folder=args.data_folder, mlab_path=args.mlab_path, spm_path=args.spm_path,
-         direction=args.direction, work_dir=args.work_dir)
+         work_dir=args.work_dir)

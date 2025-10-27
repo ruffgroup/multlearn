@@ -5,6 +5,7 @@ from os.path import join as opj
 import os
 import pandas as pd
 import shutil
+import argparse
 
 def main(t_val, con, cluster_idx, sign, base_dir, source, model=None):
 
@@ -97,5 +98,21 @@ def main(t_val, con, cluster_idx, sign, base_dir, source, model=None):
                 ext_a.run()
         """
 if __name__ == "__main__":
-    main(3.1, 1,[0, 1], 'pos', '/shares/zne.uzh/multlearn/nipype/model2/PPI/con1/cluster1_neg', source="fmri", model="PPI")
 
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--t_val', type=float, required=True, help="T-value threshold for clustering.")
+    parser.add_argument('--con', type=int, required=True, help="Condition number.")
+    parser.add_argument('--cluster_idx', type=int, nargs='+', required=True, help="List of cluster indices.")
+    parser.add_argument('--sign', type=str, required=True, help="Sign of the contrast (e.g., 'pos', 'neg').")
+    parser.add_argument('--base_dir', type=str, required=True, help="Base directory for input and output files.")
+    parser.add_argument('--source', type=str, required=True, help="Source of the data (e.g., 'neurosynth', 'fmri').")
+    parser.add_argument('--model', type=str, required=False, help="Model type (e.g., 'PPI').")
+
+    args = parser.parse_args()
+
+    main(args.t_val, args.con, args.cluster_idx, args.sign, args.base_dir, args.source, args.model)
+
+    # main(3.1, 1,[0, 1], 'pos', '/shares/zne.uzh/multlearn/nipype/model2/PPI/con1/cluster1_neg', source="fmri", model="PPI")
+
+    # args = parser.parse_args()

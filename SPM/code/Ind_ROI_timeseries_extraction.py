@@ -191,7 +191,7 @@ if __name__ == "__main__":
     parser.add_argument("roi_mask", type=str)
     parser.add_argument("--model", type=str, default="model2")
     parser.add_argument("--data_folder", type=str, default="/shares/zne.uzh/multlearn")
-    parser.add_argument("--mlab_path", type=str, default="/usr/local/MATLAB/R2022b/bin/matlab")
+    parser.add_argument("--mlab_path", type=str, default="/apps/opt/containers/bin/matlab/r2023b/matlab")
     parser.add_argument("--spm_path", type=str, default="~/spm12")
 
     args = parser.parse_args()
