@@ -31,3 +31,5 @@ Modelling/Decoding/run_glms/
 Modelling/Decoding/run_surf2img/
 Modelling/Decoding/braincoder/
 Modelling/Recovery/*/*.npy
+
+.DS_Store
