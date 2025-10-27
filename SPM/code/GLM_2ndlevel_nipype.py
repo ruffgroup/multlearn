@@ -392,7 +392,10 @@ def main(contrast, tVal=[3.1], data_folder="/mnt/d/data/",model="fmri",inference
 
     if not os.path.exists(destination):
         os.makedirs(destination)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 7281240 (Locally changed GLM szcripts)
     SnPM_2nd.inputs.destination = destination
     # SnPM_2nd.inputs.base_dir = base_dir
     SnPM_2nd.inputs.base_dir = destination

@@ -32,6 +32,7 @@ import argparse
 import nipype_helpers
 from pathlib import Path
 
+<<<<<<< HEAD
 def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="/mnt/d/multlearn-sns/SPM/mask_ICV.nii",
          ppi_roi=None, ppi_variable=None,
          model="model1", bestfitting_path='/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/', Nslices=40, refSlice=20, mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12",
@@ -40,6 +41,21 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
     MatlabCommand.set_default_paths(spm_path)
     MatlabCommand.set_default_matlab_cmd(mlab_path)
     FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
+=======
+
+def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="/mnt/d/multlearn-sns/SPM/mask_ICV.nii", ppi_mask=None, model="model1", bestfitting_path='/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/', Nslices=40, refSlice=20, mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12",
+         subject=None):
+    MatlabCommand.set_default_paths(spm_path)
+    MatlabCommand.set_default_matlab_cmd(mlab_path)
+    FSCommand.set_default_subjects_dir(opj(data_folder, "ds-mlearn/derivatives/freesurfer/"))
+    
+    if subject is None:
+        subject_list = range(1,65)
+        subject_list = [str(sub).zfill(2) for sub in subject_list if sub not in [8, 13, 16, 31, 32, 44]]
+
+    else:
+
+>>>>>>> 7281240 (Locally changed GLM szcripts)
 
     if 'PPI' in model:
         assert(ppi_roi is not None), "PPI needs an ROI definition!"
