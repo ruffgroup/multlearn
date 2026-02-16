@@ -1,8 +1,0 @@
-services:
-  hddm:
-    build: .
-    volumes:
-        - "/Volumes/SDrive/multlearn-sns:/code"
-        - "/Volumes/SDrive:/data"
-        - "./init.sh:/init.sh"
-    entrypoint: sh -c "/init.sh"
