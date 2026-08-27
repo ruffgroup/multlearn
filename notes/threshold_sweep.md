@@ -234,3 +234,32 @@ Two things follow.
   clusters are exactly that (largest 143 voxels at t > 3.98). So the right conclusion is that
   the frontal/insular uRPE-positive effect is **method-dependent** — clear under cluster-extent
   inference at a strict threshold, near-absent under TFCE — not that it is spurious.
+
+## Engine overview figure
+
+`notes/figures/fig_engines_model7.pdf` (and `_model2`), from `notes/figures/fig_engines.py`.
+
+**Both engines are permutation tests.** SnPM and nilearn each run a sign-flipping
+permutation test with 5000 permutations, on the same 58 first-level contrast images and the
+same analysis mask. Neither uses a parametric random-field approximation. Cluster-extent FWE
+in nilearn is the max-cluster-size null built from those sign flips, exactly as in SnPM.
+
+What actually differs is (i) the **family** — SnPM's `Tsign` tests each tail as its own
+one-tailed family, nilearn's `two_sided_test=True` controls both tails at once and is about
+twice as strict in the tail; (ii) the **statistic** — SnPM offers extent only, nilearn adds
+cluster mass, voxel-wise max-t and TFCE; (iii) **connectivity** — SPM uses 18, nilearn
+hardcodes 6, patched to 18 here so it is not in play.
+
+Result: **16 of 23 panels agree to the voxel** (Dice > 0.995). The disagreements are all
+marginal effects and all in the same direction, SnPM being the more permissive:
+
+| Panel | SnPM | nilearn extent |
+|---|---|---|
+| Signed RPE −, p < .001 | 88 vox | 0 |
+| Surprise +, p < .01 | 616 vox | 0 |
+| Surprise +, p < .005 | 894 vox | 0 |
+
+The figure also puts the two threshold-free corrections on the same axis, which is the
+compact version of the whole document: RPE + survives everything (≈ 40% of the mask under
+TFCE, ≈ 20% under voxel max-t), uRPE − survives everything (≈ 27% under TFCE), and
+surprise + survives cluster-extent inference at a permissive family and nothing else.

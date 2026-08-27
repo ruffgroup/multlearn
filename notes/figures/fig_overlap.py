@@ -332,7 +332,11 @@ def slice_row(fig, cell, source, variant, mode, cuts, which, info=None):
         if m is None or np.asarray(m.dataobj).sum() == 0:
             empty.append((signal, tail))
         else:
-            loaded.append((signal, m))
+            loaded.append((signal, m, int((np.asarray(m.dataobj) > 0).sum())))
+    # Paint the biggest map first and the smallest last. Drawn in list order, a
+    # 211-voxel surprise map disappears under an 8.6%-of-brain uRPE-negative one.
+    loaded.sort(key=lambda t: -t[2])
+    loaded = [(sig, m) for sig, m, _ in loaded]
     if not loaded:                      # nothing survives: draw the anatomy alone
         disp = plotting.plot_roi(nib.Nifti1Image(np.zeros((2, 2, 2), np.float32),
                                                  np.eye(4)),
@@ -349,8 +353,11 @@ def slice_row(fig, cell, source, variant, mode, cuts, which, info=None):
         for signal, m in loaded[1:]:
             disp.add_overlay(m, threshold=0.5, transparency=ALPHA[signal],
                              cmap=mcolors.ListedColormap([COLOR[signal]]))
-    for signal, m in loaded:
-        disp.add_contours(m, levels=[0.5], linewidths=0.45,
+    # outline everything, small maps last and heavier so they stay findable
+    for signal, m in loaded[::-1]:
+        n = int((np.asarray(m.dataobj) > 0).sum())
+        lw = 0.45 if n > 3000 else (0.6 if n > 800 else 0.85)
+        disp.add_contours(m, levels=[0.5], linewidths=lw,
                           colors=[mix(mcolors.to_rgb(COLOR[signal]), (0, 0, 0), 0.35)])
     disp.annotate(size=6.2)
 
