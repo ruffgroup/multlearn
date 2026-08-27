@@ -17,8 +17,10 @@ tests that directly:
 
 ROI names come from the paper's own cluster tables (appendices con1 / con5 /
 urpe_contrasts) by nearest reported peak; anything with no reported peak nearby
-is labelled from AAL, which is the vocabulary those tables already use.
-Harvard-Oxford is deliberately not used.
+falls back to a Talairach gyrus label, whose vocabulary ("Angular Gyrus",
+"Precuneus", "Middle Frontal Gyrus") is the one those tables already speak.
+Harvard-Oxford is deliberately not used.  (AAL would have been the closer match
+still, but gin.cnrs.fr serves it over a certificate that fails verification.)
 
 Outputs to $SWEEP_ROOT/contrast_rois/<source>/ :
     contrast_roi_overlap.tsv   one row per ROI x signal
@@ -86,30 +88,33 @@ def load_map(source, signal, sign, thr):
     return img, np.nan_to_num(np.squeeze(img.get_fdata()))
 
 
-def aal_labeller(ref):
-    aal = datasets.fetch_atlas_aal()
-    img = resample_to_img(aal.maps, ref, interpolation="nearest",
+def gyrus_labeller(ref):
+    """Talairach gyrus label of a mask's modal voxel, plus hemisphere from x."""
+    atlas = datasets.fetch_atlas_talairach(level_name="gyrus")
+    img = resample_to_img(atlas.maps, ref, interpolation="nearest",
                           force_resample=True, copy_header=True)
     data = np.round(np.nan_to_num(img.get_fdata())).astype(int)
-    lut = {int(i): n for i, n in zip(aal.indices, aal.labels)}
+    labels = list(atlas.labels)
 
-    def label_at(ijk, mask):
+    def label_at(ijk, mask, peak_mm):
         vals = data[mask]
         vals = vals[vals != 0]
         if vals.size == 0:
             return "Unlabelled"
-        top = np.bincount(vals).argmax()
-        name = lut.get(int(top), "Unlabelled")
-        return (name.replace("_", " ").replace(" R", " R").replace(" L", " L"))
+        name = labels[int(np.bincount(vals).argmax())]
+        if name in ("Sub-Gyral", "Unlabelled", "Background"):
+            return f"Unlabelled ({peak_mm[0]:.0f}, {peak_mm[1]:.0f}, {peak_mm[2]:.0f})"
+        side = "L" if peak_mm[0] < -4 else ("R" if peak_mm[0] > 4 else "")
+        return f"{name} {side}".strip()
     return label_at
 
 
-def name_for(peak_mm, ijk, mask, aal_label):
+def name_for(peak_mm, ijk, mask, gyrus_label):
     d = [(np.linalg.norm(np.array(peak_mm) - np.array(p[1:])), p[0]) for p in PAPER_PEAKS]
     dist, nm = min(d)
     if dist <= PAPER_MATCH_MM:
         return nm, round(float(dist), 1)
-    return aal_label(ijk, mask), np.nan
+    return gyrus_label(ijk, mask, peak_mm), np.nan
 
 
 def main(source, thr, out_root):
@@ -121,7 +126,7 @@ def main(source, thr, out_root):
         con_of[signal] = (match[0]["model"], match[0]["con"])
 
     ref = nib.load(first_level(con_of["rpe"][0], SUBJECTS[0], con_of["rpe"][1]))
-    aal_label = aal_labeller(ref)
+    gyrus_label = gyrus_labeller(ref)
 
     tmap = nib.load(op.join(snpm_dir(*con_of["rpe"]), "snpmT+.img"))
     td = np.asarray(tmap.dataobj, dtype=np.float64)
@@ -174,7 +179,7 @@ def main(source, thr, out_root):
 
     for r in merged:
         r["mask"] &= analysis_mask
-        nm, dist = name_for(r["peak_mm"], r["peak_ijk"], r["mask"], aal_label)
+        nm, dist = name_for(r["peak_mm"], r["peak_ijk"], r["mask"], gyrus_label)
         r["name"], r["paper_dist_mm"] = nm, dist
 
     # disambiguate repeated names
