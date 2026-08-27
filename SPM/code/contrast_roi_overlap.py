@@ -229,7 +229,7 @@ def main(source, variant, out_root):
         subj[signal] = arr
         print(f"[{source}] loaded {signal} ({model} con{con})", flush=True)
 
-    rows, info = [], []
+    rows, info, per_subject = [], [], []
     for r in merged:
         m = r["mask"]
         cov = {}
@@ -243,6 +243,9 @@ def main(source, variant, out_root):
                          paper_dist_mm=r["paper_dist_mm"], **cov))
         for signal in SIGNALS:
             v = subj[signal][:, m].mean(axis=1)
+            for sub, val in zip(SUBJECTS, v):
+                per_subject.append(dict(subject=sub, name=r["name"], signal=signal,
+                                        value=float(val)))
             t, p = stats.ttest_1samp(v, 0)
             rows.append(dict(source=source, name=r["name"], signal=signal,
                              mean=float(v.mean()), sem=float(stats.sem(v)),
@@ -263,6 +266,9 @@ def main(source, variant, out_root):
     os.makedirs(out_dir, exist_ok=True)
     df.to_csv(op.join(out_dir, "contrast_roi_overlap.tsv"), sep="\t", index=False)
     pd.DataFrame(info).to_csv(op.join(out_dir, "contrast_roi_info.tsv"), sep="\t", index=False)
+    # per-subject values: everything the interaction and equivalence tests need
+    pd.DataFrame(per_subject).to_csv(op.join(out_dir, "subject_values.tsv"),
+                                     sep="\t", index=False)
 
     lab = np.zeros(analysis_mask.shape, np.float32)
     for i, r in enumerate(merged, start=1):
