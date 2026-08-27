@@ -12,9 +12,12 @@ specific.
 
 Parcellation : Harvard-Oxford maxprob-thr25-2mm, cortical (split into left and
                right) plus subcortical, resampled to the contrast grid.
-Relevance    : a parcel is kept if at least --min-sig-vox of its voxels are
-               inside a cluster-FWE surviving cluster of ANY signal in EITHER
-               sign, at the reference cluster-forming threshold.
+Relevance    : a parcel is kept if at least --min-sig-vox of its voxels AND at
+               least --min-sig-frac of its volume fall inside a cluster-FWE
+               surviving cluster of ANY signal in EITHER sign, at the reference
+               cluster-forming threshold.  The fraction criterion is what keeps
+               the table readable: without it, a map that covers most of the
+               brain drags in every parcel it grazes.
 Signals      : the per-subject contrast images that the 2nd level itself tests
                (already averaged over runs and modalities), one-sample t-tested
                within each parcel.
@@ -111,7 +114,7 @@ def load_survivors(source, signal, thr):
     return out
 
 
-def main(source, min_sig_vox, thr, out_root):
+def main(source, min_sig_vox, min_sig_frac, thr, out_root):
     signals = ["rpe", "urpe", "surprise"]
     con_of = {}
     for signal in signals:
@@ -144,10 +147,11 @@ def main(source, min_sig_vox, thr, out_root):
         if mask.sum() < 30:          # too small in-mask to average meaningfully
             continue
         n_sig = int((mask & touched).sum())
-        if n_sig >= min_sig_vox:
+        if n_sig >= min_sig_vox and n_sig / mask.sum() >= min_sig_frac:
             keep.append((pid, mask, n_sig))
-    print(f"[{source}] {len(keep)} of {len(names)} parcels touched by >= "
-          f"{min_sig_vox} surviving voxels at t = {thr}", flush=True)
+    print(f"[{source}] {len(keep)} of {len(names)} parcels with >= {min_sig_vox} "
+          f"surviving voxels and >= {min_sig_frac:.0%} of their volume covered, "
+          f"at t = {thr}", flush=True)
 
     # per-subject parcel means of each signal's contrast image
     rows, info = [], []
@@ -207,7 +211,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", choices=["model7", "model2"], default="model7")
     parser.add_argument("--min-sig-vox", type=int, default=20)
+    parser.add_argument("--min-sig-frac", type=float, default=0.15)
     parser.add_argument("--threshold", type=float, default=REF_THRESHOLD)
     parser.add_argument("--out-root", default=op.join(SWEEP_ROOT, "roi_matrix"))
     args = parser.parse_args()
-    main(args.source, args.min_sig_vox, args.threshold, args.out_root)
+    main(args.source, args.min_sig_vox, args.min_sig_frac, args.threshold,
+         args.out_root)
