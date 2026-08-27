@@ -32,6 +32,7 @@ import seaborn as sns  # noqa: E402
 from matplotlib import colors as mcolors  # noqa: E402
 from matplotlib import patheffects as pe  # noqa: E402
 from matplotlib.backends.backend_pdf import PdfPages  # noqa: E402
+from matplotlib.patches import Rectangle  # noqa: E402
 from nilearn import plotting  # noqa: E402
 from nilearn.image import resample_img  # noqa: E402
 
@@ -65,6 +66,7 @@ mpl.rcParams.update({
 
 ALPHA = {"rpe": 0.68, "urpe": 0.55, "surprise": 0.55}   # RPE is the reference, so a bit stronger
 MASK_VOX = 59838          # SnPM's analysis mask
+MIN_LABEL_SEP_MM = 16.0   # keep ROI numbers from printing on top of each other
 AXIAL = [-20, -10, 0, 10, 20, 30, 40, 50]
 CORONAL = [-88, -68, -50, -32, -14, 4, 22, 42]
 
@@ -122,9 +124,18 @@ def load(source, variant):
     # order on the first-listed source, but keep the full list for the label
     info["primary"] = info["found_by"].str.split(" | ", regex=False).str[0]
     info["group"] = pd.Categorical(info["primary"], categories=GROUP_ORDER, ordered=True)
-    info = info.sort_values(["outside", "group", "n_vox"],
-                            ascending=[False, True, False]).reset_index(drop=True)
     info["found_by"] = info["found_by"].astype(str)
+    # Group rows by PROFILE -- which set of maps claims the ROI -- rather than by
+    # the contrast that happened to define it. That is the grouping the reader
+    # asks about, and it is the one a rectangle can enclose.
+    info["profile"] = [profile_tag(r) for r in info.itertuples()]
+    size = info["profile"].value_counts()
+    order = sorted(size.index,
+                   key=lambda t: (0 if t.endswith("*") else 1, -size[t], t))
+    rank = {t: i for i, t in enumerate(order)}
+    info["profile_rank"] = info["profile"].map(rank)
+    info = info.sort_values(["profile_rank", "n_vox"],
+                            ascending=[True, False]).reset_index(drop=True)
     info["roi_id"] = np.arange(1, len(info) + 1)   # keys the brain maps to the rows
     pairs = None
     fn = op.join(d, "roi_pair_tests.tsv")
@@ -146,7 +157,7 @@ def load(source, variant):
 # panel's aspect ratio -- drawing these as data-space rectangles makes squares
 # come out as wide rectangles.
 
-X_LABEL = 0.040          # left edge of the ROI name
+X_LABEL = 0.012          # left edge of the ROI name
 X_COV0 = 0.385           # first "covered by map" column
 X_STEP = 0.0385
 X_EFF0 = 0.640           # first "effect in ROI" column
@@ -156,37 +167,63 @@ X_PAIR_STEP = 0.066
 COV_MS = 9.0             # side of a 100%-coverage square, in points
 
 PAIRS = [("urpe", "surprise"), ("rpe", "urpe"), ("rpe", "surprise")]
+SHORT = {"rpe": "RPE", "urpe": "uRPE", "surprise": "Surprise"}
+PROFILE_MIN = 0.10       # a map has to cover a tenth of the ROI to be named
+
+
+def profile_members(rec):
+    """Which maps cover at least PROFILE_MIN of this ROI, in a fixed order."""
+    return [(sig, tail) for sig in SIGNALS for tail in ("pos", "neg")
+            if getattr(rec, f"{sig}_{tail}") >= PROFILE_MIN]
+
+
+def profile_color(members):
+    if not members:
+        return (0.45, 0.45, 0.45)
+    return mix(np.mean([mcolors.to_rgb(COLOR[s]) for s, _ in members], axis=0),
+               (0, 0, 0), 0.28)
+
+
+def profile_tag(rec):
+    """Compact statement of which contrasts claim this ROI.
+
+    The coverage squares already say it, but only if the reader decodes six
+    columns of areas; the tag says it in words, which is what a caption or a
+    conversation needs."""
+    glyph = {"pos": "+", "neg": "\u2212"}
+    members = profile_members(rec)
+    names = [SHORT[sig] + glyph[tail] for sig, tail in members]
+    if not names:
+        return "no map \u2265 10%"
+    tails = {t for _, t in members}
+    star = " *" if len(tails) > 1 else ""      # opposite signs in the same tissue
+    if len(names) == 1:
+        return f"only {names[0]}"
+    return " & ".join(names) + star
 
 
 def row_layout(info):
-    """y for every row, plus (label, y0, y1) for each found-by group and each
-    covered/not-covered super-group."""
-    ys, groups, supers = [], [], []
-    y = 0.0
-    prev_found, prev_outside = None, None
+    """y for every row, plus (profile, y0, y1) for each profile block."""
+    ys, groups = [], []
+    y = -1.7                     # headroom so the first box clears the headers
+    prev_found = None
     for rec in info.itertuples():
-        if prev_outside is not None and rec.outside != prev_outside:
-            y -= 1.5
-        if rec.found_by != prev_found:
+        if rec.profile != prev_found:
             if prev_found is not None:
                 y -= 1.32
-            groups.append([rec.found_by, y, y])  # label carries every source
+            groups.append([rec.profile, y, y])
         else:
             groups[-1][2] = y
-        if prev_outside is None or rec.outside != prev_outside:
-            supers.append([rec.outside, y, y])
-        else:
-            supers[-1][2] = y
         ys.append(y)
-        prev_found, prev_outside = rec.found_by, rec.outside
+        prev_found = rec.profile
         y -= 1.0
-    return np.array(ys), groups, supers
+    return np.array(ys), groups
 
 
 def panel_matrix(fig, gs, info, long, pairs=None):
     ax = fig.add_subplot(gs)
     ax.set_axis_off()
-    ys, groups, supers = row_layout(info)
+    ys, groups = row_layout(info)
     ax.set_xlim(0, 1)
     ax.set_ylim(ys.min() - 1.4, 3.6)
 
@@ -224,6 +261,10 @@ def panel_matrix(fig, gs, info, long, pairs=None):
                 color="0.45")
         ax.text(X_LABEL + 0.018, yi, rec.name, ha="left", va="center", fontsize=7,
                 color="0.1")
+        parts = [p.split() for p in rec.found_by.split(" | ")]
+        ax.text(X_COV0 - 0.030, yi,
+                "found by " + " and ".join(f"{LABEL[a]} {b}" for a, b in parts),
+                ha="right", va="center", fontsize=6.0, color="0.50")
         for xi, (s, sg) in zip(x_cov, cov_cols):
             c = getattr(rec, f"{s}_{sg}")
             if c <= 0.01:
@@ -261,22 +302,24 @@ def panel_matrix(fig, gs, info, long, pairs=None):
                     ax.plot([xi], [yi], marker="_", ms=5.0, color="0.65", mew=1.2)
 
     # --- found-by group labels, in the gutter above each block
-    for found, y0, y1 in groups:
-        parts = [p.split() for p in found.split(" | ")]
-        text = "Found by " + " and ".join(f"{LABEL[a]} {b}" for a, b in parts)
-        ax.text(X_LABEL + 0.018, y0 + 0.74, text, ha="left", va="center", fontsize=6.8,
-                color=COLOR[parts[0][0]], fontstyle="italic")
-
-    # --- the finding, as brackets rather than arrows
-    for outside, y0, y1 in supers:
-        xb = 0.022
-        ax.plot([xb, xb], [y0 + 1.05, y1 - 0.45], lw=1.4, color="0.25",
-                solid_capstyle="butt")
-        for yy in (y0 + 1.05, y1 - 0.45):
-            ax.plot([xb, xb + 0.012], [yy, yy], lw=1.4, color="0.25")
-        ax.text(xb - 0.012, (y0 + y1) / 2, "Outside the RPE map" if outside
-                else "Inside the RPE map", rotation=90, ha="center", va="center",
-                fontsize=7.5, color="0.15", fontweight="bold")
+    col_of = {rec.profile: profile_color(profile_members(rec))
+              for rec in info.itertuples()}
+    n_of = info["profile"].value_counts()
+    for prof, y0, y1 in groups:
+        col = col_of[prof]
+        # the box has to reach above the first row so the header sits inside it
+        ax.add_patch(Rectangle((0.004, y1 - 0.52), 0.988, (y0 - y1) + 1.55,
+                               facecolor=mix(col, (1, 1, 1), 0.93),
+                               edgecolor=col, lw=0.8, zorder=0,
+                               joinstyle="round"))
+        n_block = int(round(y0 - y1)) + 1        # rows in THIS box, not overall
+        extra = ("" if n_block == n_of[prof]
+                 else f" of {n_of[prof]}")
+        ax.text(X_LABEL + 0.018, y0 + 0.78,
+                f"{prof}   \u2014   {n_block} cluster"
+                f"{'s' if n_block != 1 else ''}{extra}",
+                ha="left", va="center", fontsize=6.9, color=col,
+                fontweight="bold")
 
     ax.plot([x_cov[-1] + X_STEP * 0.75] * 2, [ys.min() - 0.6, 1.2], lw=0.6,
             color="0.78")
@@ -288,64 +331,71 @@ def panel_matrix(fig, gs, info, long, pairs=None):
 def panel_key(fig, gs):
     """A glyph matrix needs a real key; this one names every mark on the table.
 
-    It runs full width under the table rather than down the right-hand side: the
-    table grew a third block of columns and no longer leaves a margin wide enough
-    for a legend without clipping it."""
+    Paragraphs are wrapped to a fixed character width rather than hand-broken:
+    unwrapped lines ran into the next column, and the vertical slots below are
+    spaced so a two-line paragraph can never reach the first marker."""
     ax = fig.add_subplot(gs)
     ax.set_axis_off()
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
     grey = "#4A4A4A"
-    xs = [0.005, 0.265, 0.520, 0.765]
+    xs = [0.005, 0.265, 0.520, 0.762]
+    WRAP = 38
+    SLOTS = [0.50, 0.385, 0.270, 0.155, 0.040]
 
     def head(x, txt):
-        ax.text(x, 0.97, txt, fontsize=7.5, color="0.1", va="top", fontweight="bold")
+        ax.text(x, 0.985, txt, fontsize=7.5, color="0.1", va="top",
+                fontweight="bold")
 
-    def para(x, y, txt):
-        ax.text(x, y, txt, fontsize=6.5, color="0.28", va="top", linespacing=1.6)
+    def para(x, y, txt, size=6.4):
+        ax.text(x, y, textwrap.fill(txt, WRAP), fontsize=size, color="0.28",
+                va="top", linespacing=1.55)
 
-    def item(x, y, txt):
-        ax.text(x + 0.038, y, txt, fontsize=6.4, color="0.28", va="center")
+    def item(x, slot, marker, txt, **kw):
+        y = SLOTS[slot]
+        if marker is not None:
+            ax.plot([x + 0.012], [y], **marker)
+        ax.text(x + 0.040, y, txt, fontsize=6.3, color="0.28", va="center")
+        return y
 
     head(xs[0], "Rows")
-    para(xs[0], 0.82, "One cluster found by one of the six contrasts.\nThe bracket says "
-         "whether the signed-RPE map\ncovers it (\u2265 5%). The number keys the row to\n"
-         "its peak on the map pages.")
+    para(xs[0], 0.855, "One cluster found by one of the six contrasts. Rows are "
+         "boxed by profile \u2014 the set of maps covering at least a tenth of them "
+         "\u2014 and the box is drawn in that profile's colour. The number keys the "
+         "row to its peak on the map pages.")
 
     head(xs[1], "Covered by map")
-    para(xs[1], 0.82, "Share of the ROI's voxels inside that map's\nsurviving clusters.")
-    for i, c in enumerate((1.0, 0.5, 0.1)):
-        y = 0.58 - i * 0.135
-        ax.plot([xs[1] + 0.012], [y], marker="s", ms=COV_MS * np.sqrt(c), mfc=grey,
-                mec="none")
-        item(xs[1], y, f"{c:.0%} of the ROI")
-    ax.plot([xs[1] + 0.012], [0.175], marker="s", ms=COV_MS * 0.8, mfc="white",
-            mec=grey, mew=1.0)
-    item(xs[1], 0.175, "Open square = negative tail")
-    ax.plot([xs[1] + 0.012], [0.055], marker=".", ms=1.6, color="0.78")
-    item(xs[1], 0.055, "Dot = below 1%, no overlap")
+    para(xs[1], 0.855, "Share of the ROI's voxels inside that map's surviving "
+         "clusters.")
+    for slot, c in enumerate((1.0, 0.5, 0.1)):
+        item(xs[1], slot, dict(marker="s", ms=COV_MS * np.sqrt(c), mfc=grey,
+                               mec="none"), f"{c:.0%} of the ROI")
+    item(xs[1], 3, dict(marker="s", ms=COV_MS * 0.8, mfc="white", mec=grey,
+                        mew=1.0), "Open square = negative tail")
+    item(xs[1], 4, dict(marker=".", ms=1.6, color="0.78"),
+         "Dot = below 1%, no overlap")
 
     head(xs[2], "Effect in ROI")
-    para(xs[2], 0.82, "Group one-sample t of that signal's contrast\nvalue, averaged over "
-         "the ROI.")
-    ax.plot([xs[2] + 0.012], [0.60], marker="^", ms=8.5, mfc=grey, mec=grey)
-    item(xs[2], 0.60, "Positive, and significant")
-    ax.plot([xs[2] + 0.012], [0.45], marker="v", ms=8.5, mfc=grey, mec=grey)
-    item(xs[2], 0.45, "Negative, and significant")
-    ax.plot([xs[2] + 0.012], [0.30], marker="^", ms=5.0, mfc="white", mec=grey, mew=0.9)
-    item(xs[2], 0.30, "Open = not significant")
-    para(xs[2], 0.185, "Bigger marker = a larger effect.\nHolm-corrected over all "
-         "ROI \u00d7 signal tests.")
+    para(xs[2], 0.855, "Group one-sample t of that signal's contrast value, "
+         "averaged over the ROI.")
+    item(xs[2], 0, dict(marker="^", ms=8.5, mfc=grey, mec=grey),
+         "Positive, and significant")
+    item(xs[2], 1, dict(marker="v", ms=8.5, mfc=grey, mec=grey),
+         "Negative, and significant")
+    item(xs[2], 2, dict(marker="^", ms=5.0, mfc="white", mec=grey, mew=0.9),
+         "Open = not significant")
+    para(xs[2], 0.185, "Bigger marker = a larger effect. Holm-corrected over all "
+         "ROI \u00d7 signal tests.", size=6.2)
 
     head(xs[3], "Are they different?")
-    para(xs[3], 0.82, "One signal against another inside the\nROI, paired across subjects.")
-    ax.plot([xs[3] + 0.012], [0.60], marker="^", ms=8.5, mfc=grey, mec=grey)
-    item(xs[3], 0.60, "Different; points to the larger")
-    ax.plot([xs[3] + 0.012], [0.45], marker="o", ms=5.2, mfc="white", mec=grey, mew=1.3)
-    item(xs[3], 0.45, "Equivalent (BF\u2080\u2081 > 3)")
-    ax.plot([xs[3] + 0.012], [0.30], marker="_", ms=5.2, color="0.65", mew=1.2)
-    item(xs[3], 0.30, "Undetermined")
-    para(xs[3], 0.185, "TOST bound in the table is dz = 0.368,\nthe smallest effect this "
-         "design can\nfind with 80% power.")
+    para(xs[3], 0.855, "One signal against another inside the ROI, paired across "
+         "subjects.")
+    item(xs[3], 0, dict(marker="^", ms=8.5, mfc=grey, mec=grey),
+         "Different; points to the larger")
+    item(xs[3], 1, dict(marker="o", ms=5.2, mfc="white", mec=grey, mew=1.3),
+         "Equivalent (BF\u2080\u2081 > 3)")
+    item(xs[3], 2, dict(marker="_", ms=5.2, color="0.65", mew=1.2), "Undetermined")
+    para(xs[3], 0.185, "TOST bound in the table is dz = 0.368, the smallest effect "
+         "this design can find with 80% power.", size=6.2)
     return ax
 
 
@@ -423,13 +473,35 @@ def slice_row(fig, cell, source, variant, mode, cuts, which, info=None):
         plane = {"z": ("peak_x", "peak_y"), "y": ("peak_x", "peak_z"),
                  "x": ("peak_y", "peak_z")}[mode]
         for coord, slicer in disp.axes.items():
+            pts = []
             for rec in info.itertuples():
                 pk = (rec.peak_x, rec.peak_y, rec.peak_z)[axis]
                 if abs(pk - coord) > 9:
                     continue
                 sig = rec.found_by.split(" | ")[0].split()[0]
-                slicer.ax.text(getattr(rec, plane[0]), getattr(rec, plane[1]),
-                               f"{rec.roi_id}", fontsize=5.6, ha="center",
+                pts.append([float(getattr(rec, plane[0])),
+                            float(getattr(rec, plane[1])), rec.roi_id, sig])
+            # nudge labels apart: two ROIs whose peaks are within a few mm print
+            # on top of each other and read as one number ("11" + "9" -> "119")
+            xy = np.array([[p[0], p[1]] for p in pts], float)
+            for _ in range(60):
+                moved = False
+                for i in range(len(xy)):
+                    for j in range(i + 1, len(xy)):
+                        d = xy[i] - xy[j]
+                        dist = np.hypot(*d)
+                        if dist < MIN_LABEL_SEP_MM:
+                            if dist < 1e-6:
+                                d = np.array([1.0, 0.0])
+                                dist = 1.0
+                            push = (MIN_LABEL_SEP_MM - dist) / 2 * d / dist
+                            xy[i] += push
+                            xy[j] -= push
+                            moved = True
+                if not moved:
+                    break
+            for (px, py), (_, _, rid, sig) in zip(xy, pts):
+                slicer.ax.text(px, py, f"{rid}", fontsize=5.6, ha="center",
                                va="center", color=COLOR[sig], fontweight="bold",
                                path_effects=halo, zorder=100, clip_on=False)
     return ax, empty
@@ -484,19 +556,60 @@ def map_extents(source, variant):
     return out
 
 
+def profile_strip(fig, gs, info):
+    """How many ROIs share each profile, in the colour the tags use.
+
+    A reader's first question about the tags is how many groups there are and how
+    the ROIs divide between them; counting rows by eye down a 21-row table is
+    exactly the work a figure should be doing for them."""
+    ax = fig.add_subplot(gs)
+    ax.set_axis_off()
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    counts = {}
+    for rec in info.itertuples():
+        tag = profile_tag(rec)
+        counts.setdefault(tag, [0, profile_color(profile_members(rec))])
+        counts[tag][0] += 1
+    items = sorted(counts.items(), key=lambda kv: (-kv[1][0], kv[0]))
+
+    ax.text(0.005, 0.96, f"Profile groups \u2014 {len(items)} of them across "
+            f"{len(info)} ROIs", fontsize=7.5, color="0.1", va="top",
+            fontweight="bold")
+    # mixed-sign groups first: a region that is positive for one signal and
+    # negative for another is the pattern this whole re-analysis is about
+    items.sort(key=lambda kv: (0 if kv[0].endswith("*") else 1, -kv[1][0], kv[0]))
+    x, y = 0.005, 0.70
+    for tag, (n, col) in items:
+        txt = f"{tag} ({n})"
+        w = 0.0092 * len(txt) + 0.020
+        if x + w > 0.995:
+            x, y = 0.005, y - 0.235
+        ax.text(x, y, txt, fontsize=6.6, color=col, va="center", fontweight="bold")
+        x += w
+    ax.text(0.005, 0.20, "*  the same tissue responds positively to one signal and "
+            "negatively to another \u2014 these groups are listed first.",
+            fontsize=6.4, color="0.20", va="center")
+    ax.text(0.005, 0.045, "Membership is map coverage: a map counts if it covers at "
+            "least a tenth of the ROI. It is not the difference tests \u2014 a signal "
+            "can be in the tag and still be \u201cundetermined\u201d against another.",
+            fontsize=6.3, color="0.45", va="center")
+    return ax
+
+
 def page_matrix(pdf, source, variant, info, long, label):
     n = len(info)
     h_matrix = max(2.4, 0.235 * n + 1.75)
-    h_key = 1.35
-    h_total = h_matrix + h_key
+    h_key, h_strip = 1.75, 1.00
+    h_total = h_matrix + h_strip + h_key
     fig = plt.figure(figsize=(7.25, h_total))
-    gs = fig.add_gridspec(2, 1, height_ratios=[h_matrix, h_key], left=0.005,
-                          right=0.995, top=1 - 1.02 / h_total, bottom=0.02,
-                          hspace=0.06)
+    gs = fig.add_gridspec(3, 1, height_ratios=[h_matrix, h_strip, h_key],
+                          left=0.005, right=0.995, top=1 - 1.02 / h_total,
+                          bottom=0.02, hspace=0.05)
     banner(fig, label, source, variant, y_top=1 - 0.10 / h_total,
            dy=0.20 / h_total, dy2=0.36 / h_total)
     ax_m = panel_matrix(fig, gs[0], info, long, pairs=info.attrs.get("pairs"))
-    panel_key(fig, gs[1])
+    profile_strip(fig, gs[1], info)
+    panel_key(fig, gs[2])
     ax_m.text(-0.005, 1.008, "a", transform=ax_m.transAxes, fontsize=8,
               fontweight="bold", va="bottom", ha="left")
     pdf.savefig(fig, facecolor="white")
@@ -512,7 +625,7 @@ def page_maps(pdf, source, variant, info, label, mode, cuts, letter, heading):
     composite -- where the overlap actually lives -- as a single summary row."""
     rows = MAP_ROWS + [None]
     fig = plt.figure(figsize=(7.25, 9.9))
-    gs = fig.add_gridspec(len(rows), 1, left=0.208, right=0.995, top=0.866,
+    gs = fig.add_gridspec(len(rows), 1, left=0.208, right=0.995, top=0.858,
                           bottom=0.045, hspace=0.06)
     banner(fig, label, source, variant)
     # The axial and coronal pages are deliberately identical in layout, which
@@ -523,9 +636,9 @@ def page_maps(pdf, source, variant, info, label, mode, cuts, letter, heading):
     span = f"{'z' if mode == 'z' else 'y'} = {cuts[0]:+d} to {cuts[-1]:+d} mm"
     fig.text(0.030, 0.917, f"{heading}   ·   {span}", fontsize=11.5,
              fontweight="bold", va="top", color="0.08")
-    fig.text(0.030, 0.8915, "one row per map, then all of them together",
+    fig.text(0.030, 0.8935, "one row per map, then all of them together",
              fontsize=7, va="top", color="0.45")
-    fig.add_artist(plt.Line2D([0.005, 0.995], [0.8845, 0.8845],
+    fig.add_artist(plt.Line2D([0.005, 0.995], [0.8775, 0.8775],
                               color="0.80", lw=0.8,
                               transform=fig.transFigure))
 
@@ -613,15 +726,15 @@ def page_conjunctions(pdf, source, variant, label, cuts, top=6):
     fig.text(0.005, 0.916, "d", fontsize=8.5, fontweight="bold", va="top", color="0.08")
     fig.text(0.030, 0.917, "Which contrasts claim each piece of tissue",
              fontsize=11.5, fontweight="bold", va="top", color="0.08")
-    fig.text(0.030, 0.8915, "every combination, then the six biggest mapped",
+    fig.text(0.030, 0.8935, "every combination, then the six biggest mapped",
              fontsize=7, va="top", color="0.45")
-    fig.add_artist(plt.Line2D([0.005, 0.995], [0.8845, 0.8845], color="0.80",
+    fig.add_artist(plt.Line2D([0.005, 0.995], [0.8775, 0.8775], color="0.80",
                               lw=0.8, transform=fig.transFigure))
 
     # the bar chart needs its own left margin for the combination names; the map
     # rows keep the gutter used on the other pages
-    gs_bar = fig.add_gridspec(1, 1, left=0.300, right=0.985, top=0.856,
-                              bottom=0.655)
+    gs_bar = fig.add_gridspec(1, 1, left=0.300, right=0.985, top=0.848,
+                              bottom=0.650)
     gs_map = fig.add_gridspec(len(shown), 1, left=0.208, right=0.995, top=0.612,
                               bottom=0.048, hspace=0.10)
 
