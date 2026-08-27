@@ -19,6 +19,7 @@ rather than scaling the PDF.
 
 import argparse
 import os.path as op
+import textwrap
 
 import matplotlib as mpl
 
@@ -30,6 +31,7 @@ import pandas as pd  # noqa: E402
 import seaborn as sns  # noqa: E402
 from matplotlib import colors as mcolors  # noqa: E402
 from matplotlib import patheffects as pe  # noqa: E402
+from matplotlib.backends.backend_pdf import PdfPages  # noqa: E402
 from nilearn import plotting  # noqa: E402
 from nilearn.image import resample_img  # noqa: E402
 
@@ -63,8 +65,8 @@ mpl.rcParams.update({
 
 ALPHA = {"rpe": 0.68, "urpe": 0.55, "surprise": 0.55}   # RPE is the reference, so a bit stronger
 MASK_VOX = 59838          # SnPM's analysis mask
-AXIAL = [-16, -6, 4, 14, 26, 38, 50]
-CORONAL = [-80, -60, -40, -20, 0, 20, 40]
+AXIAL = [-20, -10, 0, 10, 20, 30, 40, 50]
+CORONAL = [-88, -68, -50, -32, -14, 4, 22, 42]
 
 
 def mix(rgb, other, w):
@@ -337,10 +339,12 @@ def slice_row(fig, cell, source, variant, mode, cuts, which, info=None):
     # 211-voxel surprise map disappears under an 8.6%-of-brain uRPE-negative one.
     loaded.sort(key=lambda t: -t[2])
     loaded = [(sig, m) for sig, m, _ in loaded]
-    if not loaded:                      # nothing survives: draw the anatomy alone
-        disp = plotting.plot_roi(nib.Nifti1Image(np.zeros((2, 2, 2), np.float32),
-                                                 np.eye(4)),
-                                 bg_img=background(), display_mode=mode,
+    if not loaded:
+        # nothing survives: draw the anatomy alone. The placeholder has to carry
+        # the background's own grid, or nilearn rejects the cut coordinates.
+        bgi = background()
+        blank = nib.Nifti1Image(np.zeros(bgi.shape[:3], np.float32), bgi.affine)
+        disp = plotting.plot_roi(blank, bg_img=bgi, display_mode=mode,
                                  cut_coords=cuts, axes=ax, colorbar=False,
                                  annotate=False, draw_cross=False, black_bg=False)
     else:
@@ -379,28 +383,46 @@ def slice_row(fig, cell, source, variant, mode, cuts, which, info=None):
     return ax, empty
 
 
-def map_block(fig, gs_rows, source, variant, which, title, note, info=None):
-    """Two rows of cuts -- axial then coronal -- for one selection of maps."""
-    ax_a, empty = slice_row(fig, gs_rows[0], source, variant, "z", AXIAL, which, info=info)
-    ax_c, _ = slice_row(fig, gs_rows[1], source, variant, "y", CORONAL, which, info=info)
-    ax_a.text(0.030, 1.075, title, transform=ax_a.transAxes, ha="left", va="bottom",
-              fontsize=7.5, color="0.1", fontweight="bold")
-    if note:
-        ax_a.text(1.0, 1.075, note, transform=ax_a.transAxes, ha="right", va="bottom",
-                  fontsize=6.8, color="0.35")
-    return ax_a, ax_c, empty
+# What the two model sources actually are. nipype never forwards the Bunch's
+# orth=["No"], so SPM applied its default within-condition serial
+# orthogonalisation in both -- which matters only in model7, where two
+# modulators share the feedback event.
+MODEL_NOTE = {
+    "model7": ("model7 — one GLM carrying all three signals: choice (surprise, value), "
+               "feedback (uRPE first, then signed RPE). Because SPM orthogonalises "
+               "serially within an event, uRPE keeps all variance it shares with signed "
+               "RPE, and the RPE map is the residual. Apples-to-apples across signals."),
+    "model2": ("model2 — the GLM the paper reports: choice (surprise, value), feedback "
+               "(signed RPE only). It has no uRPE regressor at all, so the uRPE rows and "
+               "maps here come from model7, exactly as the manuscript mixes them. Its RPE "
+               "is the full effect, not a residual."),
+}
 
-
+MAP_ROWS = [("rpe", "pos"), ("rpe", "neg"), ("urpe", "pos"), ("urpe", "neg"),
+            ("surprise", "pos"), ("surprise", "neg")]
 POS = [("rpe", "pos"), ("urpe", "pos"), ("surprise", "pos")]
 NEG = [("rpe", "neg"), ("urpe", "neg"), ("surprise", "neg")]
-BOTH = POS + [("rpe", "neg"), ("urpe", "neg")]
+BOTH = POS + NEG
+TAIL = {"pos": "positive", "neg": "negative"}
+
+
+def banner(fig, label, source, variant, y_top=0.992):
+    """The inference choice, stated large -- it is the thing under test."""
+    fig.text(0.005, y_top, label, fontsize=10.5, fontweight="bold", va="top",
+             color="0.08")
+    ext = {(s, t): n for s, t, n, _ in map_extents(source, variant)}
+    parts = [f"{LABEL[s]} +{100 * ext[(s, 'pos')] / MASK_VOX:.1f} / "
+             f"\u2212{100 * ext[(s, 'neg')] / MASK_VOX:.1f}" for s in SIGNALS]
+    fig.text(0.005, y_top - 0.0225,
+             f"{source}  ·  n = 58  ·  surviving extent, % of mask:  "
+             + "   ".join(parts), fontsize=7.5, va="top", color="0.42")
+    note = MODEL_NOTE.get(source, "")
+    wrapped = textwrap.fill(note, 158)
+    fig.text(0.005, y_top - 0.0405, wrapped, fontsize=6.8, va="top", color="0.42",
+             linespacing=1.55)
 
 
 def map_extents(source, variant):
-    """Surviving extent of each of the six maps, as a share of the analysis mask.
-
-    Stated on the figure so nothing is hidden by the ROI decomposition: a map can
-    be large and still yield no named ROI (one confluent blob), or nearly empty."""
     out = []
     for sig in SIGNALS:
         for tail in ("pos", "neg"):
@@ -410,90 +432,198 @@ def map_extents(source, variant):
     return out
 
 
-def banner(fig, label, source, variant, y_top=0.995):
-    """The inference choice, stated large -- it is the thing under test."""
-    fig.text(0.005, y_top, label, fontsize=10.5, fontweight="bold", va="top",
-             color="0.08")
-    ext = map_extents(source, variant)
-    parts = []
-    for sig in SIGNALS:
-        vals = {t: p for s, t, n, p in ext if s == sig for t in [t]}
-        parts.append(f"{LABEL[sig]} +{vals['pos']:.1f} / −{vals['neg']:.1f}")
-    fig.text(0.005, y_top - 0.0295,
-             f"{source}  ·  n = 58  ·  surviving extent, % of mask:  "
-             + "   ".join(parts),
-             fontsize=7.5, va="top", color="0.42")
-
-
-def figure_overlap(source, variant, info, long, label, out_stem):
+def page_matrix(pdf, source, variant, info, long, label):
     n = len(info)
-    h_matrix = max(1.5, 0.235 * n + 1.15)
-    fig = plt.figure(figsize=(7.25, h_matrix + 2.85))
-    hr = [h_matrix, 1.05, 1.05]
-    gs = fig.add_gridspec(3, 2, height_ratios=hr, width_ratios=[1, 0.245],
-                          left=0.005, right=0.995, top=1 - 0.62 / (h_matrix + 2.85),
-                          bottom=0.045, hspace=0.22, wspace=0.01)
+    h_matrix = max(2.4, 0.235 * n + 1.75)
+    fig = plt.figure(figsize=(7.25, h_matrix))
+    gs = fig.add_gridspec(1, 2, width_ratios=[1, 0.245], left=0.005, right=0.995,
+                          top=1 - 1.02 / h_matrix, bottom=0.03, wspace=0.01)
     banner(fig, label, source, variant)
     ax_m = panel_matrix(fig, gs[0, 0], info, long)
     panel_key(fig, gs[0, 1])
-    ax_b, ax_b2, _ = map_block(
-        fig, [gs[1, :], gs[2, :]], source, variant, BOTH, "Every map, both tails",
-        "Signed RPE (red) · uRPE (green) · surprise (blue) · numbers mark the ROIs of a",
-        info=info)
     ax_m.text(-0.005, 1.008, "a", transform=ax_m.transAxes, fontsize=8,
               fontweight="bold", va="bottom", ha="left")
-    ax_b.text(-0.005, 1.075, "b", transform=ax_b.transAxes, fontsize=8,
-              fontweight="bold", va="bottom", ha="left")
-    ax_b2.text(0.5, -0.13,
-               "Clusters smaller than 25 voxels are not given a row in a; the extents in "
-               "the header are the full maps, so a signal can\nbe large here and absent "
-               "from a (one confluent blob), or present as a map and too small to name.",
-               transform=ax_b2.transAxes, ha="center", va="top", fontsize=7,
-               color="0.35", linespacing=1.7)
-    fig.savefig(out_stem + ".pdf", bbox_inches="tight", pad_inches=0.02)
-    fig.savefig(out_stem + ".svg", bbox_inches="tight", pad_inches=0.02)
+    pdf.savefig(fig, facecolor="white")
     plt.close(fig)
-    print("wrote", out_stem + ".pdf")
 
 
-def figure_maps(source, variant, info, label, out_stem):
-    fig = plt.figure(figsize=(7.25, 9.3))
-    gs = fig.add_gridspec(6, 1, left=0.005, right=0.995, top=0.938, bottom=0.055,
-                          hspace=0.22)
+def page_maps(pdf, source, variant, info, label, mode, cuts, letter, heading):
+    """Small multiples: one row per map, then a composite row.
+
+    Overlaying six maps at once is unreadable when one of them covers a third of
+    the brain and another covers 0.4% of it. Giving each map its own row over the
+    SAME cuts lets extent be compared by eye down a column, and keeps the
+    composite -- where the overlap actually lives -- as a single summary row."""
+    rows = MAP_ROWS + [None]
+    fig = plt.figure(figsize=(7.25, 9.9))
+    gs = fig.add_gridspec(len(rows), 1, left=0.208, right=0.995, top=0.878,
+                          bottom=0.045, hspace=0.06)
     banner(fig, label, source, variant)
-    ax1, ax1b, _ = map_block(fig, [gs[0], gs[1]], source, variant, POS,
-                             "Positive tails",
-                             "Signed RPE (red) · uRPE (green) · surprise (blue)")
-    ax2, ax2b, empty = map_block(fig, [gs[2], gs[3]], source, variant, NEG,
-                                 "Negative tails", "Same three colours")
-    ax3, ax3b, _ = map_block(fig, [gs[4], gs[5]], source, variant, BOTH,
-                             "Both tails together",
-                             "Numbers mark the ROIs of the companion figure",
-                             info=info)
-    for ax, letter in ((ax1, "a"), (ax2, "b"), (ax3, "c")):
-        ax.text(-0.005, 1.075, letter, transform=ax.transAxes, fontsize=8,
-                fontweight="bold", va="bottom", ha="left")
-    if any(sg == "surprise" for sg, _ in empty):
-        ax2.text(0.030, -0.16, "Surprise has no surviving negative clusters here.",
-                 transform=ax2.transAxes, ha="left", va="top", fontsize=6.8,
-                 color="0.35")
-    ax3b.text(0.5, -0.15,
-              "The green of b sits on the red of a — the same territory carries a "
-              "positive signed-RPE response and a negative unsigned one.",
-              transform=ax3b.transAxes, ha="center", va="top", fontsize=7,
-              color="0.35", linespacing=1.7)
-    fig.savefig(out_stem + ".pdf", bbox_inches="tight", pad_inches=0.02)
-    fig.savefig(out_stem + ".svg", bbox_inches="tight", pad_inches=0.02)
+    fig.text(0.005, 0.912, letter, fontsize=8, fontweight="bold", va="top",
+             color="0.08")
+    fig.text(0.030, 0.912, heading, fontsize=9, fontweight="bold", va="top",
+             color="0.08")
+
+    ext = {(s, t): n for s, t, n, _ in map_extents(source, variant)}
+    for i, row in enumerate(rows):
+        which = BOTH if row is None else [row]
+        ax, empty = slice_row(fig, gs[i], source, variant, mode, cuts, which,
+                              info=info if row is None else None)
+        if row is None:
+            ax.text(-0.012, 0.62, "All together", transform=ax.transAxes,
+                    ha="right", va="center", fontsize=7.8, color="0.1",
+                    fontweight="bold")
+            ax.text(-0.012, 0.30, "numbers = ROIs of page 1", transform=ax.transAxes,
+                    ha="right", va="center", fontsize=6.4, color="0.45")
+        else:
+            sig, tail = row
+            n = ext[(sig, tail)]
+            ax.text(-0.012, 0.62, f"{LABEL[sig]} {TAIL[tail]}", transform=ax.transAxes,
+                    ha="right", va="center", fontsize=7.8, color=COLOR[sig],
+                    fontweight="bold")
+            ax.text(-0.012, 0.30,
+                    "no surviving clusters" if n == 0
+                    else f"{n:,} voxels · {100 * n / MASK_VOX:.1f}% of mask",
+                    transform=ax.transAxes, ha="right", va="center", fontsize=6.4,
+                    color="0.45")
+    fig.text(0.5, 0.030,
+             "Same cuts in every row, so extent can be compared straight down a "
+             "column. Rows are the six maps on their own; the last row is all of "
+             "them together.",
+             ha="center", va="top", fontsize=7, color="0.35")
+    pdf.savefig(fig, facecolor="white")
     plt.close(fig)
-    print("wrote", out_stem + ".pdf")
+
+
+def conjunction_table(source, variant):
+    """Label every voxel by WHICH of the six maps cover it.
+
+    This is the 'only uRPE positive' question asked exactly: a voxel's category is
+    the set of contrasts that call it significant, so 'uRPE + only' means no other
+    contrast claims it, and 'RPE + & uRPE \u2212' is the shared territory."""
+    keys, masks = [], []
+    for sig in SIGNALS:
+        for tail in ("pos", "neg"):
+            m = load_map(source, sig, tail, variant)
+            if m is None:
+                continue
+            d = np.asarray(m.dataobj) > 0
+            if d.sum() == 0:
+                continue
+            keys.append((sig, tail))
+            masks.append(d)
+    if not masks:
+        return [], None
+    stack = np.stack(masks)
+    code = np.zeros(stack.shape[1:], np.int64)
+    for i in range(len(keys)):
+        code |= (stack[i].astype(np.int64) << i)
+
+    cats = []
+    for c in np.unique(code):
+        if c == 0:
+            continue
+        members = [keys[i] for i in range(len(keys)) if c >> i & 1]
+        m = code == c
+        sign_glyph = {"pos": "+", "neg": "\u2212"}
+        name = " & ".join(f"{LABEL[s]} {sign_glyph[t]}" for s, t in members)
+        if len(members) == 1:
+            name += " only"
+        col = np.mean([mcolors.to_rgb(COLOR[s]) for s, _ in members], axis=0)
+        cats.append(dict(code=int(c), name=name, mask=m, n=int(m.sum()),
+                         pct=100 * m.sum() / MASK_VOX, color=tuple(col),
+                         n_members=len(members)))
+    cats.sort(key=lambda d: -d["n"])
+    return cats, code
+
+
+def page_conjunctions(pdf, source, variant, label, cuts, top=6):
+    cats, _ = conjunction_table(source, variant)
+    if not cats:
+        return
+    shown = cats[:top]
+    rest = cats[top:]
+
+    fig = plt.figure(figsize=(7.25, 9.9))
+    banner(fig, label, source, variant)
+    fig.text(0.005, 0.912, "d", fontsize=8, fontweight="bold", va="top", color="0.08")
+    fig.text(0.030, 0.912, "Which contrasts claim each piece of tissue",
+             fontsize=9, fontweight="bold", va="top", color="0.08")
+
+    # the bar chart needs its own left margin for the combination names; the map
+    # rows keep the gutter used on the other pages
+    gs_bar = fig.add_gridspec(1, 1, left=0.300, right=0.985, top=0.868,
+                              bottom=0.660)
+    gs_map = fig.add_gridspec(len(shown), 1, left=0.208, right=0.995, top=0.612,
+                              bottom=0.048, hspace=0.10)
+
+    ax = fig.add_subplot(gs_bar[0])
+    y = np.arange(len(cats))[::-1]
+    ax.barh(y, [c["pct"] for c in cats], height=0.68,
+            color=[c["color"] for c in cats],
+            edgecolor=[mix(c["color"], (0, 0, 0), 0.35) for c in cats], lw=0.6)
+    ax.set_yticks(y)
+    ax.set_yticklabels([c["name"] for c in cats], fontsize=6.4)
+    ax.set_ylim(-0.8, len(cats) - 0.2)
+    ax.set_xlabel("% of the analysis mask (voxel counts at right)", fontsize=7.2)
+    ax.set_xscale("symlog", linthresh=1e-2)
+    ax.set_xlim(0, 100)
+    ax.set_xticks([0, 0.1, 1, 10, 100])
+    ax.set_xticklabels(["0", "0.1", "1", "10", "100"], fontsize=6.8)
+    ax.tick_params(axis="y", length=0)
+    for sp in ("top", "right"):
+        ax.spines[sp].set_visible(False)
+    for yi, c in zip(y, cats):
+        ax.text(min(c["pct"] * 1.28 + 0.004, 95), yi, f"{c['n']:,}", va="center",
+                fontsize=5.8, color="0.35")
+
+    bgi = background()
+    for i, c in enumerate(shown):
+        axr = fig.add_subplot(gs_map[i])
+        img = nib.Nifti1Image(c["mask"].astype(np.float32), REF_AFFINE[0])
+        disp = plotting.plot_roi(img, bg_img=bgi, display_mode="z", cut_coords=cuts,
+                                 axes=axr, colorbar=False,
+                                 cmap=mcolors.ListedColormap([c["color"]]),
+                                 alpha=0.80, annotate=False, draw_cross=False,
+                                 black_bg=False, resampling_interpolation="nearest")
+        disp.add_contours(img, levels=[0.5], linewidths=0.5,
+                          colors=[mix(c["color"], (0, 0, 0), 0.35)])
+        disp.annotate(size=6.0)
+        axr.text(-0.012, 0.62, c["name"], transform=axr.transAxes, ha="right",
+                 va="center", fontsize=7.2, color=mix(c["color"], (0, 0, 0), 0.25),
+                 fontweight="bold")
+        axr.text(-0.012, 0.30, f"{c['n']:,} voxels · {c['pct']:.1f}% of mask",
+                 transform=axr.transAxes, ha="right", va="center", fontsize=6.4,
+                 color="0.45")
+
+    extra = ""
+    if rest:
+        extra = (f"  The remaining {len(rest)} combinations hold "
+                 f"{sum(r['n'] for r in rest):,} voxels and are charted but not mapped.")
+    fig.text(0.5, 0.030, textwrap.fill(
+        "A voxel's category is the set of contrasts that call it significant, so "
+        "\u201conly\u201d means no other contrast claims it." + extra, 118),
+        ha="center", va="top", fontsize=6.8, color="0.35", linespacing=1.6)
+    pdf.savefig(fig, facecolor="white")
+    plt.close(fig)
+
+
+REF_AFFINE = [None]
 
 
 def main(source, variant, outdir):
     info, long, label = load(source, variant)
-    figure_overlap(source, variant, info, long, label,
-                   op.join(outdir, f"fig_overlap_{source}_{variant}"))
-    figure_maps(source, variant, info, label,
-                op.join(outdir, f"fig_maps_{source}_{variant}"))
+    out = op.join(outdir, f"fig_overlap_{source}_{variant}")
+    m0 = load_map(source, "rpe", "pos", variant)
+    REF_AFFINE[0] = m0.affine
+    with PdfPages(out + ".pdf") as pdf:
+        page_matrix(pdf, source, variant, info, long, label)
+        page_maps(pdf, source, variant, info, label, "z", AXIAL, "b",
+                  "Axial sections")
+        page_maps(pdf, source, variant, info, label, "y", CORONAL, "c",
+                  "Coronal sections")
+        page_conjunctions(pdf, source, variant, label, AXIAL)
+    print("wrote", out + ".pdf")
 
 
 if __name__ == "__main__":
