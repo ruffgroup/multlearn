@@ -82,6 +82,8 @@ VARIANTS = {
     # name -> (engine, statistic, cluster-forming t or None, human-readable label)
     "extent_p1e4": ("snpm", "size", 3.9756,
                     "Cluster-forming t > 3.98 (p < 1e-4)  ·  cluster-extent FWE p < .05"),
+    "extent_p1e3": ("snpm", "size", 3.2395,
+                    "Cluster-forming t > 3.24 (p < .001)  ·  cluster-extent FWE p < .05"),
     "extent_p1e2": ("snpm", "size", 2.3936,
                     "Cluster-forming t > 2.39 (p < .01)  ·  cluster-extent FWE p < .05"),
     "tfce": ("nilearn", "tfce", None,
