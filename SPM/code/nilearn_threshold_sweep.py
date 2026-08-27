@@ -20,7 +20,10 @@ attribute the discrepancy:
   2. One- vs two-tailed FWE family.  SnPM's `Tsign` runs each tail as its own
      one-tailed family; `--two-sided` (default) controls FWE over both tails at
      once, which is the more defensible -- and stricter -- choice.
-  3. The analysis mask.  We reuse SnPM's own mask (the finite voxels of
+  3. `threshold` in nilearn is a P-VALUE, and with two_sided_test it is halved
+     before conversion to a t; we pass twice the one-tailed p so that the actual
+     cluster-forming t matches the SnPM run exactly (asserted at runtime).
+  4. The analysis mask.  We reuse SnPM's own mask (the finite voxels of
      snpmT+.img) so voxel counts are directly comparable between engines.
 
 Outputs (all float32, gzipped) go to $SWEEP_ROOT/nilearn/<key>/ :
@@ -44,6 +47,7 @@ import time
 import nibabel as nib
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 sys.path.insert(0, op.dirname(op.abspath(__file__)))
 from sweep_config import (ANALYSES, SUBJECTS, SWEEP_ROOT, THRESHOLDS,  # noqa: E402
@@ -112,8 +116,15 @@ def run_analysis(analysis, n_perm, n_jobs, connectivity, two_sided, out_root,
             if op.exists(done):
                 print(f"[{key}] t={thr} exists, skipping", flush=True)
                 continue
+            # nilearn's `threshold` is in P-SCALE, and with two_sided_test it
+            # converts internally as t.isf(threshold / 2, df).  To land on the
+            # cluster-forming t we actually want, pass twice the one-tailed p.
+            p_arg = 2 * p if two_sided else p
+            got_t = stats.t.isf(p_arg / 2 if two_sided else p_arg, len(imgs) - 1)
+            assert abs(got_t - thr) < 1e-3, (
+                f"threshold conversion off: asked t={thr}, nilearn will use {got_t}")
             t0 = time.time()
-            out = non_parametric_inference(imgs, threshold=thr, tfce=False, **common)
+            out = non_parametric_inference(imgs, threshold=p_arg, tfce=False, **common)
             meta["timings"][f"cluster_t{tag}"] = round(time.time() - t0, 1)
             save(out["t"], op.join(out_dir, "t.nii.gz"))
             save(out["logp_max_t"], op.join(out_dir, "logp_max_t.nii.gz"))
