@@ -1,0 +1,420 @@
+\documentclass{article}
+% for affiliations
+\usepackage{authblk}
+\usepackage{float}
+% \usepackage{texcount}d
+
+\usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
+% or, to compress ranges like [2–4]:
+% \usepackage[style=numeric-comp,sorting=none,backend=biber]{biblatex}
+
+
+\addbibresource{sample.bib}
+
+% Language setting
+% Replace `english' with e.g. `spanish' to change the document language
+\usepackage[english]{babel}
+
+% Set page size and margins
+% Replace `letterpaper' with `a4paper' for UK/EU standard size
+\usepackage[a4paper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+\makeatletter
+\newcommand\thankssymb[1]{\textsuperscript{\@fnsymbol{#1}}}
+\makeatother
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{tabularx}
+\usepackage{threeparttable}
+\usepackage{booktabs}
+\usepackage{siunitx}
+\usepackage{appendix}
+
+
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+
+\title{Separable neurocomputational mechanisms underlying multisensory learning}
+\author[1,2]{Saurabh Bedi\thankssymb{1}}
+\author[1,2]{Ella Casimiro\thankssymb{1}}
+\author[1,2]{Gilles de Hollander}
+\author[2,4,6]{Nina Raduner}
+\author[2,4,5]{Fritjof Helmchen}
+\author[2,4,6]{Silvia Brem}
+\author[3]{Arkady Konovalov}
+\author[1,2,4]{Christian C. Ruff}
+\affil[1]{Zurich Center for Neuroeconomics (ZNE), University of Zurich}
+\affil[2]{University Research Priority Program (URPP), Adaptive Brain Circuits in Development and Learning (AdaBD), University of Zurich}
+\affil[3]{Centre for Human Brain Health, School of Psychology, University of Birmingham}
+\affil[4]{Neuroscience Center Zurich, ZNZ}
+\affil[5]{Brain Research Institute, University of Zurich}
+\affil[6]{Department of Child and Adolescent Psychiatry and Psychotherapy, University Hospital of Psychiatry Zurich, University of Zurich}
+
+
+\begin{document}
+\maketitle
+\thanks{\thankssymb{1} Saurabh Bedi and Ella Casimiro are co-first authors}
+
+
+\begin{abstract}
+Efficient control of behavior often requires learning from information distributed across multiple streams, such that no single stream alone is sufficient to guide behavior. Multisensory situations are an ecologically central instance of this problem, because many real-world learning contexts require binding information across visual, auditory, tactile, gustatory, or olfactory inputs. However, most neurocomputational studies have focused on learning signals derived from unisensory paradigms. Here, we identify distinct but interacting neurocomputational mechanisms that support learning of multisensory associations. We designed a task in which behaviorally relevant information was available only from combinations of visual cues with either auditory or tactile cues. In 58 participants undergoing fMRI, we dissociated three processes: multisensory statistical learning (SL), modeled as stimulus-locked Shannon surprise; reinforcement learning (RL), modeled as feedback-locked signed reward prediction errors (RPEs); and feedback-locked unsigned RPEs (uRPEs), reflecting surprise about reward outcomes. Behaviorally, response times scaled with Shannon surprise (SL) while accuracy improved with feedback (RL). Model-based fMRI revealed dissociable but complementary networks: RPEs engaged ventral striatum, vmPFC, and left angular gyrus; surprise recruited bilateral angular gyrus, dlPFC, and precuneus; and uRPEs involved insula, dorsomedial prefrontal, and lateral frontoparietal cortices. Several of these regions extend beyond canonical learning circuits and may contribute to learning when behavior depends on information distributed across sensory modalities. All three networks were modality-general, showing comparable strength for audiovisual and visuotactile learning. Notably, left angular gyrus tracked both Shannon surprise and RPE, suggesting its potential role for integrating structural and value information. These findings indicate that the brain engages distinct but complementary systems for structure-based, reward-based, and outcome-surprise computations. By combining behavioral modeling and fMRI with a novel task design, we provide a framework for dissecting the neurocomputational architecture of learning from distributed information streams, with multisensory learning as the central instantiation.
+
+\end{abstract}
+
+\section*{Introduction}
+
+Most events in daily life engage multiple senses simultaneously: Visual stimuli are paired with sounds, scents, or tactile sensations that the brain seamlessly integrates into a coherent multisensory experience. Reflecting this, neuroscience has increasingly adopted the idea of a multisensory brain \cite{calvert2004handbook, SHIMOJO2001505, ghazanfar2006neocortex, nava2023emergence, zheng2024multisensory}. Evidence shows that even brain regions traditionally viewed as unisensory respond to inputs from multiple sensory modalities \cite{driver2008multisensory}. Multisensory illusions, such as the ventriloquist and the McGurk effect, further demonstrate that this integration is automatic and can fundamentally alter perception \cite{vroomen2004handbook}. While the mechanisms of multisensory perception have been extensively studied \cite{stein2008multisensory, murray2011neural}, far less is known about how the brain learns associations, particularly when stimulus- and action-relevant information resides exclusively in the combination of sensory modalities rather than in any individual sense. Understanding the computational and neural principles of multisensory learning remains a gap with implications for many real-world behaviors and cognitive development \cite{denervaud_multisensory_2020, dionne-dostie_multisensory_2015}. For instance, the development of flavor preferences in childhood shapes lifelong eating habits \cite{beauchamp2009early} and relies on the integration of smell, taste, and touch, as no single modality suffices to create flavor perception \cite{auvray2008multisensory, spence2015multisensory}. Language acquisition similarly depends on multisensory learning \cite{dionne-dostie_multisensory_2015}: reading involves associating visual letters with auditory phonemes and writing involves coordination between visual and tactile information. Impairments in these multisensory processes have been associated with developmental dyslexia \cite{frei2025toward, hahn2014impairments}, a learning disability affecting roughly 5 to 10 percent of the population \cite{shaywitz1990prevalence}. Together, these observations highlight the need to investigate the computational and neural mechanisms that support learning from multisensory information. More generally, these examples illustrate a broader computational problem: learning often depends on non-redundant information distributed across multiple streams, such that no single stream alone is sufficient to guide behavior. This problem is especially prominent in multisensory settings, where natural behavior routinely requires binding inputs across different sensory systems, as in flavor perception, reading, and sensorimotor coordination. Although the same formal problem could in principle arise within a single modality, multisensory contexts are among the most ecologically important settings in which it occurs. We therefore use multisensory learning as a tractable and ecologically important test case for the broader question of how the brain learns from distributed information streams.\newline
+
+Understanding the computational mechanisms underlying multisensory learning begins with identifying the core goals that guide learning more generally. Broadly, learning is shaped by two distinct computational objectives that are each tied to a different source of information. \textbf{Reinforcement learning} (\textbf{RL}) involves learning to predict rewarding stimuli or actions \cite{yerkes1909method, skinner1935two} with the goal of maximizing cumulative reward \cite{sutton2018reinforcement}. In contrast, \textbf{statistical learning} (\textbf{SL}) refers to the learning of environmental regularities, with the goal of enabling efficient allocation of limited cognitive resources to frequently occurring stimuli \cite{barlow1961possible, simoncelli2001natural, geisler2008visual}. These computations are conceptually distinct: RL is driven by rewards, while SL is driven by the statistical structure of the environment. Here, we examine how each of these learning computations operates in multisensory learning, where both structure and reward are embedded across sensory modalities rather than within unisensory information.\newline
+
+Disentangling RL and SL in multisensory contexts is challenging because these processes often interact. While SL can operate independently of reinforcement, as in classic latent learning \cite{tolman1948cognitive}, it can also support RL by uncovering structure in the environment that facilitates more efficient learning \cite{botvinick2015reinforcement, solway2014optimal, lai2022action, dayan1993improving, gershman2018successor}. To examine how these learning computations operate when behavior depends on information distributed across sensory modalities, we designed a novel multisensory task that orthogonalizes RL and SL by separating their informational sources and temporal dynamics. Participants viewed combinations of visual cues with either auditory or tactile signals and judged whether each pairing was correct. Correct responses depended only on the combination of sensory cues rather than on any individual modality. Reinforcement learning was driven by probabilistic feedback, whereas statistical learning was embedded in the frequency with which specific multisensory pairings occurred, providing statistical structure that was irrelevant for reward (see Methods for details). We modeled SL as reward-independent \textbf{Shannon surprise} \cite{6773024} at stimulus onset \cite{bornstein2012dissociating, otto2013curse, konovalov2016gaze, konovalov2018neurocomputational}. Reinforcement learning was modeled using reward prediction errors (RPEs) computed at feedback, capturing the discrepancy between received rewards and expected value estimates derived from the learning model. In addition, we included unsigned RPEs (uRPEs), which index outcome surprise independent of reward valence. Because uRPEs depend on reward feedback like RPEs but quantify statistical surprise like SL, they capture a signal at the intersection of reward-based and structure-based learning. Together, Shannon surprise, signed RPEs, and uRPEs provided complementary measures to dissociate the parallel computations underlying multisensory learning.\newline
+
+This computational and temporal dissociation allowed us to investigate the neural signatures of these learning signals during multisensory learning. Because SL-related surprise occurs at stimulus onset whereas RL-related RPEs and uRPEs occur at feedback, we could temporally separate structure-based and reward-based learning signals in trial-wise fMRI analyses. Previous research in largely unisensory contexts has associated statistical surprise with activity in distributed frontal, posterior parietal regions, and striatal regions \cite{konovalov2018neurocomputational, visalli2019bayesian, o2013dissociable, corlett2022meta}. Similarly, signed RPEs are commonly linked to ventral striatal and medial frontal regions, whereas uRPEs have been associated with activity across frontoparietal and insular cortices \cite{garrison2013prediction, fouragnan2018separate, corlett2022meta}. However, because these findings are largely derived from unisensory paradigms, and have usually focussed on one type of learning,  it remains unknown whether, where, and how the corresponding computations are implemented in parallel when learning depends on associations distributed across multiple senses.\newline
+
+Theoretical accounts of multisensory processing propose several possible architectures for how multisensory computations may be implemented in the brain. One influential framework suggests that certain cortical regions may act as multisensory hubs that integrate information across sensory modalities \cite{driver2008multisensory}. These hubs may be modality-specific - i.e., engaged differently depending on which specific multisensory combinations are processed - or modality-general, operating similarly across various pairings of different senses. To examine these possibilities, we investigated Shannon surprise, signed RPEs, and uRPEs during multisensory learning across two contexts: audiovisual and visuotactile. Specifically, we asked three key questions: (1) which brain regions track these learning signals during multisensory learning, (2) whether these signals are specific to a particular multisensory pairing or generalize across different sensory stream combinations, and (3) are the different computational components of learning (structure-based (SL), reward-based (RPE), and outcome-surprise–based (uRPE)) supported by shared or distinct neural mechanisms. By combining trial-wise computational modeling with temporally separated stimulus and feedback phases, our design allowed us to isolate each computation and directly test these hypotheses within a unified experimental framework.\newline
+
+\section*{Results}
+\subsection*{The experiment}
+To separate SL and RL during multisensory learning, we developed a two-alternative forced choice task performed by participants (n = 64) across six blocks in an fMRI scanner. In each block, they were presented with one of two multisensory stimulus sets (either audiovisual or visuotactile), each comprising nine unique pairings of three insect images with either three auditory “calls” (beep sequences) or three tactile “dances” (vibration patterns). Participants' goal was to infer whether each multisensory pairing would attract a mate, mimicking a scientist classifying courtship success in insect species (Fig. 1a, b). Critically, the correct response depended only on the specific multisensory combination, not on any individual unisensory element (Fig. 1c). Feedback was probabilistic: correct pairings typically resulted in successful attraction (+1 reward) but occasionally produced failed attraction (0 reward), whereas incorrect pairings usually resulted in failed attraction but sometimes yielded success (see Methods). This probabilistic feedback ensured that the task remained challenging, promoting continuous RPE signals due to reinforcement learning throughout each block. Participants were compensated with real money based on cumulative rewards they earned during the task.\newline 
+
+To isolate SL, we manipulated the frequency with which each multisensory stimulus appeared, embedding statistical structure only in the combinations, not in the visual, auditory, or tactile components individually (Fig. 1d). SL was not required to perform the task or obtain rewards. In contrast, RL was essential: participants had to learn and indicate which combinations led to successful mating. Critically, both successful (green squares) and non-successful (white squares) combinations occurred equally often (50\%), meaning that each response (success vs. failure) was correct half the time across all stimuli. This ensured that SL provided no informational advantage for RL. We additionally modeled a third computational signal: the uRPE, which captures the magnitude of outcome surprise regardless of reward valence. While uRPE is computed at feedback alongside signed RPE, it reflects a different computational quantity: the unpredictability of the reward itself. In this sense, uRPE lies at the intersection of RL and SL: like RPE, it is grounded in feedback and value learning, yet like Shannon surprise, it captures statistical unexpectedness, but here in the distribution of reward outcomes. By dissociating these computations in both information content and temporal structure, with SL-relevant surprise occurring at stimulus onset and RL-relevant RPE/uRPE arising after choice (Fig. 1b), our design enabled independent modeling and neural analysis of SL and RL of multisensory stimulus and stimulus-response associations.\newline
+
+\begin{figure}[H]
+     \captionsetup{singlelinecheck = false, justification=justified}
+     \raggedright
+    \includegraphics[width=1\linewidth]{images/fig1.pdf}
+    \caption{\textbf{Task design}. a, Schematic of the multisensory learning task. Participants acted as “insect scientists” learning which multisensory pairings (image × sound/touch) predicted mating success. b, Trial timing showing separate epochs for stimulus presentation (driving statistical learning) and feedback (driving reinforcement learning). c, Reinforcement structure: probabilistic outcomes (green = "attracts" is rewarded, white = "not attracts" is rewarded) ensured ongoing prediction errors. d, Statistical structure: frequency distribution of multisensory pairings embedding regularities only at the combination level. Together, the task orthogonalized statistical and reinforcement learning signals in both temporal and informational domains.}
+    \label{fig:task}
+\end{figure}
+
+
+\subsection*{Models of learning}
+
+\subsubsection*{Reinforcement Learning}
+We modeled RL to quantify how participants used probabilistic feedback to adapt their (Attract/Don't attract) choices for each multisensory pairing, and to derive trial-by-trial learning signals (RPE and uRPE) for neural analyses. We used the \textbf{Q-learning algorithm} as our base model, in which action values (Q-values) are updated based on the discrepancy between expected value estimates and actual rewards, known as the reward prediction error: 
+
+\[ Q_c(t) = Q_c(t-1) + \alpha * (R - Q_c(t-1)) \]
+where $ Q_c(t)$ is the Q-value for the chosen action at trial t, R is the received reward (1 or 0), and $\alpha$ is the learning rate that determines how strongly RPEs update Q-values. Signed RPEs were computed directly from this update rule, and unsigned RPEs (uRPEs) were defined as the absolute value of the RPE, providing a valence-independent measure of reward-based surprise for neural analysis. It has been shown in purely unisensory contexts that RPEs and uRPEs engage partially distinct neural substrates: while both involve midbrain, striatal, and insular regions, unsigned PEs more consistently activate the cerebellum, dorsolateral and dorsomedial prefrontal cortex, supplementary motor area, supramarginal gyrus, and posterior parietal and temporal cortices, regions implicated in attentional control and salience processing \cite{fouragnan2018separate, corlett2022meta}. Including both signals in our analysis therefore allows us to dissociate neural systems involved in value updating from those involved in detecting surprising reward outcomes during multisensory learning.\newline
+
+The \textbf{basic Q-learning} model assumes a constant learning rate across all trials \cite{sutton2018reinforcement, rescorla1972theory}. However, participants may have various biases or adopt certain strategies depending on prior expectations or task instructions. To capture these individual differences, we implemented several model variants of Q-learning inspired by the prior literature:
+
+\begin{enumerate}
+    \item Asymmetric Learning Rates (\textbf{Asym}): Evidence suggests that participants may learn differently from positive and negative RPEs \cite{daw2002opponent, frank2007genetic, lefebvre2017behavioural, gershman2015learning}. To capture this asymmetric learning, we implemented models with distinct learning rates for positive and negative RPEs.
+    \item Transfer Learning Models (\textbf{Transfer}): The task instructions explicitly stated that each insect had only one correct call or dance. This means that if a participant received a reward for pairing insect A with call 1 (A1), they could infer that other pairings involving the same insect (e.g., A2, A3) or the same call (e.g., B1, C1) are likely incorrect. This rule-based structure, which was available from the instructions but not through direct feedback, creates opportunities for inference beyond the presented trial. We modeled this as a structured “transfer” mechanism that allowed RPEs to update not only the chosen option but also unchosen but logically related options \cite{barakchian2022implicit}. 
+    \item Initial Bias Model (\textbf{Vinit}): Participants might begin the task with preexisting biases toward one response option (e.g., left/right). We modeled this by assigning different initial values to actions, allowing for baseline preferences that could influence early behavior.
+\end{enumerate}
+
+We also fit combinations of these models (e.g., Transfer+V\textsubscript{init}), yielding eight candidate models in total (see \nameref{sec:methods}). Of these, five showed acceptable parameter recovery ($r > 0.6$) and were used for final model selection. Across participants, 31 were best fit by the basic Q-learning model, 16 by the Transfer model, and 11 by the Asymmetric model, while neither the Vinit model nor the Transfer+V\textsubscript{init} combination best fit any participant (see Methods for details). Each participant’s best-fitting model per block was then used to compute trial-by-trial estimates of RPE and uRPE for neural analyses.\newline
+
+Action selection on each trial was modeled using a softmax function:
+\[P_c(t) =  \dfrac{e^{\beta*Q_c(t)}}{e^{\beta*Q_c(t)}+e^{\beta*Q_u(t)}}\] where $Q_c$ is the value of the chosen response and $Q_u$ is the value of the unchosen response. The inverse temperature parameter $\beta$ scales the level of randomness in choices and was fit for each individual for each block.
+
+\subsubsection*{Statistical Learning}
+
+We modeled SL to test whether participants implicitly tracked the frequency structure of multisensory combinations, despite its irrelevance for reward, and to obtain a stimulus-locked, trial-by-trial index of structure-driven surprise for behavioral and fMRI analyses. We used a simple Bayesian observer that maintains beliefs over the nine combinations (uniform prior at block start) and updates them from observed frequencies \cite{bornstein2012dissociating, otto2013curse, konovalov2016gaze, konovalov2018neurocomputational}:
+\[
+p_i(t) = \frac{1 + \sum_{t'=1}^{t} \mathbb{I}_{[o(t') = i]}}{9 + t},
+\]
+where $p_i(t)$ is the belief that stimulus $i$ occurs on trial $t$ and $\mathbb{I}_{[o(t') = i]}=1$ if $i$ was observed on trial $t'$. The SL regressor is the Shannon surprise at stimulus onset,
+\[
+\text{Surprise}_o(t) = -\log\big(p_o(t)\big),
+\]
+which quantifies how unexpected the presented combination \textit{o(t)} is given current beliefs. Prior work has shown that such signals can modulate behavioral response times and neural responses, even in the absence of explicit rewards \cite{konovalov2018neurocomputational}. Because regularities were confined to joint combinations and were balanced across actions and modalities, this stimulus-locked signal is orthogonal to RL. In contrast to uRPE, which captures surprise about reward outcomes at feedback, Shannon surprise quantifies surprise about stimulus states at onset.
+
+\subsection*{Behavioral results}
+
+Our behavioral data indicate that participants were engaged in both reinforcement and statistical learning during the task. As shown in Fig. 2a, accuracy increased steadily over trials in both audiovisual and visuotactile blocks, reflecting reinforcement learning from the reward feedback. The probabilistic reward structure encouraged continued exploration and prevented early learning saturation. To test the relationship between surprise and response times, we fit a mixed-effects regression model that included surprise, Q-values, and subject-level random intercepts as predictors. Surprise was positively associated with response time in both modalities (audiovisual: $\beta$ = 0.023, one-sided p = 0.013; visuotactile: $\beta$ = 0.017, one-sided p = 0.037). This effect, visualized in Fig. 2b, shows that responses were slower for less frequent stimulus combinations, suggesting that participants were sensitive to the statistical structure of the stimulus distribution.
+
+\begin{figure}[H]
+     \captionsetup{singlelinecheck = false, justification=justified}
+     \raggedright
+    \includegraphics[width=1\linewidth]{images/fig2.pdf}
+\caption{\textbf{Behavioral signatures of reinforcement and statistical learning.}
+a, Group-averaged learning curves showing accuracy across trials (smoothed, ±SEM) for audiovisual and visuotactile conditions. Increasing accuracy indicates reinforcement learning driven by feedback-based reward prediction errors. 
+b, Response times as a function of Shannon surprise (computed at stimulus onset) showing the hypothesized longer latencies for rare combinations, consistent with implicit statistical learning.  Each line represents the fixed-effect slope from a mixed-effects model controlling for subject-level random intercepts. Together, these effects confirm that participants engaged both feedback-based and structure-based learning mechanisms.}
+    \label{fig:trial}
+\end{figure}
+
+\subsection*{Neural underpinnings of the two types of multisensory learning}
+
+Having established distinct behavioral and computational signatures of RL and SL, we next examined whether these two learning processes are implemented in separate neural systems. Specifically, we tested three key questions: (1) whether multisensory SL and RL signals are encoded in distinct brain regions, (2) whether their neural substrates are specific to a particular multisensory pairing or generalize across different sensory stream combinations, and (3) whether any identified brain areas extend beyond regions commonly reported in prior learning studies, suggesting additional demands imposed by learning from distributed information streams, in particular in multisensory settings. To address these questions, we conducted a whole-brain model-based fMRI analysis \cite{o2007model}, using trial-wise RPEs, uRPEs and Shannon surprise as parametric modulators for RL and SL. Standard nuisance regressors (motion, physiological noise) were also included in the general linear model, and all results were thresholded using non-parametric cluster-based inference (SnPM13).
+
+
+\begin{figure}[H]
+     \captionsetup{singlelinecheck = false, justification=justified}
+     \raggedright
+    \includegraphics[width=1\linewidth]{images/rpePos_neural_signatures.pdf}
+    \caption{\textbf{Neural correlates of reward prediction errors (RPEs)}. The brain images in the center display regions where signed RPEs, modeled as a parametric modulator at feedback onset, positively correlated with BOLD activation. RPE reflects the signed difference between expected and received feedback (reward-dependent) indexing reinforcement learning. Statistical maps were thresholded at a cluster-forming  $t > 8.0$ and inference was performed at cluster-level $p < .05$, FWE-corrected using SnPM, and rendered on the MNI152 standard brain. Significant activations were observed in the bilateral striatum, ventromedial prefrontal cortex (vmPFC), early lateral left visual cortex, left angular gyrus, and right cerebellum. The accompanying strip plots display the mean beta estimates of the RPE contrast across all voxels within the thresholded cluster in MNI space, with each diamond marker representing data from an individual participant. Estimates are shown separately for audiovisual and visuotactile learning, revealing that RPE-related responses did not differ significantly between different combinations of sensory modalities. The widest horizontal line indicates the group mean, whereas the more narrow lines indicate a distance of one standard error of the mean (SEM).}
+    \label{fig:RL_ns}
+\end{figure}
+
+
+In our first whole-brain GLM analysis, we collapsed across audiovisual and visuotactile conditions to target domain-general learning signals (domain-specific signals are examined in a second set of analyses). These first analyses revealed that the three learning signals (RPE, Shannon surprise, and uRPE) were each associated with largely non-overlapping brain networks, supporting the idea that distinct neural architectures support reinforcement and statistical learning. Trial-by-trial RPEs during the feedback phase were correlated with activity in the ventromedial prefrontal cortex (vmPFC) and ventral striatum (caudate nucleus, putamen), all regions consistently implicated in unisensory reinforcement learning, particularly in value representation and reward prediction error encoding across modalities \cite{Schultz1997, glimcher2011understanding, o2004reward, niv2009reinforcement, daw2011trial, o2003temporal}. Additional RPE-related activation appeared in visual association areas (fusiform, lingual, and middle occipital gyri; see Fig.~\ref{fig:RL_ns} and Table~\ref{tab:con1_pos}), likely reflecting visual stimulus-dependent value modulation or attentional processing \cite{chase2015reinforcement, corlett2022meta, garrison2013prediction}. Notably, activity in left angular gyrus also tracked RPEs, hinting at a potential region beyond classical reward circuitry. This region has so far only been reported to be involved in static reward anticipation \cite{wilson2018neural, kahnt2014disentangling}, but not in representation of dynamically evolving RPEs \cite{corlett2022meta, chase2015reinforcement, garrison2013prediction}. Inspection of the reported coordinates and available activation maps from these meta-analyses of unisensory RPE processing revealed no spatial overlap with the present activation cluster, suggesting that its involvement may reflect computations that are relevant when learning depends on information distributed across modalities or cues.\newline
+
+
+\begin{figure}[H]
+     \captionsetup{singlelinecheck = false, justification=justified}
+     \raggedright
+    \includegraphics[width=1\linewidth]{images/surprise_neural_signatures.pdf}
+    \caption{\textbf{Neural correlates of surprise}. The brain images in the center display regions where the Shannon surprise, modeled as a parametric modulator at stimulus onset, positively correlated with BOLD activation. The Shannon surprise quantifies the unexpectedness of the stimulus and indexes statistical learning. Statistical maps were thresholded at a cluster-forming $t > 3.1$ and inference was performed at $p < .05$, FWE-corrected using SnPM, and rendered on the MNI152 standard brain. Surprise significantly correlated with brain activation in the bilateral angular gyrus, left dorso-lateral prefrontal cortex (dlPFC), and left precuneus. The accompanying strip plots display the mean beta estimates of the RPE contrast across all voxels within the thresholded cluster in MNI space, with each diamond marker representing data from an individual participant. Estimates are shown separately for audiovisual and visuotactile learning, revealing that RPE-related responses did not differ significantly between modalities. The widest horizontal line indicates the group mean, whereas the more narrow lines indicate a distance of one standard error of the mean (SEM).}
+    \label{fig:SL_ns}
+\end{figure}
+
+
+In line with the assumption that separate neural systems mediate RL vs SL, Shannon surprise during stimulus presentation engaged a separate set of regions, including bilateral angular gyri, the left precuneus, and the left dorsolateral prefrontal cortex (dlPFC; see Fig.~\ref{fig:SL_ns} and Table~\ref{tab:con5}). To our knowledge, only a handful of studies have examined the neural correlates of Shannon surprise in unisensory contexts \cite{corlett2022meta, o2013dissociable, visalli2019bayesian, konovalov2018neurocomputational} and no large-scale meta-analyses are available. Despite this limited evidence base, our findings partially converge with previous reports: all four previous studies also identified a parietal cluster near to (or extending into) the angular gyrus, and two of the four studies also linked the dlPFC to the Shannon surprise, albeit in the right hemisphere \cite{corlett2022meta, konovalov2018neurocomputational}. Notably, none of these studies reported activation in the precuneus area identified here, suggesting that this region may contribute to a modality-independent representation of multisensory surprise. In any case, the absence of spatial overlap with RPE-related regions further supports the conclusion that statistical and reinforcement learning rely on distinct neurocomputational pathways.
+
+\begin{figure}[H]
+     \captionsetup{singlelinecheck = false, justification=justified}
+     \raggedright
+    \includegraphics[width=1\linewidth]{images/urpe_pos.pdf}
+    \caption{\textbf{Neural correlates of unsigned reward prediction errors (uRPEs)}. The brain images in the center display regions where unsigned RPEs, modeled as a parametric modulator at feedback onset, positively correlated with BOLD activation. uRPEs capture the magnitude of outcome surprise regardless of feedback valence. Statistical maps were thresholded at $t > 4.0$ and then $p < .05$, FWE-corrected using SnPM, and rendered on the MNI152 standard brain. Significant activations were observed in the right inferior, middle and superior frontal cortex, right dorso-medial prefrontal cortex (dmPFC), right inferior parietal lobe, and bilateral insula. The accompanying strip plots display the mean beta estimates of the RPE contrast across all voxels within the thresholded cluster in MNI space, with each diamond marker representing data from an individual participant. Estimates are shown separately for audiovisual and visuotactile learning, revealing that RPE-related responses did not differ significantly between modalities. The widest horizontal line indicates the group mean, whereas the more narrow lines indicate a distance of one standard error of the mean (SEM).}
+    \label{fig:urpe_pos}
+\end{figure}
+
+To further test the dissociability of learning signals, we modeled uRPE, a valence-independent measure of outcome surprise computed at feedback. Conceptually, uRPE bridges RL and SL: like RPE, it depends on rewards, and like Shannon surprise, it reflects deviation from reward expectation. Given this conceptual overlap, we examined whether uRPE would recruit a distinct or shared network relative to RPE and surprise signals. In line with the former option, neural responses to uRPEs revealed a third, largely distinct network, with significant activation in the right dorsomedial PFC, bilateral insula, and a lateral frontoparietal circuit including inferior parietal lobule, middle frontal gyrus, orbital inferior frontal gyrus, and superior frontal sulcus (see Fig~\ref{fig:urpe_pos} and Table~\ref{tab:urpe_pos}). This network aligns in part with prior reports of uRPE-related activation in the insula, dmPFC, and inferior parietal regions \cite{corlett2022meta, fouragnan2018separate}, supporting their role in tracking reward salience and behavioral relevance. However, compared to any previous findings, the frontal clusters identified in our study appear to be more lateral and ventral than any previously observed activations. This spatial shift may reflect the additional computational demands of our multisensory task, in which feedback integration and prediction updating occur across, rather than within, sensory modalities \cite{driver2008multisensory}. In such contexts, the brain must not only evaluate prediction errors but also determine which sensory stream contributed to the unexpected outcome and how these streams jointly inform future expectations. The recruitment of lateral and ventral frontal regions could therefore indicate enhanced engagement of cognitive control \cite{rushworth2004action} and multisensory integration processes \cite{noppeney2010perceptual} needed to arbitrate between converging sensory inputs during outcome evaluation. Together, these results support the idea that uRPE engages a third, largely dissociable network, which is functionally distinct from both RPE- and surprise-related circuits, even when operating within the same multisensory learning task.\newline
+
+
+In a second set of whole-brain GLM analyses, we tested whether RL and SL are supported by modality-general or modality-specific mechanisms. We computed whole-brain contrasts for each learning signal (RPE, Shannon surprise, and uRPE), comparing visuotactile and audiovisual conditions ($\text{visuotactile} > \text{audiovisual}$ and vice versa). No significant clusters emerged for any of the three learning signals. This suggests that, at the functional and anatomical resolution of our data, there is no evidence for modality-specific coding, neither in terms of increased or decreased activity in the identified regions, nor in the spatial distribution of the regions coding for these signals. Given the absence of significant modality-specific effects in the whole-brain analysis, we proceeded to examine whether the magnitude of learning signal coding in the already-identified domain-general learning ROIs differed across modalities. To this end, we extracted beta weights from the significant ROIs identified in the main contrasts (i.e., all voxels within clusters surviving the cluster-forming threshold). These beta weights showed comparable activation levels across both multisensory modalities (see swarm plots in Fig.~\ref{fig:RL_ns}, Fig.~\ref{fig:SL_ns}, and Fig.~\ref{fig:urpe_pos}). In sum, these results suggest that the brain uses shared, domain-general systems to encode RPEs, surprise, and outcome uncertainty for multisensory learning, even when the precise sensory input channels differ, highlighting the generality and contextual flexibility of learning circuits in multisensory environments.\newline
+
+\begin{figure}[H]
+     \captionsetup{singlelinecheck = false, justification=justified}
+     \raggedright
+    \includegraphics[width=1\linewidth]{images/brain_networks.pdf}
+    \caption{\textbf{Dissociable neural networks underlying multisensory learning.}
+Distinct brain regions encode reward prediction errors (RPE, red), Shannon surprise (blue), and unsigned reward prediction errors (uRPE, light green) during multisensory learning. The three networks show minimal overlap, highlighting specialized yet complementary systems for reinforcement learning, statistical learning, and outcome surprise. Regions outlined with a dotted line are not typically reported in prior learning studies, suggesting potential involvement in the additional demands of learning from information distributed across multiple streams. Brain maps are rendered on the MNI152 standard brain template.}
+    \label{fig:brain_networks}
+\end{figure}
+
+Finally, we explored whether any of the regions we observed may be involved in processes important for multisensory learning, beyond their role in general RL and SL (Fig.~\ref{fig:brain_networks}). While most brain regions revealed in our GLM analyses overlap with known SL and RL networks \cite{fouragnan2018separate, chase2015reinforcement, garrison2013prediction, konovalov2018neurocomputational, visalli2019bayesian, o2013dissociable, corlett2022meta}, several regions are not typically observed to be involved in learning in unisensory contexts (indicated by dotted outlines in Fig.~\ref{fig:brain_networks}). Most notably, despite the largely distinct regions underlying RPE and Shannon surprise, the \textbf{left angular gyrus} consistently tracked both these signals. Prior studies have reported neighboring parietal regions like the inferior and superior parietal lobules for surprise \cite{visalli2019bayesian, konovalov2018neurocomputational, o2013dissociable}, but have not implicated the angular gyrus as a locus for statistical learning \cite{corlett2022meta, fouragnan2018separate, chase2015reinforcement, garrison2013prediction}. Similarly, while the inferior parietal lobule has been associated with RPEs in an extensive meta-analysis \cite{corlett2022meta}, the clusters from our findings and the meta-analysis do not overlap. In contrast, our findings show robust angular gyrus engagement in both statistical and reinforcement-based multisensory learning, suggesting that this region, sitting at the intersection of the higher order visual, auditory, and tactile cortices \cite{seghier2013angular}, may play a role in integrating structural and value-related information during multisensory learning.\newline
+
+We also observed surprise-related activity in the precuneus, a region widely recognized as a major cortical hub that integrates information from multiple sensory and cognitive networks \cite{cavanna2006precuneus, yamaguchi2024structural, jitsuishi2023characteristic}, despite the precuneus not reported in prior unisensory SL studies \cite{visalli2019bayesian, konovalov2018neurocomputational, o2013dissociable, corlett2022meta}. This suggests that the precuneus may contribute to a modality-independent representation of surprise arising from conjunctive, distributed stimulus combinations, a computation most commonly demanded in multisensory contexts but potentially extending to multi-stream learning more broadly. Regarding uRPE, several regions we observed (bilateral insula, inferior parietal lobule, superior frontal sulcus, and dmPFC) have been linked to uRPEs before \cite{corlett2022meta, fouragnan2018separate}. However, the clusters in the frontal middle gyrus and orbital inferior frontal gyrus do not overlap with regions described in previous literature. Furthermore, regions typically associated with uRPEs in unisensory contexts - such as the striatum, cingulate cortex, and temporal regions - were not found to be reliably engaged in our study. Our results thus reveal distinct networks that underlie the three types of multisensory learning; each of these comprise areas typically implicated in unisensory learning but crucially also other areas that appear to be functionally relevant when learning depends on multisensory associations.
+
+\section*{Discussion}
+
+Everyday learning often depends on non-redundant information distributed across multiple senses (e.g., the integration of taste and smell in perceiving flavor), yet most work has characterized learning with unisensory stimuli. Existing studies have modeled reinforcement learning with signed reward prediction errors \cite{rescorla1972theory, 712192}, which drive learning behavior and neural activity in structures like ventral striatum/vmPFC \cite{niv2009reinforcement, Schultz1997, daw2011trial, o2003temporal, bartra2013valuation}. In parallel, stimulus-structure-driven SL is often modeled as Shannon surprise and has been shown to drive both behavior and cortical responses in largely unisensory paradigms \cite{meyniel2016human, konovalov2018neurocomputational, visalli2019bayesian, o2013dissociable}. To extend these approaches to situations in which informative structure is distributed across multiple senses, we designed a task in which learning-relevant information existed only in multisensory stimulus combinations rather than in any single modality. This design enabled temporal and informational dissociation between SL - indexed by stimulus-locked Shannon surprise - and RL indexed by feedback-locked RPE. In addition, participants’ evolving expectations about reward outcomes generated a third signal: uRPEs, which index outcome surprise and lie at the computational intersection of RL and SL. uRPEs share RL’s dependence on expected rewards and SL’s emphasis on deviation from these expectations, and are also known to modulate both learning behavior and neural responses in unisensory paradigms \cite{pearce1980model, fouragnan2018separate, corlett2022meta}. By isolating stimulus-driven structure, outcome-driven learning, and performance-contingent outcome surprise, our task and model-based fMRI results \cite{o2007model} thus provide a principled framework for studying how the brain supports multiple forms of multisensory learning within a unified context.\newline
+
+Importantly, the present findings should not be interpreted as evidence that the neural systems we identified are specific to multisensory learning per se. Rather, our task isolates learning signals in a situation where behaviorally relevant information is distributed across multiple cues, such that no single sensory channel alone can guide behavior. Multisensory environments provide a natural instance of this problem, but similar computational demands may arise in all situations where informative structure is distributed across different stimulus features or dimensions. In this sense, multisensory learning provides a tractable model system for studying how the brain integrates structural and value-based information across multiple sources. A formally similar problem could arise when two individually uninformative visual features guide behavior. Nevertheless, multisensory situations are among the most ecologically prevalent and behaviorally consequential examples of this problem, including flavor perception, reading and language acquisition, and sensorimotor coordination. Thus, we treat multisensory learning as a natural and important test case for distributed-stream learning, rather than as evidence that the identified responses are uniquely multisensory. Our audiovisual and visuotactile comparison tests whether learning signals depend on the specific sensory pairing; the absence of significant differences suggests generalization across these multisensory stream combinations. Comparisons with prior unisensory neuroimaging studies are therefore used to contextualize the present findings, not to establish multisensory specificity. Future work directly comparing multisensory, unisensory multi-feature, and single-stream learning within the same paradigm will be required to determine the boundary conditions of these effects.\newline
+
+
+Behaviorally, we observed the expected signatures of SL and RL. Response times increased with trial-wise Shannon surprise (hallmark of SL), indicating higher response times for rarer multisensory stimuli, and accuracy improved with reward feedback \cite{konovalov2018neurocomputational, daw2011trial}. Neurally, model-based fMRI revealed largely non-overlapping systems for each signal. RPEs recruited classical reward-related regions (ventral striatum, vmPFC) \cite{Schultz1997, o2003temporal, bartra2013valuation, corlett2022meta, garrison2013prediction, fouragnan2018separate}, while Shannon surprise engaged a separate network in parietal and frontal cortices \cite{o2013dissociable, visalli2019bayesian}. uRPEs were encoded in a third, dissociable network involving the insula, dorsomedial prefrontal cortex, and frontoparietal regions \cite{fouragnan2018separate, corlett2022meta}. These brain regions overlap with both the salience network and the frontoparietal network, indicating that uRPEs may engage systems responsible for detecting behaviorally relevant events and implementing adaptive cognitive control \cite{seeley2019salience, marek2018frontoparietal}. This suggests that the brain not only learns from environmental structure and feedback, but also monitors surprising feedback to potentially guide attentional shifts or cognitive control. Despite their distinct circuitry, all three signals (RPE, Shannon surprise, and uRPE) were encoded in modality-general networks, with no differences across audiovisual and visuotactile conditions. These findings suggest that the brain deploys specialized but flexible learning systems to support complex learning from multisensory input across various multisensory contexts. Nonetheless, modality-specific anatomical organization may exist at a finer scale than resolved by our standard-space fMRI analysis and should be addressed by future work using high-resolution methods \cite{poldrack2017precision,ladwig2025precision}.\newline
+
+Among the brain regions engaged by our task, the left angular gyrus was notable in tracking both RPE and Shannon surprise, despite the otherwise clear dissociation between multisensory SL and RL signals at the whole-brain level. This pattern suggests that this region contributes to integrating structure- and value-based learning signals when information is distributed across modalities. While neighboring parietal areas have previously been linked to either SL or RL in unisensory contexts \cite{visalli2019bayesian, o2013dissociable}, the angular gyrus itself is not typically highlighted in meta-analyses of either computation. Its involvement here is consistent with proposals that angular gyrus functions as a multimodal integration hub \cite{seghier2013angular}. Anatomically, the region is densely connected with higher-order visual, auditory, and somatosensory association cortices \cite{seghier2013angular, song2023functional, rockland2023angular}, positioning it well to integrate cross-modal information. In large-scale network terms, the angular gyrus forms part of the salience and frontoparietal control networks, which are typically engaged in detecting and reorienting to behaviorally relevant sensory events \cite{seghier2013angular}. These converging properties make it a plausible cortical locus for externally driven multisensory learning and integration. The angular gyrus has also been implicated in higher-level semantic processing \cite{binder2011neurobiology, binder2009semantic}, and altered activation in temporoparietal regions surrounding the angular gyrus has been reported in reading and language disorders \cite{di2023disentangling, horwitz1998functional, paz2018neural, gross1991positron}. However, meta-analyses did not link angular gyrus activation specifically to dyslexia \cite{richlan2009functional, richlan2011meta}. While the regions identified here may therefore not correspond directly to the core neural abnormalities underlying dyslexia, the angular gyrus likely contributes to integrating perceptual inputs—such as written or spoken words—with higher-level semantic representations, a process critical for reading acquisition. Whether the angular gyrus would be similarly engaged by multi-stream conjunction within a single modality, for instance, binding two co-occurring visual features, remains an open question, but its consistent engagement across both audiovisual and visuotactile learning here suggests a general role in integrating information across multisensory information streams. Future studies combining the present paradigm with causal methods such as transcranial magnetic stimulation (TMS) could directly test this possibility.\newline
+
+
+We also observed surprise-related activity in the \textbf{precuneus}, a region densely interconnected with parietal, temporal, and prefrontal association cortices and often proposed to be a cortical hub that integrates information from multiple sensory and cognitive networks \cite{yamaguchi2024structural, jitsuishi2023characteristic, cavanna2006precuneus}. Interestingly, this region has not yet been linked to Shannon surprise \cite{visalli2019bayesian, konovalov2018neurocomputational, o2013dissociable, corlett2022meta}. The presence of surprise-related signals in the precuneus may reflect the updating of internal, higher-order models that link multisensory inputs with self-referential or contextual expectations according to predictive coding frameworks \cite{friston2005theory}. In large-scale network terms, the precuneus is a core node of the default mode network, which supports internally oriented inference, mental model updating, and self-referential evaluation \cite{cavanna2006precuneus, yamaguchi2024structural, yazin2025fragmentation}. Its recruitment therefore complements the engagement of the angular gyrus, which has been more closely associated with salience and frontoparietal control networks supporting externally directed attention. In parallel, uRPE-related activation in frontal regions has not been consistently linked to feedback-driven surprise, unlike the lateral fronto-parietal cortex more commonly associated with the computation \cite{fouragnan2018separate, corlett2022meta}.\newline
+
+Together, our findings suggest that multisensory learning may recruit neural circuits that extend beyond those typically reported in unisensory learning contexts. Notably, atypical activation patterns in the regions identified here have also been reported in developmental disorders affecting learning and cognitive control. In both Attention Deficit Hyperactivity Disorder (ADHD) \cite{dickstein2006neural, cortese2012toward} and Autism Spectrum Disorder (ASD) \cite{may2020frontoparietal}, hypoactivation in frontal regions has been linked to deficits in executive functioning and attentional control. In dyslexia, frontal activation patterns are more heterogeneous, with both hypo- and hyperactivation reported across studies \cite{richlan2009functional, maisog2008meta}. The observed hypoactivation has been interpreted as reflecting executive dysfunction \cite{lonergan2019meta} and difficulties in accessing lexical and sublexical phonological representations \cite{richlan2009functional}, and it has also been associated with the high comorbidity between dyslexia and ADHD \cite{lonergan2019meta}. Conversely, hyperactivation has been suggested to reflect articulatory compensatory mechanisms \cite{richlan2009functional} or a broader spatial distribution of the reading network \cite{pollack2015meta}.
+
+Of particular relevance, the inferior frontal gyrus, together with the posterior superior temporal sulcus, occipito-temporal cortex, and inferior parietal lobe, forms the core network underlying audiovisual letter–speech sound learning and integration \cite{richlan2019functional}. Both children and adults with dyslexia exhibit reduced activation within this network, as well as impaired functional and structural connectivity among its constituent regions \cite{richlan2019functional}. Atypical hyperactivation of the precuneus has likewise been observed in ASD \cite{may2020frontoparietal, christakou2013disorder} and ADHD \cite{christakou2013disorder}, likely reflecting insufficient deactivation of the default mode network. In dyslexia, by contrast, reduced precuneus activation relative to typical readers has been reported \cite{maisog2008meta, martin2016dyslexic}, suggesting increased cognitive effort and compensatory recruitment during reading-related tasks \cite{martin2016dyslexic, richlan2011meta}. Although the present study did not directly investigate these disorders, our findings highlight that neural systems supporting learning from distributed sensory information overlap with circuits known to be affected in atypical development.\newline
+
+Several caveats warrant mention. First, as with all fMRI studies, the present findings are correlational and cannot establish causal involvement of the identified regions. Future work using causal approaches such as TMS \cite{walsh2003transcranial,pascual2000transcranial,burt2002neuropsychiatric} or lesion analyses \cite{rorden2004using} will be required to test whether these regions are necessary for multisensory learning. While superficial cortical areas such as the angular gyrus are accessible to TMS, deeper or midline structures may require emerging techniques such as focused ultrasound \cite{grossman2017noninvasive,folloni2019manipulation} or deep-TMS \cite{levkovitz2015efficacy}. Second, the absence of a unisensory control condition means we cannot rule out that the identified networks would be similarly engaged by learning from co-occurring features within a single modality. However, as multisensory contexts represent the ecologically dominant case in which distributed multi-stream learning problems arise, characterizing the neural architecture in this setting is a meaningful and necessary first step; future paradigms orthogonalizing stream number from sensory modality will be needed to fully establish the boundary conditions of the present findings. Studying developmental and aging populations may also reveal how multisensory learning and the integration of value and structure evolve across the lifespan \cite{raduner2025growing}. Finally, extending this framework to other ecologically relevant domains, such as speech perception, reading, or sensorimotor coordination, may clarify how the multisensory learning computations identified here extend to other cognitive functions. Applying the present modeling approach in these contexts could help determine whether the same neural computations that integrate structure and feedback across modalities also support language and reading acquisition, and whether they are altered in atypical development. In any case, our experimental approach and findings provide a  starting point for future studies on how the brain integrates structural and value-based information when learning associations distributed across multiple sensory sources.
+
+
+\section*{Declaration of interests}
+The authors declare no competing interests.
+
+\section*{Acknowledgements}
+We are grateful to C. Schnyder, K. Treiber, and M. Moisa at the Zurich Center for Neuroeconomics for their excellent support with recruitment and participant coordination. We thank the staff of the Laboratory for Social and Neural Systems Research for technical assistance throughout data acquisition. 
+
+This research was supported by the University Research Priority Program (URPP) Adaptive Brain Circuits in Development and Learning (AdaBD) at the University of Zurich. C.C.R. was additionally supported by the Swiss National Science Foundation (SNSF; grant no. 100019L-173248).
+
+
+
+\section*{Methods}
+\label{sec:methods}
+
+
+\subsection*{Participants}
+
+Sixty-four right-handed participants (21 women; age range 18–30 years, mean age = 23.3) took part in the fMRI study. All participants were screened for MRI compatibility prior to inclusion and reported no psychiatric or neurological disorders or need for visual correction. Participants were students at the University of Zurich or ETH Zurich, with those enrolled in Economics, Psychology, or Computer Science excluded from participation. Six participants were removed from the analyses due to scanner-related problems or excessive head motion, resulting in a final sample of 58. All procedures conformed to the Declaration of Helsinki and were approved by the Ethics Committee of the Canton of Zurich.
+
+\subsection*{Procedure}
+
+The fMRI study was conducted at the Laboratory for Social and Neural Systems Research (SNS Lab) of the University Hospital Zurich. Each session lasted no more than 2 hours and 15 minutes. Upon arrival, participants completed MRI safety screening and provided written informed consent. They then proceeded to a behavioral testing room, where they read instructions for the multisensory learning task, answered comprehension questions, and received additional information on MRI safety. Participants subsequently performed the multisensory learning task inside the MRI scanner (Philips ACHIEVA 3T), during which both behavioral and neural measures were collected. Visual stimuli were projected onto a screen and viewed via a mirror mounted on the head coil. Auditory stimuli were delivered using MRI-compatible headphones (MR Confon GmbH, www.mr-confon.de), and tactile stimuli were applied to the left index finger using a piezoelectric stimulator (mini-PTS, Dancer Design, http://www.dancerdesign.co.uk/). Eye movements were recorded with an MR-compatible infrared Eyelink II CL v.4.51 eye-tracker (SR Research Ltd), and physiological data were obtained using a breathing belt and an MR-compatible ECG device. In addition to functional imaging, we acquired a high-resolution anatomical scan and diffusion tensor imaging (DTI) data. Participants received a base payment of 50 CHF, plus a performance-dependent bonus of up to 48 CHF.
+
+
+\subsection*{Multisensory learning task}
+
+Participants were instructed to play a game in which they took the role of a scientist studying newly discovered insects. On each trial, a visual image of an insect was paired with either an auditory “call” (a sequence of beeps presented over headphones) or a tactile “dance” (a sequence of vibrations delivered to the left index finger). Participants judged whether the multisensory pairing would attract a mate (“attract” vs. “no attract”) with a button press.
+
+\paragraph{Visual stimuli.}
+Each block featured three insect “species,” distinguished solely by the orientation of a textured noise pattern superimposed on a butterfly-shaped silhouette (Fig.~\ref{fig:task}a). The textures were generated by filtering pink noise with von Mises orientation filters, yielding three distinct orientation-defined patterns at approximately $22.5^\circ$, $67.5^\circ$, and $112.5^\circ$. These angles were chosen to be equally spaced away from the cardinal axes. Images were exported at high resolution (1200~dpi), presented centrally on a gray background. Importantly, species identity could be determined from this single visual feature (orientation).
+
+\paragraph{Auditory and tactile stimuli.}
+Auditory “calls” and tactile “dances” were constructed as sequences of discrete bursts presented within a fixed 1.5~s stimulus window. Each pattern contained 9 bursts: 8 tone (or vibration) bursts separated by variable inter-burst intervals, plus a final burst, such that the entire sequence always filled 1.5~s. Each burst lasted 15~ms. For auditory stimuli, bursts were sine tones (delivered via MRI-compatible headphones), while for tactile stimuli, bursts were square pulses delivered to the left index finger via a piezoelectric stimulator (mini-PTS, Dancer Design; 48~kHz sampling rate). For both modalities, three distinct temporal patterns were created per set by varying the distribution of inter-burst intervals while keeping total duration fixed. This ensured that tactile and auditory stimuli were structurally analogous and directly comparable across modalities.
+
+\paragraph{Task structure and timing.}
+The experiment consisted of six blocks (runs), alternating between audiovisual (calls) and visuotactile (dances) modalities (3 blocks each). The starting modality was randomized across participants. Each block contained 60 trials. Trial timing was as follows: the multisensory stimulus was presented for 1.5~s (during which responses were recorded), followed by a jittered inter-stimulus interval (0.5–1.5~s), then feedback displayed for 1~s. Inter-trial intervals were jittered between 3–5~s to optimize design efficiency and minimize correlations between parametric regressors. A response-time window of up to 3.0~s was enforced (responses after this window were treated as missing). The total task duration was approximately 54~minutes.
+
+\paragraph{Reinforcement-learning (feedback) contingencies and calibration.}
+Each insect species had exactly one “high-success” pairing (i.e., one specific call or dance most likely to attract a mate), whereas the other two pairings for that species had much lower success rates. Feedback was probabilistic: correct pairings led to “+1” (green tick) most of the time, while incorrect pairings yielded “0” (red cross), with occasional probabilistic flips to maintain uncertainty (participants were informed that feedback was probabilistic but were not given exact probabilities). The first two blocks served as calibration (feedback probability fixed at $0.8$ for correct responses). Based on each participant’s calibration accuracy, subsequent blocks used individually adjusted correct-feedback probabilities of $0.7$, $0.8$, or $0.9$ (thresholds: $<0.56 \Rightarrow 0.9$; $0.56$–$<0.70 \Rightarrow 0.8$; $\geq 0.70 \Rightarrow 0.7$), ensuring sustained learning pressure across the session. Reward magnitude was fixed at 1.0 “point” for each correct outcome. These points were then converted into monetary payment according to performance-dependent scaling factors. Specifically, participants started with a base rate of 50 CHF, and their accumulated points were translated into an additional bonus ranging from 0 to 48 CHF. During the two initial calibration blocks, reward probabilities were fixed (0.8 for correct feedback) and a default conversion factor was used. Based on accuracy in these blocks, participants were assigned to one of three difficulty levels (easy, medium, hard) for the subsequent blocks, which determined both the probabilistic structure of feedback (0.9, 0.8, or 0.7 probability of positive feedback) and the money conversion factor (with harder conditions yielding higher monetary weightings). This ensured that overall payment opportunities were balanced across individuals while keeping the task suitably challenging.
+
+\paragraph{Statistical-learning (stimulus frequency) structure.}
+In addition to the reinforcement structure, we embedded a statistical structure in the frequencies of the nine possible multisensory combinations (3 visual species $\times$ 3 calls/dances). Frequencies followed a $3\times 3$ “joint probability” matrix with three levels: \textbf{common} ($p=0.50$ of the trials for that visual species), \textbf{occasional} ($p=0.35$), and \textbf{rare} ($p=0.15$). Specifically, the three common pairs were $(0,A)$, $(1,B)$, and $(2,C)$; the three occasional pairs were $(0,B)$, $(1,C)$, and $(2,A)$; and the three rare pairs were $(0,C)$, $(1,A)$, and $(2,B)$. 
+
+Trial sequences were generated algorithmically to meet three constraints: 
+(1) within every 20-trial segment of a block, pair counts matched the expected ratios exactly (10 common, 7 occasional, 3 rare events); 
+(2) across the full 60 trials of a block, frequencies matched the joint-probability matrix precisely; and 
+(3) immediate repetitions in either unisensory modality were avoided (e.g., if the current trial was visual “1” with call “A,” the following trial could not share the same visual or the same auditory/tactile element). 
+
+These constraints ensured that the statistical structure was both robust and evenly distributed, while preventing trivial strategies such as detecting simple repetitions. Importantly, participants were never informed about the frequency manipulation, and the statistical structure was independent of reward contingencies, allowing statistical learning to be probed implicitly.
+
+\subsection*{Computational models}
+
+\subsubsection*{Reinforcement Learning}
+
+To model reinforcement learning computations that are explicitly required for task performance, we employed Q-learning with two $3\times 3$ Q-value tables. Each table represented the Q-values for the two possible actions (attract or not attract) across the nine multisensory stimuli. This setup allowed us to estimate the value of each action for each stimulus pairing, as shown in Figure~1 from the main text. The green cells in the figure represent the pairings most likely to attract a partner (and therefore requiring a "yes" response; please note that rewards were (or were not) given for both correct (or incorrect) " yes" and "no" responses, so that rewards were independent of statistical structure and response type). Q-learning assumes that participants update their Q-values based on the RPE which is the difference between the expected value and the observed reward. Unless otherwise specified, unchosen values remained unchanged. In addition to signed RPEs, we also derived uRPEs, defined as the absolute magnitude of the RPE, indexing the degree of outcome surprise irrespective of valence \cite{fouragnan2018separate, corlett2022meta}.
+
+We tested different versions of Q-learning to capture the diverse strategies and biases that participants might have. These models included:
+\begin{enumerate}
+    \item \textbf{Basic Q-learning} — 
+    The simplest model was the basic Q-learning algorithm where participants only updated the value for the chosen response, with one learning rate $\alpha$ for all possibilities \cite{rescorla1972theory, sutton2018reinforcement}.
+    \[
+    Q_c(t) = Q_c(t-1) + \alpha \big(R - Q_c(t-1)\big)
+    \]
+    where $Q_c$ denotes the value of the chosen option for the presented multisensory state in that trial. The Q-values were initialized to 0.5 for both actions in this and all other models, except for versions of the Vinit model where initial values were treated as free parameters.
+    
+    \item \textbf{Asym} — 
+    Studies have suggested that people learn differently from positive and negative RPEs \cite{daw2002opponent, frank2007genetic, lefebvre2017behavioural, gershman2015learning}. To incorporate this, we designed a model with separate learning rates for positive and negative feedback:
+    \[
+    Q_c(t) = Q_c(t-1) + \alpha_{pos} \big(R - Q_c(t-1)\big), \quad \text{if } (R - Q_c(t-1)) \geq 0,
+    \]
+    \[
+    Q_c(t) = Q_c(t-1) + \alpha_{neg} \big(R - Q_c(t-1)\big), \quad \text{if } (R - Q_c(t-1)) < 0.
+    \]
+
+    \item \textbf{Transfer} — 
+    Given the task structure, each trial conveyed information not only about the presented multisensory stimulus but also about related stimuli that shared one unisensory feature. For example, if A1 attracted a partner, then A2, A3, B1, and C1 could be inferred to be less likely. To model this inference, we allowed related, unchosen pairings to be updated with a scaled parameter:
+    \[
+    Q_c^o(t) = Q_c^o(t-1) - \kappa \alpha \big(R - Q_c(t)\big),
+    \]
+    where $Q_c^o$ denotes the value of a related option, and $\kappa \leq 1$ scales the transfer update so that related stimuli are never updated more strongly than the chosen stimulus.
+
+    \item \textbf{Vinit} —  
+    This model captured initial biases in action preferences. Instead of fixing Q-values at 0.5, the initial Q-values for both action tables were treated as free parameters, allowing us to model a priori action propensities. The free parameters were $Q_0, Q_1, \alpha$. Updating followed the same rule as in basic Q-learning.
+
+    \item \textbf{TransferVinit} —  
+    This model combined the Transfer and Vinit features, i.e., transfer updates were applied and initial Q-values were free parameters.
+\end{enumerate}
+
+All of the above models had parameter recovery correlations above 0.6 between simulated and recovered parameters. Therefore, their parameters were considered recoverable. We also explored additional variants, such as models with asymmetric learning rates for actions, Pearce–Hall–style adaptive learning, and dynamic learning rates, but these failed to reach the recovery threshold ($r < 0.6$) and were excluded from further fitting.
+
+The unrecoverable models included:
+
+\begin{itemize}
+    \item \textbf{Extra} — Asymmetric learning rates for the two different actions:
+    \[
+    Q_{attract}(t+1) = Q_{attract}(t) + \alpha_{attract} \big(R - Q_{attract}(t)\big),
+    \]
+    \[
+    Q_{\neg attract}(t+1) = Q_{\neg attract}(t) + \alpha_{\neg attract} \big(R - Q_{\neg attract}(t)\big).
+    \]
+
+    \item \textbf{Pearce} — A Pearce–Hall style model \cite{pearce1980model} with trial-wise adaptive learning rates:
+    \[
+    \alpha_{t} = \eta + \omega \, |R - Q_{chosen}(t)|,
+    \]
+    where $\eta$ is the base learning rate and $\omega$ modulates sensitivity to prediction errors.
+
+    \item \textbf{Dyna} — A dynamic learning-rate model:
+    \[
+    \alpha_{t} = \alpha_{t-1} + \omega \big(|R - Q_{chosen}(t)| - \alpha_{t-1}\big).
+    \]
+\end{itemize}
+
+In the end, only the five models with recoverable parameters (Basic, Asym, Transfer, Vinit, TransferVinit) were fitted. All models were fit to each participant’s trial-by-trial choices via maximum likelihood (SciPy v1.10; L-BFGS-B; multiple random initializations). Model evidence was approximated with the Bayesian Information Criterion (BIC), computed from the maximum log-likelihood and number of free parameters. For model selection, we summed BIC across the six blocks per participant and chose the lowest-BIC model as that participant’s winner. Of the five recoverable models, three accounted for all participants' data: \textbf{Basic Q-learning (n = 31), Transfer (n = 16), and Asymmetric learning rates (n = 11)}; \textbf{no participants} were best fit by \textbf{Vinit} or \textbf{Transfer+Vinit}. The per-participant winning model was then used to generate trial-wise value estimates, signed RPEs, and uRPEs for all behavioral and fMRI analyses.
+
+\subsubsection*{Statistical Learning}
+
+To model statistical learning, we leveraged the probabilistic structure of the task. Each visual species could be paired with one of three calls/dances, resulting in nine possible multisensory combinations. Frequencies followed a $3 \times 3$ joint-probability matrix with three levels: common ($p=0.50$), occasional ($p=0.35$), and rare ($p=0.15$). This structure yielded a 50/50 split between pairings that were most likely versus least likely to attract a partner, preventing participants from adopting a trivial strategy of selecting the same action throughout the experiment.
+
+We modeled statistical learning using a Bayesian updating framework without any free parameters, following \cite{konovalov2016gaze}. The model assumes a uniform prior over the nine possible stimulus combinations at the start of each block. On every trial, beliefs about the probability of encountering each stimulus $i$ are updated, resulting in a Dirichlet posterior that gradually converges toward the true empirical frequencies.
+
+On each trial $t$, the belief for stimulus $i$ is given by:
+\[
+p_i(t) = \frac{1 + \sum_{t'=1}^{t} \mathbb{I}_{[o(t') = i]}}{9 + t},
+\]
+where $\mathbb{I}_{[o(t') = i]}$ is an indicator function equal to 1 if stimulus $i$ was observed on trial $t'$, and 0 otherwise. This formulation reflects Bayesian updating with a uniform prior and counts-based likelihood.
+
+To quantify statistical learning, we computed the Shannon surprise of the observed stimulus $o$ on trial $t$:
+\[
+\text{Surprise}_o(t) = -\log\big(p_o(t)\big).
+\]
+Lower prior belief $p_o(t)$ results in higher surprise. Trial-wise surprise values were then used as a proxy for statistical learning, with the hypothesis that more surprising stimuli would elicit longer response times.
+
+\subsection*{Behavioral analysis}
+
+To assess how reinforcement and statistical learning signals influenced behavior, we fit a linear mixed-effects regression model predicting trial-wise response times: 
+\[
+\text{responseTime} \sim 1 + \text{surprise}_o + Q_c + Q_u + (1 \,|\, \text{subject}),
+\]  
+where $\text{surprise}_o$ is the Shannon surprise of the presented stimulus on trial $t$, $Q_c$ and $Q_u$ are the chosen and unchosen action values from the fitted RL model, and $(1 \,|\, \text{subject})$ specifies subject-level random intercepts. 
+
+All predictors were z-scored prior to analysis to enable direct comparison of regression coefficients. Mixed-effects models were estimated in \texttt{R} using the \texttt{lmerTest} package, called from Python via \texttt{rpy2}. Statistical significance was evaluated using Satterthwaite’s approximation for degrees of freedom as implemented in \texttt{lmerTest}.
+
+
+\subsection*{MRI acquisition and preprocessing}
+
+Functional and anatomical MRI data were acquired at the Laboratory for Social and Neural Systems Research, University Hospital Zurich, using a Philips Achieva 3T whole-body MR scanner equipped with a 32-channel head coil. Functional images were collected across six runs using a T2*-weighted gradient-recalled echo-planar imaging (EPI) sequence (222 volumes + 5 dummy scans; flip angle = 90°; repetition time, TR = 2334 ms; echo time, TE = 30 ms; matrix size = 80 × 78; field of view = 240 × 240 mm; in-plane resolution = 3 mm; 40 axial slices, slice thickness = 3 mm, slice gap = 0.5 mm; SENSE acceleration factor = 1.5 in the phase-encoding direction; acquisition time = 8:54 min). 
+
+A high-resolution T1-weighted structural image was acquired using an MPRAGE sequence (field of view = 256 × 256 × 170 mm; 1 mm isotropic resolution; inversion time, TI = 2800 ms; 170 sagittal slices; flip angle = 8°; TR = 8.3 ms; TE = 3.9 ms; SENSE acceleration factor = 2 in the left–right direction; acquisition time = 5:35 min). In addition, diffusion tensor imaging (DTI) data were acquired (field of view = 224 × 224 × 118 mm; 2 mm isotropic resolution; 59 axial slices; TR = 9000 ms; 64 non-collinear diffusion-weighted directions with b = 1000 s/mm\textsuperscript{2}, plus one non-diffusion-weighted image with b = 0 s/mm\textsuperscript{2}; acquisition time = 10:03 min).
+
+Preprocessing of the fMRI data was performed using \textit{fMRIPrep} 20.2.3 \cite{esteban2019fmriprep} (RRID:SCR\_016216), which is based on Nipype 1.6.1 \cite{gorgolewski2011nipype} (RRID:SCR\_002502) and incorporates routines from SPM. The pipeline included realignment and unwarping, slice-timing correction, coregistration, segmentation, and normalization. A full description of preprocessing steps is provided in the Appendix. Finally, spatial smoothing was applied using SPM12, with a 6 mm full-width-at-half-maximum (FWHM) Gaussian kernel to reduce noise and account for residual inter-individual differences in anatomy during group-level analyses.
+
+\subsection*{First-Level Analysis}
+
+To model task-related neural activity, we specified a general linear model (GLM) in SPM12 (build 7771) implemented in MATLAB (R2023b, version 23.2.0.2668659). The GLM was designed to capture blood-oxygen-level-dependent (BOLD) responses associated with audiovisual and visuotactile statistical and reinforcement learning. The design matrix included six motion parameters (three translation and three rotation estimates) to account for head motion artifacts, the first five aCompCor components derived from fMRIPrep to model noise related to physiological and non-neural signals, and physiological noise regressors (cardiac and respiratory signals) estimated using the PhysIO Toolbox for MATLAB.
+
+The task-related regressors included the choice period, modeled as an epoch with a duration equal to the participant's response time and parametrically modulated by Shannon surprise and the value of the chosen option. The feedback period was modeled as a fixed-duration epoch (1 second) parametrically modulated by RPE and uRPE. All parametric modulators were z-standardized (mean-centered and scaled to unit variance) to ensure comparability across participants and conditions. No orthogonalization was applied to the regressors of interest to preserve shared variance between predictors. To verify that these regressors captured distinct computational signals, we quantified their trial-wise correlations across participants. Mean Pearson correlations were very small, confirming minimal collinearity. Mean Pearson correlations were small, confirming minimal collinearity between the learning signals. Across subjects, mean coefficients of determination were RPE--SPE, $r^2 = 0.007 \pm 0.007$; uRPE--SPE, $r^2 = 0.045 \pm 0.027$; and RPE--uRPE, $r^2 = 0.110 \pm 0.118$. These low shared variances indicate that the three learning signals were largely independent and suitable for simultaneous inclusion as separate regressors in the fMRI general linear model (GLM). The GLM design further accounted for any residual shared variance among regressors.
+
+
+For each parametric modulator, we defined first-level contrasts for all runs vs. implicit baseline, audio runs vs. baseline, tactile runs vs. baseline, and audio runs vs. tactile runs.
+
+\subsection*{Group Analysis}
+
+For second-level inference, we employed non-parametric permutation testing using the SnPM toolbox (v13.01). This approach involved 5,000 permutations to generate a null distribution for statistical testing, cluster-wise inference with family-wise error (FWE) correction at $p < 0.05$ to control for multiple comparisons. We tested both positive and negative contrasts for RPE, Shannon surprise, and uRPE. To assess modality-specific effects, we also computed direct contrasts between audiovisual and visuotactile conditions for each variable of interest.
+
+Cluster-forming thresholds were optimized for each analysis to balance cluster overlap and statistical sensitivity, with cluster-forming thresholds set at $t > 8.0$ for RPE, $t > 3.1$ for Shannon surprise, and $t > 4.0$ for uRPE.
+
+\subsection*{ROI Analysis}
+
+For the region-of-interest (ROI) analysis, we defined each ROI as the set of all voxels in MNI space that survived cluster-wise family-wise error (FWE) correction (at p < 0.05) and exceeded the variable-specific cluster-forming threshold (see previous section). These voxels, identified in the second-level group analysis, formed the functional masks for each ROI. From each mask, we extracted the mean beta estimate per participant for the audiovisual and visuotactile regressors, focusing on the contrasts of interest: RPE, Shannon surprise, and uRPE. By comparing these mean modality-specific beta estimates across conditions, we directly tested for differences in neural activation patterns related to RPE, surprise, and uRPE between audiovisual and visuotactile learning, while accounting for multiple comparisons through cluster-based thresholding.
+
+
+\subsection*{Code availability}
+
+All task scripts, computational modeling code, and analysis pipelines used in this study are publicly available at:
+
+\url{https://github.com/ruffgroup/multlearn}
+
+The repository contains the scripts required to reproduce the behavioral analyses, computational modeling, and neuroimaging results reported in this manuscript.
+
+
+\subsection*{Data availability}
+
+The anonymized MRI dataset supporting the findings of this study has been deposited on OpenNeuro and is publicly available at:
+
+\url{https://openneuro.org/datasets/ds007436/versions/1.0.0}
+
+Data are organized according to the Brain Imaging Data Structure (BIDS) standard and include all raw and preprocessed imaging data required to reproduce the reported analyses.
+
+
+\begin{appendices}
+\setcounter{figure}{0}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\include{appendices/fmriprep}
+\include{appendices/con1_clusters}
+\include{appendices/con5_clusters}
+\include{appendices/primary_regions}
+\include{appendices/urpe_contrasts}
+
+\printbibliography
+
+\end{appendices}
+
+
+\end{document}
+%TC:ignore

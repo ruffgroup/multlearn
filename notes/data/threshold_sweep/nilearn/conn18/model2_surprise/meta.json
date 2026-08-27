@@ -1,0 +1,19 @@
+{
+  "key": "model2_surprise",
+  "model": "model2",
+  "con": 5,
+  "signal": "surprise",
+  "n_subjects": 58,
+  "n_mask_voxels": 59838,
+  "n_perm": 5000,
+  "connectivity": 18,
+  "two_sided": true,
+  "timings": {
+    "cluster_t2_3936": 350.8,
+    "cluster_t2_6649": 336.8,
+    "cluster_t3_2395": 330.9,
+    "cluster_t3_9756": 323.7,
+    "cluster_t5_2929": 320.4,
+    "tfce": 4083.4
+  }
+}

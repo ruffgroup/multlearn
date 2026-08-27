@@ -1,0 +1,3 @@
+name	n_vox	peak_x	peak_y	peak_z	peak_t	found_by	paper_dist_mm	rpe_pos	rpe_neg	urpe_pos	urpe_neg	surprise_pos	surprise_neg
+Caudate / Putamen R	25696	14.5	14.5	-8.5	20.257369995117188	rpe +	5.0	1.0	0.0	0.0	0.40990815691158156	0.0	0.0
+Caudate / Putamen R (2)	15892	2.5	17.5	-8.5	-8.107786178588867	urpe −	16.3	0.662786307576139	0.0	0.0	1.0	0.0	0.0

@@ -8,7 +8,8 @@ mkdir -p "$DEST"
 # map from an earlier (buggy) run is indistinguishable from a real null result
 rsync -av --delete --prune-empty-dirs \
     --include='*/' \
-    --include='*.nii' --include='*.nii.gz' --include='*.tsv' --include='meta.json' \
+    --include='*.nii' --include='*.nii.gz' --include='*.tsv' \
+    --include='meta.json' --include='variant.txt' \
     --exclude='*' \
     sciencecluster:/shares/zne.uzh/multlearn/threshold_sweep/ "$DEST/"
 du -sh "$DEST"

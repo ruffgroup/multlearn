@@ -1,0 +1,19 @@
+{
+  "key": "model2_rpe",
+  "model": "model2",
+  "con": 1,
+  "signal": "rpe",
+  "n_subjects": 58,
+  "n_mask_voxels": 59838,
+  "n_perm": 5000,
+  "connectivity": 18,
+  "two_sided": true,
+  "timings": {
+    "cluster_t2_3936": 295.2,
+    "cluster_t2_6649": 289.1,
+    "cluster_t3_2395": 275.5,
+    "cluster_t3_9756": 267.3,
+    "cluster_t5_2929": 261.3,
+    "tfce": 3584.6
+  }
+}

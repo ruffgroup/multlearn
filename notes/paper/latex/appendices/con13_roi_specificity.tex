@@ -1,0 +1,48 @@
+\subsection{\rev Region-of-interest specificity test (surprise vs.\ unsigned RPE)}
+
+% ROI-based readout of the direct contrast (model7, con13). For each region
+% identified in the surprise and uRPE main-effect maps, we report the peak t of
+% the direct surprise-vs-uRPE contrast within that ROI and whether any voxel in
+% the ROI survived cluster-extent FWE (cluster-forming T = 3.1, p_FWE < 0.05).
+
+\begin{table}[htbp]
+    \centering
+    \rev% review marking (red); neutralise via the \rev definition in the preamble
+    \begin{threeparttable}
+    \caption{Specificity of the previously identified learning-signal regions,
+    tested with the direct surprise-vs-uRPE contrast. Surprise regions are tested
+    for surprise $>$ uRPE; uRPE regions are tested for uRPE $>$ surprise. ``Peak
+    $t$'' is the strongest direct-contrast statistic within the ROI (in the tested
+    direction); ``Significant'' indicates whether any voxel in the ROI survived
+    cluster-extent FWE correction ($p<.05$).}
+    \label{tab:con13_roi}%
+    \begin{tabularx}{\textwidth}{l *{3}{R} l c}
+        \toprule
+        \textbf{Region} & \textbf{X (mm)} & \textbf{Y (mm)} & \textbf{Z (mm)} & \textbf{Peak $t$} & \textbf{Significant} \\
+        \midrule
+        \multicolumn{6}{l}{\textit{Surprise regions --- tested for surprise $>$ uRPE}} \\
+        Precuneus L              & -4  & -54 & 40 & 5.57 & Yes \\
+        Dorsolateral PFC L       & -28 & 24  & 48 & 6.09 & Yes \\
+        Angular gyrus R          & 48  & -72 & 37 & 6.08 & Yes \\
+        Angular gyrus L          & -36 & -82 & 40 & 5.88 & Yes \\
+        \addlinespace
+        \multicolumn{6}{l}{\textit{uRPE regions --- tested for uRPE $>$ surprise}} \\
+        Dorsomedial PFC R        & 2   & 32  & 37  & 6.76 & Yes \\
+        Anterior insula R        & 36  & 24  & -5  & 6.43 & Yes \\
+        Middle frontal gyrus R   & 32  & 60  & 2   & 5.35 & Yes \\
+        Orbital IFG R            & 50  & 36  & -12 & 4.37 & Yes \\
+        Superior frontal sulcus R& 48  & 24  & 37  & 4.56 & Yes \\
+        Insula L                 & -34 & 26  & -2  & n.s. & No  \\
+        Inferior parietal lobule R& 44 & -46 & 48  & n.s. & No  \\
+        \bottomrule
+    \end{tabularx}
+    \begin{tablenotes}\footnotesize
+    \item Coordinates are the main-effect peaks (MNI152, mm) from the surprise and
+    uRPE maps. ``n.s.'': no voxel within the ROI survived the direct contrast.
+    Of seven uRPE regions, five were significantly more uRPE- than surprise-related;
+    the left insula and right inferior parietal lobule did not differ and are
+    interpreted as shared across feedback-driven learning signals. All four surprise
+    regions were significantly more surprise- than uRPE-related.
+    \end{tablenotes}
+    \end{threeparttable}
+\end{table}%

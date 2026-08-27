@@ -196,3 +196,41 @@ The organising split is the finding: **7 of 21 territories fall outside the sign
 
 So the claim that survives is narrower than the paper's: a right frontal / anterior insular
 uRPE network is genuinely separable from the RPE response, and the surprise network is not.
+
+## Robustness across inference rules
+
+Three variants of the same figure, each generated end-to-end under one rule
+(`SPM/code/contrast_roi_overlap.py --variant`, `notes/figures/fig_overlap.py --variant`).
+The rule is printed large at the top of every figure, together with the surviving extent of
+all six maps, so nothing is hidden by the ROI decomposition.
+
+| Variant | Rule | ROIs | Outside the RPE map |
+|---|---|---|---|
+| `extent_p1e4` | cluster-forming t > 3.98 (p < 1e-4), cluster-extent FWE | 21 | 7 |
+| `extent_p1e2` | cluster-forming t > 2.39 (p < .01), cluster-extent FWE | 4 | 0 |
+| `tfce` | no cluster-forming threshold, TFCE, two-tailed FWE | 2 | 0 |
+
+Surviving extent as a share of the analysis mask:
+
+| Map | t > 3.98 | t > 2.39 | TFCE |
+|---|---|---|---|
+| RPE + | 37.5% | 64.9% | 42.9% |
+| RPE − | 0.1% | 0 | 0 |
+| uRPE + | 1.0% | 2.2% | **0.04%** (27 voxels) |
+| uRPE − | 8.6% | 30.3% | 26.6% |
+| Surprise + | 0.4% | 1.0% | **0** |
+| Surprise − | 0 | 0 | 0 |
+
+Two things follow.
+
+- **The regional decomposition is a product of the threshold.** At p < .01 every map is a
+  single confluent blob and there are only four nameable territories; under TFCE, two. The
+  set of "regions" the paper reports exists only in a window of cluster-forming thresholds
+  strict enough to fragment the maps.
+- **Only the RPE-positive / uRPE-negative pair is robust.** It is large under every rule.
+  Under TFCE the surprise map is **empty** and the uRPE-positive map is **27 voxels**.
+  State the caveat honestly, though: TFCE integrates over cluster-forming thresholds in a way
+  that rewards broad smooth effects and penalises small focal ones, and the uRPE-positive
+  clusters are exactly that (largest 143 voxels at t > 3.98). So the right conclusion is that
+  the frontal/insular uRPE-positive effect is **method-dependent** — clear under cluster-extent
+  inference at a strict threshold, near-absent under TFCE — not that it is spurious.

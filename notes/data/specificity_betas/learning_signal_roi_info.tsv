@@ -1,0 +1,23 @@
+roi_set	roi_id	src	n_vox_native	com_x	com_y	com_z	peak_x	peak_y	peak_z	peak_t	n_vox_beta_grid
+surprise	surprise_1	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_1_con5_3_1_pos.nii	197	-4.398477157360404	-59.799492385786806	34.7258883248731					197
+surprise	surprise_2	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_2_con5_3_1_pos.nii	103	-24.995145631067956	24.344660194174764	46.61650485436893					103
+surprise	surprise_3	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_3_con5_3_1_pos.nii	90	47.366666666666674	-66.80000000000001	30.894444444444446					90
+surprise	surprise_4	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_4_con5_3_1_pos.nii	208	-46.091346153846146	-66.28365384615385	28.838942307692307					208
+rpe	rpe_10	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_10_con1_8_0_pos.nii	344	34.802325581395365	-80.3313953488372	4.614825581395351					344
+rpe	rpe_11	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_11_con1_8_0_pos.nii	59	-26.533898305084747	-91.51694915254237	9.889830508474574					59
+rpe	rpe_1	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_1_con1_8_0_pos.nii	307	14.95928338762215	16.57166123778501	-8.750814332247558					307
+rpe	rpe_2	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_2_con1_8_0_pos.nii	273	-15.642857142857139	13.390109890109898	-11.358974358974365					273
+rpe	rpe_3	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_3_con1_8_0_pos.nii	66	-46.0	-68.0	40.02272727272728					66
+rpe	rpe_4	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_4_con1_8_0_pos.nii	79	-45.3860759493671	-79.98101265822785	-0.037974683544305776					79
+rpe	rpe_5	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_5_con1_8_0_pos.nii	213	-1.4295774647887356	53.62676056338029	-6.758215962441312					213
+rpe	rpe_6	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_6_con1_8_0_pos.nii	61	-18.15573770491804	-91.4344262295082	-10.85245901639344					61
+rpe	rpe_7	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_7_con1_8_0_pos.nii	111	37.95945945945945	-72.95945945945945	-37.6981981981982					111
+rpe	rpe_8	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_8_con1_8_0_pos.nii	82	-1.0487804878048763	-34.8170731707317	38.57926829268294					82
+rpe	rpe_9	/shares/zne.uzh/multlearn/nipype/model2/ROI/cluster_9_con1_8_0_pos.nii	79	19.70253164556962	12.525316455696185	19.544303797468345					79
+urpe	urpe_1	/shares/zne.uzh/multlearn/nipype/model7/2ndLevel/cluster_SnPM_SecondLevel_con1/SnPM_filtered_t4_0_pos.nii	31	-33.983870967741936	24.564516129032256	-2.967741935483872	-33.5	26.5	-1.5	5.470666823220433	31
+urpe	urpe_2	/shares/zne.uzh/multlearn/nipype/model7/2ndLevel/cluster_SnPM_SecondLevel_con1/SnPM_filtered_t4_0_pos.nii	142	3.640845070422543	29.54225352112678	42.86619718309859	2.5	32.5	37.0	8.018432458136942	142
+urpe	urpe_3	/shares/zne.uzh/multlearn/nipype/model7/2ndLevel/cluster_SnPM_SecondLevel_con1/SnPM_filtered_t4_0_pos.nii	123	33.256097560975604	58.67073170731709	2.711382113821145	32.5	59.5	2.0	5.463123266123218	123
+urpe	urpe_4	/shares/zne.uzh/multlearn/nipype/model7/2ndLevel/cluster_SnPM_SecondLevel_con1/SnPM_filtered_t4_0_pos.nii	116	35.008620689655174	24.198275862068982	-3.6422413793103487	35.5	23.5	-5.0	7.249183933571238	116
+urpe	urpe_5	/shares/zne.uzh/multlearn/nipype/model7/2ndLevel/cluster_SnPM_SecondLevel_con1/SnPM_filtered_t4_0_pos.nii	24	42.875	-49.125	48.66666666666667	44.5	-45.5	47.5	4.679358788211899	24
+urpe	urpe_6	/shares/zne.uzh/multlearn/nipype/model7/2ndLevel/cluster_SnPM_SecondLevel_con1/SnPM_filtered_t4_0_pos.nii	126	47.35714285714283	21.14285714285714	34.722222222222214	47.5	23.5	37.0	5.049338683084873	126
+urpe	urpe_7	/shares/zne.uzh/multlearn/nipype/model7/2ndLevel/cluster_SnPM_SecondLevel_con1/SnPM_filtered_t4_0_pos.nii	13	50.03846153846155	39.19230769230771	-12.807692307692307	50.5	35.5	-12.0	5.3165319042693495	13

@@ -1,0 +1,19 @@
+{
+  "key": "model7_urpe",
+  "model": "model7",
+  "con": 1,
+  "signal": "urpe",
+  "n_subjects": 58,
+  "n_mask_voxels": 59838,
+  "n_perm": 5000,
+  "connectivity": 18,
+  "two_sided": true,
+  "timings": {
+    "cluster_t2_3936": 300.4,
+    "cluster_t2_6649": 291.4,
+    "cluster_t3_2395": 262.8,
+    "cluster_t3_9756": 255.3,
+    "cluster_t5_2929": 252.9,
+    "tfce": 3715.7
+  }
+}

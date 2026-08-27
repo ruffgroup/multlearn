@@ -61,6 +61,16 @@ mpl.rcParams.update({
 })
 
 
+ALPHA = {"rpe": 0.68, "urpe": 0.55, "surprise": 0.55}   # RPE is the reference, so a bit stronger
+MASK_VOX = 59838          # SnPM's analysis mask
+AXIAL = [-16, -6, 4, 14, 26, 38, 50]
+CORONAL = [-80, -60, -40, -20, 0, 20, 40]
+
+
+def mix(rgb, other, w):
+    return tuple((1 - w) * np.array(rgb) + w * np.array(other))
+
+
 def t_str(t):
     return f"{t:g}".replace(".", "_")
 
@@ -90,8 +100,8 @@ def tidy_name(name):
     return " ".join(out)
 
 
-def load(source):
-    d = op.join(SWEEP, "contrast_rois", source)
+def load(source, variant):
+    d = op.join(SWEEP, "contrast_rois", variant, source)
     info = pd.read_csv(op.join(d, "contrast_roi_info.tsv"), sep="\t")
     long = pd.read_csv(op.join(d, "contrast_roi_overlap.tsv"), sep="\t")
     # tidy, then re-disambiguate: harmonising the casing can collapse two
@@ -114,7 +124,11 @@ def load(source):
                             ascending=[False, True, False]).reset_index(drop=True)
     info["found_by"] = info["found_by"].astype(str)
     info["roi_id"] = np.arange(1, len(info) + 1)   # keys the brain maps to the rows
-    return info, long
+    label = "Inference variant"
+    lp = op.join(d, "variant.txt")
+    if op.exists(lp):
+        label = open(lp).read().strip()
+    return info, long, label
 
 
 # --------------------------------------------------------------------------
@@ -246,23 +260,22 @@ def panel_key(fig, gs):
 
     head(0.985, "Rows")
     ax.text(0.0, 0.945, "One cluster found by one of the six\ncontrasts. The bracket "
-            "says whether the\nsigned-RPE map covers it (\u2265 5% of its\nvoxels). "
-            "The number keys the row to\nits peak in b.",
+            "says whether\nthe signed-RPE map covers it (\u2265 5%). The\nnumber keys the row to its peak in b.",
             fontsize=6.6, color="0.28", va="top", linespacing=1.6)
 
-    head(0.815, "Covered by map")
-    ax.text(0.0, 0.775, "Share of the ROI's voxels lying inside\nthat map's surviving "
+    head(0.800, "Covered by map")
+    ax.text(0.0, 0.762, "Share of the ROI's voxels lying inside\nthat map's surviving "
             "clusters.", fontsize=6.6, color="0.28", va="top", linespacing=1.6)
     for i, c in enumerate((1.0, 0.5, 0.1)):
-        yy = 0.700 - i * 0.055
+        yy = 0.688 - i * 0.055
         ax.plot([0.12], [yy], marker="s", ms=COV_MS * np.sqrt(c), mfc=grey, mec="none")
         entry(yy, f"{c:.0%} of the ROI")
-    ax.plot([0.12], [0.535], marker=".", ms=1.5, color="0.78")
-    entry(0.535, "Below 1% — no overlap")
-    ax.plot([0.12], [0.480], marker="s", ms=COV_MS * 0.8, mfc=grey, mec="none")
-    entry(0.480, "Filled = positive tail")
-    ax.plot([0.12], [0.425], marker="s", ms=COV_MS * 0.8, mfc="white", mec=grey, mew=1.0)
-    entry(0.425, "Open = negative tail")
+    ax.plot([0.12], [0.523], marker=".", ms=1.5, color="0.78")
+    entry(0.523, "Below 1% — no overlap")
+    ax.plot([0.12], [0.468], marker="s", ms=COV_MS * 0.8, mfc=grey, mec="none")
+    entry(0.468, "Filled = positive tail")
+    ax.plot([0.12], [0.413], marker="s", ms=COV_MS * 0.8, mfc="white", mec=grey, mew=1.0)
+    entry(0.413, "Open = negative tail")
 
     head(0.335, "Effect in ROI")
     ax.text(0.0, 0.295, "Group one-sample t of that signal's\ncontrast value, averaged "
@@ -282,98 +295,204 @@ def panel_key(fig, gs):
     return ax
 
 
-def load_map(source, signal, sign, thr=REF_T):
-    d = op.join(SWEEP, "snpm", f"{source}_{signal}")
-    if not op.isdir(d):
-        d = op.join(SWEEP, "snpm", f"model7_{signal}")
-    fn = op.join(d, f"t{t_str(thr)}_{sign}.nii")
+def load_map(source, signal, sign, variant):
+    fn = op.join(SWEEP, "contrast_rois", variant, source,
+                 f"map_{signal}_{sign}.nii.gz")
     if not op.exists(fn):
         return None
     img = nib.load(fn)
-    data = np.abs(np.nan_to_num(np.squeeze(img.get_fdata())))
+    data = np.abs(np.nan_to_num(img.get_fdata()))
     return nib.Nifti1Image((data > 0).astype(np.float32), img.affine)
 
 
-def panel_slices(fig, gs, source, cuts, info):
-    """One row of cuts carrying every tail at once.
+_BG = {}
 
-    Signed RPE is always shown in its positive direction, as a red fill, because
-    it is the reference footprint the other maps are being compared against.
-    Everything else is an outline on top: solid for the positive tail, dashed for
-    the negative one. Numbers are the ROIs of panel a, placed at their peaks."""
-    bg = resample_img(nib.load(BG_1MM), target_affine=np.diag([2.0, 2.0, 2.0]),
-                      interpolation="continuous", force_resample=True, copy_header=True)
-    ax = fig.add_subplot(gs)
-    disp = plotting.plot_roi(load_map(source, "rpe", "pos"), bg_img=bg,
-                             display_mode="z", cut_coords=cuts, axes=ax,
-                             cmap=mcolors.ListedColormap([COLOR["rpe"]]), alpha=0.38,
-                             colorbar=False, annotate=False, draw_cross=False,
-                             black_bg=False, resampling_interpolation="nearest")
-    for signal, sg, ls in (("urpe", "pos", "solid"), ("urpe", "neg", "dashed"),
-                           ("surprise", "pos", "solid"), ("surprise", "neg", "dashed"),
-                           ("rpe", "neg", "dashed")):
-        m = load_map(source, signal, sg)
+
+def background():
+    if "img" not in _BG:
+        _BG["img"] = resample_img(nib.load(BG_1MM), target_affine=np.diag([2.0, 2.0, 2.0]),
+                                  interpolation="continuous", force_resample=True,
+                                  copy_header=True)
+    return _BG["img"]
+
+
+def slice_row(fig, cell, source, variant, mode, cuts, which, info=None):
+    """One row of cuts, maps drawn as filled semi-transparent overlays.
+
+    Sign is carried by the ROW, not by line style: solid-vs-dashed is a second
+    encoding the reader has to hold in mind, and at 1 pt it is hard to read at
+    print size. With one row per tail no sign key is needed at all, and a row can
+    still put both tails together -- no voxel is ever in both tails of the same
+    signal, so overlapping fills stay unambiguous within a hue."""
+    ax = fig.add_subplot(cell)
+    loaded = []
+    empty = []
+    for signal, tail in which:
+        m = load_map(source, signal, tail, variant)
         if m is None or np.asarray(m.dataobj).sum() == 0:
-            continue
-        disp.add_contours(m, levels=[0.5], colors=[COLOR[signal]], linewidths=1.0,
-                          linestyles=ls)
-    disp.annotate(size=6.5)
+            empty.append((signal, tail))
+        else:
+            loaded.append((signal, m))
+    if not loaded:                      # nothing survives: draw the anatomy alone
+        disp = plotting.plot_roi(nib.Nifti1Image(np.zeros((2, 2, 2), np.float32),
+                                                 np.eye(4)),
+                                 bg_img=background(), display_mode=mode,
+                                 cut_coords=cuts, axes=ax, colorbar=False,
+                                 annotate=False, draw_cross=False, black_bg=False)
+    else:
+        sig0, m0 = loaded[0]
+        disp = plotting.plot_roi(m0, bg_img=background(), display_mode=mode,
+                                 cut_coords=cuts, axes=ax, colorbar=False,
+                                 cmap=mcolors.ListedColormap([COLOR[sig0]]),
+                                 alpha=ALPHA[sig0], annotate=False, draw_cross=False,
+                                 black_bg=False, resampling_interpolation="nearest")
+        for signal, m in loaded[1:]:
+            disp.add_overlay(m, threshold=0.5, transparency=ALPHA[signal],
+                             cmap=mcolors.ListedColormap([COLOR[signal]]))
+    for signal, m in loaded:
+        disp.add_contours(m, levels=[0.5], linewidths=0.45,
+                          colors=[mix(mcolors.to_rgb(COLOR[signal]), (0, 0, 0), 0.35)])
+    disp.annotate(size=6.2)
 
-    # ROI numbers, on whichever cut is nearest that ROI's peak
-    halo = [pe.withStroke(linewidth=1.8, foreground="white")]
-    for slicer_coord, slicer in disp.axes.items():
-        for rec in info.itertuples():
-            if abs(rec.peak_z - slicer_coord) > 8:
-                continue
-            sig = rec.found_by.split(" | ")[0].split()[0]
-            slicer.ax.text(rec.peak_x, rec.peak_y, f"{rec.roi_id}", fontsize=5.8,
-                           ha="center", va="center", color=COLOR[sig],
-                           fontweight="bold", path_effects=halo, zorder=100,
-                           clip_on=False)
-    return ax
+    if info is not None:
+        halo = [pe.withStroke(linewidth=1.9, foreground="white")]
+        axis = {"z": 2, "y": 1, "x": 0}[mode]
+        plane = {"z": ("peak_x", "peak_y"), "y": ("peak_x", "peak_z"),
+                 "x": ("peak_y", "peak_z")}[mode]
+        for coord, slicer in disp.axes.items():
+            for rec in info.itertuples():
+                pk = (rec.peak_x, rec.peak_y, rec.peak_z)[axis]
+                if abs(pk - coord) > 9:
+                    continue
+                sig = rec.found_by.split(" | ")[0].split()[0]
+                slicer.ax.text(getattr(rec, plane[0]), getattr(rec, plane[1]),
+                               f"{rec.roi_id}", fontsize=5.6, ha="center",
+                               va="center", color=COLOR[sig], fontweight="bold",
+                               path_effects=halo, zorder=100, clip_on=False)
+    return ax, empty
 
 
-def main(source, out_stem):
-    info, long = load(source)
+def map_block(fig, gs_rows, source, variant, which, title, note, info=None):
+    """Two rows of cuts -- axial then coronal -- for one selection of maps."""
+    ax_a, empty = slice_row(fig, gs_rows[0], source, variant, "z", AXIAL, which, info=info)
+    ax_c, _ = slice_row(fig, gs_rows[1], source, variant, "y", CORONAL, which, info=info)
+    ax_a.text(0.030, 1.075, title, transform=ax_a.transAxes, ha="left", va="bottom",
+              fontsize=7.5, color="0.1", fontweight="bold")
+    if note:
+        ax_a.text(1.0, 1.075, note, transform=ax_a.transAxes, ha="right", va="bottom",
+                  fontsize=6.8, color="0.35")
+    return ax_a, ax_c, empty
 
-    fig = plt.figure(figsize=(7.25, 7.7))
-    gs = fig.add_gridspec(2, 2, height_ratios=[1, 0.30], width_ratios=[1, 0.245],
-                          left=0.005, right=0.995, top=0.958, bottom=0.045,
-                          hspace=0.16, wspace=0.01)
 
+POS = [("rpe", "pos"), ("urpe", "pos"), ("surprise", "pos")]
+NEG = [("rpe", "neg"), ("urpe", "neg"), ("surprise", "neg")]
+BOTH = POS + [("rpe", "neg"), ("urpe", "neg")]
+
+
+def map_extents(source, variant):
+    """Surviving extent of each of the six maps, as a share of the analysis mask.
+
+    Stated on the figure so nothing is hidden by the ROI decomposition: a map can
+    be large and still yield no named ROI (one confluent blob), or nearly empty."""
+    out = []
+    for sig in SIGNALS:
+        for tail in ("pos", "neg"):
+            m = load_map(source, sig, tail, variant)
+            n = 0 if m is None else int((np.asarray(m.dataobj) > 0).sum())
+            out.append((sig, tail, n, 100 * n / MASK_VOX))
+    return out
+
+
+def banner(fig, label, source, variant, y_top=0.995):
+    """The inference choice, stated large -- it is the thing under test."""
+    fig.text(0.005, y_top, label, fontsize=10.5, fontweight="bold", va="top",
+             color="0.08")
+    ext = map_extents(source, variant)
+    parts = []
+    for sig in SIGNALS:
+        vals = {t: p for s, t, n, p in ext if s == sig for t in [t]}
+        parts.append(f"{LABEL[sig]} +{vals['pos']:.1f} / −{vals['neg']:.1f}")
+    fig.text(0.005, y_top - 0.0295,
+             f"{source}  ·  n = 58  ·  surviving extent, % of mask:  "
+             + "   ".join(parts),
+             fontsize=7.5, va="top", color="0.42")
+
+
+def figure_overlap(source, variant, info, long, label, out_stem):
+    n = len(info)
+    h_matrix = max(1.5, 0.235 * n + 1.15)
+    fig = plt.figure(figsize=(7.25, h_matrix + 2.85))
+    hr = [h_matrix, 1.05, 1.05]
+    gs = fig.add_gridspec(3, 2, height_ratios=hr, width_ratios=[1, 0.245],
+                          left=0.005, right=0.995, top=1 - 0.62 / (h_matrix + 2.85),
+                          bottom=0.045, hspace=0.22, wspace=0.01)
+    banner(fig, label, source, variant)
     ax_m = panel_matrix(fig, gs[0, 0], info, long)
     panel_key(fig, gs[0, 1])
-    ax_b = panel_slices(fig, gs[1, :], source, [-12, 0, 12, 24, 36, 48], info)
-
+    ax_b, ax_b2, _ = map_block(
+        fig, [gs[1, :], gs[2, :]], source, variant, BOTH, "Every map, both tails",
+        "Signed RPE (red) · uRPE (green) · surprise (blue) · numbers mark the ROIs of a",
+        info=info)
     ax_m.text(-0.005, 1.008, "a", transform=ax_m.transAxes, fontsize=8,
               fontweight="bold", va="bottom", ha="left")
-    ax_b.text(-0.005, 1.055, "b", transform=ax_b.transAxes, fontsize=8,
+    ax_b.text(-0.005, 1.075, "b", transform=ax_b.transAxes, fontsize=8,
               fontweight="bold", va="bottom", ha="left")
-
-    ax_b.text(0.030, 1.055, "Every map, both tails, on the same slices",
-              transform=ax_b.transAxes, ha="left", va="bottom", fontsize=7.5,
-              color="0.1", fontweight="bold")
-    ax_b.text(1.0, 1.055,
-              "Red fill: signed RPE, positive · outlines: uRPE (green) and surprise "
-              "(blue) · solid = positive tail, dashed = negative",
-              transform=ax_b.transAxes, ha="right", va="bottom", fontsize=6.8,
-              color="0.35")
-    ax_b.text(0.5, -0.10,
-              "Surprise has no surviving negative clusters at any threshold tested. "
-              "The dashed green outlines are uRPE\ngoing negative — they fall inside "
-              "the red map, while the solid green ones sit outside it.",
-              transform=ax_b.transAxes, ha="center", va="top", fontsize=7,
-              color="0.35", linespacing=1.7)
-
+    ax_b2.text(0.5, -0.13,
+               "Clusters smaller than 25 voxels are not given a row in a; the extents in "
+               "the header are the full maps, so a signal can\nbe large here and absent "
+               "from a (one confluent blob), or present as a map and too small to name.",
+               transform=ax_b2.transAxes, ha="center", va="top", fontsize=7,
+               color="0.35", linespacing=1.7)
     fig.savefig(out_stem + ".pdf", bbox_inches="tight", pad_inches=0.02)
     fig.savefig(out_stem + ".svg", bbox_inches="tight", pad_inches=0.02)
     plt.close(fig)
     print("wrote", out_stem + ".pdf")
 
 
+def figure_maps(source, variant, info, label, out_stem):
+    fig = plt.figure(figsize=(7.25, 9.3))
+    gs = fig.add_gridspec(6, 1, left=0.005, right=0.995, top=0.938, bottom=0.055,
+                          hspace=0.22)
+    banner(fig, label, source, variant)
+    ax1, ax1b, _ = map_block(fig, [gs[0], gs[1]], source, variant, POS,
+                             "Positive tails",
+                             "Signed RPE (red) · uRPE (green) · surprise (blue)")
+    ax2, ax2b, empty = map_block(fig, [gs[2], gs[3]], source, variant, NEG,
+                                 "Negative tails", "Same three colours")
+    ax3, ax3b, _ = map_block(fig, [gs[4], gs[5]], source, variant, BOTH,
+                             "Both tails together",
+                             "Numbers mark the ROIs of the companion figure",
+                             info=info)
+    for ax, letter in ((ax1, "a"), (ax2, "b"), (ax3, "c")):
+        ax.text(-0.005, 1.075, letter, transform=ax.transAxes, fontsize=8,
+                fontweight="bold", va="bottom", ha="left")
+    if any(sg == "surprise" for sg, _ in empty):
+        ax2.text(0.030, -0.16, "Surprise has no surviving negative clusters here.",
+                 transform=ax2.transAxes, ha="left", va="top", fontsize=6.8,
+                 color="0.35")
+    ax3b.text(0.5, -0.15,
+              "The green of b sits on the red of a — the same territory carries a "
+              "positive signed-RPE response and a negative unsigned one.",
+              transform=ax3b.transAxes, ha="center", va="top", fontsize=7,
+              color="0.35", linespacing=1.7)
+    fig.savefig(out_stem + ".pdf", bbox_inches="tight", pad_inches=0.02)
+    fig.savefig(out_stem + ".svg", bbox_inches="tight", pad_inches=0.02)
+    plt.close(fig)
+    print("wrote", out_stem + ".pdf")
+
+
+def main(source, variant, outdir):
+    info, long, label = load(source, variant)
+    figure_overlap(source, variant, info, long, label,
+                   op.join(outdir, f"fig_overlap_{source}_{variant}"))
+    figure_maps(source, variant, info, label,
+                op.join(outdir, f"fig_maps_{source}_{variant}"))
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--source", default="model7")
-    ap.add_argument("--out", default=None)
+    ap.add_argument("--variant", default="extent_p1e4")
+    ap.add_argument("--outdir", default=op.join(NOTES, "figures"))
     a = ap.parse_args()
-    main(a.source, a.out or op.join(NOTES, "figures", f"fig_overlap_{a.source}"))
+    main(a.source, a.variant, a.outdir)

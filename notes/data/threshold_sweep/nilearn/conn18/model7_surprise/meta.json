@@ -1,0 +1,19 @@
+{
+  "key": "model7_surprise",
+  "model": "model7",
+  "con": 5,
+  "signal": "surprise",
+  "n_subjects": 58,
+  "n_mask_voxels": 59838,
+  "n_perm": 5000,
+  "connectivity": 18,
+  "two_sided": true,
+  "timings": {
+    "cluster_t2_3936": 404.9,
+    "cluster_t2_6649": 391.6,
+    "cluster_t3_2395": 377.3,
+    "cluster_t3_9756": 349.4,
+    "cluster_t5_2929": 300.4,
+    "tfce": 4208.4
+  }
+}
