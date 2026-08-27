@@ -76,16 +76,44 @@ PAPER_PEAKS = [
 PAPER_MATCH_MM = 20.0
 
 
-def load_map(source, signal, sign, thr):
-    key = f"{source}_{signal}"
-    d = op.join(SWEEP_ROOT, "snpm", key)
+LOGP_ALPHA = 1.3010299956639813   # -log10(.05)
+
+VARIANTS = {
+    # name -> (engine, statistic, cluster-forming t or None, human-readable label)
+    "extent_p1e4": ("snpm", "size", 3.9756,
+                    "Cluster-forming t > 3.98 (p < 1e-4)  ·  cluster-extent FWE p < .05"),
+    "extent_p1e2": ("snpm", "size", 2.3936,
+                    "Cluster-forming t > 2.39 (p < .01)  ·  cluster-extent FWE p < .05"),
+    "tfce": ("nilearn", "tfce", None,
+             "No cluster-forming threshold  ·  TFCE, two-tailed FWE p < .05"),
+}
+
+
+def load_map(source, signal, sign, engine, stat, thr):
+    """Binary map of the voxels this contrast declares significant."""
+    if engine == "snpm":
+        d = op.join(SWEEP_ROOT, "snpm", f"{source}_{signal}")
+        if not op.isdir(d):
+            d = op.join(SWEEP_ROOT, "snpm", f"model7_{signal}")
+        fn = op.join(d, f"t{t_str(thr)}_{sign}.nii")
+        if not op.exists(fn):
+            return None
+        img = nib.load(fn)
+        return img, np.nan_to_num(np.squeeze(img.get_fdata()))
+
+    d = op.join(SWEEP_ROOT, "nilearn", "conn18", f"{source}_{signal}")
     if not op.isdir(d):
-        d = op.join(SWEEP_ROOT, "snpm", f"model7_{signal}")
-    fn = op.join(d, f"t{t_str(thr)}_{sign}.nii")
-    if not op.exists(fn):
+        d = op.join(SWEEP_ROOT, "nilearn", "conn18", f"model7_{signal}")
+    t_fn = op.join(d, "t.nii.gz")
+    p_fn = op.join(d, f"logp_max_{stat}.nii.gz" if stat in ("tfce", "t")
+                   else f"logp_max_{stat}_t{t_str(thr)}.nii.gz")
+    if not (op.exists(t_fn) and op.exists(p_fn)):
         return None
-    img = nib.load(fn)
-    return img, np.nan_to_num(np.squeeze(img.get_fdata()))
+    img = nib.load(t_fn)
+    t = np.nan_to_num(img.get_fdata())
+    keep = np.nan_to_num(nib.load(p_fn).get_fdata()) > LOGP_ALPHA
+    keep &= (t > 0) if sign == "pos" else (t < 0)
+    return img, np.where(keep, t, 0.0)
 
 
 def gyrus_labeller(ref):
@@ -117,7 +145,8 @@ def name_for(peak_mm, ijk, mask, gyrus_label):
     return gyrus_label(ijk, mask, peak_mm), np.nan
 
 
-def main(source, thr, out_root):
+def main(source, variant, out_root):
+    engine, stat, thr, label = VARIANTS[variant]
     con_of = {}
     for signal in SIGNALS:
         key = f"{source}_{signal}"
@@ -136,7 +165,7 @@ def main(source, thr, out_root):
     maps, rois = {}, []
     for signal in SIGNALS:
         for sign in ("pos", "neg"):
-            got = load_map(source, signal, sign, thr)
+            got = load_map(source, signal, sign, engine, stat, thr)
             if got is None:
                 maps[(signal, sign)] = None
                 continue
@@ -228,7 +257,7 @@ def main(source, thr, out_root):
         adj[idx] = min(1.0, running)
     df["p_holm"] = adj
 
-    out_dir = op.join(out_root, source)
+    out_dir = op.join(out_root, variant, source)
     os.makedirs(out_dir, exist_ok=True)
     df.to_csv(op.join(out_dir, "contrast_roi_overlap.tsv"), sep="\t", index=False)
     pd.DataFrame(info).to_csv(op.join(out_dir, "contrast_roi_info.tsv"), sep="\t", index=False)
@@ -240,13 +269,23 @@ def main(source, thr, out_root):
     img.set_data_dtype(np.float32)
     img.header.set_slope_inter(slope=1, inter=0)
     img.to_filename(op.join(out_dir, "contrast_rois.nii.gz"))
+    # the six binary maps, so the figure never has to re-derive the variant
+    for (signal, sign), mp in maps.items():
+        if mp is None:
+            mp = np.zeros(analysis_mask.shape, bool)
+        m = nib.Nifti1Image((mp & analysis_mask).astype(np.float32), ref.affine)
+        m.set_data_dtype(np.float32)
+        m.header.set_slope_inter(slope=1, inter=0)
+        m.to_filename(op.join(out_dir, f"map_{signal}_{sign}.nii.gz"))
+    with open(op.join(out_dir, "variant.txt"), "w") as fh:
+        fh.write(label + "\n")
     print("wrote", out_dir, flush=True)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--source", choices=["model7", "model2"], default="model7")
-    parser.add_argument("--threshold", type=float, default=REF_T)
+    parser.add_argument("--variant", choices=list(VARIANTS), default="extent_p1e4")
     parser.add_argument("--out-root", default=op.join(SWEEP_ROOT, "contrast_rois"))
     args = parser.parse_args()
-    main(args.source, args.threshold, args.out_root)
+    main(args.source, args.variant, args.out_root)
