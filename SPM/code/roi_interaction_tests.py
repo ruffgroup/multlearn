@@ -6,9 +6,10 @@ Two questions the overlap figure cannot answer on its own:
    to signal B?**  A non-significant one-sample t for B is not evidence that B is
    absent -- absence of evidence is not evidence of absence.  So every pair gets
    three verdicts, not one:
-       different    -- the paired difference test is significant
-       equivalent   -- TOST rejects a difference as large as DELTA_DZ
+       different    -- the paired difference test is significant (Holm)
+       equivalent   -- BF01 > 3, moderate evidence for no difference
        undetermined -- neither; the data cannot tell
+   TOST against DELTA_DZ is reported alongside for readers who prefer it.
    DELTA_DZ is the smallest standardised difference this design has 80% power to
    detect at n = 58, so "equivalent" means any true difference is smaller than
    what the study could have found.
@@ -94,10 +95,17 @@ def tost(d, delta_dz):
     return max(p_lo, p_hi), bound
 
 
-def verdict(p_diff, p_tost):
+def verdict(p_diff, bf01):
+    """'equivalent' is judged on the Bayes factor, not Holm-corrected TOST.
+
+    Holm across 40-60 equivalence tests is punishing enough that nothing ever
+    clears it, which would report every null as 'undetermined' and hide the cells
+    where the data really do favour no difference. BF01 > 3 is the conventional
+    'moderate evidence for the null'; the TOST p-values are kept in the table so
+    a stricter reader can use them instead."""
     if p_diff < 0.05:
         return "different"
-    if p_tost < 0.05:
+    if bf01 > 3:
         return "equivalent"
     return "undetermined"
 
@@ -128,7 +136,7 @@ def main(source, variant, out_root):
     pair["p_holm"] = holm(pair["p"].values)
     pair["p_tost_holm"] = holm(pair["p_tost"].values)
     pair["verdict"] = [verdict(a, b) for a, b in
-                       zip(pair["p_holm"], pair["p_tost_holm"])]
+                       zip(pair["p_holm"], pair["bf01"])]
     pair.to_csv(op.join(d, "roi_pair_tests.tsv"), sep="\t", index=False)
 
     # ---- 2. crossover interactions across ROI pairs ---------------------
