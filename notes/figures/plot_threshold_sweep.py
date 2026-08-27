@@ -57,6 +57,9 @@ THRESHOLDS = [(2.3936, 1e-2), (2.6649, 5e-3), (3.2395, 1e-3),
 FWE_ALPHA = 0.05
 LOGP_ALPHA = -np.log10(FWE_ALPHA)
 MAX_SLOTS = 8          # cluster slices shown per panel
+# how to arrange n cluster slices inside one panel (the panel cell is ~2:1)
+SLOT_GRID = {0: (1, 1), 1: (1, 1), 2: (1, 2), 3: (1, 3), 4: (2, 2),
+             5: (2, 3), 6: (2, 3), 7: (2, 4), 8: (2, 4)}
 CONNECTIVITY = ndimage.generate_binary_structure(3, 2)  # 18, as in spm_clusters
 
 mpl.rcParams.update({
@@ -93,8 +96,11 @@ def background():
     if "img" not in _BG_CACHE:
         img = nib.load(BG_1MM)
         # 1 mm is needlessly slow for ~1500 small panels
+        # a 3x3 target_affine lets nilearn recompute the offset and keep the
+        # field of view; a 4x4 diagonal one silently moves the origin to (0,0,0)
+        # and chops off every negative coordinate
         _BG_CACHE["img"] = resample_img(
-            img, target_affine=np.diag([2.0, 2.0, 2.0, 1.0]),
+            img, target_affine=np.diag([2.0, 2.0, 2.0]),
             interpolation="continuous", force_resample=True, copy_header=True)
     return _BG_CACHE["img"]
 
@@ -153,6 +159,9 @@ def analysis_mask_size(source, signal):
     if op.exists(meta):
         import json
         return json.load(open(meta))["n_mask_voxels"]
+    t_fn = op.join(d, "t.nii.gz")           # the t map is already masked
+    if op.exists(t_fn):
+        return int((np.nan_to_num(nib.load(t_fn).get_fdata()) != 0).sum())
     return None
 
 
@@ -192,7 +201,7 @@ def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
                note=None):
     dark = sign == "neg"
     hue = SIGNAL_COLOR[signal]
-    face = "#111417" if dark else "#FFFFFF"
+    face = "#000000" if dark else "#FFFFFF"  # match nilearn's black_bg exactly
     fg = "#E8E8E8" if dark else "#1A1A1A"
 
     bg_ax = fig.add_subplot(cell)
@@ -201,17 +210,20 @@ def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
     for spine in bg_ax.spines.values():
         spine.set_color(hue); spine.set_linewidth(1.2)
 
-    inner = cell.subgridspec(3, 4, height_ratios=[0.34, 1, 1], hspace=0.30, wspace=0.04)
-    head = fig.add_subplot(inner[0, :]); head.set_axis_off()
+    head_cell, body_cell = cell.subgridspec(
+        2, 1, height_ratios=[0.30, 1], hspace=0.10)
+    head = fig.add_subplot(head_cell); head.set_axis_off()
 
-    arrow = "▼" if dark else "▲"
     direction = "Negative" if dark else "Positive"
-    title = f"{arrow}  {SIGNAL_LABEL[signal]} — {direction}"
+    title = f"{SIGNAL_LABEL[signal]} — {direction}"
+    # a drawn triangle rather than a glyph: Helvetica has no U+25B2/U+25BC
+    head.plot([0.009], [0.62], marker="v" if dark else "^", ms=7, color=hue,
+              transform=head.transAxes, clip_on=False)
 
     if img is None:
-        head.text(0.02, 0.55, title, transform=head.transAxes, fontsize=10.5,
+        head.text(0.028, 0.62, title, transform=head.transAxes, fontsize=10.5,
                   fontweight="bold", color=hue, va="center")
-        head.text(0.02, 0.05, note or "Map not available", transform=head.transAxes,
+        head.text(0.028, 0.12, note or "Map not available", transform=head.transAxes,
                   fontsize=8, color="0.5" if not dark else "0.6", style="italic")
         return dict(n_clusters=0, n_vox=0)
 
@@ -220,22 +232,23 @@ def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
     pct = 100 * n_vox / mask_vox if mask_vox else np.nan
     peak = max((abs(c["peak_t"]) for c in clusters), default=0.0)
 
-    head.text(0.02, 0.62, title, transform=head.transAxes, fontsize=10.5,
+    head.text(0.028, 0.62, title, transform=head.transAxes, fontsize=10.5,
               fontweight="bold", color=hue, va="center")
     summary = (f"{len(clusters)} cluster{'s' if len(clusters) != 1 else ''} · "
                f"{n_vox:,} voxels ({pct:.1f}% of mask) · "
                f"{n_vox * voxel_mm3 / 1000:,.1f} cm³ · peak |t| = {peak:.1f}")
-    head.text(0.02, 0.18, summary, transform=head.transAxes, fontsize=7.6,
+    head.text(0.028, 0.18, summary, transform=head.transAxes, fontsize=7.6,
               color=fg, va="center")
 
     if clusters and 100 * clusters[0]["size"] / max(n_vox, 1) > 80 and pct > 15:
-        head.text(0.98, 0.18, "⚠ one cluster covers the map — "
+        head.text(0.98, 0.18, "One cluster covers the map — "
                   "cluster-extent inference is uninformative here",
-                  transform=head.transAxes, fontsize=6.8, color="#B8860B",
+                  transform=head.transAxes, fontsize=6.8,
+                  color="#F0B429" if dark else "#9A6700",
                   ha="right", va="center", style="italic")
 
     if not clusters:
-        ax = fig.add_subplot(inner[1:, :]); ax.set_axis_off()
+        ax = fig.add_subplot(body_cell); ax.set_axis_off()
         ax.text(0.5, 0.5, "No suprathreshold clusters", transform=ax.transAxes,
                 ha="center", va="center", fontsize=9,
                 color="0.5" if not dark else "0.6", style="italic")
@@ -248,24 +261,41 @@ def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
     bg = background()
 
     shown = clusters[:MAX_SLOTS]
+    nrows, ncols = SLOT_GRID[len(shown)]
+    inner = body_cell.subgridspec(nrows, ncols, hspace=0.34, wspace=0.04)
+
+    # a cluster spanning a large part of the brain cannot be shown by one cut,
+    # so give it a short montage inside its own slot instead
+    giant_vox = 0.06 * mask_vox if mask_vox else 4000
+
     for slot, clu in enumerate(shown):
-        ax = fig.add_subplot(inner[1 + slot // 4, slot % 4])
+        ax = fig.add_subplot(inner[slot // ncols, slot % ncols])
         axis = best_plane(clu["mask"], clu["peak_ijk"])
         coord = nib.affines.apply_affine(img.affine, np.array(clu["peak_ijk"]))
         mode = "xyz"[axis]
+        if clu["size"] > giant_vox:
+            mode = "z"
+            zs = np.nonzero(clu["mask"].any(axis=0).any(axis=0))[0]
+            cuts = np.linspace(zs[0], zs[-1], min(6, len(zs))).round().astype(int)
+            world = [nib.affines.apply_affine(img.affine, [0, 0, z])[2] for z in cuts]
+            cut_coords = sorted(set(np.round(world, 1)))
+        else:
+            cut_coords = [coord[axis]]
         disp = plotting.plot_stat_map(
-            abs_img, bg_img=bg, display_mode=mode, cut_coords=[coord[axis]],
+            abs_img, bg_img=bg, display_mode=mode, cut_coords=cut_coords,
             threshold=cft, vmax=vmax, cmap=cmap, colorbar=False, axes=ax,
             annotate=False, draw_cross=False, black_bg=dark,
             resampling_interpolation="nearest")
         clu_img = nib.Nifti1Image(clu["mask"].astype(np.float32), img.affine)
         disp.add_contours(clu_img, levels=[0.5], colors=[edge], linewidths=0.7,
                           linestyles="dashed" if dark else "solid")
+        where = (f"{len(cut_coords)} axial cuts" if len(cut_coords) > 1
+                 else f"{mode}={coord[axis]:.0f}")
         label = (f"#{slot + 1}  {clu['size'] * voxel_mm3:,.0f} mm³  "
-                 f"t={clu['peak_t']:+.1f}\n{mode}={coord[axis]:.0f}  "
+                 f"t={clu['peak_t']:+.1f}\n{where}  peak "
                  f"({coord[0]:.0f}, {coord[1]:.0f}, {coord[2]:.0f})")
         ax.text(0.5, -0.02, label, transform=ax.transAxes, ha="center", va="top",
-                fontsize=5.9, color=fg, linespacing=1.25)
+                fontsize=6.0, color=fg, linespacing=1.3)
 
     if len(clusters) > MAX_SLOTS:
         rest = sum(c["size"] for c in clusters[MAX_SLOTS:])
