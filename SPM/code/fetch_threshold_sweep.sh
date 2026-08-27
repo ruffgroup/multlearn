@@ -4,7 +4,9 @@
 set -e
 DEST=/Users/gdehol/git/multlearn-sns/notes/data/threshold_sweep
 mkdir -p "$DEST"
-rsync -av --prune-empty-dirs \
+# --delete matters: a re-run replaces maps in place, and a stale local copy of a
+# map from an earlier (buggy) run is indistinguishable from a real null result
+rsync -av --delete --prune-empty-dirs \
     --include='*/' \
     --include='*.nii' --include='*.nii.gz' --include='*.tsv' --include='meta.json' \
     --exclude='*' \

@@ -8,10 +8,11 @@ that cluster's peak in whichever plane shows most of it.  No glass brains: a
 glass brain hides exactly the thing at issue here, which is how much of the
 brain a map actually covers.
 
-Colour follows the manuscript (RPE red, uRPE green, surprise blue).  Negative
-panels are rendered as a photographic negative -- dark background, the same hue
-now emitting rather than absorbing, dashed cluster outlines, a downward marker
-in the header -- so sign is legible at a glance without spending a second hue.
+Colour follows the manuscript (RPE red, uRPE green, surprise blue).  Sign is
+carried by the panel rather than by a second hue, so that blob intensity stays
+directly comparable between the two columns: negative panels get a pale wash of
+the signal's own colour, a heavy colour bar down the left edge, dashed cluster
+outlines and a downward marker in the header.
 
 Two PDFs are produced, one per model source:
     threshold_sweep_model7.pdf   all three modulators in one design
@@ -78,14 +79,11 @@ def mix(rgb, other, w):
     return tuple((1 - w) * np.array(rgb) + w * np.array(other))
 
 
-def hue_ramp(hex_color, dark_bg):
-    """Low t -> high t.  On white the ramp darkens; on black it lights up, so in
-    both cases the strongest voxels have the most contrast against the brain."""
+def hue_ramp(hex_color):
+    """Low t -> high t, light to saturated.  The same ramp is used for positive
+    and negative panels so that a blob's colour means the same thing in both."""
     base = mcolors.to_rgb(hex_color)
-    if dark_bg:
-        stops = [mix(base, (0, 0, 0), 0.60), base, mix(base, (1, 1, 1), 0.80)]
-    else:
-        stops = [mix(base, (1, 1, 1), 0.72), base, mix(base, (0, 0, 0), 0.45)]
+    stops = [mix(base, (1, 1, 1), 0.72), base, mix(base, (0, 0, 0), 0.45)]
     return mcolors.LinearSegmentedColormap.from_list("ramp", stops)
 
 
@@ -186,6 +184,29 @@ def cluster_table(img, min_vox=1):
     return out
 
 
+def n_local_maxima(img, cft):
+    """How many rows the paper's own cluster tables would have.
+
+    The manuscript enumerates regions with `nilearn.reporting.get_clusters_table`,
+    which lists local maxima at least 8 mm apart -- so a single sprawling
+    connected component can appear there as a dozen "clusters".  Reporting both
+    numbers on every panel is the only way the counts here can be compared with
+    the tables in the paper.
+    """
+    from nilearn.reporting import get_clusters_table
+    data = np.abs(np.nan_to_num(img.get_fdata()))
+    nz = data[data != 0]
+    if not nz.size:
+        return 0
+    abs_img = nib.Nifti1Image(data.astype(np.float32), img.affine)
+    try:
+        tbl = get_clusters_table(abs_img, stat_threshold=max(cft, float(nz.min()) * 0.999),
+                                 cluster_threshold=0, min_distance=8)
+        return len(tbl)
+    except Exception:
+        return -1
+
+
 def best_plane(mask, peak_ijk):
     """The cut through the peak that shows the most of this cluster."""
     counts = [mask[peak_ijk[0], :, :].sum(), mask[:, peak_ijk[1], :].sum(),
@@ -199,32 +220,36 @@ def best_plane(mask, peak_ijk):
 
 def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
                note=None):
-    dark = sign == "neg"
+    neg = sign == "neg"
     hue = SIGNAL_COLOR[signal]
-    face = "#000000" if dark else "#FFFFFF"  # match nilearn's black_bg exactly
-    fg = "#E8E8E8" if dark else "#1A1A1A"
+    rgb = mcolors.to_rgb(hue)
+    face = mix(rgb, (1, 1, 1), 0.90) if neg else "#FFFFFF"
+    fg = "#1A1A1A"
 
     bg_ax = fig.add_subplot(cell)
     bg_ax.set_facecolor(face)
     bg_ax.set_xticks([]); bg_ax.set_yticks([])
     for spine in bg_ax.spines.values():
         spine.set_color(hue); spine.set_linewidth(1.2)
+    if neg:  # heavy colour bar down the left edge: the sign cue that survives shrinking
+        bg_ax.add_patch(Rectangle((0, 0), 0.012, 1, transform=bg_ax.transAxes,
+                                  color=hue, zorder=5, clip_on=False))
 
     head_cell, body_cell = cell.subgridspec(
         2, 1, height_ratios=[0.30, 1], hspace=0.10)
     head = fig.add_subplot(head_cell); head.set_axis_off()
 
-    direction = "Negative" if dark else "Positive"
+    direction = "Negative" if neg else "Positive"
     title = f"{SIGNAL_LABEL[signal]} — {direction}"
     # a drawn triangle rather than a glyph: Helvetica has no U+25B2/U+25BC
-    head.plot([0.009], [0.62], marker="v" if dark else "^", ms=7, color=hue,
+    head.plot([0.014], [0.62], marker="v" if neg else "^", ms=7, color=hue,
               transform=head.transAxes, clip_on=False)
 
     if img is None:
-        head.text(0.028, 0.62, title, transform=head.transAxes, fontsize=10.5,
+        head.text(0.033, 0.62, title, transform=head.transAxes, fontsize=10.5,
                   fontweight="bold", color=hue, va="center")
-        head.text(0.028, 0.12, note or "Map not available", transform=head.transAxes,
-                  fontsize=8, color="0.5" if not dark else "0.6", style="italic")
+        head.text(0.033, 0.12, note or "Map not available", transform=head.transAxes,
+                  fontsize=8, color="0.5", style="italic")
         return dict(n_clusters=0, n_vox=0)
 
     clusters = cluster_table(img)
@@ -232,30 +257,32 @@ def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
     pct = 100 * n_vox / mask_vox if mask_vox else np.nan
     peak = max((abs(c["peak_t"]) for c in clusters), default=0.0)
 
-    head.text(0.028, 0.62, title, transform=head.transAxes, fontsize=10.5,
+    head.text(0.033, 0.62, title, transform=head.transAxes, fontsize=10.5,
               fontweight="bold", color=hue, va="center")
-    summary = (f"{len(clusters)} cluster{'s' if len(clusters) != 1 else ''} · "
+    n_peaks = n_local_maxima(img, cft)
+    summary = (f"{len(clusters)} connected component"
+               f"{'s' if len(clusters) != 1 else ''} (18-conn) · "
+               f"{n_peaks} local maxima ≥8 mm apart · "
                f"{n_vox:,} voxels ({pct:.1f}% of mask) · "
                f"{n_vox * voxel_mm3 / 1000:,.1f} cm³ · peak |t| = {peak:.1f}")
-    head.text(0.028, 0.18, summary, transform=head.transAxes, fontsize=7.6,
+    head.text(0.033, 0.18, summary, transform=head.transAxes, fontsize=7.6,
               color=fg, va="center")
 
     if clusters and 100 * clusters[0]["size"] / max(n_vox, 1) > 80 and pct > 15:
-        head.text(0.98, 0.18, "One cluster covers the map — "
+        head.text(0.98, 0.62, "One component covers the map — "
                   "cluster-extent inference is uninformative here",
-                  transform=head.transAxes, fontsize=6.8,
-                  color="#F0B429" if dark else "#9A6700",
+                  transform=head.transAxes, fontsize=7.0, color="#9A6700",
                   ha="right", va="center", style="italic")
 
     if not clusters:
         ax = fig.add_subplot(body_cell); ax.set_axis_off()
         ax.text(0.5, 0.5, "No suprathreshold clusters", transform=ax.transAxes,
                 ha="center", va="center", fontsize=9,
-                color="0.5" if not dark else "0.6", style="italic")
+                color="0.5", style="italic")
         return dict(n_clusters=0, n_vox=0)
 
-    cmap = hue_ramp(hue, dark_bg=dark)
-    edge = "#FFFFFF" if dark else mix(mcolors.to_rgb(hue), (0, 0, 0), 0.55)
+    cmap = hue_ramp(hue)
+    edge = mix(rgb, (0, 0, 0), 0.55)
     abs_img = nib.Nifti1Image(np.abs(np.nan_to_num(img.get_fdata())).astype(np.float32),
                               img.affine)
     bg = background()
@@ -284,11 +311,11 @@ def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
         disp = plotting.plot_stat_map(
             abs_img, bg_img=bg, display_mode=mode, cut_coords=cut_coords,
             threshold=cft, vmax=vmax, cmap=cmap, colorbar=False, axes=ax,
-            annotate=False, draw_cross=False, black_bg=dark,
+            annotate=False, draw_cross=False, black_bg=False,
             resampling_interpolation="nearest")
         clu_img = nib.Nifti1Image(clu["mask"].astype(np.float32), img.affine)
         disp.add_contours(clu_img, levels=[0.5], colors=[edge], linewidths=0.7,
-                          linestyles="dashed" if dark else "solid")
+                          linestyles="dashed" if neg else "solid")
         where = (f"{len(cut_coords)} axial cuts" if len(cut_coords) > 1
                  else f"{mode}={coord[axis]:.0f}")
         label = (f"#{slot + 1}  {clu['size'] * voxel_mm3:,.0f} mm³  "
@@ -299,9 +326,9 @@ def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
 
     if len(clusters) > MAX_SLOTS:
         rest = sum(c["size"] for c in clusters[MAX_SLOTS:])
-        head.text(0.98, 0.62, f"+{len(clusters) - MAX_SLOTS} more clusters "
+        head.text(0.98, 0.18, f"+{len(clusters) - MAX_SLOTS} more components "
                   f"({100 * (n_vox - rest) / n_vox:.0f}% of volume shown)",
-                  transform=head.transAxes, fontsize=6.8, color=fg, ha="right",
+                  transform=head.transAxes, fontsize=7.0, color=fg, ha="right",
                   va="center", style="italic")
     return dict(n_clusters=len(clusters), n_vox=n_vox)
 
@@ -309,8 +336,8 @@ def draw_panel(fig, cell, img, signal, sign, cft, vmax, mask_vox, voxel_mm3,
 def render_page(pdf, source, loader, title, subtitle, cft, voxel_mm3, urpe_note):
     fig = plt.figure(figsize=(16.5, 11.7))
     fig.patch.set_facecolor("white")
-    outer = fig.add_gridspec(3, 2, left=0.012, right=0.988, top=0.925, bottom=0.012,
-                             hspace=0.10, wspace=0.03)
+    outer = fig.add_gridspec(3, 2, left=0.012, right=0.988, top=0.925, bottom=0.030,
+                             hspace=0.13, wspace=0.03)
     fig.text(0.012, 0.972, title, fontsize=15, fontweight="bold", va="center")
     fig.text(0.012, 0.945, subtitle, fontsize=8.8, color="0.35", va="center")
 
@@ -418,7 +445,8 @@ def render_summary_page(pdf, source, summary, voxel_mm3, notes_text):
             ax.grid(alpha=0.25, lw=0.5)
             ax.tick_params(labelsize=7)
             if row == 0 and col == 0:
-                ax.legend(fontsize=6, frameon=False, ncol=1, loc="upper right")
+                ax.legend(fontsize=5.6, frameon=True, framealpha=0.9,
+                          edgecolor="none", ncol=2, loc="lower left")
 
     fig.text(0.012, 0.255, "Engine comparison and caveats", fontsize=11,
              fontweight="bold", va="top")
@@ -432,11 +460,72 @@ def render_summary_page(pdf, source, summary, voxel_mm3, notes_text):
 # ROI sign overview
 
 
+def render_roi_summary_page(pdf, source, df):
+    """One page that answers 'which sign pattern do regions actually show?'."""
+    sign = {}
+    for signal in SIGNALS:
+        sub = df[df.signal == signal].set_index("name")
+        sign[signal] = np.where(sub["p_holm"] >= 0.05, "0",
+                                np.where(sub["t"] > 0, "+", "\u2212"))
+        names = sub.index
+    pat = pd.DataFrame(sign, index=names)
+    pat["pattern"] = pat[SIGNALS[0]] + " " + pat[SIGNALS[1]] + " " + pat[SIGNALS[2]]
+    counts = pat["pattern"].value_counts()
+
+    fig = plt.figure(figsize=(16.5, 11.7))
+    fig.patch.set_facecolor("white")
+    fig.text(0.012, 0.955, f"Sign patterns across all relevant parcels — {source}",
+             fontsize=15, fontweight="bold", va="center")
+    fig.text(0.012, 0.922,
+             f"{len(pat)} Harvard-Oxford parcels are touched by at least one signal's "
+             f"surviving clusters at cluster-forming t > 3.24. For each parcel the sign "
+             f"of each signal is + / \u2212 / 0 by a Holm-corrected one-sample t-test on the "
+             f"parcel mean. Order below is RPE, uRPE, surprise.",
+             fontsize=8.8, color="0.35", va="center")
+
+    ax = fig.add_axes([0.21, 0.12, 0.38, 0.76])
+    y = np.arange(len(counts))[::-1]
+    ax.barh(y, counts.values, height=0.7, color="#6C757D")
+    ax.set_yticks(y)
+    ax.set_yticklabels([f"RPE {p.split()[0]}   uRPE {p.split()[1]}   surprise {p.split()[2]}"
+                        for p in counts.index], fontsize=9, family="monospace")
+    ax.set_xlabel("Number of parcels", fontsize=9)
+    ax.set_ylim(-0.7, len(counts) - 0.3)
+    for spine in ("top", "right"):
+        ax.spines[spine].set_visible(False)
+    for yi, v in zip(y, counts.values):
+        ax.text(v + 0.6, yi, str(v), va="center", fontsize=8.5, color="0.25")
+
+    lines = []
+    top = counts.index[0]
+    lines.append(f"The single most common pattern is  {top}  ({counts.iloc[0]} of "
+                 f"{len(pat)} parcels).")
+    n_rpe_pos = int((pat[SIGNALS[0]] == "+").sum())
+    n_urpe_neg = int((pat[SIGNALS[1]] == "\u2212").sum())
+    n_sur_any = int((pat[SIGNALS[2]] != "0").sum())
+    both = int(((pat[SIGNALS[0]] == "+") & (pat[SIGNALS[1]] == "\u2212")).sum())
+    lines.append(f"RPE is significantly positive in {n_rpe_pos} parcels; uRPE is "
+                 f"significantly negative in {n_urpe_neg}; the two co-occur in {both}.")
+    lines.append(f"Surprise reaches significance in either direction in only "
+                 f"{n_sur_any} parcels.")
+    lines.append("")
+    lines.append("Read this together with the orthogonalisation caveat: in model7 uRPE is")
+    lines.append("the FIRST feedback modulator and signed RPE the second, so SPM's default")
+    lines.append("serial orthogonalisation gives uRPE every scrap of variance the two share.")
+    lines.append("A negative uRPE loading therefore cannot be an artefact of the ordering --")
+    lines.append("the ordering biases uRPE the other way.")
+    fig.text(0.635, 0.85, "\n".join(lines), fontsize=9.5, va="top", color="0.15",
+             linespacing=1.9)
+    pdf.savefig(fig, facecolor="white")
+    plt.close(fig)
+
+
 def render_roi_pages(pdf, source, per_page=22):
     tsv = op.join(SWEEP, "roi_matrix", source, "roi_sign_matrix.tsv")
     if not op.exists(tsv):
         return
     df = pd.read_csv(tsv, sep="\t")
+    render_roi_summary_page(pdf, source, df)
     wide_t = df.pivot(index="name", columns="signal", values="t")
     wide_p = df.pivot(index="name", columns="signal", values="p_holm")
     # how much of the parcel that signal's own whole-brain map actually covers
@@ -467,12 +556,11 @@ def render_roi_pages(pdf, source, per_page=22):
                  fontsize=15, fontweight="bold", va="center")
         fig.text(0.012, 0.925,
                  "Harvard-Oxford parcels touched by any signal's surviving clusters "
-                 "(cluster-forming t > 3.24, p < .001). Bars are the group one-sample "
-                 "t of that parcel's mean contrast value; anatomical parcels give no "
-                 "signal a home-field advantage. Filled = Holm-significant across all "
-                 "parcel × signal tests, open = not. A dot on the far side of "
-                 "the axis marks parcels that this signal's own whole-brain map "
-                 "covers by at least 10%.",
+                 "(cluster-forming t > 3.24, p < .001). Bars are the group one-sample t of "
+                 "that parcel's mean contrast value;\nanatomical parcels give no signal a "
+                 "home-field advantage. Filled = Holm-significant across all parcel × signal "
+                 "tests, open = not. A dot on the far side of the axis marks\nparcels that "
+                 "this signal's own whole-brain map covers by at least 10%.",
                  fontsize=8.6, color="0.35", va="center")
 
         y = np.arange(len(chunk))[::-1]
