@@ -439,6 +439,9 @@ def render_roi_pages(pdf, source, per_page=22):
     df = pd.read_csv(tsv, sep="\t")
     wide_t = df.pivot(index="name", columns="signal", values="t")
     wide_p = df.pivot(index="name", columns="signal", values="p_holm")
+    # how much of the parcel that signal's own whole-brain map actually covers
+    df["frac_sig"] = df[["frac_sig_pos", "frac_sig_neg"]].max(axis=1)
+    wide_cov = df.pivot(index="name", columns="signal", values="frac_sig")
 
     # order: by which signal dominates, then by that signal's |t|
     dom = wide_t.abs().idxmax(axis=1)
@@ -467,7 +470,9 @@ def render_roi_pages(pdf, source, per_page=22):
                  "(cluster-forming t > 3.24, p < .001). Bars are the group one-sample "
                  "t of that parcel's mean contrast value; anatomical parcels give no "
                  "signal a home-field advantage. Filled = Holm-significant across all "
-                 "parcel × signal tests, open = not.",
+                 "parcel × signal tests, open = not. A dot on the far side of "
+                 "the axis marks parcels that this signal's own whole-brain map "
+                 "covers by at least 10%.",
                  fontsize=8.6, color="0.35", va="center")
 
         y = np.arange(len(chunk))[::-1]
@@ -481,6 +486,13 @@ def render_roi_pages(pdf, source, per_page=22):
                     zorder=3)
             ax.barh(y[~sig], vals[~sig], height=0.66, color="white",
                     edgecolor=SIGNAL_COLOR[signal], lw=0.9, zorder=4)
+            # a dot marks parcels this signal's own whole-brain map covers,
+            # i.e. the regions that would have been "its" ROIs
+            cov = wide_cov.loc[chunk, signal].values
+            covered = cov >= 0.10
+            ax.plot(np.where(vals[covered] >= 0, -tmax * 0.965, tmax * 0.965),
+                    y[covered], "o", ms=3.2, color=SIGNAL_COLOR[signal],
+                    zorder=6, clip_on=False)
             ax.axvline(0, color="0.25", lw=0.8, zorder=5)
             ax.set_xlim(-tmax, tmax)
             ax.set_ylim(-0.7, len(chunk) - 0.3)

@@ -80,7 +80,9 @@ def build_parcellation(ref_img):
             next_id += 1
     # subcortical labels are already lateralised; they win over cortex on overlap
     for lab, name in enumerate(sub.labels):
-        if lab == 0 or "Cerebral Cortex" in name or "Cerebral White Matter" in name:
+        if lab == 0 or any(skip in name for skip in
+                           ("Cerebral Cortex", "Cerebral White Matter",
+                            "Lateral Ventricle")):
             continue
         mask = sub_d == lab
         if mask.sum() == 0:
@@ -139,6 +141,8 @@ def main(source, min_sig_vox, thr, out_root):
     keep = []
     for pid in sorted(set(np.unique(parcels)) - {0}):
         mask = parcels == pid
+        if mask.sum() < 30:          # too small in-mask to average meaningfully
+            continue
         n_sig = int((mask & touched).sum())
         if n_sig >= min_sig_vox:
             keep.append((pid, mask, n_sig))
