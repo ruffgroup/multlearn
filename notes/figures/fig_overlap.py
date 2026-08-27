@@ -126,6 +126,13 @@ def load(source, variant):
                             ascending=[False, True, False]).reset_index(drop=True)
     info["found_by"] = info["found_by"].astype(str)
     info["roi_id"] = np.arange(1, len(info) + 1)   # keys the brain maps to the rows
+    pairs = None
+    fn = op.join(d, "roi_pair_tests.tsv")
+    if op.exists(fn):
+        pairs = pd.read_csv(fn, sep="\t")
+        pairs["name"] = pairs["name"].map(tidy)      # same renaming as the rows
+        pairs = pairs.dropna(subset=["name"]).set_index(["name", "signal_a", "signal_b"])
+    info.attrs["pairs"] = pairs
     label = "Inference variant"
     lp = op.join(d, "variant.txt")
     if op.exists(lp):
@@ -139,11 +146,16 @@ def load(source, variant):
 # panel's aspect ratio -- drawing these as data-space rectangles makes squares
 # come out as wide rectangles.
 
-X_LABEL = 0.055          # left edge of the ROI name
-X_COV0 = 0.475           # first "covered by map" column
-X_STEP = 0.052
-X_EFF0 = 0.815           # first "effect in ROI" column
-COV_MS = 9.5             # side of a 100%-coverage square, in points
+X_LABEL = 0.040          # left edge of the ROI name
+X_COV0 = 0.385           # first "covered by map" column
+X_STEP = 0.0385
+X_EFF0 = 0.640           # first "effect in ROI" column
+X_EFF_STEP = 0.050
+X_PAIR0 = 0.800          # first "signal vs signal" column
+X_PAIR_STEP = 0.066
+COV_MS = 9.0             # side of a 100%-coverage square, in points
+
+PAIRS = [("urpe", "surprise"), ("rpe", "urpe"), ("rpe", "surprise")]
 
 
 def row_layout(info):
@@ -171,7 +183,7 @@ def row_layout(info):
     return np.array(ys), groups, supers
 
 
-def panel_matrix(fig, gs, info, long):
+def panel_matrix(fig, gs, info, long, pairs=None):
     ax = fig.add_subplot(gs)
     ax.set_axis_off()
     ys, groups, supers = row_layout(info)
@@ -180,7 +192,8 @@ def panel_matrix(fig, gs, info, long):
 
     cov_cols = [(s, sg) for s in SIGNALS for sg in ("pos", "neg")]
     x_cov = X_COV0 + np.arange(len(cov_cols)) * X_STEP
-    x_eff = X_EFF0 + np.arange(3) * X_STEP * 1.35
+    x_eff = X_EFF0 + np.arange(3) * X_EFF_STEP
+    x_pair = X_PAIR0 + np.arange(len(PAIRS)) * X_PAIR_STEP
 
     # --- headers
     for xi, (s, sg) in zip(x_cov, cov_cols):
@@ -192,9 +205,16 @@ def panel_matrix(fig, gs, info, long):
     ax.text(np.mean(x_cov), 2.7, "Covered by map", ha="center", va="bottom",
             fontsize=8, color="0.15")
     for s, xi in zip(SIGNALS, x_eff):
-        ax.text(xi, 0.75, LABEL[s], ha="center", va="bottom", fontsize=7.5,
+        ax.text(xi, 0.75, LABEL[s], ha="center", va="bottom", fontsize=6.6,
                 color=COLOR[s])
     ax.text(np.mean(x_eff), 2.7, "Effect in ROI", ha="center", va="bottom",
+            fontsize=8, color="0.15")
+    for (a, b), xi in zip(PAIRS, x_pair):
+        ax.text(xi, 0.70, f"{LABEL[a]}\nvs {LABEL[b]}", ha="center", va="bottom",
+                fontsize=5.9, color=mix(np.mean([mcolors.to_rgb(COLOR[a]),
+                                                 mcolors.to_rgb(COLOR[b])], axis=0),
+                                        (0, 0, 0), 0.2), linespacing=1.3)
+    ax.text(np.mean(x_pair), 2.7, "Are they different?", ha="center", va="bottom",
             fontsize=8, color="0.15")
 
     # --- rows
@@ -222,6 +242,24 @@ def panel_matrix(fig, gs, info, long):
             ax.plot([xi], [yi], marker="^" if r["t"] > 0 else "v", ms=ms,
                     mfc=COLOR[s] if filled else "white", mec=COLOR[s], mew=0.9)
 
+        if pairs is not None:
+            for (a, b), xi in zip(PAIRS, x_pair):
+                try:
+                    r = pairs.loc[(rec.name, a, b)]
+                except KeyError:
+                    continue
+                col = mix(np.mean([mcolors.to_rgb(COLOR[a]),
+                                   mcolors.to_rgb(COLOR[b])], axis=0), (0, 0, 0), 0.2)
+                if r["verdict"] == "different":
+                    ms = 3.2 + 5.6 * min(abs(r["t"]) / 10.0, 1.0)
+                    ax.plot([xi], [yi], marker="^" if r["t"] > 0 else "v", ms=ms,
+                            mfc=col, mec=col, mew=0.9)
+                elif r["verdict"] == "equivalent":
+                    ax.plot([xi], [yi], marker="o", ms=5.0, mfc="white", mec=col,
+                            mew=1.3)
+                else:
+                    ax.plot([xi], [yi], marker="_", ms=5.0, color="0.65", mew=1.2)
+
     # --- found-by group labels, in the gutter above each block
     for found, y0, y1 in groups:
         parts = [p.split() for p in found.split(" | ")]
@@ -240,60 +278,74 @@ def panel_matrix(fig, gs, info, long):
                 else "Inside the RPE map", rotation=90, ha="center", va="center",
                 fontsize=7.5, color="0.15", fontweight="bold")
 
-    ax.plot([x_cov[-1] + X_STEP * 0.62] * 2, [ys.min() - 0.6, 1.2], lw=0.6,
+    ax.plot([x_cov[-1] + X_STEP * 0.75] * 2, [ys.min() - 0.6, 1.2], lw=0.6,
+            color="0.78")
+    ax.plot([x_eff[-1] + X_EFF_STEP * 0.75] * 2, [ys.min() - 0.6, 1.2], lw=0.6,
             color="0.78")
     return ax
 
 
 def panel_key(fig, gs):
-    """A glyph matrix needs a real key; this one names every mark on panel a."""
+    """A glyph matrix needs a real key; this one names every mark on the table.
+
+    It runs full width under the table rather than down the right-hand side: the
+    table grew a third block of columns and no longer leaves a margin wide enough
+    for a legend without clipping it."""
     ax = fig.add_subplot(gs)
     ax.set_axis_off()
     ax.set_xlim(0, 1); ax.set_ylim(0, 1)
     grey = "#4A4A4A"
+    xs = [0.005, 0.265, 0.520, 0.765]
 
-    def head(y, txt):
-        ax.text(0.0, y, txt, fontsize=7.5, color="0.1", va="center",
-                fontweight="bold")
+    def head(x, txt):
+        ax.text(x, 0.97, txt, fontsize=7.5, color="0.1", va="top", fontweight="bold")
 
-    def entry(y, txt):
-        ax.text(0.26, y, txt, fontsize=6.6, color="0.28", va="center",
-                linespacing=1.55)
+    def para(x, y, txt):
+        ax.text(x, y, txt, fontsize=6.5, color="0.28", va="top", linespacing=1.6)
 
-    head(0.985, "Rows")
-    ax.text(0.0, 0.945, "One cluster found by one of the six\ncontrasts. The bracket "
-            "says whether\nthe signed-RPE map covers it (\u2265 5%). The\nnumber keys the row to its peak in b.",
-            fontsize=6.6, color="0.28", va="top", linespacing=1.6)
+    def item(x, y, txt):
+        ax.text(x + 0.038, y, txt, fontsize=6.4, color="0.28", va="center")
 
-    head(0.800, "Covered by map")
-    ax.text(0.0, 0.762, "Share of the ROI's voxels lying inside\nthat map's surviving "
-            "clusters.", fontsize=6.6, color="0.28", va="top", linespacing=1.6)
+    head(xs[0], "Rows")
+    para(xs[0], 0.82, "One cluster found by one of the six contrasts.\nThe bracket says "
+         "whether the signed-RPE map\ncovers it (\u2265 5%). The number keys the row to\n"
+         "its peak on the map pages.")
+
+    head(xs[1], "Covered by map")
+    para(xs[1], 0.82, "Share of the ROI's voxels inside that map's\nsurviving clusters.")
     for i, c in enumerate((1.0, 0.5, 0.1)):
-        yy = 0.688 - i * 0.055
-        ax.plot([0.12], [yy], marker="s", ms=COV_MS * np.sqrt(c), mfc=grey, mec="none")
-        entry(yy, f"{c:.0%} of the ROI")
-    ax.plot([0.12], [0.523], marker=".", ms=1.5, color="0.78")
-    entry(0.523, "Below 1% — no overlap")
-    ax.plot([0.12], [0.468], marker="s", ms=COV_MS * 0.8, mfc=grey, mec="none")
-    entry(0.468, "Filled = positive tail")
-    ax.plot([0.12], [0.413], marker="s", ms=COV_MS * 0.8, mfc="white", mec=grey, mew=1.0)
-    entry(0.413, "Open = negative tail")
+        y = 0.58 - i * 0.135
+        ax.plot([xs[1] + 0.012], [y], marker="s", ms=COV_MS * np.sqrt(c), mfc=grey,
+                mec="none")
+        item(xs[1], y, f"{c:.0%} of the ROI")
+    ax.plot([xs[1] + 0.012], [0.175], marker="s", ms=COV_MS * 0.8, mfc="white",
+            mec=grey, mew=1.0)
+    item(xs[1], 0.175, "Open square = negative tail")
+    ax.plot([xs[1] + 0.012], [0.055], marker=".", ms=1.6, color="0.78")
+    item(xs[1], 0.055, "Dot = below 1%, no overlap")
 
-    head(0.335, "Effect in ROI")
-    ax.text(0.0, 0.295, "Group one-sample t of that signal's\ncontrast value, averaged "
-            "over the ROI.", fontsize=6.6, color="0.28", va="top", linespacing=1.6)
-    ax.plot([0.12], [0.215], marker="^", ms=8.8, mfc=grey, mec=grey)
-    entry(0.215, "Positive, and significant")
-    ax.plot([0.12], [0.160], marker="v", ms=8.8, mfc=grey, mec=grey)
-    entry(0.160, "Negative, and significant")
-    ax.plot([0.12], [0.105], marker="^", ms=5.2, mfc="white", mec=grey, mew=0.9)
-    entry(0.105, "Open = not significant")
-    ax.text(0.0, 0.055, "Bigger marker = a larger effect. Significance is\nHolm-corrected "
-            "over all ROI \u00d7 signal tests.", fontsize=6.6, color="0.28", va="top",
-            linespacing=1.6)
-    ax.text(0.0, -0.015, "All six maps share one cluster-forming\nthreshold "
-            "(t > 3.98, one-tailed p < 1e-4).", fontsize=6.6, color="0.45",
-            va="top", linespacing=1.6, fontstyle="italic")
+    head(xs[2], "Effect in ROI")
+    para(xs[2], 0.82, "Group one-sample t of that signal's contrast\nvalue, averaged over "
+         "the ROI.")
+    ax.plot([xs[2] + 0.012], [0.60], marker="^", ms=8.5, mfc=grey, mec=grey)
+    item(xs[2], 0.60, "Positive, and significant")
+    ax.plot([xs[2] + 0.012], [0.45], marker="v", ms=8.5, mfc=grey, mec=grey)
+    item(xs[2], 0.45, "Negative, and significant")
+    ax.plot([xs[2] + 0.012], [0.30], marker="^", ms=5.0, mfc="white", mec=grey, mew=0.9)
+    item(xs[2], 0.30, "Open = not significant")
+    para(xs[2], 0.185, "Bigger marker = a larger effect.\nHolm-corrected over all "
+         "ROI \u00d7 signal tests.")
+
+    head(xs[3], "Are they different?")
+    para(xs[3], 0.82, "One signal against another inside the\nROI, paired across subjects.")
+    ax.plot([xs[3] + 0.012], [0.60], marker="^", ms=8.5, mfc=grey, mec=grey)
+    item(xs[3], 0.60, "Different; points to the larger")
+    ax.plot([xs[3] + 0.012], [0.45], marker="o", ms=5.2, mfc="white", mec=grey, mew=1.3)
+    item(xs[3], 0.45, "Equivalent (BF\u2080\u2081 > 3)")
+    ax.plot([xs[3] + 0.012], [0.30], marker="_", ms=5.2, color="0.65", mew=1.2)
+    item(xs[3], 0.30, "Undetermined")
+    para(xs[3], 0.185, "TOST bound in the table is dz = 0.368,\nthe smallest effect this "
+         "design can\nfind with 80% power.")
     return ax
 
 
@@ -406,19 +458,19 @@ BOTH = POS + NEG
 TAIL = {"pos": "positive", "neg": "negative"}
 
 
-def banner(fig, label, source, variant, y_top=0.992):
+def banner(fig, label, source, variant, y_top=0.992, dy=0.0225, dy2=0.0405):
     """The inference choice, stated large -- it is the thing under test."""
     fig.text(0.005, y_top, label, fontsize=10.5, fontweight="bold", va="top",
              color="0.08")
     ext = {(s, t): n for s, t, n, _ in map_extents(source, variant)}
     parts = [f"{LABEL[s]} +{100 * ext[(s, 'pos')] / MASK_VOX:.1f} / "
              f"\u2212{100 * ext[(s, 'neg')] / MASK_VOX:.1f}" for s in SIGNALS]
-    fig.text(0.005, y_top - 0.0225,
+    fig.text(0.005, y_top - dy,
              f"{source}  ·  n = 58  ·  surviving extent, % of mask:  "
              + "   ".join(parts), fontsize=7.5, va="top", color="0.42")
     note = MODEL_NOTE.get(source, "")
     wrapped = textwrap.fill(note, 158)
-    fig.text(0.005, y_top - 0.0405, wrapped, fontsize=6.8, va="top", color="0.42",
+    fig.text(0.005, y_top - dy2, wrapped, fontsize=6.8, va="top", color="0.42",
              linespacing=1.55)
 
 
@@ -435,12 +487,16 @@ def map_extents(source, variant):
 def page_matrix(pdf, source, variant, info, long, label):
     n = len(info)
     h_matrix = max(2.4, 0.235 * n + 1.75)
-    fig = plt.figure(figsize=(7.25, h_matrix))
-    gs = fig.add_gridspec(1, 2, width_ratios=[1, 0.245], left=0.005, right=0.995,
-                          top=1 - 1.02 / h_matrix, bottom=0.03, wspace=0.01)
-    banner(fig, label, source, variant)
-    ax_m = panel_matrix(fig, gs[0, 0], info, long)
-    panel_key(fig, gs[0, 1])
+    h_key = 1.35
+    h_total = h_matrix + h_key
+    fig = plt.figure(figsize=(7.25, h_total))
+    gs = fig.add_gridspec(2, 1, height_ratios=[h_matrix, h_key], left=0.005,
+                          right=0.995, top=1 - 1.02 / h_total, bottom=0.02,
+                          hspace=0.06)
+    banner(fig, label, source, variant, y_top=1 - 0.10 / h_total,
+           dy=0.20 / h_total, dy2=0.36 / h_total)
+    ax_m = panel_matrix(fig, gs[0], info, long, pairs=info.attrs.get("pairs"))
+    panel_key(fig, gs[1])
     ax_m.text(-0.005, 1.008, "a", transform=ax_m.transAxes, fontsize=8,
               fontweight="bold", va="bottom", ha="left")
     pdf.savefig(fig, facecolor="white")

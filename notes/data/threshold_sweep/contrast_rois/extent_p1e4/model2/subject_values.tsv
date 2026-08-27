@@ -1,0 +1,3655 @@
+subject	name	signal	value
+01	Caudate / Putamen R	rpe	0.10166865462117268
+02	Caudate / Putamen R	rpe	0.5003750685841593
+03	Caudate / Putamen R	rpe	0.552845896185419
+04	Caudate / Putamen R	rpe	0.24975898478482997
+05	Caudate / Putamen R	rpe	0.4162815535470517
+06	Caudate / Putamen R	rpe	0.14329300074551266
+07	Caudate / Putamen R	rpe	-0.025411804728310304
+09	Caudate / Putamen R	rpe	0.20528405714317643
+10	Caudate / Putamen R	rpe	0.6827321855470453
+11	Caudate / Putamen R	rpe	0.47386513256057355
+12	Caudate / Putamen R	rpe	0.17167586343222965
+14	Caudate / Putamen R	rpe	0.1877532283874521
+15	Caudate / Putamen R	rpe	0.1938137984294439
+17	Caudate / Putamen R	rpe	0.17146809454191844
+18	Caudate / Putamen R	rpe	0.09634189408117144
+19	Caudate / Putamen R	rpe	0.39453227661685014
+20	Caudate / Putamen R	rpe	0.16832613900465948
+21	Caudate / Putamen R	rpe	0.3354454765732856
+22	Caudate / Putamen R	rpe	0.1295416655824251
+23	Caudate / Putamen R	rpe	0.08636726864539901
+24	Caudate / Putamen R	rpe	0.4656803294626149
+25	Caudate / Putamen R	rpe	0.4016312952983609
+26	Caudate / Putamen R	rpe	-0.18595438354197175
+27	Caudate / Putamen R	rpe	0.3910980606011945
+28	Caudate / Putamen R	rpe	0.3146124773069699
+29	Caudate / Putamen R	rpe	0.2544435023875522
+30	Caudate / Putamen R	rpe	0.31639883709140726
+33	Caudate / Putamen R	rpe	0.13222802416424756
+34	Caudate / Putamen R	rpe	0.13561782988399593
+35	Caudate / Putamen R	rpe	0.2563461060576095
+36	Caudate / Putamen R	rpe	0.19320465373153775
+37	Caudate / Putamen R	rpe	0.284949478159996
+38	Caudate / Putamen R	rpe	-0.008210002126149552
+39	Caudate / Putamen R	rpe	0.2530414841862291
+40	Caudate / Putamen R	rpe	-0.0008542139897860511
+41	Caudate / Putamen R	rpe	0.6074230623462034
+42	Caudate / Putamen R	rpe	0.22663333061593177
+43	Caudate / Putamen R	rpe	0.23102314904241583
+45	Caudate / Putamen R	rpe	0.3562058884631994
+46	Caudate / Putamen R	rpe	0.10481048098836146
+47	Caudate / Putamen R	rpe	0.5233194799935111
+48	Caudate / Putamen R	rpe	0.31559522548943086
+49	Caudate / Putamen R	rpe	0.4180300628475979
+50	Caudate / Putamen R	rpe	0.13313481824287812
+51	Caudate / Putamen R	rpe	0.5156606603469427
+52	Caudate / Putamen R	rpe	0.2740784987608396
+53	Caudate / Putamen R	rpe	0.14010384717067373
+54	Caudate / Putamen R	rpe	0.17472292916665821
+55	Caudate / Putamen R	rpe	0.3918170154032796
+56	Caudate / Putamen R	rpe	0.3387451566681891
+57	Caudate / Putamen R	rpe	0.17987605703475668
+58	Caudate / Putamen R	rpe	0.4264891089886899
+59	Caudate / Putamen R	rpe	0.054824001117521476
+60	Caudate / Putamen R	rpe	0.12024912337716258
+61	Caudate / Putamen R	rpe	0.2531728089220374
+62	Caudate / Putamen R	rpe	0.06951787480526718
+63	Caudate / Putamen R	rpe	-0.14302595756846084
+64	Caudate / Putamen R	rpe	0.2983852650281355
+01	Caudate / Putamen R	urpe	0.06272040555468093
+02	Caudate / Putamen R	urpe	-0.2976845128877937
+03	Caudate / Putamen R	urpe	-0.09367929620776384
+04	Caudate / Putamen R	urpe	-0.33284463407582027
+05	Caudate / Putamen R	urpe	-0.16198104333000782
+06	Caudate / Putamen R	urpe	-0.0310831776309664
+07	Caudate / Putamen R	urpe	0.007963869431877737
+09	Caudate / Putamen R	urpe	-0.22892063285416547
+10	Caudate / Putamen R	urpe	-0.26641900302247673
+11	Caudate / Putamen R	urpe	-0.06977639418311654
+12	Caudate / Putamen R	urpe	-0.040292419758493875
+14	Caudate / Putamen R	urpe	-0.1983032954101041
+15	Caudate / Putamen R	urpe	0.03746868019778489
+17	Caudate / Putamen R	urpe	-0.20527490008366173
+18	Caudate / Putamen R	urpe	0.05408870905865907
+19	Caudate / Putamen R	urpe	-0.09965783066292062
+20	Caudate / Putamen R	urpe	-0.15902326497259334
+21	Caudate / Putamen R	urpe	0.033078969946494424
+22	Caudate / Putamen R	urpe	0.041180262603808956
+23	Caudate / Putamen R	urpe	0.08655505023004609
+24	Caudate / Putamen R	urpe	-0.3017974778406647
+25	Caudate / Putamen R	urpe	-0.10340305469744121
+26	Caudate / Putamen R	urpe	0.024449404764517728
+27	Caudate / Putamen R	urpe	-0.02730817190410279
+28	Caudate / Putamen R	urpe	0.016706156243006143
+29	Caudate / Putamen R	urpe	0.18129663865798723
+30	Caudate / Putamen R	urpe	-0.10855692293328655
+33	Caudate / Putamen R	urpe	-0.0017784390098064767
+34	Caudate / Putamen R	urpe	0.07186032617635671
+35	Caudate / Putamen R	urpe	-0.12953863553031086
+36	Caudate / Putamen R	urpe	-0.20505678465593036
+37	Caudate / Putamen R	urpe	0.06799658793640516
+38	Caudate / Putamen R	urpe	-0.21582118334475933
+39	Caudate / Putamen R	urpe	-0.2256281971107075
+40	Caudate / Putamen R	urpe	-0.017747349066607288
+41	Caudate / Putamen R	urpe	-0.10184317165430766
+42	Caudate / Putamen R	urpe	-0.12188794088314678
+43	Caudate / Putamen R	urpe	-0.06549988505355603
+45	Caudate / Putamen R	urpe	-0.048276241894388276
+46	Caudate / Putamen R	urpe	-0.07137284158109651
+47	Caudate / Putamen R	urpe	-0.006984303726367431
+48	Caudate / Putamen R	urpe	-0.18270987632097382
+49	Caudate / Putamen R	urpe	-0.15500489733015754
+50	Caudate / Putamen R	urpe	-0.1011366288124968
+51	Caudate / Putamen R	urpe	-0.3260060773596227
+52	Caudate / Putamen R	urpe	-0.05654731381013926
+53	Caudate / Putamen R	urpe	-0.034785980252330574
+54	Caudate / Putamen R	urpe	-0.1681742469033047
+55	Caudate / Putamen R	urpe	-0.2089046977916652
+56	Caudate / Putamen R	urpe	-0.20179504714744634
+57	Caudate / Putamen R	urpe	-0.1742174230978556
+58	Caudate / Putamen R	urpe	-0.09844705691358539
+59	Caudate / Putamen R	urpe	0.16917663483766374
+60	Caudate / Putamen R	urpe	0.020273537464926217
+61	Caudate / Putamen R	urpe	-0.10800576884984726
+62	Caudate / Putamen R	urpe	0.04193474726327658
+63	Caudate / Putamen R	urpe	-0.07804232311760907
+64	Caudate / Putamen R	urpe	0.013323041487637329
+01	Caudate / Putamen R	surprise	-0.05649237148925948
+02	Caudate / Putamen R	surprise	0.0006351722920680962
+03	Caudate / Putamen R	surprise	-0.02811432242416405
+04	Caudate / Putamen R	surprise	-0.06627992066002285
+05	Caudate / Putamen R	surprise	0.04289897394621935
+06	Caudate / Putamen R	surprise	0.02792339636850501
+07	Caudate / Putamen R	surprise	0.008743800396457271
+09	Caudate / Putamen R	surprise	-0.010663836689869225
+10	Caudate / Putamen R	surprise	0.0019210461328687531
+11	Caudate / Putamen R	surprise	0.03306949341479745
+12	Caudate / Putamen R	surprise	0.011508358774762415
+14	Caudate / Putamen R	surprise	0.013419019835807944
+15	Caudate / Putamen R	surprise	-0.03931144992873803
+17	Caudate / Putamen R	surprise	-0.01493427672977061
+18	Caudate / Putamen R	surprise	-0.054854930598900786
+19	Caudate / Putamen R	surprise	-0.17429629496135854
+20	Caudate / Putamen R	surprise	0.04249553694883882
+21	Caudate / Putamen R	surprise	-0.003631858419347825
+22	Caudate / Putamen R	surprise	-0.028964734680753793
+23	Caudate / Putamen R	surprise	0.021232188300927615
+24	Caudate / Putamen R	surprise	-0.018308284523398607
+25	Caudate / Putamen R	surprise	-0.07423795862695004
+26	Caudate / Putamen R	surprise	0.21150105956337117
+27	Caudate / Putamen R	surprise	0.026890473298694574
+28	Caudate / Putamen R	surprise	0.025683248401480754
+29	Caudate / Putamen R	surprise	-0.014761946281436083
+30	Caudate / Putamen R	surprise	-0.010352969619880754
+33	Caudate / Putamen R	surprise	0.015363584512610152
+34	Caudate / Putamen R	surprise	0.0026368736314719833
+35	Caudate / Putamen R	surprise	0.10471803205121627
+36	Caudate / Putamen R	surprise	-0.04259196177156159
+37	Caudate / Putamen R	surprise	-0.001640946234712313
+38	Caudate / Putamen R	surprise	0.165239101100353
+39	Caudate / Putamen R	surprise	0.06862401169499831
+40	Caudate / Putamen R	surprise	-0.022026365253981023
+41	Caudate / Putamen R	surprise	0.06664150375922186
+42	Caudate / Putamen R	surprise	-0.022995753106987114
+43	Caudate / Putamen R	surprise	-0.00867745220393955
+45	Caudate / Putamen R	surprise	-0.00045930892156687323
+46	Caudate / Putamen R	surprise	0.00010157664549427117
+47	Caudate / Putamen R	surprise	-0.04809591475954224
+48	Caudate / Putamen R	surprise	-0.04022719300400573
+49	Caudate / Putamen R	surprise	0.08401229745473922
+50	Caudate / Putamen R	surprise	-0.0044425671655349466
+51	Caudate / Putamen R	surprise	-0.005769068031989843
+52	Caudate / Putamen R	surprise	-0.04050200319217407
+53	Caudate / Putamen R	surprise	0.01705721659347714
+54	Caudate / Putamen R	surprise	0.03614482927009579
+55	Caudate / Putamen R	surprise	-0.07501767503698713
+56	Caudate / Putamen R	surprise	0.11058348674267389
+57	Caudate / Putamen R	surprise	-0.04078484894730758
+58	Caudate / Putamen R	surprise	0.012766581999260618
+59	Caudate / Putamen R	surprise	-0.12656533651639681
+60	Caudate / Putamen R	surprise	-0.030375449215249296
+61	Caudate / Putamen R	surprise	-0.009608094875126153
+62	Caudate / Putamen R	surprise	0.03670165072702709
+63	Caudate / Putamen R	surprise	0.0725934836433392
+64	Caudate / Putamen R	surprise	0.008675748009278022
+01	Caudate / Putamen R (2)	rpe	0.31257789499386923
+02	Caudate / Putamen R (2)	rpe	0.6766826053081223
+03	Caudate / Putamen R (2)	rpe	0.783978267736252
+04	Caudate / Putamen R (2)	rpe	0.09424663310450601
+05	Caudate / Putamen R (2)	rpe	0.38791462997818427
+06	Caudate / Putamen R (2)	rpe	0.24259729988260958
+07	Caudate / Putamen R (2)	rpe	-0.02039398938214141
+09	Caudate / Putamen R (2)	rpe	0.263448002624407
+10	Caudate / Putamen R (2)	rpe	0.7522792661545932
+11	Caudate / Putamen R (2)	rpe	0.4193220110922755
+12	Caudate / Putamen R (2)	rpe	0.3064121142913488
+14	Caudate / Putamen R (2)	rpe	0.3437590733458776
+15	Caudate / Putamen R (2)	rpe	0.017656151828008487
+17	Caudate / Putamen R (2)	rpe	0.17994763729137567
+18	Caudate / Putamen R (2)	rpe	0.4134268760452479
+19	Caudate / Putamen R (2)	rpe	0.43894544072988667
+20	Caudate / Putamen R (2)	rpe	0.22322025937201467
+21	Caudate / Putamen R (2)	rpe	0.4184435250669984
+22	Caudate / Putamen R (2)	rpe	0.23097374990360375
+23	Caudate / Putamen R (2)	rpe	0.1025908989053451
+24	Caudate / Putamen R (2)	rpe	0.48751849476774667
+25	Caudate / Putamen R (2)	rpe	0.2884278576694106
+26	Caudate / Putamen R (2)	rpe	-0.08315773756585258
+27	Caudate / Putamen R (2)	rpe	0.576620914752857
+28	Caudate / Putamen R (2)	rpe	0.5389895979416732
+29	Caudate / Putamen R (2)	rpe	0.2277228591894143
+30	Caudate / Putamen R (2)	rpe	0.47375310466971615
+33	Caudate / Putamen R (2)	rpe	0.24183003604935255
+34	Caudate / Putamen R (2)	rpe	0.2293013904815141
+35	Caudate / Putamen R (2)	rpe	0.3622010398574362
+36	Caudate / Putamen R (2)	rpe	0.12432718645361006
+37	Caudate / Putamen R (2)	rpe	0.22574929850594516
+38	Caudate / Putamen R (2)	rpe	0.027896279399252374
+39	Caudate / Putamen R (2)	rpe	0.35585658499299566
+40	Caudate / Putamen R (2)	rpe	0.21114897488159406
+41	Caudate / Putamen R (2)	rpe	0.5774241331173731
+42	Caudate / Putamen R (2)	rpe	0.4502427281417113
+43	Caudate / Putamen R (2)	rpe	0.43699537721552456
+45	Caudate / Putamen R (2)	rpe	0.6800168496711454
+46	Caudate / Putamen R (2)	rpe	0.19755432777737952
+47	Caudate / Putamen R (2)	rpe	0.732974602457779
+48	Caudate / Putamen R (2)	rpe	0.27315213899966606
+49	Caudate / Putamen R (2)	rpe	0.5848008434847326
+50	Caudate / Putamen R (2)	rpe	0.1004608457294775
+51	Caudate / Putamen R (2)	rpe	0.5483895802204469
+52	Caudate / Putamen R (2)	rpe	0.4552101671011076
+53	Caudate / Putamen R (2)	rpe	0.06904684795458056
+54	Caudate / Putamen R (2)	rpe	0.3519530332754324
+55	Caudate / Putamen R (2)	rpe	0.4803469265339594
+56	Caudate / Putamen R (2)	rpe	0.2933642760375473
+57	Caudate / Putamen R (2)	rpe	0.19258065771689525
+58	Caudate / Putamen R (2)	rpe	0.5002370612282816
+59	Caudate / Putamen R (2)	rpe	0.15593411351841324
+60	Caudate / Putamen R (2)	rpe	0.039613047679934725
+61	Caudate / Putamen R (2)	rpe	0.25887736879515916
+62	Caudate / Putamen R (2)	rpe	0.23830431186143824
+63	Caudate / Putamen R (2)	rpe	-0.076405453343198
+64	Caudate / Putamen R (2)	rpe	0.42930556946958814
+01	Caudate / Putamen R (2)	urpe	-0.21698567319399445
+02	Caudate / Putamen R (2)	urpe	-0.43383008660173455
+03	Caudate / Putamen R (2)	urpe	-0.28212186279186946
+04	Caudate / Putamen R (2)	urpe	-0.3164040550925122
+05	Caudate / Putamen R (2)	urpe	-0.3520334757075467
+06	Caudate / Putamen R (2)	urpe	-0.10308572399882819
+07	Caudate / Putamen R (2)	urpe	0.012272314613498262
+09	Caudate / Putamen R (2)	urpe	-0.3596161135742813
+10	Caudate / Putamen R (2)	urpe	-0.4024579565558194
+11	Caudate / Putamen R (2)	urpe	-0.11304024309950668
+12	Caudate / Putamen R (2)	urpe	0.012757150396681113
+14	Caudate / Putamen R (2)	urpe	-0.3277589868056176
+15	Caudate / Putamen R (2)	urpe	-0.03419700111336126
+17	Caudate / Putamen R (2)	urpe	-0.23939496861293308
+18	Caudate / Putamen R (2)	urpe	-0.08481680425974272
+19	Caudate / Putamen R (2)	urpe	-0.12622915033146326
+20	Caudate / Putamen R (2)	urpe	-0.28700808683258533
+21	Caudate / Putamen R (2)	urpe	-0.06591880470436774
+22	Caudate / Putamen R (2)	urpe	0.03905457903966808
+23	Caudate / Putamen R (2)	urpe	-0.09030748888304364
+24	Caudate / Putamen R (2)	urpe	-0.44583344870119446
+25	Caudate / Putamen R (2)	urpe	-0.05102234234747292
+26	Caudate / Putamen R (2)	urpe	-0.008635390490616417
+27	Caudate / Putamen R (2)	urpe	0.014065373071822424
+28	Caudate / Putamen R (2)	urpe	-0.03213282566623873
+29	Caudate / Putamen R (2)	urpe	0.22707232928594404
+30	Caudate / Putamen R (2)	urpe	-0.33173272088970407
+33	Caudate / Putamen R (2)	urpe	-0.040265325684612475
+34	Caudate / Putamen R (2)	urpe	-0.15286297151639397
+35	Caudate / Putamen R (2)	urpe	-0.18568463591781048
+36	Caudate / Putamen R (2)	urpe	-0.11169639553807298
+37	Caudate / Putamen R (2)	urpe	-0.09565802850121724
+38	Caudate / Putamen R (2)	urpe	-0.11957989311690437
+39	Caudate / Putamen R (2)	urpe	-0.4017125953687528
+40	Caudate / Putamen R (2)	urpe	-0.04695442683694832
+41	Caudate / Putamen R (2)	urpe	-0.16544681887987087
+42	Caudate / Putamen R (2)	urpe	-0.19802142227225497
+43	Caudate / Putamen R (2)	urpe	-0.20273116080936146
+45	Caudate / Putamen R (2)	urpe	-0.33866135617245163
+46	Caudate / Putamen R (2)	urpe	-0.16095188268061195
+47	Caudate / Putamen R (2)	urpe	-0.1621626182702693
+48	Caudate / Putamen R (2)	urpe	-0.2872050935104891
+49	Caudate / Putamen R (2)	urpe	-0.534689190489319
+50	Caudate / Putamen R (2)	urpe	-0.28177634970259186
+51	Caudate / Putamen R (2)	urpe	-0.32867050496099093
+52	Caudate / Putamen R (2)	urpe	-0.2715072475892298
+53	Caudate / Putamen R (2)	urpe	-0.10797923971036825
+54	Caudate / Putamen R (2)	urpe	-0.5264020216039907
+55	Caudate / Putamen R (2)	urpe	-0.49432330036154654
+56	Caudate / Putamen R (2)	urpe	-0.11502876351441955
+57	Caudate / Putamen R (2)	urpe	-0.24403275458137483
+58	Caudate / Putamen R (2)	urpe	-0.33836829086827663
+59	Caudate / Putamen R (2)	urpe	0.003275813664800981
+60	Caudate / Putamen R (2)	urpe	-0.0675285336661199
+61	Caudate / Putamen R (2)	urpe	-0.18578973567408477
+62	Caudate / Putamen R (2)	urpe	-0.08789651081236852
+63	Caudate / Putamen R (2)	urpe	-0.0009061351269029469
+64	Caudate / Putamen R (2)	urpe	0.042665392254015645
+01	Caudate / Putamen R (2)	surprise	-0.10064967766412294
+02	Caudate / Putamen R (2)	surprise	-0.07351499638207315
+03	Caudate / Putamen R (2)	surprise	-0.09098456298332687
+04	Caudate / Putamen R (2)	surprise	0.014295159398350387
+05	Caudate / Putamen R (2)	surprise	0.11569630848978357
+06	Caudate / Putamen R (2)	surprise	0.044121000632689866
+07	Caudate / Putamen R (2)	surprise	0.0593460564127045
+09	Caudate / Putamen R (2)	surprise	0.07785518531759625
+10	Caudate / Putamen R (2)	surprise	-0.017830486082541376
+11	Caudate / Putamen R (2)	surprise	0.023203814459907605
+12	Caudate / Putamen R (2)	surprise	-0.04694666085583776
+14	Caudate / Putamen R (2)	surprise	0.009808434460137506
+15	Caudate / Putamen R (2)	surprise	-0.012828241871630737
+17	Caudate / Putamen R (2)	surprise	0.07820133983627567
+18	Caudate / Putamen R (2)	surprise	-0.0438061063833023
+19	Caudate / Putamen R (2)	surprise	-0.14298569354136167
+20	Caudate / Putamen R (2)	surprise	0.00236237639368756
+21	Caudate / Putamen R (2)	surprise	-0.0421976746765963
+22	Caudate / Putamen R (2)	surprise	-0.08107280882915283
+23	Caudate / Putamen R (2)	surprise	-0.024588483557246427
+24	Caudate / Putamen R (2)	surprise	-0.06237042210481121
+25	Caudate / Putamen R (2)	surprise	-0.09385462314768726
+26	Caudate / Putamen R (2)	surprise	0.2887150195714033
+27	Caudate / Putamen R (2)	surprise	0.15438294726139767
+28	Caudate / Putamen R (2)	surprise	0.03456636672222625
+29	Caudate / Putamen R (2)	surprise	-0.00021714756039294852
+30	Caudate / Putamen R (2)	surprise	-0.026864499972751737
+33	Caudate / Putamen R (2)	surprise	0.018179177874013217
+34	Caudate / Putamen R (2)	surprise	-0.048198184882295166
+35	Caudate / Putamen R (2)	surprise	0.02436079857566039
+36	Caudate / Putamen R (2)	surprise	-0.03518960634065111
+37	Caudate / Putamen R (2)	surprise	-0.017552915280615318
+38	Caudate / Putamen R (2)	surprise	0.12297320350093979
+39	Caudate / Putamen R (2)	surprise	0.011657599718780278
+40	Caudate / Putamen R (2)	surprise	-0.02296157938051779
+41	Caudate / Putamen R (2)	surprise	0.030015740347105403
+42	Caudate / Putamen R (2)	surprise	-0.0031186212170463737
+43	Caudate / Putamen R (2)	surprise	-0.11706069726100223
+45	Caudate / Putamen R (2)	surprise	-0.05210169390176215
+46	Caudate / Putamen R (2)	surprise	0.054780713677109814
+47	Caudate / Putamen R (2)	surprise	-0.16863219146914507
+48	Caudate / Putamen R (2)	surprise	-0.023443942839379533
+49	Caudate / Putamen R (2)	surprise	-0.004389894867164825
+50	Caudate / Putamen R (2)	surprise	-0.07207101547077227
+51	Caudate / Putamen R (2)	surprise	-0.02678649657932727
+52	Caudate / Putamen R (2)	surprise	-0.03146856488487434
+53	Caudate / Putamen R (2)	surprise	-0.027991230561532836
+54	Caudate / Putamen R (2)	surprise	0.02449826279859432
+55	Caudate / Putamen R (2)	surprise	-0.0987151513508295
+56	Caudate / Putamen R (2)	surprise	0.3112561722818923
+57	Caudate / Putamen R (2)	surprise	-0.05286388963435283
+58	Caudate / Putamen R (2)	surprise	0.07685738925583575
+59	Caudate / Putamen R (2)	surprise	-0.05581905699281422
+60	Caudate / Putamen R (2)	surprise	-0.021742365184518133
+61	Caudate / Putamen R (2)	surprise	-0.010588694548090687
+62	Caudate / Putamen R (2)	surprise	0.08298135601022902
+63	Caudate / Putamen R (2)	surprise	0.10236138615303259
+64	Caudate / Putamen R (2)	surprise	-0.0020033920452446874
+01	Cingulate Gyrus L	rpe	0.24022429134658035
+02	Cingulate Gyrus L	rpe	0.8196714892159097
+03	Cingulate Gyrus L	rpe	1.1590159103991702
+04	Cingulate Gyrus L	rpe	0.2909175601344557
+05	Cingulate Gyrus L	rpe	0.8855738449887218
+06	Cingulate Gyrus L	rpe	0.2309558545365428
+07	Cingulate Gyrus L	rpe	-0.2914956549012498
+09	Cingulate Gyrus L	rpe	0.7047087752056638
+10	Cingulate Gyrus L	rpe	0.9719638773643274
+11	Cingulate Gyrus L	rpe	0.8272588788890916
+12	Cingulate Gyrus L	rpe	0.10282437632531734
+14	Cingulate Gyrus L	rpe	0.49456097372315544
+15	Cingulate Gyrus L	rpe	0.3075246619794918
+17	Cingulate Gyrus L	rpe	0.16456112763125072
+18	Cingulate Gyrus L	rpe	0.49947250870088883
+19	Cingulate Gyrus L	rpe	0.7536706870104435
+20	Cingulate Gyrus L	rpe	0.11585648731520516
+21	Cingulate Gyrus L	rpe	0.636620770626134
+22	Cingulate Gyrus L	rpe	0.18474979999425567
+23	Cingulate Gyrus L	rpe	0.006464136511097237
+24	Cingulate Gyrus L	rpe	0.6945684407522424
+25	Cingulate Gyrus L	rpe	0.6010574451218732
+26	Cingulate Gyrus L	rpe	-0.4595026584346257
+27	Cingulate Gyrus L	rpe	0.43407961140416734
+28	Cingulate Gyrus L	rpe	0.2909666749878221
+29	Cingulate Gyrus L	rpe	0.3631376860360693
+30	Cingulate Gyrus L	rpe	0.7588002676512223
+33	Cingulate Gyrus L	rpe	-0.05355622873679957
+34	Cingulate Gyrus L	rpe	0.09408118072452401
+35	Cingulate Gyrus L	rpe	0.18712041659392292
+36	Cingulate Gyrus L	rpe	0.3648528954698356
+37	Cingulate Gyrus L	rpe	0.17376726851053395
+38	Cingulate Gyrus L	rpe	-0.04110604701612815
+39	Cingulate Gyrus L	rpe	0.4601587559911552
+40	Cingulate Gyrus L	rpe	-0.1220538524181306
+41	Cingulate Gyrus L	rpe	0.7197312847372624
+42	Cingulate Gyrus L	rpe	0.12379128327164887
+43	Cingulate Gyrus L	rpe	0.44406308967613156
+45	Cingulate Gyrus L	rpe	0.8210689341354822
+46	Cingulate Gyrus L	rpe	0.067904064619201
+47	Cingulate Gyrus L	rpe	0.9109750995973226
+48	Cingulate Gyrus L	rpe	0.4436834721695389
+49	Cingulate Gyrus L	rpe	0.2959988096406033
+50	Cingulate Gyrus L	rpe	0.09307479146808167
+51	Cingulate Gyrus L	rpe	0.7573519746431063
+52	Cingulate Gyrus L	rpe	0.44504404314636015
+53	Cingulate Gyrus L	rpe	-0.10349107078727118
+54	Cingulate Gyrus L	rpe	0.25742335510610725
+55	Cingulate Gyrus L	rpe	0.7185341655083309
+56	Cingulate Gyrus L	rpe	-0.06201181564194907
+57	Cingulate Gyrus L	rpe	-0.1745614761481449
+58	Cingulate Gyrus L	rpe	0.589588791449822
+59	Cingulate Gyrus L	rpe	0.1347312030602623
+60	Cingulate Gyrus L	rpe	0.13165886098984822
+61	Cingulate Gyrus L	rpe	0.4777544793936054
+62	Cingulate Gyrus L	rpe	-0.3230447328320501
+63	Cingulate Gyrus L	rpe	-0.5808201419661435
+64	Cingulate Gyrus L	rpe	0.4630796851323593
+01	Cingulate Gyrus L	urpe	-0.027290336400903965
+02	Cingulate Gyrus L	urpe	-0.5961326520248034
+03	Cingulate Gyrus L	urpe	-0.3106003077333141
+04	Cingulate Gyrus L	urpe	-0.9312181743471724
+05	Cingulate Gyrus L	urpe	-0.5512385798223502
+06	Cingulate Gyrus L	urpe	-0.2140122639730735
+07	Cingulate Gyrus L	urpe	-0.15371927548032957
+09	Cingulate Gyrus L	urpe	-0.7373210862339988
+10	Cingulate Gyrus L	urpe	-0.3830809512978769
+11	Cingulate Gyrus L	urpe	-0.2140286543350212
+12	Cingulate Gyrus L	urpe	-0.23883380840886217
+14	Cingulate Gyrus L	urpe	-0.6004215489921019
+15	Cingulate Gyrus L	urpe	0.2939594404144724
+17	Cingulate Gyrus L	urpe	-0.4537588728571256
+18	Cingulate Gyrus L	urpe	-0.36466090036442744
+19	Cingulate Gyrus L	urpe	-0.16750328295230277
+20	Cingulate Gyrus L	urpe	-0.5503877660881864
+21	Cingulate Gyrus L	urpe	-0.0008734333263394876
+22	Cingulate Gyrus L	urpe	0.1422198735846711
+23	Cingulate Gyrus L	urpe	0.2092356187540877
+24	Cingulate Gyrus L	urpe	-0.5742140855216633
+25	Cingulate Gyrus L	urpe	-0.06521290424787812
+26	Cingulate Gyrus L	urpe	-0.06227148793840349
+27	Cingulate Gyrus L	urpe	-0.15597354208116823
+28	Cingulate Gyrus L	urpe	-0.19577125532058512
+29	Cingulate Gyrus L	urpe	0.2916509381940746
+30	Cingulate Gyrus L	urpe	-0.2784456388899394
+33	Cingulate Gyrus L	urpe	-0.18371282438796682
+34	Cingulate Gyrus L	urpe	-0.0805569845991347
+35	Cingulate Gyrus L	urpe	-0.02696014202799105
+36	Cingulate Gyrus L	urpe	-0.31122489571507067
+37	Cingulate Gyrus L	urpe	-0.017033850772230866
+38	Cingulate Gyrus L	urpe	-0.4309887400839672
+39	Cingulate Gyrus L	urpe	-0.46264263514140425
+40	Cingulate Gyrus L	urpe	-0.04898577859575734
+41	Cingulate Gyrus L	urpe	-0.3468275066112663
+42	Cingulate Gyrus L	urpe	-0.07391656928341195
+43	Cingulate Gyrus L	urpe	-0.22963891398059835
+45	Cingulate Gyrus L	urpe	-0.5082181526951908
+46	Cingulate Gyrus L	urpe	-0.15613312781929245
+47	Cingulate Gyrus L	urpe	-0.1888312668691466
+48	Cingulate Gyrus L	urpe	-0.2735361822620582
+49	Cingulate Gyrus L	urpe	-0.41148136110385086
+50	Cingulate Gyrus L	urpe	-0.16322272962844503
+51	Cingulate Gyrus L	urpe	-0.8221618629553739
+52	Cingulate Gyrus L	urpe	-0.1851064678715745
+53	Cingulate Gyrus L	urpe	-0.04855715725395842
+54	Cingulate Gyrus L	urpe	-0.22695514228575853
+55	Cingulate Gyrus L	urpe	-0.5628406447363598
+56	Cingulate Gyrus L	urpe	0.10089186505289473
+57	Cingulate Gyrus L	urpe	-0.11179940586617773
+58	Cingulate Gyrus L	urpe	-0.2543314547329928
+59	Cingulate Gyrus L	urpe	0.11393312331910925
+60	Cingulate Gyrus L	urpe	-0.08106872350309297
+61	Cingulate Gyrus L	urpe	-0.2756153918602403
+62	Cingulate Gyrus L	urpe	-0.11526462490588402
+63	Cingulate Gyrus L	urpe	-0.511203305259839
+64	Cingulate Gyrus L	urpe	0.04001326235224896
+01	Cingulate Gyrus L	surprise	-0.19635388165708223
+02	Cingulate Gyrus L	surprise	0.04165449997229418
+03	Cingulate Gyrus L	surprise	-0.15500659866887223
+04	Cingulate Gyrus L	surprise	-0.14013835638538175
+05	Cingulate Gyrus L	surprise	0.23663258224856998
+06	Cingulate Gyrus L	surprise	0.07058757244940696
+07	Cingulate Gyrus L	surprise	0.007507923031795845
+09	Cingulate Gyrus L	surprise	0.0763246911640158
+10	Cingulate Gyrus L	surprise	0.024634871894639088
+11	Cingulate Gyrus L	surprise	0.13394408191484303
+12	Cingulate Gyrus L	surprise	-0.027725192287723098
+14	Cingulate Gyrus L	surprise	-0.01472783548690957
+15	Cingulate Gyrus L	surprise	-0.10902980482648282
+17	Cingulate Gyrus L	surprise	-0.09508233767324013
+18	Cingulate Gyrus L	surprise	-0.20245724436278845
+19	Cingulate Gyrus L	surprise	-0.45631769428843144
+20	Cingulate Gyrus L	surprise	-0.013698881223341246
+21	Cingulate Gyrus L	surprise	0.0737008566965365
+22	Cingulate Gyrus L	surprise	0.17823102960676893
+23	Cingulate Gyrus L	surprise	0.013359605529995223
+24	Cingulate Gyrus L	surprise	0.0545896664295654
+25	Cingulate Gyrus L	surprise	-0.03381318728664071
+26	Cingulate Gyrus L	surprise	0.5063263004438393
+27	Cingulate Gyrus L	surprise	0.13021420834180444
+28	Cingulate Gyrus L	surprise	0.030456085188108106
+29	Cingulate Gyrus L	surprise	-0.0037818072380789544
+30	Cingulate Gyrus L	surprise	0.008931048558758562
+33	Cingulate Gyrus L	surprise	0.040909284435021516
+34	Cingulate Gyrus L	surprise	0.10418662547422511
+35	Cingulate Gyrus L	surprise	0.20957108371442232
+36	Cingulate Gyrus L	surprise	-0.1514435242146996
+37	Cingulate Gyrus L	surprise	-0.006504861735307263
+38	Cingulate Gyrus L	surprise	0.2840450156049202
+39	Cingulate Gyrus L	surprise	0.02481170730551398
+40	Cingulate Gyrus L	surprise	0.012049295507088317
+41	Cingulate Gyrus L	surprise	0.17208983575213044
+42	Cingulate Gyrus L	surprise	-0.08159690022740354
+43	Cingulate Gyrus L	surprise	-0.0545449044765419
+45	Cingulate Gyrus L	surprise	0.05104167550184235
+46	Cingulate Gyrus L	surprise	0.09154687757935175
+47	Cingulate Gyrus L	surprise	0.05057578383504075
+48	Cingulate Gyrus L	surprise	-0.048313665067759984
+49	Cingulate Gyrus L	surprise	0.2101256290449271
+50	Cingulate Gyrus L	surprise	-0.09743626922588397
+51	Cingulate Gyrus L	surprise	-0.035336482584608975
+52	Cingulate Gyrus L	surprise	-0.03741790046936731
+53	Cingulate Gyrus L	surprise	0.12121028663714686
+54	Cingulate Gyrus L	surprise	0.029416603518885403
+55	Cingulate Gyrus L	surprise	-0.2862405066141191
+56	Cingulate Gyrus L	surprise	-0.013552439715627931
+57	Cingulate Gyrus L	surprise	-0.03461573599765623
+58	Cingulate Gyrus L	surprise	0.09781863194902336
+59	Cingulate Gyrus L	surprise	-0.11822089015999261
+60	Cingulate Gyrus L	surprise	-0.15314243768859184
+61	Cingulate Gyrus L	surprise	-0.12713758881460757
+62	Cingulate Gyrus L	surprise	0.0058059626966098865
+63	Cingulate Gyrus L	surprise	0.2673400695735204
+64	Cingulate Gyrus L	surprise	0.0243446613181554
+01	Visual cortex (mid/lat occipital) L	rpe	0.045153405601981285
+02	Visual cortex (mid/lat occipital) L	rpe	0.457769971684624
+03	Visual cortex (mid/lat occipital) L	rpe	0.6915633133703103
+04	Visual cortex (mid/lat occipital) L	rpe	0.12366126345421463
+05	Visual cortex (mid/lat occipital) L	rpe	0.633589178471422
+06	Visual cortex (mid/lat occipital) L	rpe	0.08092537395221001
+07	Visual cortex (mid/lat occipital) L	rpe	0.009547272638229224
+09	Visual cortex (mid/lat occipital) L	rpe	0.27683287148270813
+10	Visual cortex (mid/lat occipital) L	rpe	0.5882573536940073
+11	Visual cortex (mid/lat occipital) L	rpe	0.5674577215516697
+12	Visual cortex (mid/lat occipital) L	rpe	0.2714205421419658
+14	Visual cortex (mid/lat occipital) L	rpe	0.07678737908810739
+15	Visual cortex (mid/lat occipital) L	rpe	0.06442223410849161
+17	Visual cortex (mid/lat occipital) L	rpe	0.31446816229087754
+18	Visual cortex (mid/lat occipital) L	rpe	0.13054079138818123
+19	Visual cortex (mid/lat occipital) L	rpe	0.6325463711389907
+20	Visual cortex (mid/lat occipital) L	rpe	0.2812792065930055
+21	Visual cortex (mid/lat occipital) L	rpe	0.4046263673751845
+22	Visual cortex (mid/lat occipital) L	rpe	0.20723243906456335
+23	Visual cortex (mid/lat occipital) L	rpe	0.03766165775454712
+24	Visual cortex (mid/lat occipital) L	rpe	0.6246863769804142
+25	Visual cortex (mid/lat occipital) L	rpe	0.45165075163667023
+26	Visual cortex (mid/lat occipital) L	rpe	-0.10264727263624754
+27	Visual cortex (mid/lat occipital) L	rpe	0.41513306489565105
+28	Visual cortex (mid/lat occipital) L	rpe	0.37838955842273114
+29	Visual cortex (mid/lat occipital) L	rpe	0.30643010683378086
+30	Visual cortex (mid/lat occipital) L	rpe	0.21209391619989484
+33	Visual cortex (mid/lat occipital) L	rpe	0.1964850147104967
+34	Visual cortex (mid/lat occipital) L	rpe	0.13815630110927055
+35	Visual cortex (mid/lat occipital) L	rpe	0.2540438447375093
+36	Visual cortex (mid/lat occipital) L	rpe	0.3575792452157786
+37	Visual cortex (mid/lat occipital) L	rpe	0.31562085448970423
+38	Visual cortex (mid/lat occipital) L	rpe	-0.045533742174388214
+39	Visual cortex (mid/lat occipital) L	rpe	0.2566744543804096
+40	Visual cortex (mid/lat occipital) L	rpe	0.09610948179908822
+41	Visual cortex (mid/lat occipital) L	rpe	0.7957495171327782
+42	Visual cortex (mid/lat occipital) L	rpe	0.3721203431524038
+43	Visual cortex (mid/lat occipital) L	rpe	0.2564861101890421
+45	Visual cortex (mid/lat occipital) L	rpe	0.5289573055841391
+46	Visual cortex (mid/lat occipital) L	rpe	0.14408779196741195
+47	Visual cortex (mid/lat occipital) L	rpe	0.5785412322472383
+48	Visual cortex (mid/lat occipital) L	rpe	0.22626264262687723
+49	Visual cortex (mid/lat occipital) L	rpe	0.48021719495303034
+50	Visual cortex (mid/lat occipital) L	rpe	0.14894332715792086
+51	Visual cortex (mid/lat occipital) L	rpe	0.4857148135025484
+52	Visual cortex (mid/lat occipital) L	rpe	0.3722624894547032
+53	Visual cortex (mid/lat occipital) L	rpe	0.18109480820657953
+54	Visual cortex (mid/lat occipital) L	rpe	0.1669557194630327
+55	Visual cortex (mid/lat occipital) L	rpe	0.3768075040307061
+56	Visual cortex (mid/lat occipital) L	rpe	0.28552131211213405
+57	Visual cortex (mid/lat occipital) L	rpe	0.23146050111792374
+58	Visual cortex (mid/lat occipital) L	rpe	0.4398130522463765
+59	Visual cortex (mid/lat occipital) L	rpe	-0.012337491860871236
+60	Visual cortex (mid/lat occipital) L	rpe	0.12567698635796892
+61	Visual cortex (mid/lat occipital) L	rpe	0.256122949962278
+62	Visual cortex (mid/lat occipital) L	rpe	0.1351004792528972
+63	Visual cortex (mid/lat occipital) L	rpe	-0.23865600559293385
+64	Visual cortex (mid/lat occipital) L	rpe	0.23815036560218872
+01	Visual cortex (mid/lat occipital) L	urpe	0.03987815587643878
+02	Visual cortex (mid/lat occipital) L	urpe	-0.35151232760127993
+03	Visual cortex (mid/lat occipital) L	urpe	-0.19562140813921963
+04	Visual cortex (mid/lat occipital) L	urpe	-0.2793740636745767
+05	Visual cortex (mid/lat occipital) L	urpe	-0.3496587132160322
+06	Visual cortex (mid/lat occipital) L	urpe	-0.13097897663188846
+07	Visual cortex (mid/lat occipital) L	urpe	-0.021966960034582126
+09	Visual cortex (mid/lat occipital) L	urpe	-0.3160629117326559
+10	Visual cortex (mid/lat occipital) L	urpe	-0.20902247197902987
+11	Visual cortex (mid/lat occipital) L	urpe	-0.05151421907487654
+12	Visual cortex (mid/lat occipital) L	urpe	-0.1172683935644868
+14	Visual cortex (mid/lat occipital) L	urpe	-0.20623532580737255
+15	Visual cortex (mid/lat occipital) L	urpe	-0.16228888257288399
+17	Visual cortex (mid/lat occipital) L	urpe	-0.2935780240252517
+18	Visual cortex (mid/lat occipital) L	urpe	0.024673757515037868
+19	Visual cortex (mid/lat occipital) L	urpe	-0.03937153796260852
+20	Visual cortex (mid/lat occipital) L	urpe	-0.22524937998200292
+21	Visual cortex (mid/lat occipital) L	urpe	0.08008103189287578
+22	Visual cortex (mid/lat occipital) L	urpe	0.0265562454207273
+23	Visual cortex (mid/lat occipital) L	urpe	-0.01107936290931296
+24	Visual cortex (mid/lat occipital) L	urpe	-0.47676654605343166
+25	Visual cortex (mid/lat occipital) L	urpe	-0.17366962394205218
+26	Visual cortex (mid/lat occipital) L	urpe	0.028912518228043554
+27	Visual cortex (mid/lat occipital) L	urpe	-0.0922255464980527
+28	Visual cortex (mid/lat occipital) L	urpe	-0.004551132582962617
+29	Visual cortex (mid/lat occipital) L	urpe	0.09398997477244446
+30	Visual cortex (mid/lat occipital) L	urpe	-0.1091522939088313
+33	Visual cortex (mid/lat occipital) L	urpe	0.025436386007039805
+34	Visual cortex (mid/lat occipital) L	urpe	0.027074619628633865
+35	Visual cortex (mid/lat occipital) L	urpe	-0.2514057421744467
+36	Visual cortex (mid/lat occipital) L	urpe	-0.2707900081422827
+37	Visual cortex (mid/lat occipital) L	urpe	0.01531256876532366
+38	Visual cortex (mid/lat occipital) L	urpe	-0.26904032667301014
+39	Visual cortex (mid/lat occipital) L	urpe	-0.31390566322550606
+40	Visual cortex (mid/lat occipital) L	urpe	-0.11814833574523152
+41	Visual cortex (mid/lat occipital) L	urpe	-0.2624915025588015
+42	Visual cortex (mid/lat occipital) L	urpe	-0.13079072425847355
+43	Visual cortex (mid/lat occipital) L	urpe	-0.1820710298673797
+45	Visual cortex (mid/lat occipital) L	urpe	-0.25786746676469063
+46	Visual cortex (mid/lat occipital) L	urpe	-0.15102771297663015
+47	Visual cortex (mid/lat occipital) L	urpe	-0.2108663603071634
+48	Visual cortex (mid/lat occipital) L	urpe	-0.20955452186346943
+49	Visual cortex (mid/lat occipital) L	urpe	-0.24965964000666302
+50	Visual cortex (mid/lat occipital) L	urpe	-0.2569966305306556
+51	Visual cortex (mid/lat occipital) L	urpe	-0.3619781360511466
+52	Visual cortex (mid/lat occipital) L	urpe	-0.16492199342650332
+53	Visual cortex (mid/lat occipital) L	urpe	-0.17732312993470334
+54	Visual cortex (mid/lat occipital) L	urpe	-0.11922508276142361
+55	Visual cortex (mid/lat occipital) L	urpe	-0.271300132090468
+56	Visual cortex (mid/lat occipital) L	urpe	-0.1788491232331346
+57	Visual cortex (mid/lat occipital) L	urpe	-0.2010217737793232
+58	Visual cortex (mid/lat occipital) L	urpe	-0.146569225031152
+59	Visual cortex (mid/lat occipital) L	urpe	0.17001297099586063
+60	Visual cortex (mid/lat occipital) L	urpe	0.03978866377613354
+61	Visual cortex (mid/lat occipital) L	urpe	-0.09514889166465358
+62	Visual cortex (mid/lat occipital) L	urpe	0.0873961346448506
+63	Visual cortex (mid/lat occipital) L	urpe	-0.11010357189660706
+64	Visual cortex (mid/lat occipital) L	urpe	0.10653915031966066
+01	Visual cortex (mid/lat occipital) L	surprise	-0.04081557097720372
+02	Visual cortex (mid/lat occipital) L	surprise	-0.016301359683761067
+03	Visual cortex (mid/lat occipital) L	surprise	-0.019376760013683
+04	Visual cortex (mid/lat occipital) L	surprise	-0.007863068510702217
+05	Visual cortex (mid/lat occipital) L	surprise	0.027249415638608217
+06	Visual cortex (mid/lat occipital) L	surprise	0.03459370393616381
+07	Visual cortex (mid/lat occipital) L	surprise	0.04884714190657211
+09	Visual cortex (mid/lat occipital) L	surprise	-0.031144913535280535
+10	Visual cortex (mid/lat occipital) L	surprise	0.018185770074100792
+11	Visual cortex (mid/lat occipital) L	surprise	0.02884796361140041
+12	Visual cortex (mid/lat occipital) L	surprise	0.02781184527275853
+14	Visual cortex (mid/lat occipital) L	surprise	0.03707471803934166
+15	Visual cortex (mid/lat occipital) L	surprise	-0.023401307887431656
+17	Visual cortex (mid/lat occipital) L	surprise	-0.024536699082396224
+18	Visual cortex (mid/lat occipital) L	surprise	-0.03126129531011581
+19	Visual cortex (mid/lat occipital) L	surprise	-0.11368647807738767
+20	Visual cortex (mid/lat occipital) L	surprise	0.07435253051865393
+21	Visual cortex (mid/lat occipital) L	surprise	0.007788342798683147
+22	Visual cortex (mid/lat occipital) L	surprise	-0.05988963615210226
+23	Visual cortex (mid/lat occipital) L	surprise	0.01368315513973534
+24	Visual cortex (mid/lat occipital) L	surprise	-0.026493322227827333
+25	Visual cortex (mid/lat occipital) L	surprise	-0.006019881278589619
+26	Visual cortex (mid/lat occipital) L	surprise	0.19949016497155847
+27	Visual cortex (mid/lat occipital) L	surprise	-0.004635741922793342
+28	Visual cortex (mid/lat occipital) L	surprise	0.05017353978922805
+29	Visual cortex (mid/lat occipital) L	surprise	-0.05216376029011537
+30	Visual cortex (mid/lat occipital) L	surprise	-0.04106464349648622
+33	Visual cortex (mid/lat occipital) L	surprise	0.0018820835067905172
+34	Visual cortex (mid/lat occipital) L	surprise	-0.02705457274799589
+35	Visual cortex (mid/lat occipital) L	surprise	0.12795437592815015
+36	Visual cortex (mid/lat occipital) L	surprise	-0.07312609089250087
+37	Visual cortex (mid/lat occipital) L	surprise	0.09477555138715794
+38	Visual cortex (mid/lat occipital) L	surprise	0.20483148684895616
+39	Visual cortex (mid/lat occipital) L	surprise	0.130452163343471
+40	Visual cortex (mid/lat occipital) L	surprise	-0.016363715176310877
+41	Visual cortex (mid/lat occipital) L	surprise	0.04019917027585866
+42	Visual cortex (mid/lat occipital) L	surprise	-0.05689715077730806
+43	Visual cortex (mid/lat occipital) L	surprise	0.0034280850430665143
+45	Visual cortex (mid/lat occipital) L	surprise	0.017645410242952173
+46	Visual cortex (mid/lat occipital) L	surprise	-0.05242716596965633
+47	Visual cortex (mid/lat occipital) L	surprise	-0.017653221483891892
+48	Visual cortex (mid/lat occipital) L	surprise	-0.05986565283758799
+49	Visual cortex (mid/lat occipital) L	surprise	0.08337543971884812
+50	Visual cortex (mid/lat occipital) L	surprise	0.02323917105976201
+51	Visual cortex (mid/lat occipital) L	surprise	0.025715311499654052
+52	Visual cortex (mid/lat occipital) L	surprise	-0.028552883222573655
+53	Visual cortex (mid/lat occipital) L	surprise	0.04484734283063714
+54	Visual cortex (mid/lat occipital) L	surprise	0.050382101106299905
+55	Visual cortex (mid/lat occipital) L	surprise	-0.07249722076154563
+56	Visual cortex (mid/lat occipital) L	surprise	0.07686321021580757
+57	Visual cortex (mid/lat occipital) L	surprise	-0.0009645391274359584
+58	Visual cortex (mid/lat occipital) L	surprise	0.004749976810785621
+59	Visual cortex (mid/lat occipital) L	surprise	-0.11661893160045693
+60	Visual cortex (mid/lat occipital) L	surprise	-0.025566081543205433
+61	Visual cortex (mid/lat occipital) L	surprise	-0.04136948860098043
+62	Visual cortex (mid/lat occipital) L	surprise	0.06208310046568903
+63	Visual cortex (mid/lat occipital) L	surprise	0.11245514251260845
+64	Visual cortex (mid/lat occipital) L	surprise	-0.021840549573404963
+01	Middle Temporal Gyrus R	rpe	0.09436379811267864
+02	Middle Temporal Gyrus R	rpe	0.5344309979672924
+03	Middle Temporal Gyrus R	rpe	0.6883057756416254
+04	Middle Temporal Gyrus R	rpe	0.2494998880026667
+05	Middle Temporal Gyrus R	rpe	0.5513131898930403
+06	Middle Temporal Gyrus R	rpe	0.2747854159693461
+07	Middle Temporal Gyrus R	rpe	0.31461305405535045
+09	Middle Temporal Gyrus R	rpe	0.3180256908329974
+10	Middle Temporal Gyrus R	rpe	0.6526724552265348
+11	Middle Temporal Gyrus R	rpe	0.5938752889098704
+12	Middle Temporal Gyrus R	rpe	0.17513592355187121
+14	Middle Temporal Gyrus R	rpe	0.08224604036084442
+15	Middle Temporal Gyrus R	rpe	0.07850686452131708
+17	Middle Temporal Gyrus R	rpe	0.2986635259653935
+18	Middle Temporal Gyrus R	rpe	0.11139632254562352
+19	Middle Temporal Gyrus R	rpe	0.5641746492050935
+20	Middle Temporal Gyrus R	rpe	0.3642747716145497
+21	Middle Temporal Gyrus R	rpe	0.435135016804414
+22	Middle Temporal Gyrus R	rpe	0.1509454912661835
+23	Middle Temporal Gyrus R	rpe	-0.0173670573157881
+24	Middle Temporal Gyrus R	rpe	0.6103018052296257
+25	Middle Temporal Gyrus R	rpe	0.3227808527593164
+26	Middle Temporal Gyrus R	rpe	-0.25201669755496
+27	Middle Temporal Gyrus R	rpe	0.46154437165231665
+28	Middle Temporal Gyrus R	rpe	0.44125527633992767
+29	Middle Temporal Gyrus R	rpe	0.2505027131627446
+30	Middle Temporal Gyrus R	rpe	0.12316204710540174
+33	Middle Temporal Gyrus R	rpe	0.12804204995501411
+34	Middle Temporal Gyrus R	rpe	0.2944164211753892
+35	Middle Temporal Gyrus R	rpe	0.20520503559096187
+36	Middle Temporal Gyrus R	rpe	0.38417437004629945
+37	Middle Temporal Gyrus R	rpe	0.3577818312869946
+38	Middle Temporal Gyrus R	rpe	0.03942313050303222
+39	Middle Temporal Gyrus R	rpe	0.31441484546515835
+40	Middle Temporal Gyrus R	rpe	0.1891650895358046
+41	Middle Temporal Gyrus R	rpe	0.9438817259218207
+42	Middle Temporal Gyrus R	rpe	0.51311198054259
+43	Middle Temporal Gyrus R	rpe	0.30914334634666274
+45	Middle Temporal Gyrus R	rpe	0.3957593685742254
+46	Middle Temporal Gyrus R	rpe	0.08678533743919142
+47	Middle Temporal Gyrus R	rpe	0.4529754745996446
+48	Middle Temporal Gyrus R	rpe	0.21706526629117998
+49	Middle Temporal Gyrus R	rpe	0.4636457923137004
+50	Middle Temporal Gyrus R	rpe	0.2520041978377946
+51	Middle Temporal Gyrus R	rpe	0.4690445787874632
+52	Middle Temporal Gyrus R	rpe	0.2597061280350547
+53	Middle Temporal Gyrus R	rpe	0.24105775405564633
+54	Middle Temporal Gyrus R	rpe	0.1067412989825786
+55	Middle Temporal Gyrus R	rpe	0.5108802258146431
+56	Middle Temporal Gyrus R	rpe	0.4230549697348497
+57	Middle Temporal Gyrus R	rpe	0.3137009700074113
+58	Middle Temporal Gyrus R	rpe	0.41873194286297444
+59	Middle Temporal Gyrus R	rpe	-0.0015731076456885651
+60	Middle Temporal Gyrus R	rpe	0.12891658158383726
+61	Middle Temporal Gyrus R	rpe	0.288277160965569
+62	Middle Temporal Gyrus R	rpe	0.23357114355159833
+63	Middle Temporal Gyrus R	rpe	-0.22676777798322348
+64	Middle Temporal Gyrus R	rpe	0.24612649214832136
+01	Middle Temporal Gyrus R	urpe	-0.06056653781634671
+02	Middle Temporal Gyrus R	urpe	-0.46754021043895905
+03	Middle Temporal Gyrus R	urpe	-0.09911529845665001
+04	Middle Temporal Gyrus R	urpe	-0.3856228290311666
+05	Middle Temporal Gyrus R	urpe	-0.2616544074571486
+06	Middle Temporal Gyrus R	urpe	-0.10693690212370983
+07	Middle Temporal Gyrus R	urpe	-0.013292942236487786
+09	Middle Temporal Gyrus R	urpe	-0.39650873599708925
+10	Middle Temporal Gyrus R	urpe	-0.19765238477417968
+11	Middle Temporal Gyrus R	urpe	-0.09744698241133566
+12	Middle Temporal Gyrus R	urpe	-0.030506032936830692
+14	Middle Temporal Gyrus R	urpe	-0.22525462880747332
+15	Middle Temporal Gyrus R	urpe	-0.09203703430258446
+17	Middle Temporal Gyrus R	urpe	-0.2047685986210043
+18	Middle Temporal Gyrus R	urpe	-0.15713859932327864
+19	Middle Temporal Gyrus R	urpe	-0.14871722437512166
+20	Middle Temporal Gyrus R	urpe	-0.1702806634436653
+21	Middle Temporal Gyrus R	urpe	0.06499268086602908
+22	Middle Temporal Gyrus R	urpe	0.06931142008706721
+23	Middle Temporal Gyrus R	urpe	-0.15337225440143
+24	Middle Temporal Gyrus R	urpe	-0.4174321299633265
+25	Middle Temporal Gyrus R	urpe	-0.08649791679738411
+26	Middle Temporal Gyrus R	urpe	0.01093764180132082
+27	Middle Temporal Gyrus R	urpe	-0.11996949348684151
+28	Middle Temporal Gyrus R	urpe	-0.10125360901138382
+29	Middle Temporal Gyrus R	urpe	0.1348984470746218
+30	Middle Temporal Gyrus R	urpe	-0.07485226130049036
+33	Middle Temporal Gyrus R	urpe	0.0057977930221932445
+34	Middle Temporal Gyrus R	urpe	0.13420791332141346
+35	Middle Temporal Gyrus R	urpe	-0.22247110065851103
+36	Middle Temporal Gyrus R	urpe	-0.32738463587955313
+37	Middle Temporal Gyrus R	urpe	0.05992821117511809
+38	Middle Temporal Gyrus R	urpe	-0.2417732029428393
+39	Middle Temporal Gyrus R	urpe	-0.5003974082234344
+40	Middle Temporal Gyrus R	urpe	-0.12785171351285812
+41	Middle Temporal Gyrus R	urpe	-0.3443496163838723
+42	Middle Temporal Gyrus R	urpe	-0.291577338435623
+43	Middle Temporal Gyrus R	urpe	-0.17352031142898658
+45	Middle Temporal Gyrus R	urpe	-0.18628954650717955
+46	Middle Temporal Gyrus R	urpe	-0.06838393737401867
+47	Middle Temporal Gyrus R	urpe	-0.05893844667634388
+48	Middle Temporal Gyrus R	urpe	-0.21463399480429873
+49	Middle Temporal Gyrus R	urpe	-0.1435779516049527
+50	Middle Temporal Gyrus R	urpe	-0.3501848151389218
+51	Middle Temporal Gyrus R	urpe	-0.5393176349127128
+52	Middle Temporal Gyrus R	urpe	-0.18082632079670055
+53	Middle Temporal Gyrus R	urpe	-0.1510183043733619
+54	Middle Temporal Gyrus R	urpe	-0.12001175955888298
+55	Middle Temporal Gyrus R	urpe	-0.2481685222969678
+56	Middle Temporal Gyrus R	urpe	-0.25482298791795366
+57	Middle Temporal Gyrus R	urpe	-0.2786236141318618
+58	Middle Temporal Gyrus R	urpe	-0.08125484242204876
+59	Middle Temporal Gyrus R	urpe	0.1209675249723127
+60	Middle Temporal Gyrus R	urpe	-0.036364509345208816
+61	Middle Temporal Gyrus R	urpe	-0.1290346344919886
+62	Middle Temporal Gyrus R	urpe	0.09293027407022218
+63	Middle Temporal Gyrus R	urpe	-0.16601260149122132
+64	Middle Temporal Gyrus R	urpe	0.0814228512002645
+01	Middle Temporal Gyrus R	surprise	-0.1163001980856689
+02	Middle Temporal Gyrus R	surprise	-0.03664997439618791
+03	Middle Temporal Gyrus R	surprise	0.022450848169087993
+04	Middle Temporal Gyrus R	surprise	-0.03588331559769157
+05	Middle Temporal Gyrus R	surprise	0.018269198580681698
+06	Middle Temporal Gyrus R	surprise	-0.07885538155624795
+07	Middle Temporal Gyrus R	surprise	0.1199396665296063
+09	Middle Temporal Gyrus R	surprise	-0.05601412701935586
+10	Middle Temporal Gyrus R	surprise	0.055528046142293015
+11	Middle Temporal Gyrus R	surprise	0.019785752106159436
+12	Middle Temporal Gyrus R	surprise	0.060555682926495394
+14	Middle Temporal Gyrus R	surprise	0.037605880171694854
+15	Middle Temporal Gyrus R	surprise	-0.05536099126566819
+17	Middle Temporal Gyrus R	surprise	0.01886563934031178
+18	Middle Temporal Gyrus R	surprise	0.01896272868593854
+19	Middle Temporal Gyrus R	surprise	-0.1368421826358294
+20	Middle Temporal Gyrus R	surprise	0.054286852329724716
+21	Middle Temporal Gyrus R	surprise	0.002241984359573284
+22	Middle Temporal Gyrus R	surprise	-0.03973151753753638
+23	Middle Temporal Gyrus R	surprise	-0.07811788356533467
+24	Middle Temporal Gyrus R	surprise	0.0051792149236252055
+25	Middle Temporal Gyrus R	surprise	-0.0772944857419768
+26	Middle Temporal Gyrus R	surprise	0.21523117918472395
+27	Middle Temporal Gyrus R	surprise	-0.029273516741796554
+28	Middle Temporal Gyrus R	surprise	-0.011927912743075503
+29	Middle Temporal Gyrus R	surprise	-0.03412221883225453
+30	Middle Temporal Gyrus R	surprise	-0.031064642273007616
+33	Middle Temporal Gyrus R	surprise	0.03380917450910838
+34	Middle Temporal Gyrus R	surprise	-0.05522311943990999
+35	Middle Temporal Gyrus R	surprise	0.1726155123491992
+36	Middle Temporal Gyrus R	surprise	-0.05196243647558919
+37	Middle Temporal Gyrus R	surprise	0.04039248684064169
+38	Middle Temporal Gyrus R	surprise	0.19936517933020517
+39	Middle Temporal Gyrus R	surprise	0.13903614826931504
+40	Middle Temporal Gyrus R	surprise	0.007940173650721964
+41	Middle Temporal Gyrus R	surprise	0.0691970076607881
+42	Middle Temporal Gyrus R	surprise	-0.07842694526634124
+43	Middle Temporal Gyrus R	surprise	0.011517201455268565
+45	Middle Temporal Gyrus R	surprise	-0.02945102173070072
+46	Middle Temporal Gyrus R	surprise	-0.031124703728029682
+47	Middle Temporal Gyrus R	surprise	0.06227546684454118
+48	Middle Temporal Gyrus R	surprise	-0.0822558695549136
+49	Middle Temporal Gyrus R	surprise	0.08593794136313812
+50	Middle Temporal Gyrus R	surprise	0.029487214122970572
+51	Middle Temporal Gyrus R	surprise	-0.01300858256884435
+52	Middle Temporal Gyrus R	surprise	-0.02310988223422597
+53	Middle Temporal Gyrus R	surprise	0.04250123566092968
+54	Middle Temporal Gyrus R	surprise	0.09858790213516969
+55	Middle Temporal Gyrus R	surprise	-0.10171756848911778
+56	Middle Temporal Gyrus R	surprise	0.05142852230814427
+57	Middle Temporal Gyrus R	surprise	-0.05645237305610631
+58	Middle Temporal Gyrus R	surprise	-0.010280369696997116
+59	Middle Temporal Gyrus R	surprise	-0.1129265136520317
+60	Middle Temporal Gyrus R	surprise	-0.05236122514561508
+61	Middle Temporal Gyrus R	surprise	-0.04215544044745129
+62	Middle Temporal Gyrus R	surprise	0.058461497904888325
+63	Middle Temporal Gyrus R	surprise	0.08267402908956188
+64	Middle Temporal Gyrus R	surprise	0.02528337970414545
+01	Inferior Parietal Lobule R	rpe	0.24462573899760504
+02	Inferior Parietal Lobule R	rpe	0.3127869348126379
+03	Inferior Parietal Lobule R	rpe	0.8059699985791337
+04	Inferior Parietal Lobule R	rpe	0.14978296026410218
+05	Inferior Parietal Lobule R	rpe	0.2574831741687376
+06	Inferior Parietal Lobule R	rpe	0.09094161019822257
+07	Inferior Parietal Lobule R	rpe	-0.31299302681476215
+09	Inferior Parietal Lobule R	rpe	0.4450780902745795
+10	Inferior Parietal Lobule R	rpe	0.6253608046480539
+11	Inferior Parietal Lobule R	rpe	0.42218437641012396
+12	Inferior Parietal Lobule R	rpe	-0.01917744798966768
+14	Inferior Parietal Lobule R	rpe	0.15599669092599386
+15	Inferior Parietal Lobule R	rpe	-0.23935448866819073
+17	Inferior Parietal Lobule R	rpe	0.08254971106388521
+18	Inferior Parietal Lobule R	rpe	0.36544244862584907
+19	Inferior Parietal Lobule R	rpe	0.10920205358521674
+20	Inferior Parietal Lobule R	rpe	-0.11981185645775193
+21	Inferior Parietal Lobule R	rpe	0.418357993460218
+22	Inferior Parietal Lobule R	rpe	0.2343342695247636
+23	Inferior Parietal Lobule R	rpe	-0.36196623076261447
+24	Inferior Parietal Lobule R	rpe	0.1065514403310689
+25	Inferior Parietal Lobule R	rpe	-0.00611718269541267
+26	Inferior Parietal Lobule R	rpe	-0.5437525708905675
+27	Inferior Parietal Lobule R	rpe	0.37834306965920733
+28	Inferior Parietal Lobule R	rpe	-0.0915601867978694
+29	Inferior Parietal Lobule R	rpe	0.06389677466517737
+30	Inferior Parietal Lobule R	rpe	0.2724070904670622
+33	Inferior Parietal Lobule R	rpe	-0.18301652909351768
+34	Inferior Parietal Lobule R	rpe	-0.2737280330409042
+35	Inferior Parietal Lobule R	rpe	-0.06213178265554069
+36	Inferior Parietal Lobule R	rpe	0.11633710263254629
+37	Inferior Parietal Lobule R	rpe	-0.05657368360486792
+38	Inferior Parietal Lobule R	rpe	-0.27654789664401586
+39	Inferior Parietal Lobule R	rpe	0.35456346325279975
+40	Inferior Parietal Lobule R	rpe	0.041798942677930676
+41	Inferior Parietal Lobule R	rpe	0.5947326838038862
+42	Inferior Parietal Lobule R	rpe	0.23447692162695932
+43	Inferior Parietal Lobule R	rpe	0.18882489140411385
+45	Inferior Parietal Lobule R	rpe	0.021739191075771075
+46	Inferior Parietal Lobule R	rpe	-0.1280020538548177
+47	Inferior Parietal Lobule R	rpe	0.04951258652197959
+48	Inferior Parietal Lobule R	rpe	0.361620729166845
+49	Inferior Parietal Lobule R	rpe	-0.12487303242404861
+50	Inferior Parietal Lobule R	rpe	-0.2957262204515494
+51	Inferior Parietal Lobule R	rpe	0.8066570463473909
+52	Inferior Parietal Lobule R	rpe	0.16222868414638056
+53	Inferior Parietal Lobule R	rpe	0.2042951334437186
+54	Inferior Parietal Lobule R	rpe	0.23358460965418174
+55	Inferior Parietal Lobule R	rpe	0.36258676567595105
+56	Inferior Parietal Lobule R	rpe	-0.14863683272547365
+57	Inferior Parietal Lobule R	rpe	-0.5113139101473445
+58	Inferior Parietal Lobule R	rpe	0.5325023195536976
+59	Inferior Parietal Lobule R	rpe	-0.0800253899069503
+60	Inferior Parietal Lobule R	rpe	-0.14592917415892853
+61	Inferior Parietal Lobule R	rpe	0.16927559015087107
+62	Inferior Parietal Lobule R	rpe	-0.42358886534983126
+63	Inferior Parietal Lobule R	rpe	-0.38513049472292715
+64	Inferior Parietal Lobule R	rpe	0.4763195334277539
+01	Inferior Parietal Lobule R	urpe	-0.411887922284024
+02	Inferior Parietal Lobule R	urpe	-0.33948768649398436
+03	Inferior Parietal Lobule R	urpe	-0.3625994661272588
+04	Inferior Parietal Lobule R	urpe	-0.752698156085204
+05	Inferior Parietal Lobule R	urpe	-0.12198074245507913
+06	Inferior Parietal Lobule R	urpe	-0.16479962073287674
+07	Inferior Parietal Lobule R	urpe	-0.09659328572240404
+09	Inferior Parietal Lobule R	urpe	-0.47744750770454464
+10	Inferior Parietal Lobule R	urpe	-0.22778439617673443
+11	Inferior Parietal Lobule R	urpe	-0.129510978581278
+12	Inferior Parietal Lobule R	urpe	-0.04849535836097361
+14	Inferior Parietal Lobule R	urpe	-0.40072122342799876
+15	Inferior Parietal Lobule R	urpe	0.025146095066553575
+17	Inferior Parietal Lobule R	urpe	-0.29358888564377345
+18	Inferior Parietal Lobule R	urpe	-0.3111301664535528
+19	Inferior Parietal Lobule R	urpe	-0.16586704276540495
+20	Inferior Parietal Lobule R	urpe	-0.32835984483615244
+21	Inferior Parietal Lobule R	urpe	-0.07095953424921556
+22	Inferior Parietal Lobule R	urpe	0.088834202190959
+23	Inferior Parietal Lobule R	urpe	-0.3342023352499713
+24	Inferior Parietal Lobule R	urpe	-0.10607325310173275
+25	Inferior Parietal Lobule R	urpe	0.1633614249717952
+26	Inferior Parietal Lobule R	urpe	-0.25199613669167525
+27	Inferior Parietal Lobule R	urpe	-0.09044016561793713
+28	Inferior Parietal Lobule R	urpe	0.1398043062524018
+29	Inferior Parietal Lobule R	urpe	0.27619529914571267
+30	Inferior Parietal Lobule R	urpe	-0.29446125801081174
+33	Inferior Parietal Lobule R	urpe	-0.31149523323825135
+34	Inferior Parietal Lobule R	urpe	0.0606515593435192
+35	Inferior Parietal Lobule R	urpe	-0.03141965316105846
+36	Inferior Parietal Lobule R	urpe	0.008729726505275308
+37	Inferior Parietal Lobule R	urpe	0.017837540788935836
+38	Inferior Parietal Lobule R	urpe	-0.14310060755021617
+39	Inferior Parietal Lobule R	urpe	-0.3837210217617791
+40	Inferior Parietal Lobule R	urpe	-0.2514761337438937
+41	Inferior Parietal Lobule R	urpe	-0.3508178591278424
+42	Inferior Parietal Lobule R	urpe	-0.4285956149201163
+43	Inferior Parietal Lobule R	urpe	-0.22804297260789264
+45	Inferior Parietal Lobule R	urpe	0.0022868071430077012
+46	Inferior Parietal Lobule R	urpe	0.017764188958310775
+47	Inferior Parietal Lobule R	urpe	-0.21965344739252363
+48	Inferior Parietal Lobule R	urpe	-0.3732638700272549
+49	Inferior Parietal Lobule R	urpe	-0.36409088112413884
+50	Inferior Parietal Lobule R	urpe	0.10278220181591513
+51	Inferior Parietal Lobule R	urpe	-0.9035498296672647
+52	Inferior Parietal Lobule R	urpe	-0.07459369717213452
+53	Inferior Parietal Lobule R	urpe	-0.06007401752603156
+54	Inferior Parietal Lobule R	urpe	-0.25948879513042894
+55	Inferior Parietal Lobule R	urpe	-0.49858850220387635
+56	Inferior Parietal Lobule R	urpe	-0.03675075397103766
+57	Inferior Parietal Lobule R	urpe	0.20819614697194827
+58	Inferior Parietal Lobule R	urpe	-0.32187114990400995
+59	Inferior Parietal Lobule R	urpe	0.07982353157223604
+60	Inferior Parietal Lobule R	urpe	-0.026360558304639365
+61	Inferior Parietal Lobule R	urpe	-0.15815518217658048
+62	Inferior Parietal Lobule R	urpe	-0.21605874878693032
+63	Inferior Parietal Lobule R	urpe	-0.26488529628894125
+64	Inferior Parietal Lobule R	urpe	0.06699246855039911
+01	Inferior Parietal Lobule R	surprise	-0.1544186271621253
+02	Inferior Parietal Lobule R	surprise	-0.004911504181853326
+03	Inferior Parietal Lobule R	surprise	-0.009556978261257013
+04	Inferior Parietal Lobule R	surprise	0.09972255512204191
+05	Inferior Parietal Lobule R	surprise	0.14811271754283967
+06	Inferior Parietal Lobule R	surprise	-0.0038220287260297813
+07	Inferior Parietal Lobule R	surprise	-0.04303211196833714
+09	Inferior Parietal Lobule R	surprise	0.03486055363477631
+10	Inferior Parietal Lobule R	surprise	0.06728100748515234
+11	Inferior Parietal Lobule R	surprise	-0.00322644065996759
+12	Inferior Parietal Lobule R	surprise	0.01748219828335674
+14	Inferior Parietal Lobule R	surprise	-0.07992670721644324
+15	Inferior Parietal Lobule R	surprise	-0.07468526776276783
+17	Inferior Parietal Lobule R	surprise	-0.056546615555635074
+18	Inferior Parietal Lobule R	surprise	0.06491891049663537
+19	Inferior Parietal Lobule R	surprise	-0.14947029871340914
+20	Inferior Parietal Lobule R	surprise	-0.026889934758814474
+21	Inferior Parietal Lobule R	surprise	0.0047470232614118275
+22	Inferior Parietal Lobule R	surprise	0.0697164862935262
+23	Inferior Parietal Lobule R	surprise	0.04777803512141955
+24	Inferior Parietal Lobule R	surprise	-0.020716182004385204
+25	Inferior Parietal Lobule R	surprise	-0.11993405145013557
+26	Inferior Parietal Lobule R	surprise	0.3143165278671817
+27	Inferior Parietal Lobule R	surprise	0.03201845872562527
+28	Inferior Parietal Lobule R	surprise	0.02451141612638656
+29	Inferior Parietal Lobule R	surprise	-0.055080813993117775
+30	Inferior Parietal Lobule R	surprise	-0.07994600252356825
+33	Inferior Parietal Lobule R	surprise	-0.033713265067424135
+34	Inferior Parietal Lobule R	surprise	0.0581125036363863
+35	Inferior Parietal Lobule R	surprise	0.18636858179868962
+36	Inferior Parietal Lobule R	surprise	0.05810388618847355
+37	Inferior Parietal Lobule R	surprise	-0.020171664308343846
+38	Inferior Parietal Lobule R	surprise	0.25741825101405
+39	Inferior Parietal Lobule R	surprise	-0.029248985995681407
+40	Inferior Parietal Lobule R	surprise	0.16155075095709684
+41	Inferior Parietal Lobule R	surprise	0.10935212438317567
+42	Inferior Parietal Lobule R	surprise	-0.10451408840440722
+43	Inferior Parietal Lobule R	surprise	0.058458169927524235
+45	Inferior Parietal Lobule R	surprise	-0.06144889020948044
+46	Inferior Parietal Lobule R	surprise	-0.0707442241014922
+47	Inferior Parietal Lobule R	surprise	0.007778354632318951
+48	Inferior Parietal Lobule R	surprise	0.04982777229676933
+49	Inferior Parietal Lobule R	surprise	0.08137114181683336
+50	Inferior Parietal Lobule R	surprise	-0.09646918620419456
+51	Inferior Parietal Lobule R	surprise	-0.07966574788429584
+52	Inferior Parietal Lobule R	surprise	-0.05643266014098613
+53	Inferior Parietal Lobule R	surprise	-0.026026744372475978
+54	Inferior Parietal Lobule R	surprise	-0.09369365036043084
+55	Inferior Parietal Lobule R	surprise	-0.2601695580407977
+56	Inferior Parietal Lobule R	surprise	-0.09661961402347184
+57	Inferior Parietal Lobule R	surprise	-0.12261636026880958
+58	Inferior Parietal Lobule R	surprise	-0.008474594303102507
+59	Inferior Parietal Lobule R	surprise	-0.1294127754327333
+60	Inferior Parietal Lobule R	surprise	-0.20953704679025328
+61	Inferior Parietal Lobule R	surprise	-0.1583100619730513
+62	Inferior Parietal Lobule R	surprise	0.05520306868473364
+63	Inferior Parietal Lobule R	surprise	0.08394622262408534
+64	Inferior Parietal Lobule R	surprise	0.14718188986100192
+01	Superior Temporal Gyrus R	rpe	0.12461682784259491
+02	Superior Temporal Gyrus R	rpe	0.3825997911760592
+03	Superior Temporal Gyrus R	rpe	0.4377475769381352
+04	Superior Temporal Gyrus R	rpe	0.19674126163858938
+05	Superior Temporal Gyrus R	rpe	0.47051470891158376
+06	Superior Temporal Gyrus R	rpe	0.15006426497403327
+07	Superior Temporal Gyrus R	rpe	-0.09342483587617759
+09	Superior Temporal Gyrus R	rpe	0.18080012086823943
+10	Superior Temporal Gyrus R	rpe	0.5414264530269643
+11	Superior Temporal Gyrus R	rpe	0.3094074332213227
+12	Superior Temporal Gyrus R	rpe	0.0049662509471945756
+14	Superior Temporal Gyrus R	rpe	0.09208777817055365
+15	Superior Temporal Gyrus R	rpe	0.04277587205188752
+17	Superior Temporal Gyrus R	rpe	0.09213919632141114
+18	Superior Temporal Gyrus R	rpe	0.10056079674162366
+19	Superior Temporal Gyrus R	rpe	0.08077621888712666
+20	Superior Temporal Gyrus R	rpe	0.10937383646158338
+21	Superior Temporal Gyrus R	rpe	0.26546318521015005
+22	Superior Temporal Gyrus R	rpe	0.17380814603851757
+23	Superior Temporal Gyrus R	rpe	-0.08654732611859196
+24	Superior Temporal Gyrus R	rpe	0.29911096233961637
+25	Superior Temporal Gyrus R	rpe	0.21519331143329926
+26	Superior Temporal Gyrus R	rpe	-0.12810045627668964
+27	Superior Temporal Gyrus R	rpe	0.22265495309254266
+28	Superior Temporal Gyrus R	rpe	0.14518118821155448
+29	Superior Temporal Gyrus R	rpe	0.18872379591154184
+30	Superior Temporal Gyrus R	rpe	0.30423902189530744
+33	Superior Temporal Gyrus R	rpe	0.14389166812313728
+34	Superior Temporal Gyrus R	rpe	-0.15831343620352464
+35	Superior Temporal Gyrus R	rpe	0.05167698588644472
+36	Superior Temporal Gyrus R	rpe	0.30169779749657993
+37	Superior Temporal Gyrus R	rpe	0.1870936090952807
+38	Superior Temporal Gyrus R	rpe	-0.13688948171638157
+39	Superior Temporal Gyrus R	rpe	0.18904650049854912
+40	Superior Temporal Gyrus R	rpe	0.021884831733071385
+41	Superior Temporal Gyrus R	rpe	0.48429599707336746
+42	Superior Temporal Gyrus R	rpe	0.09098026292314881
+43	Superior Temporal Gyrus R	rpe	0.18427697566422646
+45	Superior Temporal Gyrus R	rpe	0.21543999028570246
+46	Superior Temporal Gyrus R	rpe	-0.0014759195123022328
+47	Superior Temporal Gyrus R	rpe	0.4317897716150855
+48	Superior Temporal Gyrus R	rpe	0.1648632776623051
+49	Superior Temporal Gyrus R	rpe	0.3668617045255764
+50	Superior Temporal Gyrus R	rpe	-0.0427540630340353
+51	Superior Temporal Gyrus R	rpe	0.47989543040673577
+52	Superior Temporal Gyrus R	rpe	0.20067440363318845
+53	Superior Temporal Gyrus R	rpe	0.1494010804405582
+54	Superior Temporal Gyrus R	rpe	0.13119886524885171
+55	Superior Temporal Gyrus R	rpe	0.26907405982111593
+56	Superior Temporal Gyrus R	rpe	0.1946760200455995
+57	Superior Temporal Gyrus R	rpe	0.027828703658582324
+58	Superior Temporal Gyrus R	rpe	0.3326949031984252
+59	Superior Temporal Gyrus R	rpe	-0.2181078153664563
+60	Superior Temporal Gyrus R	rpe	0.009326299034570846
+61	Superior Temporal Gyrus R	rpe	0.1646449458087936
+62	Superior Temporal Gyrus R	rpe	0.023538900974227013
+63	Superior Temporal Gyrus R	rpe	-0.05802191574392574
+64	Superior Temporal Gyrus R	rpe	0.2843180388504047
+01	Superior Temporal Gyrus R	urpe	-0.07960659233946568
+02	Superior Temporal Gyrus R	urpe	-0.34014774420268323
+03	Superior Temporal Gyrus R	urpe	-0.12170198932182782
+04	Superior Temporal Gyrus R	urpe	-0.38161205886627125
+05	Superior Temporal Gyrus R	urpe	-0.2961356694936701
+06	Superior Temporal Gyrus R	urpe	-0.13013436154661967
+07	Superior Temporal Gyrus R	urpe	0.033976330923470174
+09	Superior Temporal Gyrus R	urpe	-0.27874378211611733
+10	Superior Temporal Gyrus R	urpe	-0.23543074183849497
+11	Superior Temporal Gyrus R	urpe	0.016851950822556864
+12	Superior Temporal Gyrus R	urpe	0.17387460875040572
+14	Superior Temporal Gyrus R	urpe	-0.26283361766839286
+15	Superior Temporal Gyrus R	urpe	-0.07800728852124585
+17	Superior Temporal Gyrus R	urpe	-0.15463822873519553
+18	Superior Temporal Gyrus R	urpe	0.06688246876715542
+19	Superior Temporal Gyrus R	urpe	-0.1110812315346098
+20	Superior Temporal Gyrus R	urpe	-0.2247753898955963
+21	Superior Temporal Gyrus R	urpe	0.09408157142262781
+22	Superior Temporal Gyrus R	urpe	0.0854261140258605
+23	Superior Temporal Gyrus R	urpe	-0.010135619932236278
+24	Superior Temporal Gyrus R	urpe	-0.22223001341539336
+25	Superior Temporal Gyrus R	urpe	0.12165218793264267
+26	Superior Temporal Gyrus R	urpe	-0.0358856070635093
+27	Superior Temporal Gyrus R	urpe	-0.02633734786502635
+28	Superior Temporal Gyrus R	urpe	0.04710133131776538
+29	Superior Temporal Gyrus R	urpe	0.290886068631882
+30	Superior Temporal Gyrus R	urpe	-0.1461354123363014
+33	Superior Temporal Gyrus R	urpe	-0.10382994485338763
+34	Superior Temporal Gyrus R	urpe	0.10175465945635111
+35	Superior Temporal Gyrus R	urpe	-0.09882539734544774
+36	Superior Temporal Gyrus R	urpe	-0.076215406580429
+37	Superior Temporal Gyrus R	urpe	-0.007826291559283377
+38	Superior Temporal Gyrus R	urpe	-0.09781762053664293
+39	Superior Temporal Gyrus R	urpe	-0.16398406348755576
+40	Superior Temporal Gyrus R	urpe	-0.006534869774981844
+41	Superior Temporal Gyrus R	urpe	-0.13303106330004671
+42	Superior Temporal Gyrus R	urpe	-0.18966163381261425
+43	Superior Temporal Gyrus R	urpe	-0.0525832565458146
+45	Superior Temporal Gyrus R	urpe	-0.10527113985837853
+46	Superior Temporal Gyrus R	urpe	-0.013203387689446249
+47	Superior Temporal Gyrus R	urpe	-0.14782241158389103
+48	Superior Temporal Gyrus R	urpe	-0.20459836236123974
+49	Superior Temporal Gyrus R	urpe	-0.33295550326117174
+50	Superior Temporal Gyrus R	urpe	-0.15051160229440813
+51	Superior Temporal Gyrus R	urpe	-0.45000617712421154
+52	Superior Temporal Gyrus R	urpe	-0.04685679382632791
+53	Superior Temporal Gyrus R	urpe	0.017538718459162054
+54	Superior Temporal Gyrus R	urpe	-0.15980621962606895
+55	Superior Temporal Gyrus R	urpe	-0.3454593809724953
+56	Superior Temporal Gyrus R	urpe	-0.190269322491311
+57	Superior Temporal Gyrus R	urpe	-0.08032120570373047
+58	Superior Temporal Gyrus R	urpe	-0.13620632687800302
+59	Superior Temporal Gyrus R	urpe	0.28022348065002206
+60	Superior Temporal Gyrus R	urpe	-0.06660898448302559
+61	Superior Temporal Gyrus R	urpe	-0.13040723216672714
+62	Superior Temporal Gyrus R	urpe	-0.08254599106210511
+63	Superior Temporal Gyrus R	urpe	-0.03828174558568484
+64	Superior Temporal Gyrus R	urpe	0.06992295465253998
+01	Superior Temporal Gyrus R	surprise	-0.07793953517625701
+02	Superior Temporal Gyrus R	surprise	-0.036258072737166615
+03	Superior Temporal Gyrus R	surprise	0.06766445304077733
+04	Superior Temporal Gyrus R	surprise	-0.013717100204345191
+05	Superior Temporal Gyrus R	surprise	0.1253012405603283
+06	Superior Temporal Gyrus R	surprise	0.04989582030600192
+07	Superior Temporal Gyrus R	surprise	0.034505629850927554
+09	Superior Temporal Gyrus R	surprise	-0.0007079385215572665
+10	Superior Temporal Gyrus R	surprise	0.08165695478659941
+11	Superior Temporal Gyrus R	surprise	0.009486598492179426
+12	Superior Temporal Gyrus R	surprise	-0.05447101617879894
+14	Superior Temporal Gyrus R	surprise	-0.0154612827218569
+15	Superior Temporal Gyrus R	surprise	0.03212500717850351
+17	Superior Temporal Gyrus R	surprise	-0.04267403770968842
+18	Superior Temporal Gyrus R	surprise	0.001664320631558934
+19	Superior Temporal Gyrus R	surprise	-0.07043810865135937
+20	Superior Temporal Gyrus R	surprise	0.044714289084066154
+21	Superior Temporal Gyrus R	surprise	-0.02898633560838504
+22	Superior Temporal Gyrus R	surprise	0.001490083281143916
+23	Superior Temporal Gyrus R	surprise	0.07168151949417524
+24	Superior Temporal Gyrus R	surprise	-0.08447886365873541
+25	Superior Temporal Gyrus R	surprise	-0.09400578619389739
+26	Superior Temporal Gyrus R	surprise	0.3073511641238674
+27	Superior Temporal Gyrus R	surprise	0.029881361215713345
+28	Superior Temporal Gyrus R	surprise	-0.011260602888511708
+29	Superior Temporal Gyrus R	surprise	-0.010294208919236754
+30	Superior Temporal Gyrus R	surprise	-0.017004538482228885
+33	Superior Temporal Gyrus R	surprise	-0.029562015839691987
+34	Superior Temporal Gyrus R	surprise	-0.021070109278474365
+35	Superior Temporal Gyrus R	surprise	0.05499876530062834
+36	Superior Temporal Gyrus R	surprise	0.010594445090214635
+37	Superior Temporal Gyrus R	surprise	-0.0335039493857458
+38	Superior Temporal Gyrus R	surprise	0.20624605015570444
+39	Superior Temporal Gyrus R	surprise	-0.026537882861003177
+40	Superior Temporal Gyrus R	surprise	0.08062573167182127
+41	Superior Temporal Gyrus R	surprise	0.062000853769708646
+42	Superior Temporal Gyrus R	surprise	-0.02759598280265761
+43	Superior Temporal Gyrus R	surprise	-0.0703538948118331
+45	Superior Temporal Gyrus R	surprise	-0.08426408684213779
+46	Superior Temporal Gyrus R	surprise	0.0516618235710813
+47	Superior Temporal Gyrus R	surprise	-0.1142273524336174
+48	Superior Temporal Gyrus R	surprise	0.012799506871609665
+49	Superior Temporal Gyrus R	surprise	0.06342428638535436
+50	Superior Temporal Gyrus R	surprise	-0.05534765334002682
+51	Superior Temporal Gyrus R	surprise	-0.04989636974427463
+52	Superior Temporal Gyrus R	surprise	-0.04465077315504996
+53	Superior Temporal Gyrus R	surprise	-0.01815734712012951
+54	Superior Temporal Gyrus R	surprise	-0.03974359504508889
+55	Superior Temporal Gyrus R	surprise	-0.10297673334065001
+56	Superior Temporal Gyrus R	surprise	0.07827980262694091
+57	Superior Temporal Gyrus R	surprise	0.00831865790963424
+58	Superior Temporal Gyrus R	surprise	0.034483154524280794
+59	Superior Temporal Gyrus R	surprise	-0.07870309430324894
+60	Superior Temporal Gyrus R	surprise	-0.06491453949591584
+61	Superior Temporal Gyrus R	surprise	-0.003752958382845187
+62	Superior Temporal Gyrus R	surprise	0.029849617672125992
+63	Superior Temporal Gyrus R	surprise	0.03614478531172998
+64	Superior Temporal Gyrus R	surprise	0.04291719032294859
+01	Postcentral Gyrus R	rpe	0.3161963827182474
+02	Postcentral Gyrus R	rpe	0.6452434472349841
+03	Postcentral Gyrus R	rpe	0.4645437661471755
+04	Postcentral Gyrus R	rpe	0.5335133806044279
+05	Postcentral Gyrus R	rpe	0.3288414900423959
+06	Postcentral Gyrus R	rpe	0.40641226363043453
+07	Postcentral Gyrus R	rpe	-0.04666485442850349
+09	Postcentral Gyrus R	rpe	0.6659398884620777
+10	Postcentral Gyrus R	rpe	0.8104350906298604
+11	Postcentral Gyrus R	rpe	0.9942897957424784
+12	Postcentral Gyrus R	rpe	0.05442652541543032
+14	Postcentral Gyrus R	rpe	0.34524393823582594
+15	Postcentral Gyrus R	rpe	0.3683341208098153
+17	Postcentral Gyrus R	rpe	0.06401919091640171
+18	Postcentral Gyrus R	rpe	0.20694122981648286
+19	Postcentral Gyrus R	rpe	0.3887125412825235
+20	Postcentral Gyrus R	rpe	0.1982226789257554
+21	Postcentral Gyrus R	rpe	0.4170603672481077
+22	Postcentral Gyrus R	rpe	0.11563144487567073
+23	Postcentral Gyrus R	rpe	-0.15983584966323727
+24	Postcentral Gyrus R	rpe	0.35380177120326173
+25	Postcentral Gyrus R	rpe	0.5175379265099764
+26	Postcentral Gyrus R	rpe	-0.6525260512152251
+27	Postcentral Gyrus R	rpe	0.32435809012467237
+28	Postcentral Gyrus R	rpe	-0.015372684504836798
+29	Postcentral Gyrus R	rpe	0.23667100292608834
+30	Postcentral Gyrus R	rpe	0.33321007462651575
+33	Postcentral Gyrus R	rpe	0.0870541570792083
+34	Postcentral Gyrus R	rpe	0.001426493176150807
+35	Postcentral Gyrus R	rpe	-0.023566146455515653
+36	Postcentral Gyrus R	rpe	0.3857097690600122
+37	Postcentral Gyrus R	rpe	0.2421526092960131
+38	Postcentral Gyrus R	rpe	-0.14679965203598164
+39	Postcentral Gyrus R	rpe	0.384276018499635
+40	Postcentral Gyrus R	rpe	-0.05719859598523959
+41	Postcentral Gyrus R	rpe	0.5174011451820302
+42	Postcentral Gyrus R	rpe	0.13072681546557782
+43	Postcentral Gyrus R	rpe	0.4023023158674626
+45	Postcentral Gyrus R	rpe	0.38793883346194447
+46	Postcentral Gyrus R	rpe	0.049501630047141296
+47	Postcentral Gyrus R	rpe	0.14810354303416992
+48	Postcentral Gyrus R	rpe	0.2731107450663626
+49	Postcentral Gyrus R	rpe	0.3903549192864502
+50	Postcentral Gyrus R	rpe	0.2330468067628613
+51	Postcentral Gyrus R	rpe	0.8337032652265111
+52	Postcentral Gyrus R	rpe	0.5410352917084861
+53	Postcentral Gyrus R	rpe	0.3647641160792054
+54	Postcentral Gyrus R	rpe	0.4169101224908995
+55	Postcentral Gyrus R	rpe	0.590445160146716
+56	Postcentral Gyrus R	rpe	0.023442485657802156
+57	Postcentral Gyrus R	rpe	0.18347265917271766
+58	Postcentral Gyrus R	rpe	0.25582365860166245
+59	Postcentral Gyrus R	rpe	0.14314521630511207
+60	Postcentral Gyrus R	rpe	-0.1050019645657347
+61	Postcentral Gyrus R	rpe	0.3794550860568686
+62	Postcentral Gyrus R	rpe	-0.09310144950164655
+63	Postcentral Gyrus R	rpe	-0.19923270856717948
+64	Postcentral Gyrus R	rpe	0.8750283241271972
+01	Postcentral Gyrus R	urpe	-0.2611437092080366
+02	Postcentral Gyrus R	urpe	-0.4611471431465213
+03	Postcentral Gyrus R	urpe	-0.25989131012628247
+04	Postcentral Gyrus R	urpe	-0.9607266388660254
+05	Postcentral Gyrus R	urpe	-0.10255545051118663
+06	Postcentral Gyrus R	urpe	-0.33637265204993444
+07	Postcentral Gyrus R	urpe	-0.21894622007222456
+09	Postcentral Gyrus R	urpe	-0.7005207468257394
+10	Postcentral Gyrus R	urpe	-0.37150968339640733
+11	Postcentral Gyrus R	urpe	-0.37065705582066333
+12	Postcentral Gyrus R	urpe	-0.08906947289820934
+14	Postcentral Gyrus R	urpe	-0.7598268565050391
+15	Postcentral Gyrus R	urpe	0.3481244361401687
+17	Postcentral Gyrus R	urpe	-0.28706045050910395
+18	Postcentral Gyrus R	urpe	-0.16913152811588547
+19	Postcentral Gyrus R	urpe	-0.2905572999983506
+20	Postcentral Gyrus R	urpe	-0.4052237948489397
+21	Postcentral Gyrus R	urpe	0.03899844081660862
+22	Postcentral Gyrus R	urpe	0.25296434607752055
+23	Postcentral Gyrus R	urpe	-0.06334840870505676
+24	Postcentral Gyrus R	urpe	-0.29380185079468457
+25	Postcentral Gyrus R	urpe	-0.16905729939597983
+26	Postcentral Gyrus R	urpe	-0.32775968218541723
+27	Postcentral Gyrus R	urpe	0.11650466469812294
+28	Postcentral Gyrus R	urpe	0.03788982566261967
+29	Postcentral Gyrus R	urpe	0.23877307637053174
+30	Postcentral Gyrus R	urpe	-0.09775438837650866
+33	Postcentral Gyrus R	urpe	-0.10217844665505338
+34	Postcentral Gyrus R	urpe	-0.12192629044388183
+35	Postcentral Gyrus R	urpe	-0.041338126847065636
+36	Postcentral Gyrus R	urpe	-0.16480036787363853
+37	Postcentral Gyrus R	urpe	0.134543448743183
+38	Postcentral Gyrus R	urpe	-0.25512566311544804
+39	Postcentral Gyrus R	urpe	-0.25376606434367077
+40	Postcentral Gyrus R	urpe	-0.05611579147503213
+41	Postcentral Gyrus R	urpe	-0.38720753043456824
+42	Postcentral Gyrus R	urpe	-0.28883558967865486
+43	Postcentral Gyrus R	urpe	-0.06307168858759322
+45	Postcentral Gyrus R	urpe	-0.2890121188198844
+46	Postcentral Gyrus R	urpe	-0.04223214577610041
+47	Postcentral Gyrus R	urpe	-0.13292002363596112
+48	Postcentral Gyrus R	urpe	-0.17006718650823024
+49	Postcentral Gyrus R	urpe	-0.4937269917667605
+50	Postcentral Gyrus R	urpe	0.06778638698810409
+51	Postcentral Gyrus R	urpe	-0.6631475910544395
+52	Postcentral Gyrus R	urpe	-0.21266462497608085
+53	Postcentral Gyrus R	urpe	-0.015128239199822379
+54	Postcentral Gyrus R	urpe	-0.4027411579652581
+55	Postcentral Gyrus R	urpe	-0.35290231979776954
+56	Postcentral Gyrus R	urpe	-0.05962209462957744
+57	Postcentral Gyrus R	urpe	-0.2323790448555333
+58	Postcentral Gyrus R	urpe	-0.138074553967995
+59	Postcentral Gyrus R	urpe	0.21943420457632043
+60	Postcentral Gyrus R	urpe	0.031002468760341927
+61	Postcentral Gyrus R	urpe	-0.291142997238785
+62	Postcentral Gyrus R	urpe	-0.06811943092968228
+63	Postcentral Gyrus R	urpe	-0.036093674865443
+64	Postcentral Gyrus R	urpe	-0.2679888223021746
+01	Postcentral Gyrus R	surprise	-0.19937764399652477
+02	Postcentral Gyrus R	surprise	-0.04576794124031737
+03	Postcentral Gyrus R	surprise	-0.11392280482869802
+04	Postcentral Gyrus R	surprise	-0.2053510562906605
+05	Postcentral Gyrus R	surprise	0.12143776009920551
+06	Postcentral Gyrus R	surprise	-0.02963318932953096
+07	Postcentral Gyrus R	surprise	-0.054486121699419736
+09	Postcentral Gyrus R	surprise	0.016936452578759833
+10	Postcentral Gyrus R	surprise	0.11784796648629031
+11	Postcentral Gyrus R	surprise	0.02457584331440198
+12	Postcentral Gyrus R	surprise	-0.047260578188958555
+14	Postcentral Gyrus R	surprise	0.05660474938773658
+15	Postcentral Gyrus R	surprise	0.017051823312676576
+17	Postcentral Gyrus R	surprise	-0.13054953846612777
+18	Postcentral Gyrus R	surprise	0.009870072135019527
+19	Postcentral Gyrus R	surprise	-0.2612800837256188
+20	Postcentral Gyrus R	surprise	-0.028046470838003292
+21	Postcentral Gyrus R	surprise	0.06407088269452499
+22	Postcentral Gyrus R	surprise	-0.0016750035199694076
+23	Postcentral Gyrus R	surprise	-0.0717714685057344
+24	Postcentral Gyrus R	surprise	0.03709352651413335
+25	Postcentral Gyrus R	surprise	-0.03295512510474425
+26	Postcentral Gyrus R	surprise	0.45555344726457153
+27	Postcentral Gyrus R	surprise	0.004732570390326653
+28	Postcentral Gyrus R	surprise	-0.02839085968753775
+29	Postcentral Gyrus R	surprise	0.04232902046466289
+30	Postcentral Gyrus R	surprise	-0.04121495879845434
+33	Postcentral Gyrus R	surprise	-0.040075301617616785
+34	Postcentral Gyrus R	surprise	0.18470370017728488
+35	Postcentral Gyrus R	surprise	0.16474510930664024
+36	Postcentral Gyrus R	surprise	0.007399729242667469
+37	Postcentral Gyrus R	surprise	-0.058440841175175846
+38	Postcentral Gyrus R	surprise	0.18307389164056498
+39	Postcentral Gyrus R	surprise	-0.022994663400120685
+40	Postcentral Gyrus R	surprise	-0.0523582428934724
+41	Postcentral Gyrus R	surprise	0.03221462044856771
+42	Postcentral Gyrus R	surprise	0.02809734550788393
+43	Postcentral Gyrus R	surprise	0.15517031014138877
+45	Postcentral Gyrus R	surprise	-0.013654762935377306
+46	Postcentral Gyrus R	surprise	-0.024609024262767783
+47	Postcentral Gyrus R	surprise	0.10082861649002446
+48	Postcentral Gyrus R	surprise	0.002429209111345022
+49	Postcentral Gyrus R	surprise	0.15887626851773495
+50	Postcentral Gyrus R	surprise	-0.07143065110358293
+51	Postcentral Gyrus R	surprise	0.028883324586718648
+52	Postcentral Gyrus R	surprise	-0.09371979561861778
+53	Postcentral Gyrus R	surprise	0.029897781071621318
+54	Postcentral Gyrus R	surprise	0.02021484506901267
+55	Postcentral Gyrus R	surprise	-0.06772873841069076
+56	Postcentral Gyrus R	surprise	-0.04046144123530275
+57	Postcentral Gyrus R	surprise	-0.10805552446954819
+58	Postcentral Gyrus R	surprise	-0.04952147230989879
+59	Postcentral Gyrus R	surprise	-0.12262629923778912
+60	Postcentral Gyrus R	surprise	-0.10998125087136815
+61	Postcentral Gyrus R	surprise	-0.1722598446533084
+62	Postcentral Gyrus R	surprise	0.1490854165227109
+63	Postcentral Gyrus R	surprise	0.006698076425629213
+64	Postcentral Gyrus R	surprise	0.18555375733954269
+01	DLPFC L	rpe	-0.05722261976916343
+02	DLPFC L	rpe	0.4994971702708313
+03	DLPFC L	rpe	0.6062637802982784
+04	DLPFC L	rpe	0.2083785089613365
+05	DLPFC L	rpe	0.6097264742096944
+06	DLPFC L	rpe	0.04257986551694433
+07	DLPFC L	rpe	-0.008842179795397411
+09	DLPFC L	rpe	-0.06247380655656586
+10	DLPFC L	rpe	0.6691592337552065
+11	DLPFC L	rpe	0.47579382985876584
+12	DLPFC L	rpe	0.21606602443032175
+14	DLPFC L	rpe	0.23457751057533002
+15	DLPFC L	rpe	0.04693896091009508
+17	DLPFC L	rpe	0.050559174597714536
+18	DLPFC L	rpe	0.24496182452868134
+19	DLPFC L	rpe	0.46767954066430467
+20	DLPFC L	rpe	0.1700972374572031
+21	DLPFC L	rpe	0.3859964359250868
+22	DLPFC L	rpe	0.2492497859273962
+23	DLPFC L	rpe	0.17393332074529358
+24	DLPFC L	rpe	0.4084339991836629
+25	DLPFC L	rpe	0.1914002710348863
+26	DLPFC L	rpe	0.13506193580366208
+27	DLPFC L	rpe	0.41262057099653326
+28	DLPFC L	rpe	0.18377004827875992
+29	DLPFC L	rpe	0.13354025174493422
+30	DLPFC L	rpe	0.7661229449422648
+33	DLPFC L	rpe	0.36002485039904253
+34	DLPFC L	rpe	0.031563336562556187
+35	DLPFC L	rpe	0.4611523074057439
+36	DLPFC L	rpe	-0.009109118846331879
+37	DLPFC L	rpe	0.4719116241896745
+38	DLPFC L	rpe	0.025884770916959978
+39	DLPFC L	rpe	0.2427130780712071
+40	DLPFC L	rpe	0.06382321545374088
+41	DLPFC L	rpe	0.954568388299172
+42	DLPFC L	rpe	-0.03846793126181832
+43	DLPFC L	rpe	0.43347856864587675
+45	DLPFC L	rpe	0.6926298030530629
+46	DLPFC L	rpe	0.28611610558242623
+47	DLPFC L	rpe	0.5181575362506953
+48	DLPFC L	rpe	0.8273674969717583
+49	DLPFC L	rpe	0.261551578154987
+50	DLPFC L	rpe	0.07122892811634109
+51	DLPFC L	rpe	0.4849534464930618
+52	DLPFC L	rpe	0.4552724739964704
+53	DLPFC L	rpe	-0.09127316897068323
+54	DLPFC L	rpe	0.42305802831553524
+55	DLPFC L	rpe	0.5181109010941863
+56	DLPFC L	rpe	0.190911712874051
+57	DLPFC L	rpe	0.342712810511776
+58	DLPFC L	rpe	0.7419435864094621
+59	DLPFC L	rpe	0.14614926946406565
+60	DLPFC L	rpe	0.2894114164276893
+61	DLPFC L	rpe	0.22587143280977232
+62	DLPFC L	rpe	0.10010116348355454
+63	DLPFC L	rpe	-0.24681228631745838
+64	DLPFC L	rpe	0.25666424267641874
+01	DLPFC L	urpe	0.07887545905472937
+02	DLPFC L	urpe	-0.4532293357498805
+03	DLPFC L	urpe	-0.23883031955659853
+04	DLPFC L	urpe	-0.1922268306356363
+05	DLPFC L	urpe	-0.28337330660372045
+06	DLPFC L	urpe	-0.1379371250542864
+07	DLPFC L	urpe	0.013360530747569264
+09	DLPFC L	urpe	-0.16319160697683807
+10	DLPFC L	urpe	-0.3819369562056551
+11	DLPFC L	urpe	-0.05105020799196863
+12	DLPFC L	urpe	0.04366496715821928
+14	DLPFC L	urpe	-0.13803561073612214
+15	DLPFC L	urpe	0.1592023437958419
+17	DLPFC L	urpe	-0.3725686802800675
+18	DLPFC L	urpe	0.26907399054963765
+19	DLPFC L	urpe	-0.26572961519148364
+20	DLPFC L	urpe	-0.4273471952595326
+21	DLPFC L	urpe	-0.019537830142512546
+22	DLPFC L	urpe	-0.06179636344024391
+23	DLPFC L	urpe	0.11295438924896883
+24	DLPFC L	urpe	-0.3731186508030417
+25	DLPFC L	urpe	-0.09071054889803162
+26	DLPFC L	urpe	0.0637622449846406
+27	DLPFC L	urpe	-0.08918634037377302
+28	DLPFC L	urpe	-0.007814655686827718
+29	DLPFC L	urpe	0.09405895323718186
+30	DLPFC L	urpe	-0.32822673685663606
+33	DLPFC L	urpe	0.03191361270565829
+34	DLPFC L	urpe	0.08905501813506303
+35	DLPFC L	urpe	-0.18906439413672302
+36	DLPFC L	urpe	-0.23621546218724146
+37	DLPFC L	urpe	0.02460720567669002
+38	DLPFC L	urpe	-0.16172074956887383
+39	DLPFC L	urpe	-0.1936256456389873
+40	DLPFC L	urpe	0.0144595136455266
+41	DLPFC L	urpe	-0.25208162626696995
+42	DLPFC L	urpe	-0.18709845655823346
+43	DLPFC L	urpe	-0.072985335377729
+45	DLPFC L	urpe	-0.4558610595785868
+46	DLPFC L	urpe	-0.3113084053273619
+47	DLPFC L	urpe	-0.12126749142663125
+48	DLPFC L	urpe	-0.4745700490308104
+49	DLPFC L	urpe	-0.3776766539750887
+50	DLPFC L	urpe	-0.26598584268282616
+51	DLPFC L	urpe	-0.4471321443951926
+52	DLPFC L	urpe	-0.20102133325833296
+53	DLPFC L	urpe	-0.10019977586557192
+54	DLPFC L	urpe	-0.4592243950316532
+55	DLPFC L	urpe	-0.27064987254742623
+56	DLPFC L	urpe	-0.15261191345667408
+57	DLPFC L	urpe	-0.27921850082713257
+58	DLPFC L	urpe	-0.3202069995133785
+59	DLPFC L	urpe	-0.10998819464881274
+60	DLPFC L	urpe	-0.07218533463527373
+61	DLPFC L	urpe	-0.1610930638260538
+62	DLPFC L	urpe	0.0563578208769608
+63	DLPFC L	urpe	-0.14558904104640488
+64	DLPFC L	urpe	0.12503748581027438
+01	DLPFC L	surprise	0.045535265205945724
+02	DLPFC L	surprise	0.10000653744831403
+03	DLPFC L	surprise	-0.013981132479587002
+04	DLPFC L	surprise	-0.06333803548911436
+05	DLPFC L	surprise	0.27637470585584833
+06	DLPFC L	surprise	0.185573094541797
+07	DLPFC L	surprise	0.08884296713864015
+09	DLPFC L	surprise	0.04419529489357232
+10	DLPFC L	surprise	0.04574319617392536
+11	DLPFC L	surprise	0.09577729297991298
+12	DLPFC L	surprise	-0.02009685354608094
+14	DLPFC L	surprise	0.013597675479850182
+15	DLPFC L	surprise	-0.02865575475731043
+17	DLPFC L	surprise	0.08076207354514403
+18	DLPFC L	surprise	-0.12705338458958665
+19	DLPFC L	surprise	-0.1112354516640294
+20	DLPFC L	surprise	0.0505850544052563
+21	DLPFC L	surprise	-0.05724474003409059
+22	DLPFC L	surprise	0.18229992589508387
+23	DLPFC L	surprise	0.22565493703912365
+24	DLPFC L	surprise	0.015254735931877397
+25	DLPFC L	surprise	-0.03379663613499055
+26	DLPFC L	surprise	0.2653809735834923
+27	DLPFC L	surprise	0.15258099589782828
+28	DLPFC L	surprise	0.03401350008355604
+29	DLPFC L	surprise	-0.032908305441902846
+30	DLPFC L	surprise	0.06350690994400138
+33	DLPFC L	surprise	-0.02404987638178484
+34	DLPFC L	surprise	0.00909764747602087
+35	DLPFC L	surprise	0.051244544098786406
+36	DLPFC L	surprise	-0.03398158761921414
+37	DLPFC L	surprise	0.0685511484539884
+38	DLPFC L	surprise	0.1216842520509135
+39	DLPFC L	surprise	0.10947774255450132
+40	DLPFC L	surprise	0.021230864992961056
+41	DLPFC L	surprise	0.09677290528412888
+42	DLPFC L	surprise	0.21486655202757868
+43	DLPFC L	surprise	-0.04918814080721057
+45	DLPFC L	surprise	0.010699204528582808
+46	DLPFC L	surprise	0.09431847086702676
+47	DLPFC L	surprise	0.0034765228487434437
+48	DLPFC L	surprise	-0.0492093192127111
+49	DLPFC L	surprise	0.21649475381796404
+50	DLPFC L	surprise	-0.0119893110098002
+51	DLPFC L	surprise	-0.028603314493655555
+52	DLPFC L	surprise	-0.06873241797673822
+53	DLPFC L	surprise	0.022451147691618583
+54	DLPFC L	surprise	-0.018634202698437623
+55	DLPFC L	surprise	0.10164689050526582
+56	DLPFC L	surprise	0.3747103725305487
+57	DLPFC L	surprise	0.004589577350614163
+58	DLPFC L	surprise	0.05771963885820453
+59	DLPFC L	surprise	-0.1338609309031148
+60	DLPFC L	surprise	0.02102381081854699
+61	DLPFC L	surprise	-0.04263616551830208
+62	DLPFC L	surprise	0.15228536536032045
+63	DLPFC L	surprise	0.06338184329273283
+64	DLPFC L	surprise	0.09586464179830151
+01	dmPFC R	rpe	-0.31658520432631976
+02	dmPFC R	rpe	-0.25757888970014126
+03	dmPFC R	rpe	-0.3820840456177826
+04	dmPFC R	rpe	-0.05382498304385666
+05	dmPFC R	rpe	-0.5593721898845755
+06	dmPFC R	rpe	-0.3022915177792962
+07	dmPFC R	rpe	-0.32797014986985473
+09	dmPFC R	rpe	-0.04930522233342192
+10	dmPFC R	rpe	0.2921268463185036
+11	dmPFC R	rpe	-0.00930611107993376
+12	dmPFC R	rpe	-0.05272316181921511
+14	dmPFC R	rpe	-0.12541141991106258
+15	dmPFC R	rpe	0.4926073238110313
+17	dmPFC R	rpe	-0.7202286155490608
+18	dmPFC R	rpe	-0.4508260749280453
+19	dmPFC R	rpe	-0.16702919454522222
+20	dmPFC R	rpe	-0.24634300410736132
+21	dmPFC R	rpe	-0.12402387056123201
+22	dmPFC R	rpe	0.5879786309176182
+23	dmPFC R	rpe	0.3096708580851555
+24	dmPFC R	rpe	-0.21660413522125951
+25	dmPFC R	rpe	-0.007321500032163271
+26	dmPFC R	rpe	-0.2312337800818072
+27	dmPFC R	rpe	0.022995521434927946
+28	dmPFC R	rpe	-0.22384179364303713
+29	dmPFC R	rpe	0.0737204118289861
+30	dmPFC R	rpe	-0.5507126082226608
+33	dmPFC R	rpe	0.39542887869113535
+34	dmPFC R	rpe	-0.10004028622256396
+35	dmPFC R	rpe	0.08749468984136072
+36	dmPFC R	rpe	-0.17520662090233105
+37	dmPFC R	rpe	0.25795930921640636
+38	dmPFC R	rpe	-0.17742493081434102
+39	dmPFC R	rpe	-0.4282977489943427
+40	dmPFC R	rpe	-0.6524923584143911
+41	dmPFC R	rpe	0.11935729851907158
+42	dmPFC R	rpe	-0.6791489426228967
+43	dmPFC R	rpe	0.017090617180834492
+45	dmPFC R	rpe	-0.5295759004628664
+46	dmPFC R	rpe	-0.16985594067019183
+47	dmPFC R	rpe	0.3287118364946096
+48	dmPFC R	rpe	-0.41840300008889053
+49	dmPFC R	rpe	-0.20813783910125494
+50	dmPFC R	rpe	0.04231091254260318
+51	dmPFC R	rpe	-0.16550095977222587
+52	dmPFC R	rpe	-0.4235265507799137
+53	dmPFC R	rpe	0.019066122339361093
+54	dmPFC R	rpe	-0.5349391626806318
+55	dmPFC R	rpe	-0.14472644976698434
+56	dmPFC R	rpe	0.8132078784902196
+57	dmPFC R	rpe	-0.0548222794754543
+58	dmPFC R	rpe	-0.1998660442959908
+59	dmPFC R	rpe	-0.20461994877827544
+60	dmPFC R	rpe	0.49104250274546496
+61	dmPFC R	rpe	-0.1631732384403158
+62	dmPFC R	rpe	-0.4112916028491788
+63	dmPFC R	rpe	-0.39795424806611884
+64	dmPFC R	rpe	-0.5160032550875957
+01	dmPFC R	urpe	0.43923554291795625
+02	dmPFC R	urpe	0.41684280364559245
+03	dmPFC R	urpe	0.47175815929756404
+04	dmPFC R	urpe	0.011209971626399905
+05	dmPFC R	urpe	0.5181215675156954
+06	dmPFC R	urpe	0.303064503980527
+07	dmPFC R	urpe	-0.15899853926425525
+09	dmPFC R	urpe	0.26624076731724444
+10	dmPFC R	urpe	-0.1009436959312851
+11	dmPFC R	urpe	0.020338385211225676
+12	dmPFC R	urpe	0.30917949733809547
+14	dmPFC R	urpe	0.14449644591223768
+15	dmPFC R	urpe	0.18486156051333708
+17	dmPFC R	urpe	0.12571567415066023
+18	dmPFC R	urpe	0.44337307771185896
+19	dmPFC R	urpe	0.15847098250577057
+20	dmPFC R	urpe	-0.06947306977337474
+21	dmPFC R	urpe	-0.06394895232629383
+22	dmPFC R	urpe	0.0840994330543139
+23	dmPFC R	urpe	0.3649786079222649
+24	dmPFC R	urpe	0.188039249612016
+25	dmPFC R	urpe	0.3245871073120254
+26	dmPFC R	urpe	0.07640367943363693
+27	dmPFC R	urpe	-0.12035153436285632
+28	dmPFC R	urpe	0.20258531495987786
+29	dmPFC R	urpe	0.2858432541907459
+30	dmPFC R	urpe	0.616832408975888
+33	dmPFC R	urpe	0.35991595497263684
+34	dmPFC R	urpe	0.3184676237593216
+35	dmPFC R	urpe	-0.15197978463427692
+36	dmPFC R	urpe	-0.11208596992325949
+37	dmPFC R	urpe	0.07281017421835942
+38	dmPFC R	urpe	-0.13161304869409812
+39	dmPFC R	urpe	0.7366986057975076
+40	dmPFC R	urpe	0.21795478897573023
+41	dmPFC R	urpe	0.625962795435705
+42	dmPFC R	urpe	0.1691949124246717
+43	dmPFC R	urpe	0.24740071293826288
+45	dmPFC R	urpe	0.9147299476541005
+46	dmPFC R	urpe	0.3323272579671958
+47	dmPFC R	urpe	0.340384689890747
+48	dmPFC R	urpe	0.46650041364152894
+49	dmPFC R	urpe	0.21743629024676667
+50	dmPFC R	urpe	0.38400083506834803
+51	dmPFC R	urpe	0.22383804595866402
+52	dmPFC R	urpe	0.4827200596504096
+53	dmPFC R	urpe	0.36836132616573175
+54	dmPFC R	urpe	0.5710906842104778
+55	dmPFC R	urpe	0.16291941264912915
+56	dmPFC R	urpe	-0.4117714961855575
+57	dmPFC R	urpe	0.1978130528012981
+58	dmPFC R	urpe	0.25980912055820227
+59	dmPFC R	urpe	0.7913571135564283
+60	dmPFC R	urpe	-0.043699803617127546
+61	dmPFC R	urpe	0.24744042271823083
+62	dmPFC R	urpe	0.12931515771400678
+63	dmPFC R	urpe	-0.1249637635020943
+64	dmPFC R	urpe	0.41448648490168
+01	dmPFC R	surprise	-0.06319973030138983
+02	dmPFC R	surprise	0.10286333579472363
+03	dmPFC R	surprise	0.07462759531865065
+04	dmPFC R	surprise	-0.09401527922322699
+05	dmPFC R	surprise	-0.11148798693837664
+06	dmPFC R	surprise	-0.06682039156920029
+07	dmPFC R	surprise	-0.1439240658264998
+09	dmPFC R	surprise	-0.07069934681880165
+10	dmPFC R	surprise	-0.012432080723664404
+11	dmPFC R	surprise	0.05359990917751891
+12	dmPFC R	surprise	0.04770435607777192
+14	dmPFC R	surprise	-0.0524160306620081
+15	dmPFC R	surprise	-0.013352800092262614
+17	dmPFC R	surprise	-0.018918425092226143
+18	dmPFC R	surprise	-0.27006519161216863
+19	dmPFC R	surprise	-0.06935388239025679
+20	dmPFC R	surprise	0.129206171477461
+21	dmPFC R	surprise	0.02006317137567965
+22	dmPFC R	surprise	0.3000294669935076
+23	dmPFC R	surprise	0.1448513986717851
+24	dmPFC R	surprise	0.12843017227236603
+25	dmPFC R	surprise	-0.06950595544755354
+26	dmPFC R	surprise	0.20680527847872435
+27	dmPFC R	surprise	-0.018804918194736737
+28	dmPFC R	surprise	0.07514133454354194
+29	dmPFC R	surprise	0.0699977431054735
+30	dmPFC R	surprise	0.19059044039984058
+33	dmPFC R	surprise	0.027939005537041817
+34	dmPFC R	surprise	-0.12760773226879277
+35	dmPFC R	surprise	0.15630350090926382
+36	dmPFC R	surprise	0.04500858040308332
+37	dmPFC R	surprise	0.06729454627538171
+38	dmPFC R	surprise	-0.017660462734667207
+39	dmPFC R	surprise	0.1346446013947545
+40	dmPFC R	surprise	-0.01987626781105878
+41	dmPFC R	surprise	0.16232682973487544
+42	dmPFC R	surprise	0.03198273585729913
+43	dmPFC R	surprise	0.3232742742068701
+45	dmPFC R	surprise	-0.026576318957808695
+46	dmPFC R	surprise	-0.06073976836820179
+47	dmPFC R	surprise	-0.07284141633369784
+48	dmPFC R	surprise	0.030530894767424627
+49	dmPFC R	surprise	0.3411659559795073
+50	dmPFC R	surprise	0.08760683673150656
+51	dmPFC R	surprise	0.06136836068195102
+52	dmPFC R	surprise	-0.002264339732449059
+53	dmPFC R	surprise	-0.025263037917837565
+54	dmPFC R	surprise	-0.05766567653305568
+55	dmPFC R	surprise	-0.1543286095798289
+56	dmPFC R	surprise	-0.26950884222906163
+57	dmPFC R	surprise	0.15267069104055947
+58	dmPFC R	surprise	-0.004364159179528218
+59	dmPFC R	surprise	-0.35822723812987
+60	dmPFC R	surprise	-0.04249999186852817
+61	dmPFC R	surprise	0.11444446605823973
+62	dmPFC R	surprise	0.07066731548084962
+63	dmPFC R	surprise	-0.024539719351151734
+64	dmPFC R	surprise	-0.06849730811676115
+01	Superior frontal sulcus R	rpe	-0.23407881613109857
+02	Superior frontal sulcus R	rpe	0.1176574560884699
+03	Superior frontal sulcus R	rpe	-0.17352210925732037
+04	Superior frontal sulcus R	rpe	0.680202913698065
+05	Superior frontal sulcus R	rpe	-0.4007284299484703
+06	Superior frontal sulcus R	rpe	-0.3101192470355571
+07	Superior frontal sulcus R	rpe	-0.364998072300476
+09	Superior frontal sulcus R	rpe	-0.25649372533582265
+10	Superior frontal sulcus R	rpe	0.14597031617721984
+11	Superior frontal sulcus R	rpe	-0.376258984208107
+12	Superior frontal sulcus R	rpe	0.0197189973688592
+14	Superior frontal sulcus R	rpe	-0.23197863375384162
+15	Superior frontal sulcus R	rpe	0.34984868444601885
+17	Superior frontal sulcus R	rpe	-0.09493704442688414
+18	Superior frontal sulcus R	rpe	-0.8405159156314517
+19	Superior frontal sulcus R	rpe	-0.36444082531992716
+20	Superior frontal sulcus R	rpe	-0.31975653273487137
+21	Superior frontal sulcus R	rpe	-0.24121633824405353
+22	Superior frontal sulcus R	rpe	0.4236291164233712
+23	Superior frontal sulcus R	rpe	0.023491655783869952
+24	Superior frontal sulcus R	rpe	-0.06329153683160979
+25	Superior frontal sulcus R	rpe	0.15663672149110716
+26	Superior frontal sulcus R	rpe	-0.36925726125144775
+27	Superior frontal sulcus R	rpe	0.12274148268793154
+28	Superior frontal sulcus R	rpe	-0.05999852265213538
+29	Superior frontal sulcus R	rpe	-0.011074469933101466
+30	Superior frontal sulcus R	rpe	-1.060063797553987
+33	Superior frontal sulcus R	rpe	0.23909186709935257
+34	Superior frontal sulcus R	rpe	-0.011851049101651995
+35	Superior frontal sulcus R	rpe	0.2255185093083739
+36	Superior frontal sulcus R	rpe	-0.327198943414704
+37	Superior frontal sulcus R	rpe	0.2543514148787176
+38	Superior frontal sulcus R	rpe	0.07905202620584546
+39	Superior frontal sulcus R	rpe	-0.47103675427217434
+40	Superior frontal sulcus R	rpe	-0.03697402329887939
+41	Superior frontal sulcus R	rpe	0.19539521411789992
+42	Superior frontal sulcus R	rpe	-0.39626207206227626
+43	Superior frontal sulcus R	rpe	-0.5203412848574515
+45	Superior frontal sulcus R	rpe	-1.064115924689606
+46	Superior frontal sulcus R	rpe	-0.6791932892537754
+47	Superior frontal sulcus R	rpe	-0.04191417993892354
+48	Superior frontal sulcus R	rpe	0.3018819984272549
+49	Superior frontal sulcus R	rpe	0.0016434589855884778
+50	Superior frontal sulcus R	rpe	0.35761256579252826
+51	Superior frontal sulcus R	rpe	-0.29753195608873634
+52	Superior frontal sulcus R	rpe	-0.47715846312993015
+53	Superior frontal sulcus R	rpe	0.02538934259902942
+54	Superior frontal sulcus R	rpe	-0.6417720608612281
+55	Superior frontal sulcus R	rpe	-0.08186182755984024
+56	Superior frontal sulcus R	rpe	0.5546952880748356
+57	Superior frontal sulcus R	rpe	-0.3815772915792204
+58	Superior frontal sulcus R	rpe	-0.20468012140601702
+59	Superior frontal sulcus R	rpe	-0.43780675422166293
+60	Superior frontal sulcus R	rpe	0.1902840745831726
+61	Superior frontal sulcus R	rpe	-0.13907717393874724
+62	Superior frontal sulcus R	rpe	-0.2477948242800225
+63	Superior frontal sulcus R	rpe	-0.34437555411674137
+64	Superior frontal sulcus R	rpe	-0.44111632642934706
+01	Superior frontal sulcus R	urpe	0.6400291246881011
+02	Superior frontal sulcus R	urpe	0.15221464696992545
+03	Superior frontal sulcus R	urpe	0.36701029254912704
+04	Superior frontal sulcus R	urpe	0.34309499253668174
+05	Superior frontal sulcus R	urpe	0.5825343333405053
+06	Superior frontal sulcus R	urpe	0.404256816949866
+07	Superior frontal sulcus R	urpe	0.17471783033408622
+09	Superior frontal sulcus R	urpe	0.2751175600711882
+10	Superior frontal sulcus R	urpe	0.14083172932608437
+11	Superior frontal sulcus R	urpe	0.06531153213757514
+12	Superior frontal sulcus R	urpe	-0.029688789116668352
+14	Superior frontal sulcus R	urpe	0.1662009129965436
+15	Superior frontal sulcus R	urpe	0.08712920971847501
+17	Superior frontal sulcus R	urpe	-0.08819787122738768
+18	Superior frontal sulcus R	urpe	0.612910610588111
+19	Superior frontal sulcus R	urpe	0.049156935359457976
+20	Superior frontal sulcus R	urpe	0.1526059801299267
+21	Superior frontal sulcus R	urpe	-0.004511032912116818
+22	Superior frontal sulcus R	urpe	-0.3407779270356507
+23	Superior frontal sulcus R	urpe	0.4095293978435336
+24	Superior frontal sulcus R	urpe	0.12803071781106246
+25	Superior frontal sulcus R	urpe	0.15046948627373274
+26	Superior frontal sulcus R	urpe	0.023283912333702483
+27	Superior frontal sulcus R	urpe	-0.02344106943484303
+28	Superior frontal sulcus R	urpe	0.04721424477850265
+29	Superior frontal sulcus R	urpe	0.22233779735877426
+30	Superior frontal sulcus R	urpe	0.5918266558735311
+33	Superior frontal sulcus R	urpe	-0.015726061168176528
+34	Superior frontal sulcus R	urpe	0.2010743224879821
+35	Superior frontal sulcus R	urpe	-0.22630167686032088
+36	Superior frontal sulcus R	urpe	0.14878502771798663
+37	Superior frontal sulcus R	urpe	0.03038390104761987
+38	Superior frontal sulcus R	urpe	-0.13461222914438553
+39	Superior frontal sulcus R	urpe	0.55725866605222
+40	Superior frontal sulcus R	urpe	-0.07019964918824809
+41	Superior frontal sulcus R	urpe	0.2948270219712312
+42	Superior frontal sulcus R	urpe	0.20463857098166183
+43	Superior frontal sulcus R	urpe	0.38914238485216185
+45	Superior frontal sulcus R	urpe	1.3875290394284343
+46	Superior frontal sulcus R	urpe	0.8316382443006257
+47	Superior frontal sulcus R	urpe	0.5027572036052536
+48	Superior frontal sulcus R	urpe	0.057465602784641516
+49	Superior frontal sulcus R	urpe	0.47927877326844304
+50	Superior frontal sulcus R	urpe	0.34723568647275216
+51	Superior frontal sulcus R	urpe	0.39956159549160997
+52	Superior frontal sulcus R	urpe	0.644960654259638
+53	Superior frontal sulcus R	urpe	0.03612398213834878
+54	Superior frontal sulcus R	urpe	0.1223161306093582
+55	Superior frontal sulcus R	urpe	0.3166872203023038
+56	Superior frontal sulcus R	urpe	-0.5015351636946657
+57	Superior frontal sulcus R	urpe	0.19916322325864622
+58	Superior frontal sulcus R	urpe	0.31590323789731267
+59	Superior frontal sulcus R	urpe	0.7416599091170853
+60	Superior frontal sulcus R	urpe	0.11629837736992152
+61	Superior frontal sulcus R	urpe	0.20671315700036139
+62	Superior frontal sulcus R	urpe	0.13324642244136345
+63	Superior frontal sulcus R	urpe	-0.184351468889775
+64	Superior frontal sulcus R	urpe	0.15663526928866991
+01	Superior frontal sulcus R	surprise	-0.06489205955330439
+02	Superior frontal sulcus R	surprise	0.03857395251704565
+03	Superior frontal sulcus R	surprise	0.1385309283811784
+04	Superior frontal sulcus R	surprise	-0.24925232243960552
+05	Superior frontal sulcus R	surprise	-0.18554598678841847
+06	Superior frontal sulcus R	surprise	-0.05520494361559128
+07	Superior frontal sulcus R	surprise	-0.0717096967757715
+09	Superior frontal sulcus R	surprise	-0.06611540270112264
+10	Superior frontal sulcus R	surprise	-0.0331428611659061
+11	Superior frontal sulcus R	surprise	0.08421297148732071
+12	Superior frontal sulcus R	surprise	0.03860592034659597
+14	Superior frontal sulcus R	surprise	0.006647054098887753
+15	Superior frontal sulcus R	surprise	-0.07129969177074474
+17	Superior frontal sulcus R	surprise	0.10490133291384106
+18	Superior frontal sulcus R	surprise	-0.19661261560750826
+19	Superior frontal sulcus R	surprise	-0.025085035023254605
+20	Superior frontal sulcus R	surprise	0.14311528088278777
+21	Superior frontal sulcus R	surprise	0.01607260031035554
+22	Superior frontal sulcus R	surprise	-0.008840059513183495
+23	Superior frontal sulcus R	surprise	0.055863135033962494
+24	Superior frontal sulcus R	surprise	-0.006420793068881381
+25	Superior frontal sulcus R	surprise	-0.00946607653001405
+26	Superior frontal sulcus R	surprise	0.10287729955136442
+27	Superior frontal sulcus R	surprise	-0.17723725677133745
+28	Superior frontal sulcus R	surprise	-0.01331063081534359
+29	Superior frontal sulcus R	surprise	0.04700940561937706
+30	Superior frontal sulcus R	surprise	0.2459041478524681
+33	Superior frontal sulcus R	surprise	0.08625812245508876
+34	Superior frontal sulcus R	surprise	-0.0157686545231863
+35	Superior frontal sulcus R	surprise	0.16258006842934902
+36	Superior frontal sulcus R	surprise	0.3302315479315078
+37	Superior frontal sulcus R	surprise	-0.047811470106457366
+38	Superior frontal sulcus R	surprise	0.06827986878405133
+39	Superior frontal sulcus R	surprise	0.22722805248758265
+40	Superior frontal sulcus R	surprise	0.0024849978921657697
+41	Superior frontal sulcus R	surprise	0.16923809413556437
+42	Superior frontal sulcus R	surprise	-0.012884846328622626
+43	Superior frontal sulcus R	surprise	0.2949395661619101
+45	Superior frontal sulcus R	surprise	0.16186754124946465
+46	Superior frontal sulcus R	surprise	0.04379506253207259
+47	Superior frontal sulcus R	surprise	-0.029539123266839374
+48	Superior frontal sulcus R	surprise	0.13211911599567686
+49	Superior frontal sulcus R	surprise	0.27922807255660304
+50	Superior frontal sulcus R	surprise	0.18942590622330896
+51	Superior frontal sulcus R	surprise	0.09717249177406961
+52	Superior frontal sulcus R	surprise	-0.058491974189710444
+53	Superior frontal sulcus R	surprise	0.04306181848319318
+54	Superior frontal sulcus R	surprise	0.07961775928749952
+55	Superior frontal sulcus R	surprise	-0.12110989946225047
+56	Superior frontal sulcus R	surprise	-0.02290457826532523
+57	Superior frontal sulcus R	surprise	0.13712168964628443
+58	Superior frontal sulcus R	surprise	0.05221560817331392
+59	Superior frontal sulcus R	surprise	-0.2784380033907289
+60	Superior frontal sulcus R	surprise	0.03372165959644778
+61	Superior frontal sulcus R	surprise	0.2563019311459884
+62	Superior frontal sulcus R	surprise	-0.007540504036218866
+63	Superior frontal sulcus R	surprise	-0.032120126822984686
+64	Superior frontal sulcus R	surprise	0.0923566188474847
+01	Frontal middle gyrus R	rpe	-0.13295246496948773
+02	Frontal middle gyrus R	rpe	-0.08527679122273084
+03	Frontal middle gyrus R	rpe	-0.18317659245654996
+04	Frontal middle gyrus R	rpe	0.49918266262595107
+05	Frontal middle gyrus R	rpe	-0.30838720562068495
+06	Frontal middle gyrus R	rpe	-0.26585513004285144
+07	Frontal middle gyrus R	rpe	-0.3397097127420661
+09	Frontal middle gyrus R	rpe	-0.2860462035815136
+10	Frontal middle gyrus R	rpe	0.2628690302371979
+11	Frontal middle gyrus R	rpe	0.04655365754406089
+12	Frontal middle gyrus R	rpe	0.09152470503413067
+14	Frontal middle gyrus R	rpe	0.03947050279963351
+15	Frontal middle gyrus R	rpe	0.24378486723922319
+17	Frontal middle gyrus R	rpe	0.024869970229315006
+18	Frontal middle gyrus R	rpe	-0.5338124367518453
+19	Frontal middle gyrus R	rpe	-0.05834091813523528
+20	Frontal middle gyrus R	rpe	-0.11947671663544075
+21	Frontal middle gyrus R	rpe	0.09374171757830424
+22	Frontal middle gyrus R	rpe	0.13071063572199884
+23	Frontal middle gyrus R	rpe	0.2878569483933017
+24	Frontal middle gyrus R	rpe	-0.047118225840734336
+25	Frontal middle gyrus R	rpe	0.22739271371300868
+26	Frontal middle gyrus R	rpe	-0.5954180151649465
+27	Frontal middle gyrus R	rpe	0.0749572376889272
+28	Frontal middle gyrus R	rpe	-0.12772296618864556
+29	Frontal middle gyrus R	rpe	-0.044140815208702694
+30	Frontal middle gyrus R	rpe	-0.16771724113945183
+33	Frontal middle gyrus R	rpe	0.13395352116382614
+34	Frontal middle gyrus R	rpe	0.04490021663611594
+35	Frontal middle gyrus R	rpe	0.18263221935801735
+36	Frontal middle gyrus R	rpe	-0.05093380655565365
+37	Frontal middle gyrus R	rpe	0.5200786385520207
+38	Frontal middle gyrus R	rpe	-0.10560442619984185
+39	Frontal middle gyrus R	rpe	-0.22709433515679905
+40	Frontal middle gyrus R	rpe	-0.19243036046272188
+41	Frontal middle gyrus R	rpe	0.5319042607379241
+42	Frontal middle gyrus R	rpe	-0.045155483479501574
+43	Frontal middle gyrus R	rpe	-0.34688996790365617
+45	Frontal middle gyrus R	rpe	-0.1354293278968475
+46	Frontal middle gyrus R	rpe	-0.4109357897940231
+47	Frontal middle gyrus R	rpe	0.33237963383944014
+48	Frontal middle gyrus R	rpe	-0.06681765558144928
+49	Frontal middle gyrus R	rpe	-0.1941928420450509
+50	Frontal middle gyrus R	rpe	0.032370513576856545
+51	Frontal middle gyrus R	rpe	0.0708791564418531
+52	Frontal middle gyrus R	rpe	-0.12027065461688477
+53	Frontal middle gyrus R	rpe	0.22996759550062953
+54	Frontal middle gyrus R	rpe	-0.22609921791920745
+55	Frontal middle gyrus R	rpe	-0.06192396459899344
+56	Frontal middle gyrus R	rpe	0.908099369593258
+57	Frontal middle gyrus R	rpe	-0.1885121671178591
+58	Frontal middle gyrus R	rpe	0.021966942517713858
+59	Frontal middle gyrus R	rpe	0.2594111530315571
+60	Frontal middle gyrus R	rpe	0.060674282433886784
+61	Frontal middle gyrus R	rpe	-0.11354796656436748
+62	Frontal middle gyrus R	rpe	-0.008784020641327314
+63	Frontal middle gyrus R	rpe	-0.015366847879861988
+64	Frontal middle gyrus R	rpe	-0.42165764537823247
+01	Frontal middle gyrus R	urpe	0.5882435836535915
+02	Frontal middle gyrus R	urpe	0.21716103246655521
+03	Frontal middle gyrus R	urpe	0.5397845628693347
+04	Frontal middle gyrus R	urpe	-0.066460940067924
+05	Frontal middle gyrus R	urpe	0.3549332253847594
+06	Frontal middle gyrus R	urpe	0.24094239578355015
+07	Frontal middle gyrus R	urpe	0.13107508262912707
+09	Frontal middle gyrus R	urpe	0.3627957725497769
+10	Frontal middle gyrus R	urpe	0.03200478586514928
+11	Frontal middle gyrus R	urpe	-0.05096540430663374
+12	Frontal middle gyrus R	urpe	0.18265407994539865
+14	Frontal middle gyrus R	urpe	0.011114581671404087
+15	Frontal middle gyrus R	urpe	0.1804610366500386
+17	Frontal middle gyrus R	urpe	-0.10858714106074703
+18	Frontal middle gyrus R	urpe	0.29622493008441314
+19	Frontal middle gyrus R	urpe	-0.08366694223542705
+20	Frontal middle gyrus R	urpe	0.05512657152914156
+21	Frontal middle gyrus R	urpe	0.02559458446205643
+22	Frontal middle gyrus R	urpe	-0.07757643626326344
+23	Frontal middle gyrus R	urpe	0.5305013277633922
+24	Frontal middle gyrus R	urpe	0.21878831849917477
+25	Frontal middle gyrus R	urpe	0.199390849837388
+26	Frontal middle gyrus R	urpe	0.05924464705836497
+27	Frontal middle gyrus R	urpe	0.11660067004098476
+28	Frontal middle gyrus R	urpe	0.026692842059552406
+29	Frontal middle gyrus R	urpe	0.15318342237769972
+30	Frontal middle gyrus R	urpe	0.3124981466350769
+33	Frontal middle gyrus R	urpe	0.07080642232170886
+34	Frontal middle gyrus R	urpe	0.14390085567903566
+35	Frontal middle gyrus R	urpe	0.09113022084641234
+36	Frontal middle gyrus R	urpe	-0.02637071588615645
+37	Frontal middle gyrus R	urpe	0.2889217880488498
+38	Frontal middle gyrus R	urpe	-0.08605576637700589
+39	Frontal middle gyrus R	urpe	0.4363413036353593
+40	Frontal middle gyrus R	urpe	0.22156598172920544
+41	Frontal middle gyrus R	urpe	0.2548607571516186
+42	Frontal middle gyrus R	urpe	-0.05948180140855018
+43	Frontal middle gyrus R	urpe	0.6099415686069511
+45	Frontal middle gyrus R	urpe	0.5786138633119426
+46	Frontal middle gyrus R	urpe	0.5644075263238432
+47	Frontal middle gyrus R	urpe	0.17434428085199022
+48	Frontal middle gyrus R	urpe	0.19294912236060682
+49	Frontal middle gyrus R	urpe	0.2936550374069493
+50	Frontal middle gyrus R	urpe	0.5575408332497175
+51	Frontal middle gyrus R	urpe	0.06548778546284738
+52	Frontal middle gyrus R	urpe	0.29664323363438483
+53	Frontal middle gyrus R	urpe	0.024689419280075814
+54	Frontal middle gyrus R	urpe	0.0990494678766782
+55	Frontal middle gyrus R	urpe	0.26597635125499364
+56	Frontal middle gyrus R	urpe	-0.35465260778414454
+57	Frontal middle gyrus R	urpe	0.2819357386049558
+58	Frontal middle gyrus R	urpe	0.2949907975418009
+59	Frontal middle gyrus R	urpe	0.5598476143025859
+60	Frontal middle gyrus R	urpe	-0.020694046481109157
+61	Frontal middle gyrus R	urpe	0.22026657450056863
+62	Frontal middle gyrus R	urpe	0.14066705822795225
+63	Frontal middle gyrus R	urpe	0.035122806384176836
+64	Frontal middle gyrus R	urpe	0.24037734776087688
+01	Frontal middle gyrus R	surprise	-0.031228881030697302
+02	Frontal middle gyrus R	surprise	0.0643594474430878
+03	Frontal middle gyrus R	surprise	0.1006325100499066
+04	Frontal middle gyrus R	surprise	-0.23964304861971947
+05	Frontal middle gyrus R	surprise	0.12490845758505266
+06	Frontal middle gyrus R	surprise	0.02144271413947815
+07	Frontal middle gyrus R	surprise	-0.007552409254923815
+09	Frontal middle gyrus R	surprise	-0.012331970265422999
+10	Frontal middle gyrus R	surprise	-0.08313794911648403
+11	Frontal middle gyrus R	surprise	0.08939563113404071
+12	Frontal middle gyrus R	surprise	0.06710820585327941
+14	Frontal middle gyrus R	surprise	0.03996116283150779
+15	Frontal middle gyrus R	surprise	-0.1740294467166477
+17	Frontal middle gyrus R	surprise	0.1284856552974959
+18	Frontal middle gyrus R	surprise	-0.19068766028187642
+19	Frontal middle gyrus R	surprise	-0.1470587562520321
+20	Frontal middle gyrus R	surprise	0.10462455213707908
+21	Frontal middle gyrus R	surprise	-0.0025063281820163013
+22	Frontal middle gyrus R	surprise	-0.10683054281545319
+23	Frontal middle gyrus R	surprise	0.10059032184585166
+24	Frontal middle gyrus R	surprise	0.09831221173352409
+25	Frontal middle gyrus R	surprise	0.019480168355141186
+26	Frontal middle gyrus R	surprise	0.17117234144842675
+27	Frontal middle gyrus R	surprise	0.015596886123273902
+28	Frontal middle gyrus R	surprise	-0.08728734118768608
+29	Frontal middle gyrus R	surprise	-0.03016373284544253
+30	Frontal middle gyrus R	surprise	0.24188084286311276
+33	Frontal middle gyrus R	surprise	-0.0018850109736090453
+34	Frontal middle gyrus R	surprise	0.08124202782667231
+35	Frontal middle gyrus R	surprise	0.09848331534009248
+36	Frontal middle gyrus R	surprise	0.06192166878526488
+37	Frontal middle gyrus R	surprise	-0.15819234041658442
+38	Frontal middle gyrus R	surprise	0.02944715801575111
+39	Frontal middle gyrus R	surprise	0.15662281778384382
+40	Frontal middle gyrus R	surprise	-0.029013119210174222
+41	Frontal middle gyrus R	surprise	0.16026803831511185
+42	Frontal middle gyrus R	surprise	-0.02007950497511591
+43	Frontal middle gyrus R	surprise	0.39402343329100864
+45	Frontal middle gyrus R	surprise	-0.12013266183787455
+46	Frontal middle gyrus R	surprise	-0.0006281892094379804
+47	Frontal middle gyrus R	surprise	-0.12678359393727065
+48	Frontal middle gyrus R	surprise	0.0397267541618959
+49	Frontal middle gyrus R	surprise	0.15375727015239457
+50	Frontal middle gyrus R	surprise	0.05491669416403779
+51	Frontal middle gyrus R	surprise	-0.08955314175196462
+52	Frontal middle gyrus R	surprise	-0.056979483087784534
+53	Frontal middle gyrus R	surprise	0.003421550947534815
+54	Frontal middle gyrus R	surprise	-0.05277916072046487
+55	Frontal middle gyrus R	surprise	-0.16674984321199857
+56	Frontal middle gyrus R	surprise	-0.15998108505374958
+57	Frontal middle gyrus R	surprise	-0.0012021951265559774
+58	Frontal middle gyrus R	surprise	0.04201397871668267
+59	Frontal middle gyrus R	surprise	-0.13922917309737814
+60	Frontal middle gyrus R	surprise	0.025473116320469894
+61	Frontal middle gyrus R	surprise	0.2376834200401827
+62	Frontal middle gyrus R	surprise	0.04119397025426124
+63	Frontal middle gyrus R	surprise	-0.07568280452779425
+64	Frontal middle gyrus R	surprise	-0.10856897063923662
+01	Insula R	rpe	-0.40443321396247484
+02	Insula R	rpe	-0.44922099718707614
+03	Insula R	rpe	-0.4645710416592192
+04	Insula R	rpe	-0.038597042521869296
+05	Insula R	rpe	-0.7967057090252638
+06	Insula R	rpe	-0.3082517802120128
+07	Insula R	rpe	-0.15084488698863424
+09	Insula R	rpe	-0.1559880126758435
+10	Insula R	rpe	0.23774149815086276
+11	Insula R	rpe	-0.00022286770006758162
+12	Insula R	rpe	0.059770626227837055
+14	Insula R	rpe	-0.3921410818194272
+15	Insula R	rpe	0.19122151640243829
+17	Insula R	rpe	-0.3940958838444203
+18	Insula R	rpe	-0.5311448033992201
+19	Insula R	rpe	-0.3088924832383054
+20	Insula R	rpe	-0.3981916820304468
+21	Insula R	rpe	-0.1988747313206841
+22	Insula R	rpe	0.2534496691607637
+23	Insula R	rpe	-0.040598793495155404
+24	Insula R	rpe	-0.03555694987411698
+25	Insula R	rpe	-0.16153973202803174
+26	Insula R	rpe	-0.21615123281721027
+27	Insula R	rpe	0.028704188580304615
+28	Insula R	rpe	-0.25301075241935905
+29	Insula R	rpe	-0.09348379482486052
+30	Insula R	rpe	-0.6112766780913808
+33	Insula R	rpe	-0.08193808862997684
+34	Insula R	rpe	-0.07239619348256383
+35	Insula R	rpe	0.16314819295716007
+36	Insula R	rpe	-0.2704234204720706
+37	Insula R	rpe	-0.018177680068765766
+38	Insula R	rpe	-0.4097375201340765
+39	Insula R	rpe	-0.6001177198410733
+40	Insula R	rpe	-0.4981071215425618
+41	Insula R	rpe	0.17460018868147018
+42	Insula R	rpe	-0.4309372903383337
+43	Insula R	rpe	-0.08846490242578511
+45	Insula R	rpe	-0.6869402922026348
+46	Insula R	rpe	-0.650938193500042
+47	Insula R	rpe	0.21692585609773232
+48	Insula R	rpe	-0.38010156368254683
+49	Insula R	rpe	-0.4802959200670011
+50	Insula R	rpe	-0.0594069011999818
+51	Insula R	rpe	-0.1959786630020244
+52	Insula R	rpe	-0.3347647914203117
+53	Insula R	rpe	0.05537773631964228
+54	Insula R	rpe	-0.24766004712204448
+55	Insula R	rpe	-0.3136166832537856
+56	Insula R	rpe	0.4470103274972644
+57	Insula R	rpe	-0.4951506438909564
+58	Insula R	rpe	-0.15218844422488473
+59	Insula R	rpe	-0.34855966475792227
+60	Insula R	rpe	0.11786412631510756
+61	Insula R	rpe	-0.25649536690649255
+62	Insula R	rpe	0.11711544881836744
+63	Insula R	rpe	-0.4366084731882438
+64	Insula R	rpe	-0.504295966620557
+01	Insula R	urpe	0.2634531959932065
+02	Insula R	urpe	0.7320565773139243
+03	Insula R	urpe	0.8736222259700298
+04	Insula R	urpe	-0.03143444944522344
+05	Insula R	urpe	0.13126847859704868
+06	Insula R	urpe	0.05897646706318483
+07	Insula R	urpe	-0.04418849557827343
+09	Insula R	urpe	0.2130755412497092
+10	Insula R	urpe	-0.07902044669317547
+11	Insula R	urpe	0.2264501811057562
+12	Insula R	urpe	0.08945105422579218
+14	Insula R	urpe	0.21397465580143035
+15	Insula R	urpe	-0.0029910635692067446
+17	Insula R	urpe	0.19800915221276227
+18	Insula R	urpe	0.07779326136515011
+19	Insula R	urpe	0.07139569615268555
+20	Insula R	urpe	0.023143063904717563
+21	Insula R	urpe	-0.10132928452338091
+22	Insula R	urpe	-0.10823149688781995
+23	Insula R	urpe	0.08292738205753267
+24	Insula R	urpe	0.23831796364305774
+25	Insula R	urpe	0.3738913491833955
+26	Insula R	urpe	0.0806705873052124
+27	Insula R	urpe	-0.05041492447839119
+28	Insula R	urpe	0.03957269453141635
+29	Insula R	urpe	0.21864216986694374
+30	Insula R	urpe	0.5826969964429736
+33	Insula R	urpe	0.054945521227418796
+34	Insula R	urpe	0.07270700314256828
+35	Insula R	urpe	-0.14146816035034135
+36	Insula R	urpe	0.18267338216421194
+37	Insula R	urpe	0.08696186118559127
+38	Insula R	urpe	-0.15317080762586557
+39	Insula R	urpe	0.5458059115381911
+40	Insula R	urpe	0.17745791836641728
+41	Insula R	urpe	0.34291709723416713
+42	Insula R	urpe	0.44742834409698845
+43	Insula R	urpe	0.16239122707745993
+45	Insula R	urpe	0.4259677444258705
+46	Insula R	urpe	0.5811516738682986
+47	Insula R	urpe	0.005191625487641432
+48	Insula R	urpe	0.5826181519031525
+49	Insula R	urpe	-0.08346155468145298
+50	Insula R	urpe	0.25214830950601025
+51	Insula R	urpe	0.13406787765328773
+52	Insula R	urpe	0.3371266636752989
+53	Insula R	urpe	0.1524987451087509
+54	Insula R	urpe	0.17947782228817233
+55	Insula R	urpe	0.2839367386055528
+56	Insula R	urpe	-0.22924412823980675
+57	Insula R	urpe	0.444209095411934
+58	Insula R	urpe	0.38560748722869903
+59	Insula R	urpe	0.7962851059809327
+60	Insula R	urpe	-0.18497758986544796
+61	Insula R	urpe	0.23933859639568256
+62	Insula R	urpe	0.04908247443687287
+63	Insula R	urpe	-0.10522248435765505
+64	Insula R	urpe	0.37735161480261015
+01	Insula R	surprise	-0.17002708760323004
+02	Insula R	surprise	0.05682279182627099
+03	Insula R	surprise	0.18642151317550087
+04	Insula R	surprise	0.06812195655794767
+05	Insula R	surprise	0.0494767042096646
+06	Insula R	surprise	-0.05468997780611971
+07	Insula R	surprise	-0.12153059320233296
+09	Insula R	surprise	-0.042001882125332485
+10	Insula R	surprise	-0.04595779860072071
+11	Insula R	surprise	0.11240801401465433
+12	Insula R	surprise	-0.005601681395201012
+14	Insula R	surprise	-0.00029936935716250445
+15	Insula R	surprise	-0.015019718904113688
+17	Insula R	surprise	0.08925501684367192
+18	Insula R	surprise	-0.14850267486515803
+19	Insula R	surprise	-0.04214288386880071
+20	Insula R	surprise	0.04065833989501698
+21	Insula R	surprise	0.02586941006768029
+22	Insula R	surprise	0.16237986142281444
+23	Insula R	surprise	0.02820195614302065
+24	Insula R	surprise	0.025855342098220716
+25	Insula R	surprise	-0.036879792467989315
+26	Insula R	surprise	0.2860545875295065
+27	Insula R	surprise	-0.019918244893488007
+28	Insula R	surprise	0.07644597386359236
+29	Insula R	surprise	0.020467587158927925
+30	Insula R	surprise	0.017719215360702947
+33	Insula R	surprise	0.12282647583284416
+34	Insula R	surprise	-0.008590223803985282
+35	Insula R	surprise	0.09761642057099379
+36	Insula R	surprise	0.13373392130830325
+37	Insula R	surprise	0.009350631139241158
+38	Insula R	surprise	-0.004955096900230274
+39	Insula R	surprise	0.020367783178808167
+40	Insula R	surprise	0.00511561875930056
+41	Insula R	surprise	0.1889504203130491
+42	Insula R	surprise	-0.02674252321186941
+43	Insula R	surprise	0.1369698620948475
+45	Insula R	surprise	0.017447211750259158
+46	Insula R	surprise	0.07556519479607232
+47	Insula R	surprise	-0.01770057654939592
+48	Insula R	surprise	-0.03195882302708924
+49	Insula R	surprise	0.004773280412919121
+50	Insula R	surprise	-0.029632744074915535
+51	Insula R	surprise	-0.03991056088532787
+52	Insula R	surprise	-0.08916868427797453
+53	Insula R	surprise	0.062241512770706324
+54	Insula R	surprise	-0.019935370807688743
+55	Insula R	surprise	-0.19268116558348994
+56	Insula R	surprise	-0.03772469495655969
+57	Insula R	surprise	-0.09572196868568426
+58	Insula R	surprise	-0.020411010778334456
+59	Insula R	surprise	-0.32648844783194364
+60	Insula R	surprise	-0.06965444697958446
+61	Insula R	surprise	-0.0797880353097571
+62	Insula R	surprise	0.0212894204937038
+63	Insula R	surprise	0.037962843886343765
+64	Insula R	surprise	-0.055410079062348815
+01	Inferior Parietal Lobule L	rpe	0.14678734268786178
+02	Inferior Parietal Lobule L	rpe	0.30245893634467697
+03	Inferior Parietal Lobule L	rpe	0.497999225763811
+04	Inferior Parietal Lobule L	rpe	0.08350509854757951
+05	Inferior Parietal Lobule L	rpe	0.14273606941957648
+06	Inferior Parietal Lobule L	rpe	0.11646909285207382
+07	Inferior Parietal Lobule L	rpe	-0.23487660672075839
+09	Inferior Parietal Lobule L	rpe	0.19444781597703695
+10	Inferior Parietal Lobule L	rpe	0.2563758564128269
+11	Inferior Parietal Lobule L	rpe	0.3798500005505048
+12	Inferior Parietal Lobule L	rpe	0.07972418639272089
+14	Inferior Parietal Lobule L	rpe	0.1695116486814287
+15	Inferior Parietal Lobule L	rpe	0.14753442749432805
+17	Inferior Parietal Lobule L	rpe	0.0791987509395565
+18	Inferior Parietal Lobule L	rpe	0.21753004868385487
+19	Inferior Parietal Lobule L	rpe	0.1693767616059631
+20	Inferior Parietal Lobule L	rpe	-0.19848298196577363
+21	Inferior Parietal Lobule L	rpe	0.2930662951742609
+22	Inferior Parietal Lobule L	rpe	0.0783540483758164
+23	Inferior Parietal Lobule L	rpe	-0.11013563433468031
+24	Inferior Parietal Lobule L	rpe	0.2536950633343723
+25	Inferior Parietal Lobule L	rpe	0.21170890721388988
+26	Inferior Parietal Lobule L	rpe	-0.2583632686692807
+27	Inferior Parietal Lobule L	rpe	0.2381313335047
+28	Inferior Parietal Lobule L	rpe	-0.09790392259084102
+29	Inferior Parietal Lobule L	rpe	0.01790699222215658
+30	Inferior Parietal Lobule L	rpe	0.13103609855235038
+33	Inferior Parietal Lobule L	rpe	-0.0408830402060428
+34	Inferior Parietal Lobule L	rpe	-0.0840394357064118
+35	Inferior Parietal Lobule L	rpe	0.018732178651003375
+36	Inferior Parietal Lobule L	rpe	0.17010654834254335
+37	Inferior Parietal Lobule L	rpe	-0.19578064014462548
+38	Inferior Parietal Lobule L	rpe	-0.058818904341508944
+39	Inferior Parietal Lobule L	rpe	0.02644183335809834
+40	Inferior Parietal Lobule L	rpe	0.08247958702332754
+41	Inferior Parietal Lobule L	rpe	0.5342222383452786
+42	Inferior Parietal Lobule L	rpe	0.06686702289120552
+43	Inferior Parietal Lobule L	rpe	0.28107580937859084
+45	Inferior Parietal Lobule L	rpe	0.009706161442833643
+46	Inferior Parietal Lobule L	rpe	-0.09133887022358572
+47	Inferior Parietal Lobule L	rpe	0.3041412618942559
+48	Inferior Parietal Lobule L	rpe	0.192639750278128
+49	Inferior Parietal Lobule L	rpe	0.05613176233083424
+50	Inferior Parietal Lobule L	rpe	-0.19457001000797997
+51	Inferior Parietal Lobule L	rpe	0.5204508783399231
+52	Inferior Parietal Lobule L	rpe	0.2010853013023734
+53	Inferior Parietal Lobule L	rpe	0.04262375908761492
+54	Inferior Parietal Lobule L	rpe	0.14203970119868042
+55	Inferior Parietal Lobule L	rpe	0.40036469522035784
+56	Inferior Parietal Lobule L	rpe	-0.24893327390309422
+57	Inferior Parietal Lobule L	rpe	-0.2133576742425147
+58	Inferior Parietal Lobule L	rpe	0.4040562090774377
+59	Inferior Parietal Lobule L	rpe	0.025018607756161753
+60	Inferior Parietal Lobule L	rpe	-0.009968999090294044
+61	Inferior Parietal Lobule L	rpe	0.020892487692375047
+62	Inferior Parietal Lobule L	rpe	-0.2533537391987112
+63	Inferior Parietal Lobule L	rpe	-0.44254923090338705
+64	Inferior Parietal Lobule L	rpe	0.308499669842422
+01	Inferior Parietal Lobule L	urpe	-0.3154532935987744
+02	Inferior Parietal Lobule L	urpe	-0.1600390914025613
+03	Inferior Parietal Lobule L	urpe	0.043408771628552736
+04	Inferior Parietal Lobule L	urpe	-0.6297505974769593
+05	Inferior Parietal Lobule L	urpe	-0.1279341047791402
+06	Inferior Parietal Lobule L	urpe	-0.14145104111392154
+07	Inferior Parietal Lobule L	urpe	-0.04015929248287446
+09	Inferior Parietal Lobule L	urpe	-0.17258234496289837
+10	Inferior Parietal Lobule L	urpe	-0.02660408565489989
+11	Inferior Parietal Lobule L	urpe	0.06885332900823818
+12	Inferior Parietal Lobule L	urpe	-0.09231633687805799
+14	Inferior Parietal Lobule L	urpe	-0.39458786456121336
+15	Inferior Parietal Lobule L	urpe	0.07810341413973623
+17	Inferior Parietal Lobule L	urpe	-0.13029890187446855
+18	Inferior Parietal Lobule L	urpe	-0.14802876344506835
+19	Inferior Parietal Lobule L	urpe	-0.2313921514237235
+20	Inferior Parietal Lobule L	urpe	-0.16482560351077052
+21	Inferior Parietal Lobule L	urpe	-0.1154519741423428
+22	Inferior Parietal Lobule L	urpe	-0.06936692761567732
+23	Inferior Parietal Lobule L	urpe	-0.02619577988387189
+24	Inferior Parietal Lobule L	urpe	-0.1987543982764085
+25	Inferior Parietal Lobule L	urpe	-0.02717835584965845
+26	Inferior Parietal Lobule L	urpe	-0.10142618081766462
+27	Inferior Parietal Lobule L	urpe	-0.10862568804231058
+28	Inferior Parietal Lobule L	urpe	0.07227046497994
+29	Inferior Parietal Lobule L	urpe	-0.0019459616601832548
+30	Inferior Parietal Lobule L	urpe	-0.1360300584094754
+33	Inferior Parietal Lobule L	urpe	-0.1551134604546759
+34	Inferior Parietal Lobule L	urpe	0.05493373766787247
+35	Inferior Parietal Lobule L	urpe	-0.09316902428917173
+36	Inferior Parietal Lobule L	urpe	-0.10451702932154552
+37	Inferior Parietal Lobule L	urpe	0.06782735007679246
+38	Inferior Parietal Lobule L	urpe	-0.06392373518909962
+39	Inferior Parietal Lobule L	urpe	-0.10974924822286185
+40	Inferior Parietal Lobule L	urpe	-0.2881956041687065
+41	Inferior Parietal Lobule L	urpe	-0.20345045693425667
+42	Inferior Parietal Lobule L	urpe	-0.028725429562230904
+43	Inferior Parietal Lobule L	urpe	-0.2223051712382585
+45	Inferior Parietal Lobule L	urpe	-0.15194859840460898
+46	Inferior Parietal Lobule L	urpe	0.06503560849750001
+47	Inferior Parietal Lobule L	urpe	-0.2861672798689041
+48	Inferior Parietal Lobule L	urpe	-0.1612654053994144
+49	Inferior Parietal Lobule L	urpe	-0.447824079874489
+50	Inferior Parietal Lobule L	urpe	0.13490524562593137
+51	Inferior Parietal Lobule L	urpe	-0.5925660736548404
+52	Inferior Parietal Lobule L	urpe	-0.05804539523928219
+53	Inferior Parietal Lobule L	urpe	-0.1286688891737463
+54	Inferior Parietal Lobule L	urpe	-0.14916084943656138
+55	Inferior Parietal Lobule L	urpe	-0.3172899396469196
+56	Inferior Parietal Lobule L	urpe	0.10403312672343519
+57	Inferior Parietal Lobule L	urpe	0.11346516685928994
+58	Inferior Parietal Lobule L	urpe	-0.2539076476978759
+59	Inferior Parietal Lobule L	urpe	0.1266115528469931
+60	Inferior Parietal Lobule L	urpe	-0.08430633254497985
+61	Inferior Parietal Lobule L	urpe	-0.04113440372877651
+62	Inferior Parietal Lobule L	urpe	-0.006655758323096153
+63	Inferior Parietal Lobule L	urpe	-0.41986198027928673
+64	Inferior Parietal Lobule L	urpe	-0.039227955653849574
+01	Inferior Parietal Lobule L	surprise	-0.13317538996537526
+02	Inferior Parietal Lobule L	surprise	-0.008009692628871159
+03	Inferior Parietal Lobule L	surprise	0.044159614887192014
+04	Inferior Parietal Lobule L	surprise	0.04146414711657498
+05	Inferior Parietal Lobule L	surprise	-0.05130916407894499
+06	Inferior Parietal Lobule L	surprise	-0.007804790080263047
+07	Inferior Parietal Lobule L	surprise	-0.035245667131109965
+09	Inferior Parietal Lobule L	surprise	-0.04005811188091886
+10	Inferior Parietal Lobule L	surprise	0.036054825687703365
+11	Inferior Parietal Lobule L	surprise	-0.024114376235391116
+12	Inferior Parietal Lobule L	surprise	-0.015226669335970656
+14	Inferior Parietal Lobule L	surprise	-0.07339236891518036
+15	Inferior Parietal Lobule L	surprise	-0.05803373358147736
+17	Inferior Parietal Lobule L	surprise	-0.04167958288970921
+18	Inferior Parietal Lobule L	surprise	-0.03646769023164072
+19	Inferior Parietal Lobule L	surprise	-0.13852517106958354
+20	Inferior Parietal Lobule L	surprise	-0.02665100483896418
+21	Inferior Parietal Lobule L	surprise	0.019965242135933498
+22	Inferior Parietal Lobule L	surprise	0.20946810237235494
+23	Inferior Parietal Lobule L	surprise	0.020489509289553905
+24	Inferior Parietal Lobule L	surprise	-0.025583948901071886
+25	Inferior Parietal Lobule L	surprise	-0.03411506569763231
+26	Inferior Parietal Lobule L	surprise	0.13419439934271699
+27	Inferior Parietal Lobule L	surprise	0.026903644528162355
+28	Inferior Parietal Lobule L	surprise	0.016776234829901822
+29	Inferior Parietal Lobule L	surprise	-0.0707479003816843
+30	Inferior Parietal Lobule L	surprise	-0.038110325103237606
+33	Inferior Parietal Lobule L	surprise	0.02946888756705448
+34	Inferior Parietal Lobule L	surprise	0.03671350392978638
+35	Inferior Parietal Lobule L	surprise	0.21528087026543088
+36	Inferior Parietal Lobule L	surprise	-0.03926570881158113
+37	Inferior Parietal Lobule L	surprise	-0.025195615561278827
+38	Inferior Parietal Lobule L	surprise	0.0189445527891318
+39	Inferior Parietal Lobule L	surprise	-0.006657238465009464
+40	Inferior Parietal Lobule L	surprise	0.044098570444879845
+41	Inferior Parietal Lobule L	surprise	0.044344858926746784
+42	Inferior Parietal Lobule L	surprise	-0.002463130984041426
+43	Inferior Parietal Lobule L	surprise	0.0010478015643052964
+45	Inferior Parietal Lobule L	surprise	-0.07617670580511912
+46	Inferior Parietal Lobule L	surprise	-0.09159431874286383
+47	Inferior Parietal Lobule L	surprise	0.07318462908733636
+48	Inferior Parietal Lobule L	surprise	0.0054707226841451805
+49	Inferior Parietal Lobule L	surprise	0.14177460285524526
+50	Inferior Parietal Lobule L	surprise	-0.055130580336683326
+51	Inferior Parietal Lobule L	surprise	-0.049803923880164
+52	Inferior Parietal Lobule L	surprise	-0.049956855829805136
+53	Inferior Parietal Lobule L	surprise	0.030256955473709643
+54	Inferior Parietal Lobule L	surprise	-0.06388934308067999
+55	Inferior Parietal Lobule L	surprise	-0.22730152739418877
+56	Inferior Parietal Lobule L	surprise	-0.09688878572649426
+57	Inferior Parietal Lobule L	surprise	-0.0025911468008416707
+58	Inferior Parietal Lobule L	surprise	-0.0707765768489076
+59	Inferior Parietal Lobule L	surprise	-0.15442661817457218
+60	Inferior Parietal Lobule L	surprise	-0.15107279109070076
+61	Inferior Parietal Lobule L	surprise	-0.11277577279963427
+62	Inferior Parietal Lobule L	surprise	0.06263601188418559
+63	Inferior Parietal Lobule L	surprise	0.140787980829676
+64	Inferior Parietal Lobule L	surprise	0.18556562049003938
+01	Precuneus L	rpe	0.13099264786041415
+02	Precuneus L	rpe	0.23498772021622033
+03	Precuneus L	rpe	0.9741814488974901
+04	Precuneus L	rpe	-0.3280955755438369
+05	Precuneus L	rpe	0.16336602644206813
+06	Precuneus L	rpe	-0.07891825336936073
+07	Precuneus L	rpe	-0.2639447419429556
+09	Precuneus L	rpe	0.01980493190841606
+10	Precuneus L	rpe	1.3003961621568754
+11	Precuneus L	rpe	0.641853463764374
+12	Precuneus L	rpe	0.16421156409733856
+14	Precuneus L	rpe	0.332641535366957
+15	Precuneus L	rpe	-0.016000992009559505
+17	Precuneus L	rpe	-0.03915784042328596
+18	Precuneus L	rpe	-0.2699352083190416
+19	Precuneus L	rpe	0.22080446872860193
+20	Precuneus L	rpe	-0.13822709281857198
+21	Precuneus L	rpe	0.21935887769975054
+22	Precuneus L	rpe	0.322548887746122
+23	Precuneus L	rpe	-0.02648079347384807
+24	Precuneus L	rpe	0.7473327758220526
+25	Precuneus L	rpe	0.8788338945462153
+26	Precuneus L	rpe	0.18340283969882876
+27	Precuneus L	rpe	0.21486301243735048
+28	Precuneus L	rpe	0.5039635191922291
+29	Precuneus L	rpe	0.0972372930846177
+30	Precuneus L	rpe	0.3859827869141904
+33	Precuneus L	rpe	-0.178416896392054
+34	Precuneus L	rpe	0.15042319785481176
+35	Precuneus L	rpe	0.8889847986686689
+36	Precuneus L	rpe	-0.2653942139720759
+37	Precuneus L	rpe	0.5973524381048404
+38	Precuneus L	rpe	-0.024012508626373556
+39	Precuneus L	rpe	0.11316120055674289
+40	Precuneus L	rpe	-0.6762563683665715
+41	Precuneus L	rpe	0.9471411086045779
+42	Precuneus L	rpe	-0.3408789840311958
+43	Precuneus L	rpe	-0.004532806020086775
+45	Precuneus L	rpe	0.17331187692112648
+46	Precuneus L	rpe	-0.024581399459678393
+47	Precuneus L	rpe	0.7971496880054474
+48	Precuneus L	rpe	0.35685831704302895
+49	Precuneus L	rpe	0.420267291367054
+50	Precuneus L	rpe	0.24918024539231107
+51	Precuneus L	rpe	0.6043941478889722
+52	Precuneus L	rpe	0.4085057395008894
+53	Precuneus L	rpe	-0.14753209835348222
+54	Precuneus L	rpe	0.13185451100938594
+55	Precuneus L	rpe	0.5911036119438134
+56	Precuneus L	rpe	0.6083439032618816
+57	Precuneus L	rpe	0.23073927860689133
+58	Precuneus L	rpe	0.31317893765830934
+59	Precuneus L	rpe	0.11980119016404317
+60	Precuneus L	rpe	0.046448885498998255
+61	Precuneus L	rpe	0.09393138905020001
+62	Precuneus L	rpe	0.3590868426343569
+63	Precuneus L	rpe	-0.48836200827589404
+64	Precuneus L	rpe	0.11988316904395245
+01	Precuneus L	urpe	0.32553050749433726
+02	Precuneus L	urpe	0.09234541649213777
+03	Precuneus L	urpe	-0.1545970520685212
+04	Precuneus L	urpe	-0.19322818589325136
+05	Precuneus L	urpe	0.4061103896954312
+06	Precuneus L	urpe	-0.1307711453947167
+07	Precuneus L	urpe	-0.39112050071931803
+09	Precuneus L	urpe	-0.13723035338625778
+10	Precuneus L	urpe	-0.2327732701624672
+11	Precuneus L	urpe	-0.36600451773175824
+12	Precuneus L	urpe	0.015575175963301892
+14	Precuneus L	urpe	0.20999568614822167
+15	Precuneus L	urpe	-0.20926280993108565
+17	Precuneus L	urpe	-0.43419713928149295
+18	Precuneus L	urpe	0.3571517307024736
+19	Precuneus L	urpe	0.09066630384068748
+20	Precuneus L	urpe	-0.7139007913378569
+21	Precuneus L	urpe	0.2696239607981764
+22	Precuneus L	urpe	-0.14232914774821928
+23	Precuneus L	urpe	0.35347358911083293
+24	Precuneus L	urpe	-0.6451657042623713
+25	Precuneus L	urpe	-0.49083516059013516
+26	Precuneus L	urpe	-0.02744693516769285
+27	Precuneus L	urpe	-0.056922182415012054
+28	Precuneus L	urpe	-0.14389051826527485
+29	Precuneus L	urpe	0.2799848628660234
+30	Precuneus L	urpe	-0.04075316570770855
+33	Precuneus L	urpe	-0.04288056632727743
+34	Precuneus L	urpe	0.18551872647367418
+35	Precuneus L	urpe	-0.4871543049812317
+36	Precuneus L	urpe	-0.14768562786496028
+37	Precuneus L	urpe	-0.11972546817448276
+38	Precuneus L	urpe	-0.3008755173247594
+39	Precuneus L	urpe	-0.005167930100399714
+40	Precuneus L	urpe	0.35194608664516214
+41	Precuneus L	urpe	-0.157632405417434
+42	Precuneus L	urpe	0.18550463910931006
+43	Precuneus L	urpe	-0.32045107854243654
+45	Precuneus L	urpe	0.4160180441282976
+46	Precuneus L	urpe	-0.16698228984586633
+47	Precuneus L	urpe	0.36061191401229453
+48	Precuneus L	urpe	-0.28949394456755656
+49	Precuneus L	urpe	-0.48421322346593326
+50	Precuneus L	urpe	-0.8287205775626577
+51	Precuneus L	urpe	-0.2212833271612628
+52	Precuneus L	urpe	-0.17157939818795198
+53	Precuneus L	urpe	-0.2131625479982736
+54	Precuneus L	urpe	-0.5804289920757023
+55	Precuneus L	urpe	-0.27717423546486175
+56	Precuneus L	urpe	-0.33829928733981574
+57	Precuneus L	urpe	-0.19495769914311284
+58	Precuneus L	urpe	0.24094328666643167
+59	Precuneus L	urpe	0.6136012620364244
+60	Precuneus L	urpe	0.15488739231099877
+61	Precuneus L	urpe	-0.012685753658073597
+62	Precuneus L	urpe	0.04544331406493886
+63	Precuneus L	urpe	-0.10499542056976889
+64	Precuneus L	urpe	0.14092251314230872
+01	Precuneus L	surprise	0.007741807431627352
+02	Precuneus L	surprise	0.1789465355406999
+03	Precuneus L	surprise	0.26037932545519793
+04	Precuneus L	surprise	0.08341326345040355
+05	Precuneus L	surprise	0.21129925849023634
+06	Precuneus L	surprise	0.3192174441825885
+07	Precuneus L	surprise	0.0627682857045259
+09	Precuneus L	surprise	0.2085913374590186
+10	Precuneus L	surprise	0.24097378920907012
+11	Precuneus L	surprise	0.1319680232918472
+12	Precuneus L	surprise	-0.08333063129192361
+14	Precuneus L	surprise	0.2476423358401427
+15	Precuneus L	surprise	-0.07987493851508659
+17	Precuneus L	surprise	0.016030081101724554
+18	Precuneus L	surprise	-0.015657961467066064
+19	Precuneus L	surprise	-0.08579036101694398
+20	Precuneus L	surprise	0.02513332670339598
+21	Precuneus L	surprise	0.11263208644679533
+22	Precuneus L	surprise	0.17014146118442744
+23	Precuneus L	surprise	-0.020304448691044506
+24	Precuneus L	surprise	0.1163428002798285
+25	Precuneus L	surprise	0.12966767030481535
+26	Precuneus L	surprise	0.4275584862782405
+27	Precuneus L	surprise	-0.0476580038263749
+28	Precuneus L	surprise	0.05563688463567255
+29	Precuneus L	surprise	-0.04052172286153039
+30	Precuneus L	surprise	0.11871336167678237
+33	Precuneus L	surprise	-0.07946059279716931
+34	Precuneus L	surprise	0.0015955266191247995
+35	Precuneus L	surprise	0.07115043157514614
+36	Precuneus L	surprise	0.12819595223006147
+37	Precuneus L	surprise	0.08833651080763397
+38	Precuneus L	surprise	0.406063330001556
+39	Precuneus L	surprise	0.24744715126088032
+40	Precuneus L	surprise	-0.12174380050587039
+41	Precuneus L	surprise	0.26917466682453567
+42	Precuneus L	surprise	0.13633631255092601
+43	Precuneus L	surprise	-0.09732227431735598
+45	Precuneus L	surprise	0.25735141121997285
+46	Precuneus L	surprise	0.1922339775527899
+47	Precuneus L	surprise	0.34756490846092886
+48	Precuneus L	surprise	0.2425352389422747
+49	Precuneus L	surprise	0.2519441234091154
+50	Precuneus L	surprise	-0.0616751273538774
+51	Precuneus L	surprise	0.18954148568893567
+52	Precuneus L	surprise	0.10915862408000976
+53	Precuneus L	surprise	0.10458411113359034
+54	Precuneus L	surprise	0.05443896355007802
+55	Precuneus L	surprise	0.1774204269839594
+56	Precuneus L	surprise	0.18760431400285318
+57	Precuneus L	surprise	-0.12861317502280983
+58	Precuneus L	surprise	0.19174283563804168
+59	Precuneus L	surprise	-0.3078509959248969
+60	Precuneus L	surprise	-0.03209098527664677
+61	Precuneus L	surprise	0.39710376859427643
+62	Precuneus L	surprise	0.044109972758003727
+63	Precuneus L	surprise	0.23691685168215862
+64	Precuneus L	surprise	0.273609798146376
+01	Inferior Frontal Gyrus L	rpe	-0.24829537119716405
+02	Inferior Frontal Gyrus L	rpe	0.18985454455018044
+03	Inferior Frontal Gyrus L	rpe	0.386244176030159
+04	Inferior Frontal Gyrus L	rpe	0.5639297422766686
+05	Inferior Frontal Gyrus L	rpe	0.2372938072262332
+06	Inferior Frontal Gyrus L	rpe	-0.1750806299550459
+07	Inferior Frontal Gyrus L	rpe	-0.43614105705171824
+09	Inferior Frontal Gyrus L	rpe	0.044876971333287656
+10	Inferior Frontal Gyrus L	rpe	0.3945559920370579
+11	Inferior Frontal Gyrus L	rpe	0.3163905178010464
+12	Inferior Frontal Gyrus L	rpe	0.24937356494367122
+14	Inferior Frontal Gyrus L	rpe	0.06048902295529843
+15	Inferior Frontal Gyrus L	rpe	0.5610507726669312
+17	Inferior Frontal Gyrus L	rpe	-0.04252089500427246
+18	Inferior Frontal Gyrus L	rpe	-0.13053752638399602
+19	Inferior Frontal Gyrus L	rpe	0.18983663266757503
+20	Inferior Frontal Gyrus L	rpe	-0.32069109452830163
+21	Inferior Frontal Gyrus L	rpe	0.14470062734559178
+22	Inferior Frontal Gyrus L	rpe	0.11076611833646893
+23	Inferior Frontal Gyrus L	rpe	0.20396678062155843
+24	Inferior Frontal Gyrus L	rpe	0.04689674296416342
+25	Inferior Frontal Gyrus L	rpe	0.5415340268611908
+26	Inferior Frontal Gyrus L	rpe	-0.018074065878172407
+27	Inferior Frontal Gyrus L	rpe	0.4834169664978981
+28	Inferior Frontal Gyrus L	rpe	-0.2566673826426268
+29	Inferior Frontal Gyrus L	rpe	0.13533822780475022
+30	Inferior Frontal Gyrus L	rpe	0.43508987113833425
+33	Inferior Frontal Gyrus L	rpe	0.21613257963210344
+34	Inferior Frontal Gyrus L	rpe	0.02883649340066313
+35	Inferior Frontal Gyrus L	rpe	0.5006354263424874
+36	Inferior Frontal Gyrus L	rpe	0.3578802774194628
+37	Inferior Frontal Gyrus L	rpe	0.30206898115575315
+38	Inferior Frontal Gyrus L	rpe	-0.014542345530353487
+39	Inferior Frontal Gyrus L	rpe	-0.005793263485757052
+40	Inferior Frontal Gyrus L	rpe	0.06859452468343079
+41	Inferior Frontal Gyrus L	rpe	0.42787920551374553
+42	Inferior Frontal Gyrus L	rpe	0.06672250384552171
+43	Inferior Frontal Gyrus L	rpe	0.2754291621595621
+45	Inferior Frontal Gyrus L	rpe	-0.24109904219862074
+46	Inferior Frontal Gyrus L	rpe	-0.1515819723458844
+47	Inferior Frontal Gyrus L	rpe	0.33164620667696
+48	Inferior Frontal Gyrus L	rpe	0.16536115893162787
+49	Inferior Frontal Gyrus L	rpe	0.2123373543098569
+50	Inferior Frontal Gyrus L	rpe	0.12854966979008167
+51	Inferior Frontal Gyrus L	rpe	0.5187525653839111
+52	Inferior Frontal Gyrus L	rpe	0.038239182960242035
+53	Inferior Frontal Gyrus L	rpe	0.17340137908235193
+54	Inferior Frontal Gyrus L	rpe	0.16515415649861098
+55	Inferior Frontal Gyrus L	rpe	0.5422359544038773
+56	Inferior Frontal Gyrus L	rpe	0.06568374836817384
+57	Inferior Frontal Gyrus L	rpe	0.1409194029122591
+58	Inferior Frontal Gyrus L	rpe	0.43975382633507254
+59	Inferior Frontal Gyrus L	rpe	0.5525276905298233
+60	Inferior Frontal Gyrus L	rpe	0.31454565808176993
+61	Inferior Frontal Gyrus L	rpe	-0.033729353167582306
+62	Inferior Frontal Gyrus L	rpe	0.2449278913065791
+63	Inferior Frontal Gyrus L	rpe	-0.21580996743403374
+64	Inferior Frontal Gyrus L	rpe	0.11338744924869389
+01	Inferior Frontal Gyrus L	urpe	0.62230175614357
+02	Inferior Frontal Gyrus L	urpe	0.13519874207209795
+03	Inferior Frontal Gyrus L	urpe	0.12781174791860395
+04	Inferior Frontal Gyrus L	urpe	-0.497003832757473
+05	Inferior Frontal Gyrus L	urpe	0.2161913322098553
+06	Inferior Frontal Gyrus L	urpe	0.0007176874252036214
+07	Inferior Frontal Gyrus L	urpe	0.06061063209548592
+09	Inferior Frontal Gyrus L	urpe	0.15491494938731193
+10	Inferior Frontal Gyrus L	urpe	-0.02146551925688982
+11	Inferior Frontal Gyrus L	urpe	0.119128334694542
+12	Inferior Frontal Gyrus L	urpe	-0.20061503548175097
+14	Inferior Frontal Gyrus L	urpe	-0.029253642242401838
+15	Inferior Frontal Gyrus L	urpe	0.07186490930616855
+17	Inferior Frontal Gyrus L	urpe	0.03081884538754821
+18	Inferior Frontal Gyrus L	urpe	0.2977044551819563
+19	Inferior Frontal Gyrus L	urpe	-0.2406344327516854
+20	Inferior Frontal Gyrus L	urpe	0.18535283529665322
+21	Inferior Frontal Gyrus L	urpe	-0.16428032457828523
+22	Inferior Frontal Gyrus L	urpe	-0.19720661103725434
+23	Inferior Frontal Gyrus L	urpe	0.19743306152988224
+24	Inferior Frontal Gyrus L	urpe	0.0485496271494776
+25	Inferior Frontal Gyrus L	urpe	-0.28507925659418104
+26	Inferior Frontal Gyrus L	urpe	-0.006638225931674242
+27	Inferior Frontal Gyrus L	urpe	-0.07726738197728991
+28	Inferior Frontal Gyrus L	urpe	0.5280157393217086
+29	Inferior Frontal Gyrus L	urpe	-0.02216637951787561
+30	Inferior Frontal Gyrus L	urpe	0.1128380236029625
+33	Inferior Frontal Gyrus L	urpe	-0.006001403834670782
+34	Inferior Frontal Gyrus L	urpe	0.1565978142246604
+35	Inferior Frontal Gyrus L	urpe	-0.2856852561235428
+36	Inferior Frontal Gyrus L	urpe	-0.47661759722977876
+37	Inferior Frontal Gyrus L	urpe	0.17549999148584902
+38	Inferior Frontal Gyrus L	urpe	-0.01694507183274254
+39	Inferior Frontal Gyrus L	urpe	0.05248950215056539
+40	Inferior Frontal Gyrus L	urpe	-0.2827517864946276
+41	Inferior Frontal Gyrus L	urpe	0.521056161057204
+42	Inferior Frontal Gyrus L	urpe	-0.04204598140437156
+43	Inferior Frontal Gyrus L	urpe	-0.1693673218227923
+45	Inferior Frontal Gyrus L	urpe	0.7620988273620606
+46	Inferior Frontal Gyrus L	urpe	0.19732508059125395
+47	Inferior Frontal Gyrus L	urpe	0.33145582490134984
+48	Inferior Frontal Gyrus L	urpe	-0.04460922108963132
+49	Inferior Frontal Gyrus L	urpe	-0.020718453861773015
+50	Inferior Frontal Gyrus L	urpe	0.1334608372952789
+51	Inferior Frontal Gyrus L	urpe	-0.13372248209198007
+52	Inferior Frontal Gyrus L	urpe	0.08556255919160322
+53	Inferior Frontal Gyrus L	urpe	0.01972070658346638
+54	Inferior Frontal Gyrus L	urpe	-0.07600225153641077
+55	Inferior Frontal Gyrus L	urpe	-0.14051364736631514
+56	Inferior Frontal Gyrus L	urpe	0.11547503020614386
+57	Inferior Frontal Gyrus L	urpe	-0.09255488716065884
+58	Inferior Frontal Gyrus L	urpe	-0.015921824541292155
+59	Inferior Frontal Gyrus L	urpe	0.02899374246946536
+60	Inferior Frontal Gyrus L	urpe	-0.0858941329549998
+61	Inferior Frontal Gyrus L	urpe	0.17975281516090036
+62	Inferior Frontal Gyrus L	urpe	0.24180772176012397
+63	Inferior Frontal Gyrus L	urpe	-0.23195520371198655
+64	Inferior Frontal Gyrus L	urpe	-0.08923132222145796
+01	Inferior Frontal Gyrus L	surprise	0.03223491072174511
+02	Inferior Frontal Gyrus L	surprise	-0.06536463611992076
+03	Inferior Frontal Gyrus L	surprise	0.011897441596956923
+04	Inferior Frontal Gyrus L	surprise	-0.04424450887367129
+05	Inferior Frontal Gyrus L	surprise	-0.003754979397635907
+06	Inferior Frontal Gyrus L	surprise	0.07840753305703402
+07	Inferior Frontal Gyrus L	surprise	-0.04523964192834683
+09	Inferior Frontal Gyrus L	surprise	-0.13500321850180627
+10	Inferior Frontal Gyrus L	surprise	0.030802062016446145
+11	Inferior Frontal Gyrus L	surprise	0.057641911786049604
+12	Inferior Frontal Gyrus L	surprise	0.07232378462329507
+14	Inferior Frontal Gyrus L	surprise	0.03305768252583221
+15	Inferior Frontal Gyrus L	surprise	-0.05837163249729201
+17	Inferior Frontal Gyrus L	surprise	-0.08812997553846799
+18	Inferior Frontal Gyrus L	surprise	-0.0023537702579051255
+19	Inferior Frontal Gyrus L	surprise	-0.025655450061894954
+20	Inferior Frontal Gyrus L	surprise	0.09980915416963398
+21	Inferior Frontal Gyrus L	surprise	-0.02613632973298081
+22	Inferior Frontal Gyrus L	surprise	0.00043307946529239414
+23	Inferior Frontal Gyrus L	surprise	0.20732049914076925
+24	Inferior Frontal Gyrus L	surprise	-0.14457838816568255
+25	Inferior Frontal Gyrus L	surprise	0.010994685580953956
+26	Inferior Frontal Gyrus L	surprise	0.10785229559027357
+27	Inferior Frontal Gyrus L	surprise	-0.11350003488361836
+28	Inferior Frontal Gyrus L	surprise	0.02577930833220307
+29	Inferior Frontal Gyrus L	surprise	-0.03817256084643304
+30	Inferior Frontal Gyrus L	surprise	0.004395948002347723
+33	Inferior Frontal Gyrus L	surprise	0.15573551036417485
+34	Inferior Frontal Gyrus L	surprise	0.11806138917803764
+35	Inferior Frontal Gyrus L	surprise	0.08735322212800384
+36	Inferior Frontal Gyrus L	surprise	0.07993513982743025
+37	Inferior Frontal Gyrus L	surprise	0.004093590020202101
+38	Inferior Frontal Gyrus L	surprise	-0.06928777086315677
+39	Inferior Frontal Gyrus L	surprise	-0.05797596307471395
+40	Inferior Frontal Gyrus L	surprise	0.007240576437907293
+41	Inferior Frontal Gyrus L	surprise	0.2165250760316849
+42	Inferior Frontal Gyrus L	surprise	0.019857146348804235
+43	Inferior Frontal Gyrus L	surprise	0.04367445538424363
+45	Inferior Frontal Gyrus L	surprise	0.12857703594956546
+46	Inferior Frontal Gyrus L	surprise	-0.11630313443019986
+47	Inferior Frontal Gyrus L	surprise	0.12980341598391532
+48	Inferior Frontal Gyrus L	surprise	0.1376810451108031
+49	Inferior Frontal Gyrus L	surprise	0.02515269797295332
+50	Inferior Frontal Gyrus L	surprise	0.11814883829094469
+51	Inferior Frontal Gyrus L	surprise	0.052096831263042986
+52	Inferior Frontal Gyrus L	surprise	-0.09574267302581575
+53	Inferior Frontal Gyrus L	surprise	-0.018397466684691607
+54	Inferior Frontal Gyrus L	surprise	0.013094247330445796
+55	Inferior Frontal Gyrus L	surprise	-0.15826191917061805
+56	Inferior Frontal Gyrus L	surprise	-0.11502653645118699
+57	Inferior Frontal Gyrus L	surprise	-0.015543441902846098
+58	Inferior Frontal Gyrus L	surprise	-0.0034224517084658146
+59	Inferior Frontal Gyrus L	surprise	0.030908047053962946
+60	Inferior Frontal Gyrus L	surprise	-0.007759806703352297
+61	Inferior Frontal Gyrus L	surprise	-0.021066285844426602
+62	Inferior Frontal Gyrus L	surprise	0.18566410116851328
+63	Inferior Frontal Gyrus L	surprise	0.009381338208913802
+64	Inferior Frontal Gyrus L	surprise	0.08661658396944404
+01	Superior Temporal Gyrus L	rpe	-0.17146128622081244
+02	Superior Temporal Gyrus L	rpe	0.44338194913033285
+03	Superior Temporal Gyrus L	rpe	0.5471316651920929
+04	Superior Temporal Gyrus L	rpe	-0.05277065328449349
+05	Superior Temporal Gyrus L	rpe	0.599054390000123
+06	Superior Temporal Gyrus L	rpe	0.03182334793294131
+07	Superior Temporal Gyrus L	rpe	-0.05422994381550587
+09	Superior Temporal Gyrus L	rpe	0.20028105205997374
+10	Superior Temporal Gyrus L	rpe	0.9055706310001287
+11	Superior Temporal Gyrus L	rpe	0.6641197073640246
+12	Superior Temporal Gyrus L	rpe	0.3629085073868434
+14	Superior Temporal Gyrus L	rpe	0.0665789578307533
+15	Superior Temporal Gyrus L	rpe	-0.2702307563573055
+17	Superior Temporal Gyrus L	rpe	0.03893032622749381
+18	Superior Temporal Gyrus L	rpe	0.2187889584650596
+19	Superior Temporal Gyrus L	rpe	0.298705503570311
+20	Superior Temporal Gyrus L	rpe	0.3212047956432357
+21	Superior Temporal Gyrus L	rpe	0.40929828719659284
+22	Superior Temporal Gyrus L	rpe	0.37490052255717193
+23	Superior Temporal Gyrus L	rpe	0.15551162193613974
+24	Superior Temporal Gyrus L	rpe	0.7430471795977969
+25	Superior Temporal Gyrus L	rpe	0.7800673761151053
+26	Superior Temporal Gyrus L	rpe	0.23364657152331236
+27	Superior Temporal Gyrus L	rpe	0.2503137534314936
+28	Superior Temporal Gyrus L	rpe	0.3203465366510279
+29	Superior Temporal Gyrus L	rpe	0.5172896367130857
+30	Superior Temporal Gyrus L	rpe	0.2458079130473462
+33	Superior Temporal Gyrus L	rpe	0.1133620493029329
+34	Superior Temporal Gyrus L	rpe	-0.06729424853498737
+35	Superior Temporal Gyrus L	rpe	0.28316398100419476
+36	Superior Temporal Gyrus L	rpe	0.01610784137014751
+37	Superior Temporal Gyrus L	rpe	0.3629643178798936
+38	Superior Temporal Gyrus L	rpe	-0.14258063096327311
+39	Superior Temporal Gyrus L	rpe	-0.3359836516055194
+40	Superior Temporal Gyrus L	rpe	-0.058245429105943804
+41	Superior Temporal Gyrus L	rpe	0.7996017707116676
+42	Superior Temporal Gyrus L	rpe	0.11066361707917442
+43	Superior Temporal Gyrus L	rpe	0.26204100841035444
+45	Superior Temporal Gyrus L	rpe	0.5674310659206557
+46	Superior Temporal Gyrus L	rpe	0.6099654297259721
+47	Superior Temporal Gyrus L	rpe	0.38847848039233324
+48	Superior Temporal Gyrus L	rpe	0.0236450399068858
+49	Superior Temporal Gyrus L	rpe	0.41159808229316364
+50	Superior Temporal Gyrus L	rpe	-0.12664241072806445
+51	Superior Temporal Gyrus L	rpe	0.5538415076549758
+52	Superior Temporal Gyrus L	rpe	0.5943595410296412
+53	Superior Temporal Gyrus L	rpe	-0.17928451442187934
+54	Superior Temporal Gyrus L	rpe	0.21747332922126533
+55	Superior Temporal Gyrus L	rpe	0.5258943777192723
+56	Superior Temporal Gyrus L	rpe	0.32465709339488635
+57	Superior Temporal Gyrus L	rpe	0.053639402838818954
+58	Superior Temporal Gyrus L	rpe	0.4184584166064407
+59	Superior Temporal Gyrus L	rpe	0.22156013768504967
+60	Superior Temporal Gyrus L	rpe	0.09211645794637276
+61	Superior Temporal Gyrus L	rpe	0.16207038938547624
+62	Superior Temporal Gyrus L	rpe	-0.10241384917136395
+63	Superior Temporal Gyrus L	rpe	-0.1179690902618776
+64	Superior Temporal Gyrus L	rpe	0.2808866864634734
+01	Superior Temporal Gyrus L	urpe	0.28653870951948746
+02	Superior Temporal Gyrus L	urpe	-0.5748236648964159
+03	Superior Temporal Gyrus L	urpe	-0.10963843164570404
+04	Superior Temporal Gyrus L	urpe	0.1144507315404939
+05	Superior Temporal Gyrus L	urpe	-0.6410992598781983
+06	Superior Temporal Gyrus L	urpe	-0.210293797642049
+07	Superior Temporal Gyrus L	urpe	-0.12286487503936797
+09	Superior Temporal Gyrus L	urpe	-0.3738071153956381
+10	Superior Temporal Gyrus L	urpe	-0.16111009388370087
+11	Superior Temporal Gyrus L	urpe	0.029384979808872395
+12	Superior Temporal Gyrus L	urpe	0.1222744449253448
+14	Superior Temporal Gyrus L	urpe	0.15322999238516344
+15	Superior Temporal Gyrus L	urpe	-0.14292361916071086
+17	Superior Temporal Gyrus L	urpe	-0.23914907454992784
+18	Superior Temporal Gyrus L	urpe	-0.0019626167380589654
+19	Superior Temporal Gyrus L	urpe	0.22107082274460205
+20	Superior Temporal Gyrus L	urpe	-0.16901541077955204
+21	Superior Temporal Gyrus L	urpe	0.06740750645456667
+22	Superior Temporal Gyrus L	urpe	0.30518009485394665
+23	Superior Temporal Gyrus L	urpe	0.20537132558158852
+24	Superior Temporal Gyrus L	urpe	-0.7978099864540678
+25	Superior Temporal Gyrus L	urpe	-0.4658688298624122
+26	Superior Temporal Gyrus L	urpe	0.14508359866555443
+27	Superior Temporal Gyrus L	urpe	-0.13188905443177756
+28	Superior Temporal Gyrus L	urpe	0.14670797862168966
+29	Superior Temporal Gyrus L	urpe	0.14990430113605477
+30	Superior Temporal Gyrus L	urpe	-0.21221303210283318
+33	Superior Temporal Gyrus L	urpe	-0.055401438818962284
+34	Superior Temporal Gyrus L	urpe	-0.42581672186144826
+35	Superior Temporal Gyrus L	urpe	-0.29137136442869
+36	Superior Temporal Gyrus L	urpe	-0.15236095841409583
+37	Superior Temporal Gyrus L	urpe	-0.3327156729770429
+38	Superior Temporal Gyrus L	urpe	-0.24188048821507077
+39	Superior Temporal Gyrus L	urpe	-0.09296751919795167
+40	Superior Temporal Gyrus L	urpe	0.031292424773599836
+41	Superior Temporal Gyrus L	urpe	-0.20768034026189003
+42	Superior Temporal Gyrus L	urpe	-0.09074514251992558
+43	Superior Temporal Gyrus L	urpe	-0.35167842200308136
+45	Superior Temporal Gyrus L	urpe	0.019542373307613714
+46	Superior Temporal Gyrus L	urpe	-0.5542289749295874
+47	Superior Temporal Gyrus L	urpe	-0.060325737901483524
+48	Superior Temporal Gyrus L	urpe	-0.08060596902346746
+49	Superior Temporal Gyrus L	urpe	-0.5965309219829964
+50	Superior Temporal Gyrus L	urpe	-0.24004518579352985
+51	Superior Temporal Gyrus L	urpe	-0.6698844913167484
+52	Superior Temporal Gyrus L	urpe	-0.34619494725837174
+53	Superior Temporal Gyrus L	urpe	-0.1387433379211209
+54	Superior Temporal Gyrus L	urpe	-0.5153162560679696
+55	Superior Temporal Gyrus L	urpe	-0.5597883291316755
+56	Superior Temporal Gyrus L	urpe	-0.3951091199661746
+57	Superior Temporal Gyrus L	urpe	-0.02934799348991929
+58	Superior Temporal Gyrus L	urpe	-0.19557329707524992
+59	Superior Temporal Gyrus L	urpe	0.0370884763472008
+60	Superior Temporal Gyrus L	urpe	0.02684683997226371
+61	Superior Temporal Gyrus L	urpe	-0.05821112786405579
+62	Superior Temporal Gyrus L	urpe	-0.015331274727500524
+63	Superior Temporal Gyrus L	urpe	0.004397972882019751
+64	Superior Temporal Gyrus L	urpe	0.25715430442130927
+01	Superior Temporal Gyrus L	surprise	0.167636645562721
+02	Superior Temporal Gyrus L	surprise	0.11963273257468686
+03	Superior Temporal Gyrus L	surprise	0.11927503960164772
+04	Superior Temporal Gyrus L	surprise	0.001420433832346603
+05	Superior Temporal Gyrus L	surprise	0.3156785549539508
+06	Superior Temporal Gyrus L	surprise	0.27991575770305865
+07	Superior Temporal Gyrus L	surprise	0.04256344387822813
+09	Superior Temporal Gyrus L	surprise	0.2620980464147799
+10	Superior Temporal Gyrus L	surprise	0.13596348089137764
+11	Superior Temporal Gyrus L	surprise	0.21149649019494202
+12	Superior Temporal Gyrus L	surprise	-0.08253870945367398
+14	Superior Temporal Gyrus L	surprise	0.08957529357973147
+15	Superior Temporal Gyrus L	surprise	-0.057940993712029674
+17	Superior Temporal Gyrus L	surprise	0.028591827279921166
+18	Superior Temporal Gyrus L	surprise	-0.03233231469692493
+19	Superior Temporal Gyrus L	surprise	0.031494502729566935
+20	Superior Temporal Gyrus L	surprise	0.07214058461514386
+21	Superior Temporal Gyrus L	surprise	0.027240325308715303
+22	Superior Temporal Gyrus L	surprise	0.30911027007933817
+23	Superior Temporal Gyrus L	surprise	-0.0008651316730361996
+24	Superior Temporal Gyrus L	surprise	-0.03161082500027436
+25	Superior Temporal Gyrus L	surprise	0.1468606864835954
+26	Superior Temporal Gyrus L	surprise	0.17190656494913678
+27	Superior Temporal Gyrus L	surprise	0.0733113957597225
+28	Superior Temporal Gyrus L	surprise	0.04569836732381108
+29	Superior Temporal Gyrus L	surprise	0.034285741944613896
+30	Superior Temporal Gyrus L	surprise	0.00415421928504877
+33	Superior Temporal Gyrus L	surprise	0.0520469763062217
+34	Superior Temporal Gyrus L	surprise	-0.0016227589680277038
+35	Superior Temporal Gyrus L	surprise	-0.07548595122484998
+36	Superior Temporal Gyrus L	surprise	-0.04602497844307712
+37	Superior Temporal Gyrus L	surprise	0.12247951605329008
+38	Superior Temporal Gyrus L	surprise	0.18479924795754027
+39	Superior Temporal Gyrus L	surprise	0.3279935825954784
+40	Superior Temporal Gyrus L	surprise	-0.0024789893138927946
+41	Superior Temporal Gyrus L	surprise	0.07331626950480948
+42	Superior Temporal Gyrus L	surprise	0.1764812400620995
+43	Superior Temporal Gyrus L	surprise	-0.15744528795282045
+45	Superior Temporal Gyrus L	surprise	0.1378035960775433
+46	Superior Temporal Gyrus L	surprise	0.01150409442308239
+47	Superior Temporal Gyrus L	surprise	0.12029569164962706
+48	Superior Temporal Gyrus L	surprise	0.037019866800895244
+49	Superior Temporal Gyrus L	surprise	0.03288666266863319
+50	Superior Temporal Gyrus L	surprise	0.030525545509810785
+51	Superior Temporal Gyrus L	surprise	-0.041244729930026966
+52	Superior Temporal Gyrus L	surprise	-0.03920027416086558
+53	Superior Temporal Gyrus L	surprise	0.04969674580956273
+54	Superior Temporal Gyrus L	surprise	0.05672649413551853
+55	Superior Temporal Gyrus L	surprise	0.08297835311598399
+56	Superior Temporal Gyrus L	surprise	0.1987926128574393
+57	Superior Temporal Gyrus L	surprise	-0.012192353034730662
+58	Superior Temporal Gyrus L	surprise	-0.008707296489526263
+59	Superior Temporal Gyrus L	surprise	0.008744386269509878
+60	Superior Temporal Gyrus L	surprise	-0.06127733121287416
+61	Superior Temporal Gyrus L	surprise	-0.044251324524256314
+62	Superior Temporal Gyrus L	surprise	0.14645676704292948
+63	Superior Temporal Gyrus L	surprise	0.15524300797419113
+64	Superior Temporal Gyrus L	surprise	0.15533829328011384
+01	Insula L	rpe	-0.5857949075289071
+02	Insula L	rpe	-0.17244111293985043
+03	Insula L	rpe	-0.3826820427784696
+04	Insula L	rpe	0.2402676317433361
+05	Insula L	rpe	-0.7095554722473025
+06	Insula L	rpe	-0.4239930717740208
+07	Insula L	rpe	-0.3508313671918586
+09	Insula L	rpe	-0.268813963746652
+10	Insula L	rpe	0.2911617823410779
+11	Insula L	rpe	-0.048700191924581304
+12	Insula L	rpe	0.1789046377525665
+14	Insula L	rpe	-0.07875947025604546
+15	Insula L	rpe	0.6058307541534305
+17	Insula L	rpe	-0.3657050833571702
+18	Insula L	rpe	-0.07315549501799978
+19	Insula L	rpe	-0.15067393820208963
+20	Insula L	rpe	-0.3566868619527668
+21	Insula L	rpe	0.04357169022841845
+22	Insula L	rpe	0.16317858404909202
+23	Insula L	rpe	0.27121491968864575
+24	Insula L	rpe	0.005965316602669191
+25	Insula L	rpe	0.32006838724373665
+26	Insula L	rpe	-0.17312643962577567
+27	Insula L	rpe	0.2595908190123737
+28	Insula L	rpe	-0.2118501281220233
+29	Insula L	rpe	0.0880792068419396
+30	Insula L	rpe	-0.06669061569846235
+33	Insula L	rpe	0.06073128376738168
+34	Insula L	rpe	-0.08996213239151984
+35	Insula L	rpe	0.23873409659427125
+36	Insula L	rpe	-0.2546603668597527
+37	Insula L	rpe	0.1476098797575105
+38	Insula L	rpe	-0.34101818756607827
+39	Insula L	rpe	-0.4074004744179547
+40	Insula L	rpe	-0.15230648004217073
+41	Insula L	rpe	0.44194325752323493
+42	Insula L	rpe	-0.3441049553803168
+43	Insula L	rpe	0.24726573904627003
+45	Insula L	rpe	-0.8127299956977367
+46	Insula L	rpe	-0.4272080797236413
+47	Insula L	rpe	0.03254291333723813
+48	Insula L	rpe	0.07813281030394137
+49	Insula L	rpe	-0.049060699122492224
+50	Insula L	rpe	-0.2547234075909728
+51	Insula L	rpe	0.1096871843733993
+52	Insula L	rpe	-0.1875376010139007
+53	Insula L	rpe	0.17784772144659655
+54	Insula L	rpe	-0.2930319102888461
+55	Insula L	rpe	-0.16052024469536263
+56	Insula L	rpe	0.6424063004087657
+57	Insula L	rpe	-0.24231448890350293
+58	Insula L	rpe	0.1723487859708257
+59	Insula L	rpe	-0.7201802264899015
+60	Insula L	rpe	0.3902749647386372
+61	Insula L	rpe	-0.026229346549371257
+62	Insula L	rpe	0.18494620076671708
+63	Insula L	rpe	-0.23482097127998713
+64	Insula L	rpe	-0.26301768724806607
+01	Insula L	urpe	0.5624574269168079
+02	Insula L	urpe	0.48941464722156525
+03	Insula L	urpe	0.5209147095447406
+04	Insula L	urpe	-0.11770167778013274
+05	Insula L	urpe	0.5027833632193506
+06	Insula L	urpe	0.05213664792245254
+07	Insula L	urpe	-0.0171834009088343
+09	Insula L	urpe	0.28514757787343115
+10	Insula L	urpe	0.022656862551230006
+11	Insula L	urpe	0.33295161710702814
+12	Insula L	urpe	-0.03728036030952353
+14	Insula L	urpe	0.3024161111097783
+15	Insula L	urpe	0.08041084953583777
+17	Insula L	urpe	0.15785577075439505
+18	Insula L	urpe	0.7132910694926977
+19	Insula L	urpe	-0.006263363466132432
+20	Insula L	urpe	-0.05118729234527564
+21	Insula L	urpe	-0.13535874784429325
+22	Insula L	urpe	-0.238796406541951
+23	Insula L	urpe	-0.034280195805877156
+24	Insula L	urpe	0.08203038368083071
+25	Insula L	urpe	0.15575816680211574
+26	Insula L	urpe	-0.023776615744282026
+27	Insula L	urpe	-0.07614343694149284
+28	Insula L	urpe	0.03347760800534161
+29	Insula L	urpe	0.16848909401414858
+30	Insula L	urpe	0.4658638830296695
+33	Insula L	urpe	0.007572003141831374
+34	Insula L	urpe	0.15472870238590986
+35	Insula L	urpe	-0.11963190011738334
+36	Insula L	urpe	0.08918288075074088
+37	Insula L	urpe	0.320873407414183
+38	Insula L	urpe	-0.060564004408661276
+39	Insula L	urpe	0.41096210153773427
+40	Insula L	urpe	0.07682512090377713
+41	Insula L	urpe	0.4231459964066744
+42	Insula L	urpe	0.13788954525080044
+43	Insula L	urpe	0.11904930607124697
+45	Insula L	urpe	0.5925048291683197
+46	Insula L	urpe	0.37788397347321734
+47	Insula L	urpe	0.47964432113803923
+48	Insula L	urpe	0.14071242971112952
+49	Insula L	urpe	0.08154464551626006
+50	Insula L	urpe	0.4534075076226145
+51	Insula L	urpe	-0.10000133440189529
+52	Insula L	urpe	0.1559445957900607
+53	Insula L	urpe	0.18716715567279607
+54	Insula L	urpe	0.1584070088720182
+55	Insula L	urpe	0.3127702206838876
+56	Insula L	urpe	-0.32095606648363173
+57	Insula L	urpe	0.056577769450086635
+58	Insula L	urpe	0.28908647620119154
+59	Insula L	urpe	0.9464974254369736
+60	Insula L	urpe	-0.07904210552806035
+61	Insula L	urpe	0.14413235351094045
+62	Insula L	urpe	0.2237551906146109
+63	Insula L	urpe	-0.08219852683396311
+64	Insula L	urpe	0.38809187803417444
+01	Insula L	surprise	-0.06295291808783077
+02	Insula L	surprise	0.08957109031052823
+03	Insula L	surprise	0.1350017108488828
+04	Insula L	surprise	-0.025196126465743873
+05	Insula L	surprise	-0.07161936571355909
+06	Insula L	surprise	-0.06896103669834774
+07	Insula L	surprise	-0.10100010357018618
+09	Insula L	surprise	-0.025366142559505533
+10	Insula L	surprise	-0.03486198242899263
+11	Insula L	surprise	0.14618288225028664
+12	Insula L	surprise	0.023902466591607663
+14	Insula L	surprise	0.015308438589272555
+15	Insula L	surprise	-0.051159772901883116
+17	Insula L	surprise	-0.07284391301800497
+18	Insula L	surprise	-0.17936765193007886
+19	Insula L	surprise	-0.04023188333667349
+20	Insula L	surprise	0.1374272540997481
+21	Insula L	surprise	0.015088378913787892
+22	Insula L	surprise	0.1403710038648569
+23	Insula L	surprise	0.00863011900037236
+24	Insula L	surprise	0.10264477832242846
+25	Insula L	surprise	-0.04739651089710151
+26	Insula L	surprise	0.2801667272578925
+27	Insula L	surprise	0.032570901268627495
+28	Insula L	surprise	0.0955331524455687
+29	Insula L	surprise	0.02635978527905536
+30	Insula L	surprise	0.09050508590007666
+33	Insula L	surprise	0.04867486379589536
+34	Insula L	surprise	-0.03890907702589175
+35	Insula L	surprise	0.185617612907663
+36	Insula L	surprise	-0.007607731677126139
+37	Insula L	surprise	-0.010256803048832808
+38	Insula L	surprise	-0.0950068866222864
+39	Insula L	surprise	0.028608142819393834
+40	Insula L	surprise	-0.038059035898186266
+41	Insula L	surprise	0.20172989228740335
+42	Insula L	surprise	0.09956700366456062
+43	Insula L	surprise	0.032350367599065066
+45	Insula L	surprise	0.008483507102937438
+46	Insula L	surprise	-0.08728558730217628
+47	Insula L	surprise	-0.05835151728388155
+48	Insula L	surprise	-0.058956847205990925
+49	Insula L	surprise	0.06318084109807387
+50	Insula L	surprise	5.287634667183738e-05
+51	Insula L	surprise	0.033314653555862606
+52	Insula L	surprise	-0.050557614624267444
+53	Insula L	surprise	0.187542484869482
+54	Insula L	surprise	-0.04062479866843205
+55	Insula L	surprise	-0.179990544449538
+56	Insula L	surprise	0.09377664059138624
+57	Insula L	surprise	-0.07991890139965108
+58	Insula L	surprise	-0.047087701299460605
+59	Insula L	surprise	-0.42798306746408343
+60	Insula L	surprise	-0.06070789284422062
+61	Insula L	surprise	-0.07359672797429084
+62	Insula L	surprise	-0.026254127220454393
+63	Insula L	surprise	0.08799802494468167
+64	Insula L	surprise	-0.07076171488733962
+01	Superior Frontal Gyrus R	rpe	-0.22361304293628093
+02	Superior Frontal Gyrus R	rpe	-0.21043303905537836
+03	Superior Frontal Gyrus R	rpe	-0.4938771284909712
+04	Superior Frontal Gyrus R	rpe	-0.4817696428961224
+05	Superior Frontal Gyrus R	rpe	-0.655586775926942
+06	Superior Frontal Gyrus R	rpe	-0.3830607102976905
+07	Superior Frontal Gyrus R	rpe	-0.23788721928441967
+09	Superior Frontal Gyrus R	rpe	-0.21264879536573533
+10	Superior Frontal Gyrus R	rpe	0.04427729402151373
+11	Superior Frontal Gyrus R	rpe	-0.010717945156136045
+12	Superior Frontal Gyrus R	rpe	-0.03304968041333335
+14	Superior Frontal Gyrus R	rpe	-0.16153525032482488
+15	Superior Frontal Gyrus R	rpe	-0.5351896553679749
+17	Superior Frontal Gyrus R	rpe	-0.5408816254801221
+18	Superior Frontal Gyrus R	rpe	0.010131948524051242
+19	Superior Frontal Gyrus R	rpe	-0.0844627869039498
+20	Superior Frontal Gyrus R	rpe	-0.3381742551508877
+21	Superior Frontal Gyrus R	rpe	-0.2758819863752083
+22	Superior Frontal Gyrus R	rpe	0.11981397356700015
+23	Superior Frontal Gyrus R	rpe	0.3674355637696054
+24	Superior Frontal Gyrus R	rpe	-0.03407108465088876
+25	Superior Frontal Gyrus R	rpe	-0.21643829379334217
+26	Superior Frontal Gyrus R	rpe	-0.17412976816908834
+27	Superior Frontal Gyrus R	rpe	-0.29921668574765875
+28	Superior Frontal Gyrus R	rpe	-0.2874119333853876
+29	Superior Frontal Gyrus R	rpe	0.0057926504803752455
+30	Superior Frontal Gyrus R	rpe	-0.39495061130987275
+33	Superior Frontal Gyrus R	rpe	-0.1370132863521576
+34	Superior Frontal Gyrus R	rpe	-0.566475761157495
+35	Superior Frontal Gyrus R	rpe	0.06780161170495881
+36	Superior Frontal Gyrus R	rpe	-0.3491326221437366
+37	Superior Frontal Gyrus R	rpe	0.2663350957273333
+38	Superior Frontal Gyrus R	rpe	-0.3379034284088347
+39	Superior Frontal Gyrus R	rpe	-0.1942342008739986
+40	Superior Frontal Gyrus R	rpe	-0.2671248105665048
+41	Superior Frontal Gyrus R	rpe	-0.18273683133776542
+42	Superior Frontal Gyrus R	rpe	-0.5248020845982764
+43	Superior Frontal Gyrus R	rpe	-0.18253594506273252
+45	Superior Frontal Gyrus R	rpe	-0.5827196775073255
+46	Superior Frontal Gyrus R	rpe	-0.4568326398730278
+47	Superior Frontal Gyrus R	rpe	0.7048284079948509
+48	Superior Frontal Gyrus R	rpe	-0.3735857625250463
+49	Superior Frontal Gyrus R	rpe	-0.8953873305409042
+50	Superior Frontal Gyrus R	rpe	-0.12085644693838225
+51	Superior Frontal Gyrus R	rpe	0.2935426024099191
+52	Superior Frontal Gyrus R	rpe	-0.555146220933508
+53	Superior Frontal Gyrus R	rpe	-0.27647311443945877
+54	Superior Frontal Gyrus R	rpe	-0.2636488701596304
+55	Superior Frontal Gyrus R	rpe	-0.15861750495861526
+56	Superior Frontal Gyrus R	rpe	0.1372960542363149
+57	Superior Frontal Gyrus R	rpe	-0.4108758840571951
+58	Superior Frontal Gyrus R	rpe	-0.1631880664370126
+59	Superior Frontal Gyrus R	rpe	-0.6349531947462647
+60	Superior Frontal Gyrus R	rpe	0.004644890177856993
+61	Superior Frontal Gyrus R	rpe	-0.3326726307471593
+62	Superior Frontal Gyrus R	rpe	-0.370639280864486
+63	Superior Frontal Gyrus R	rpe	-0.3772437288253396
+64	Superior Frontal Gyrus R	rpe	-0.392789567510287
+01	Superior Frontal Gyrus R	urpe	0.2770226477748818
+02	Superior Frontal Gyrus R	urpe	0.07515056348509258
+03	Superior Frontal Gyrus R	urpe	0.06159603871681072
+04	Superior Frontal Gyrus R	urpe	0.20772887660725112
+05	Superior Frontal Gyrus R	urpe	-0.12724655532036666
+06	Superior Frontal Gyrus R	urpe	-0.05076816883283081
+07	Superior Frontal Gyrus R	urpe	-0.05828339523739285
+09	Superior Frontal Gyrus R	urpe	0.17023711270411257
+10	Superior Frontal Gyrus R	urpe	-0.05001898901537061
+11	Superior Frontal Gyrus R	urpe	0.06910371808852586
+12	Superior Frontal Gyrus R	urpe	0.008381594800286822
+14	Superior Frontal Gyrus R	urpe	0.039418786091523036
+15	Superior Frontal Gyrus R	urpe	-0.05943036962438513
+17	Superior Frontal Gyrus R	urpe	0.2532364478921173
+18	Superior Frontal Gyrus R	urpe	-0.3330915722892516
+19	Superior Frontal Gyrus R	urpe	0.0964319362408585
+20	Superior Frontal Gyrus R	urpe	-0.20711800676805
+21	Superior Frontal Gyrus R	urpe	-0.12386234442668932
+22	Superior Frontal Gyrus R	urpe	-0.01677389615387828
+23	Superior Frontal Gyrus R	urpe	0.1935032899319022
+24	Superior Frontal Gyrus R	urpe	0.18124858745917058
+25	Superior Frontal Gyrus R	urpe	0.28374657766134653
+26	Superior Frontal Gyrus R	urpe	-0.060494287543136765
+27	Superior Frontal Gyrus R	urpe	0.022809714423837484
+28	Superior Frontal Gyrus R	urpe	0.26719531341007463
+29	Superior Frontal Gyrus R	urpe	0.11103445148371437
+30	Superior Frontal Gyrus R	urpe	0.3840109064347214
+33	Superior Frontal Gyrus R	urpe	-0.15289788684566263
+34	Superior Frontal Gyrus R	urpe	0.0011309837508532736
+35	Superior Frontal Gyrus R	urpe	-0.14921417452946859
+36	Superior Frontal Gyrus R	urpe	-0.259428935435911
+37	Superior Frontal Gyrus R	urpe	0.1344124915647424
+38	Superior Frontal Gyrus R	urpe	-0.0352805995175408
+39	Superior Frontal Gyrus R	urpe	0.07550795107252067
+40	Superior Frontal Gyrus R	urpe	0.11788824952586933
+41	Superior Frontal Gyrus R	urpe	0.416474307714789
+42	Superior Frontal Gyrus R	urpe	0.2427685455315643
+43	Superior Frontal Gyrus R	urpe	0.13762821560656582
+45	Superior Frontal Gyrus R	urpe	0.4117388645256007
+46	Superior Frontal Gyrus R	urpe	0.26764684953485374
+47	Superior Frontal Gyrus R	urpe	-0.09037611619741828
+48	Superior Frontal Gyrus R	urpe	0.31895750429895187
+49	Superior Frontal Gyrus R	urpe	-0.1766160479574292
+50	Superior Frontal Gyrus R	urpe	-0.0057769492397912675
+51	Superior Frontal Gyrus R	urpe	-0.41715084237081035
+52	Superior Frontal Gyrus R	urpe	0.257057826379659
+53	Superior Frontal Gyrus R	urpe	0.23565418045553896
+54	Superior Frontal Gyrus R	urpe	0.42850179594286064
+55	Superior Frontal Gyrus R	urpe	0.03924918814596755
+56	Superior Frontal Gyrus R	urpe	-0.13924831013988564
+57	Superior Frontal Gyrus R	urpe	0.43450165122609447
+58	Superior Frontal Gyrus R	urpe	0.26708434970350936
+59	Superior Frontal Gyrus R	urpe	0.4397432402604156
+60	Superior Frontal Gyrus R	urpe	-0.11031328607350588
+61	Superior Frontal Gyrus R	urpe	0.31503203952753983
+62	Superior Frontal Gyrus R	urpe	0.05970088968536368
+63	Superior Frontal Gyrus R	urpe	-0.15380146673932257
+64	Superior Frontal Gyrus R	urpe	0.14230211306777266
+01	Superior Frontal Gyrus R	surprise	0.00846359545701287
+02	Superior Frontal Gyrus R	surprise	-0.014806320545311016
+03	Superior Frontal Gyrus R	surprise	0.20940455794334412
+04	Superior Frontal Gyrus R	surprise	-0.026269768244000496
+05	Superior Frontal Gyrus R	surprise	0.020693853049090615
+06	Superior Frontal Gyrus R	surprise	-0.02095535751087246
+07	Superior Frontal Gyrus R	surprise	-0.11549993511289358
+09	Superior Frontal Gyrus R	surprise	-0.010332778556201246
+10	Superior Frontal Gyrus R	surprise	0.03506644890229735
+11	Superior Frontal Gyrus R	surprise	0.10919253289251139
+12	Superior Frontal Gyrus R	surprise	-0.010058101059661971
+14	Superior Frontal Gyrus R	surprise	-0.03234598390689051
+15	Superior Frontal Gyrus R	surprise	-0.18691278772894293
+17	Superior Frontal Gyrus R	surprise	-0.043263686613904104
+18	Superior Frontal Gyrus R	surprise	-0.06083943713545321
+19	Superior Frontal Gyrus R	surprise	-0.0893069689972671
+20	Superior Frontal Gyrus R	surprise	0.041939471675841895
+21	Superior Frontal Gyrus R	surprise	-0.03409663199326368
+22	Superior Frontal Gyrus R	surprise	0.0732787717219994
+23	Superior Frontal Gyrus R	surprise	0.2497408519740458
+24	Superior Frontal Gyrus R	surprise	0.19325458560207928
+25	Superior Frontal Gyrus R	surprise	-0.09857288765272608
+26	Superior Frontal Gyrus R	surprise	0.37749882766769993
+27	Superior Frontal Gyrus R	surprise	0.020000467490818765
+28	Superior Frontal Gyrus R	surprise	0.0422255938389787
+29	Superior Frontal Gyrus R	surprise	-0.09010168920374578
+30	Superior Frontal Gyrus R	surprise	-0.05732642983396848
+33	Superior Frontal Gyrus R	surprise	0.007591743828487341
+34	Superior Frontal Gyrus R	surprise	0.014134351597426252
+35	Superior Frontal Gyrus R	surprise	0.15550233327128268
+36	Superior Frontal Gyrus R	surprise	0.02186174913206034
+37	Superior Frontal Gyrus R	surprise	0.0870549488571231
+38	Superior Frontal Gyrus R	surprise	-0.04537052580013147
+39	Superior Frontal Gyrus R	surprise	0.1198156223528915
+40	Superior Frontal Gyrus R	surprise	-0.06475875342126798
+41	Superior Frontal Gyrus R	surprise	0.2626413734698737
+42	Superior Frontal Gyrus R	surprise	0.0001024000898555473
+43	Superior Frontal Gyrus R	surprise	0.13299776767423652
+45	Superior Frontal Gyrus R	surprise	0.02577270374253944
+46	Superior Frontal Gyrus R	surprise	-0.01845024001819116
+47	Superior Frontal Gyrus R	surprise	-0.07306971911478925
+48	Superior Frontal Gyrus R	surprise	0.00929192764926012
+49	Superior Frontal Gyrus R	surprise	0.21181660738808136
+50	Superior Frontal Gyrus R	surprise	-0.06905276833654002
+51	Superior Frontal Gyrus R	surprise	-0.05279628444394028
+52	Superior Frontal Gyrus R	surprise	-0.04451492647812874
+53	Superior Frontal Gyrus R	surprise	0.017837905613877984
+54	Superior Frontal Gyrus R	surprise	-0.005225237045023177
+55	Superior Frontal Gyrus R	surprise	0.015082509325886215
+56	Superior Frontal Gyrus R	surprise	0.07270928099751472
+57	Superior Frontal Gyrus R	surprise	0.15716898944918756
+58	Superior Frontal Gyrus R	surprise	0.07598348368925077
+59	Superior Frontal Gyrus R	surprise	-0.2170306794276392
+60	Superior Frontal Gyrus R	surprise	-0.1012106872405167
+61	Superior Frontal Gyrus R	surprise	-0.010178175168456855
+62	Superior Frontal Gyrus R	surprise	0.12006747639841503
+63	Superior Frontal Gyrus R	surprise	0.046430290470231776
+64	Superior Frontal Gyrus R	surprise	0.005781547200900537
+01	Inferior parietal lobule R	rpe	0.038523106214900814
+02	Inferior parietal lobule R	rpe	-0.08358538357747926
+03	Inferior parietal lobule R	rpe	-0.012539643432117172
+04	Inferior parietal lobule R	rpe	0.9876306476416411
+05	Inferior parietal lobule R	rpe	0.4567135125398636
+06	Inferior parietal lobule R	rpe	0.04335035040491709
+07	Inferior parietal lobule R	rpe	0.3047696604496903
+09	Inferior parietal lobule R	rpe	-0.1882474998322626
+10	Inferior parietal lobule R	rpe	0.6248203990636049
+11	Inferior parietal lobule R	rpe	-0.08756500303193375
+12	Inferior parietal lobule R	rpe	0.049802936484209366
+14	Inferior parietal lobule R	rpe	0.3742115218192339
+15	Inferior parietal lobule R	rpe	1.3647004652906347
+17	Inferior parietal lobule R	rpe	-0.019722649948326527
+18	Inferior parietal lobule R	rpe	-0.9496738939649529
+19	Inferior parietal lobule R	rpe	-0.4421457448905265
+20	Inferior parietal lobule R	rpe	0.17234733386862058
+21	Inferior parietal lobule R	rpe	0.12338513518787092
+22	Inferior parietal lobule R	rpe	0.28702756555544007
+23	Inferior parietal lobule R	rpe	0.06804506206471059
+24	Inferior parietal lobule R	rpe	0.6160907127239086
+25	Inferior parietal lobule R	rpe	0.5213348909660622
+26	Inferior parietal lobule R	rpe	-0.3496959343276642
+27	Inferior parietal lobule R	rpe	0.03268064693030384
+28	Inferior parietal lobule R	rpe	0.09618258821191611
+29	Inferior parietal lobule R	rpe	0.17666834123708583
+30	Inferior parietal lobule R	rpe	-0.2738430230981774
+33	Inferior parietal lobule R	rpe	0.5365227251141159
+34	Inferior parietal lobule R	rpe	0.29383925652062454
+35	Inferior parietal lobule R	rpe	0.16343667102908646
+36	Inferior parietal lobule R	rpe	0.015792500262183172
+37	Inferior parietal lobule R	rpe	1.4381890120329681
+38	Inferior parietal lobule R	rpe	0.12971896192714297
+39	Inferior parietal lobule R	rpe	0.3470005773835712
+40	Inferior parietal lobule R	rpe	-0.38543610440360176
+41	Inferior parietal lobule R	rpe	0.5064494883020719
+42	Inferior parietal lobule R	rpe	-0.10226119915023446
+43	Inferior parietal lobule R	rpe	-0.07974948330471913
+45	Inferior parietal lobule R	rpe	-0.5488036236277333
+46	Inferior parietal lobule R	rpe	-0.4562657613445211
+47	Inferior parietal lobule R	rpe	0.31711881497391947
+48	Inferior parietal lobule R	rpe	-0.29549624412148084
+49	Inferior parietal lobule R	rpe	0.45205432583612426
+50	Inferior parietal lobule R	rpe	0.33946138123671216
+51	Inferior parietal lobule R	rpe	0.0030049284299214682
+52	Inferior parietal lobule R	rpe	-0.04601058455322076
+53	Inferior parietal lobule R	rpe	-0.19725467906230026
+54	Inferior parietal lobule R	rpe	-0.3899718627885536
+55	Inferior parietal lobule R	rpe	-0.12480031425581763
+56	Inferior parietal lobule R	rpe	1.0772854961730816
+57	Inferior parietal lobule R	rpe	0.07230025031431406
+58	Inferior parietal lobule R	rpe	0.1389686823995025
+59	Inferior parietal lobule R	rpe	-0.20323918904695246
+60	Inferior parietal lobule R	rpe	0.406386939463792
+61	Inferior parietal lobule R	rpe	0.017270093852723087
+62	Inferior parietal lobule R	rpe	0.1381611776434713
+63	Inferior parietal lobule R	rpe	-0.18539640692028184
+64	Inferior parietal lobule R	rpe	-0.29015185670168314
+01	Inferior parietal lobule R	urpe	1.0010790736586959
+02	Inferior parietal lobule R	urpe	0.18120730939079766
+03	Inferior parietal lobule R	urpe	0.4751893973529891
+04	Inferior parietal lobule R	urpe	-0.25237361857688045
+05	Inferior parietal lobule R	urpe	0.3954024002369907
+06	Inferior parietal lobule R	urpe	0.270239718189394
+07	Inferior parietal lobule R	urpe	0.14639209264337463
+09	Inferior parietal lobule R	urpe	0.39750854781380407
+10	Inferior parietal lobule R	urpe	-0.06174461435808486
+11	Inferior parietal lobule R	urpe	-0.11786483580039607
+12	Inferior parietal lobule R	urpe	0.17433704480235637
+14	Inferior parietal lobule R	urpe	-0.038117980748346006
+15	Inferior parietal lobule R	urpe	0.20452572848578845
+17	Inferior parietal lobule R	urpe	0.11773607715386553
+18	Inferior parietal lobule R	urpe	0.3377928849723604
+19	Inferior parietal lobule R	urpe	0.2733933591732272
+20	Inferior parietal lobule R	urpe	-0.00271237096576779
+21	Inferior parietal lobule R	urpe	-0.05567174179789921
+22	Inferior parietal lobule R	urpe	-0.3510475213880892
+23	Inferior parietal lobule R	urpe	0.6956692227610836
+24	Inferior parietal lobule R	urpe	-0.2745112211667691
+25	Inferior parietal lobule R	urpe	0.10722045283074733
+26	Inferior parietal lobule R	urpe	-0.3376926608659603
+27	Inferior parietal lobule R	urpe	-0.0912969092907453
+28	Inferior parietal lobule R	urpe	-0.030850236774077295
+29	Inferior parietal lobule R	urpe	0.29618865886220225
+30	Inferior parietal lobule R	urpe	0.24894133658596762
+33	Inferior parietal lobule R	urpe	0.1171709006518574
+34	Inferior parietal lobule R	urpe	0.25150501010594545
+35	Inferior parietal lobule R	urpe	0.05078811105340719
+36	Inferior parietal lobule R	urpe	-0.3642962671540402
+37	Inferior parietal lobule R	urpe	0.27317976151351575
+38	Inferior parietal lobule R	urpe	-0.24126728341259338
+39	Inferior parietal lobule R	urpe	0.06368855345580313
+40	Inferior parietal lobule R	urpe	0.0805889708334925
+41	Inferior parietal lobule R	urpe	0.4912899953347665
+42	Inferior parietal lobule R	urpe	0.207023026973561
+43	Inferior parietal lobule R	urpe	0.35224157930524264
+45	Inferior parietal lobule R	urpe	0.8890729656925908
+46	Inferior parietal lobule R	urpe	0.7856853206952413
+47	Inferior parietal lobule R	urpe	0.5510694572219142
+48	Inferior parietal lobule R	urpe	0.23134578336720113
+49	Inferior parietal lobule R	urpe	0.4744585904258269
+50	Inferior parietal lobule R	urpe	0.6700371310666755
+51	Inferior parietal lobule R	urpe	0.6104881455431934
+52	Inferior parietal lobule R	urpe	0.41223434331240477
+53	Inferior parietal lobule R	urpe	-0.07385135959419939
+54	Inferior parietal lobule R	urpe	0.181727944381742
+55	Inferior parietal lobule R	urpe	0.4783299303165189
+56	Inferior parietal lobule R	urpe	-0.3315793267554707
+57	Inferior parietal lobule R	urpe	-0.024201963441791357
+58	Inferior parietal lobule R	urpe	0.3259380428396441
+59	Inferior parietal lobule R	urpe	1.1008659203847249
+60	Inferior parietal lobule R	urpe	0.26165600176210757
+61	Inferior parietal lobule R	urpe	0.010728902838848255
+62	Inferior parietal lobule R	urpe	0.25049033954187677
+63	Inferior parietal lobule R	urpe	0.012953502919386935
+64	Inferior parietal lobule R	urpe	0.3105292734172609
+01	Inferior parietal lobule R	surprise	-0.017758281398443983
+02	Inferior parietal lobule R	surprise	0.13966941091887378
+03	Inferior parietal lobule R	surprise	-0.0521135804657307
+04	Inferior parietal lobule R	surprise	-0.3657331347413775
+05	Inferior parietal lobule R	surprise	0.11797986407246855
+06	Inferior parietal lobule R	surprise	-0.05756426333553261
+07	Inferior parietal lobule R	surprise	-0.12672278257431807
+09	Inferior parietal lobule R	surprise	-0.20167697359014441
+10	Inferior parietal lobule R	surprise	-0.03477767931030097
+11	Inferior parietal lobule R	surprise	0.014893841260345653
+12	Inferior parietal lobule R	surprise	-0.0018839623296150454
+14	Inferior parietal lobule R	surprise	0.08531637931311573
+15	Inferior parietal lobule R	surprise	-0.11372258414134935
+17	Inferior parietal lobule R	surprise	0.12447484968988984
+18	Inferior parietal lobule R	surprise	-0.20403766494106362
+19	Inferior parietal lobule R	surprise	-0.1164059433568683
+20	Inferior parietal lobule R	surprise	0.10102887589622427
+21	Inferior parietal lobule R	surprise	0.013164495368039719
+22	Inferior parietal lobule R	surprise	-0.1953267230203858
+23	Inferior parietal lobule R	surprise	0.136277100554219
+24	Inferior parietal lobule R	surprise	0.11466188866783071
+25	Inferior parietal lobule R	surprise	-0.03660126694443601
+26	Inferior parietal lobule R	surprise	0.10205819921274842
+27	Inferior parietal lobule R	surprise	0.04866234654629672
+28	Inferior parietal lobule R	surprise	-0.045670339139178395
+29	Inferior parietal lobule R	surprise	0.016003586655305872
+30	Inferior parietal lobule R	surprise	0.037960123650177764
+33	Inferior parietal lobule R	surprise	0.006986083221380357
+34	Inferior parietal lobule R	surprise	0.16775806472395305
+35	Inferior parietal lobule R	surprise	0.03571147239374652
+36	Inferior parietal lobule R	surprise	0.025289898169123463
+37	Inferior parietal lobule R	surprise	-0.23126216977834702
+38	Inferior parietal lobule R	surprise	0.1341749357956427
+39	Inferior parietal lobule R	surprise	0.12572419298467813
+40	Inferior parietal lobule R	surprise	-0.09162380993883643
+41	Inferior parietal lobule R	surprise	0.12485520831197156
+42	Inferior parietal lobule R	surprise	-0.051520887244906693
+43	Inferior parietal lobule R	surprise	0.36041902667946285
+45	Inferior parietal lobule R	surprise	0.0645112712626104
+46	Inferior parietal lobule R	surprise	-0.09283704027809479
+47	Inferior parietal lobule R	surprise	-0.04788835119042131
+48	Inferior parietal lobule R	surprise	0.042026012765105675
+49	Inferior parietal lobule R	surprise	0.4380571511056688
+50	Inferior parietal lobule R	surprise	0.2041532802912924
+51	Inferior parietal lobule R	surprise	-0.08601761937003445
+52	Inferior parietal lobule R	surprise	-0.14871126882455968
+53	Inferior parietal lobule R	surprise	0.11818492081430224
+54	Inferior parietal lobule R	surprise	0.03655434360364409
+55	Inferior parietal lobule R	surprise	-0.06276454697190612
+56	Inferior parietal lobule R	surprise	-0.26651332899928093
+57	Inferior parietal lobule R	surprise	-0.08505240224163842
+58	Inferior parietal lobule R	surprise	0.10844520845071033
+59	Inferior parietal lobule R	surprise	-0.5860542434233206
+60	Inferior parietal lobule R	surprise	-0.008650173588345448
+61	Inferior parietal lobule R	surprise	0.04868793309045335
+62	Inferior parietal lobule R	surprise	-0.05887020924301059
+63	Inferior parietal lobule R	surprise	0.07537539824153539
+64	Inferior parietal lobule R	surprise	-0.11593728498728187
+01	Angular gyrus R	rpe	0.2775306344308235
+02	Angular gyrus R	rpe	0.5485356494232461
+03	Angular gyrus R	rpe	0.47531969921180495
+04	Angular gyrus R	rpe	0.1569572603157549
+05	Angular gyrus R	rpe	0.3616553561899949
+06	Angular gyrus R	rpe	0.07732957525661698
+07	Angular gyrus R	rpe	-0.37839813585634585
+09	Angular gyrus R	rpe	-0.07276140324150522
+10	Angular gyrus R	rpe	1.3356862951208044
+11	Angular gyrus R	rpe	0.49153524692411776
+12	Angular gyrus R	rpe	0.12794995951655977
+14	Angular gyrus R	rpe	0.2420653147553956
+15	Angular gyrus R	rpe	0.04201104869652125
+17	Angular gyrus R	rpe	-0.2756892299210584
+18	Angular gyrus R	rpe	0.35798144437096735
+19	Angular gyrus R	rpe	0.11676029433254842
+20	Angular gyrus R	rpe	0.32434068123499554
+21	Angular gyrus R	rpe	0.3587248347423695
+22	Angular gyrus R	rpe	0.631211102284767
+23	Angular gyrus R	rpe	0.2006784790299005
+24	Angular gyrus R	rpe	0.77579966628993
+25	Angular gyrus R	rpe	0.646406704628909
+26	Angular gyrus R	rpe	0.08435579653208454
+27	Angular gyrus R	rpe	0.3434863142945148
+28	Angular gyrus R	rpe	0.6114545359655663
+29	Angular gyrus R	rpe	0.33162236655199967
+30	Angular gyrus R	rpe	0.11379176586935366
+33	Angular gyrus R	rpe	0.19991798628190602
+34	Angular gyrus R	rpe	0.14742992285863254
+35	Angular gyrus R	rpe	0.37897469958773367
+36	Angular gyrus R	rpe	0.2361346122946728
+37	Angular gyrus R	rpe	0.5796791309559787
+38	Angular gyrus R	rpe	0.12554867072375836
+39	Angular gyrus R	rpe	0.3549199694836581
+40	Angular gyrus R	rpe	0.4350092686988689
+41	Angular gyrus R	rpe	0.8765505651632944
+42	Angular gyrus R	rpe	0.40057932061177715
+43	Angular gyrus R	rpe	0.11162798637869181
+45	Angular gyrus R	rpe	0.6410697599252065
+46	Angular gyrus R	rpe	0.3130516338127631
+47	Angular gyrus R	rpe	0.6031355672964344
+48	Angular gyrus R	rpe	0.3218004709730546
+49	Angular gyrus R	rpe	-0.05254102208548122
+50	Angular gyrus R	rpe	0.2495972823213648
+51	Angular gyrus R	rpe	0.5194918165604273
+52	Angular gyrus R	rpe	0.6532312079712197
+53	Angular gyrus R	rpe	-0.18790934386628647
+54	Angular gyrus R	rpe	0.04561747379463028
+55	Angular gyrus R	rpe	0.2740315184066141
+56	Angular gyrus R	rpe	0.6430538758566534
+57	Angular gyrus R	rpe	0.11355665498585613
+58	Angular gyrus R	rpe	0.12145572335079864
+59	Angular gyrus R	rpe	-0.015975278284814622
+60	Angular gyrus R	rpe	-0.0015812344780122792
+61	Angular gyrus R	rpe	0.2542359842746346
+62	Angular gyrus R	rpe	0.1148933816390733
+63	Angular gyrus R	rpe	-0.1414150614981298
+64	Angular gyrus R	rpe	-0.253666823833353
+01	Angular gyrus R	urpe	-0.02181173778242535
+02	Angular gyrus R	urpe	-0.5141632976355376
+03	Angular gyrus R	urpe	-0.057529833219531507
+04	Angular gyrus R	urpe	0.0256743589071212
+05	Angular gyrus R	urpe	-0.44712784907056224
+06	Angular gyrus R	urpe	-0.20423892867337498
+07	Angular gyrus R	urpe	-0.05269932308820663
+09	Angular gyrus R	urpe	0.002399279115100702
+10	Angular gyrus R	urpe	-0.35733182203990443
+11	Angular gyrus R	urpe	-0.2802164697398742
+12	Angular gyrus R	urpe	0.16938335621832973
+14	Angular gyrus R	urpe	-0.036617142544990336
+15	Angular gyrus R	urpe	-0.07782171404472103
+17	Angular gyrus R	urpe	0.10079830565869256
+18	Angular gyrus R	urpe	0.2469700309275477
+19	Angular gyrus R	urpe	0.38587861977241655
+20	Angular gyrus R	urpe	-0.2439527575754457
+21	Angular gyrus R	urpe	0.021039533006303287
+22	Angular gyrus R	urpe	-0.2223679451358125
+23	Angular gyrus R	urpe	0.42195942832363975
+24	Angular gyrus R	urpe	-0.6023963099276578
+25	Angular gyrus R	urpe	-0.05610609439167159
+26	Angular gyrus R	urpe	0.08587983933587869
+27	Angular gyrus R	urpe	-0.208839221685021
+28	Angular gyrus R	urpe	-0.07695966322811458
+29	Angular gyrus R	urpe	0.12878360191421556
+30	Angular gyrus R	urpe	-0.5263736413584815
+33	Angular gyrus R	urpe	0.08129237507711407
+34	Angular gyrus R	urpe	-0.10990112509440493
+35	Angular gyrus R	urpe	-0.151594759447983
+36	Angular gyrus R	urpe	-0.40320118765036267
+37	Angular gyrus R	urpe	-0.056012039788550246
+38	Angular gyrus R	urpe	-0.06972355768084526
+39	Angular gyrus R	urpe	-0.18800998896498372
+40	Angular gyrus R	urpe	-0.03573983542069241
+41	Angular gyrus R	urpe	0.24056983049269076
+42	Angular gyrus R	urpe	-0.3065945870346493
+43	Angular gyrus R	urpe	-0.10693191128989889
+45	Angular gyrus R	urpe	0.04447822258980186
+46	Angular gyrus R	urpe	-0.1810722184902126
+47	Angular gyrus R	urpe	0.379897968377918
+48	Angular gyrus R	urpe	-0.31841061964493106
+49	Angular gyrus R	urpe	0.02267673797905445
+50	Angular gyrus R	urpe	-0.44418213571663256
+51	Angular gyrus R	urpe	0.026192609910611755
+52	Angular gyrus R	urpe	-0.5426591987963076
+53	Angular gyrus R	urpe	-0.011590797743001193
+54	Angular gyrus R	urpe	-0.750570046680945
+55	Angular gyrus R	urpe	-0.3590091190956257
+56	Angular gyrus R	urpe	-0.3541050517448672
+57	Angular gyrus R	urpe	-0.22619491012409088
+58	Angular gyrus R	urpe	0.10274582742540925
+59	Angular gyrus R	urpe	0.1269677510513079
+60	Angular gyrus R	urpe	0.07441238658847632
+61	Angular gyrus R	urpe	-0.15086514909786206
+62	Angular gyrus R	urpe	0.12556654376978124
+63	Angular gyrus R	urpe	-0.004657217560129033
+64	Angular gyrus R	urpe	0.3824473390424693
+01	Angular gyrus R	surprise	-0.032505983003863585
+02	Angular gyrus R	surprise	0.05737551405198044
+03	Angular gyrus R	surprise	0.2341747105949455
+04	Angular gyrus R	surprise	-0.15623457198617635
+05	Angular gyrus R	surprise	0.6152389623500683
+06	Angular gyrus R	surprise	0.11387218227954926
+07	Angular gyrus R	surprise	0.14072605201767552
+09	Angular gyrus R	surprise	0.0614680466155901
+10	Angular gyrus R	surprise	0.21895987568078218
+11	Angular gyrus R	surprise	0.14564995771204983
+12	Angular gyrus R	surprise	-0.04037895609723852
+14	Angular gyrus R	surprise	0.07367519723010008
+15	Angular gyrus R	surprise	-0.04839946743514803
+17	Angular gyrus R	surprise	0.228756760591986
+18	Angular gyrus R	surprise	0.009479705382276464
+19	Angular gyrus R	surprise	-0.013007560844050237
+20	Angular gyrus R	surprise	0.04134894076829638
+21	Angular gyrus R	surprise	0.05232933438727977
+22	Angular gyrus R	surprise	0.05411715484741661
+23	Angular gyrus R	surprise	-0.06273241189342958
+24	Angular gyrus R	surprise	0.06191745305140675
+25	Angular gyrus R	surprise	0.1274020708752451
+26	Angular gyrus R	surprise	0.05348574904793942
+27	Angular gyrus R	surprise	0.004395678471256461
+28	Angular gyrus R	surprise	0.08414673915615788
+29	Angular gyrus R	surprise	0.02529343045575337
+30	Angular gyrus R	surprise	0.06375679516026543
+33	Angular gyrus R	surprise	-0.06100079227514841
+34	Angular gyrus R	surprise	0.011752182889419297
+35	Angular gyrus R	surprise	-0.018301380916522315
+36	Angular gyrus R	surprise	0.12369749341504993
+37	Angular gyrus R	surprise	0.07823641492157346
+38	Angular gyrus R	surprise	0.25356512392560643
+39	Angular gyrus R	surprise	0.34999126802991937
+40	Angular gyrus R	surprise	0.12359786642439387
+41	Angular gyrus R	surprise	0.11647587179861686
+42	Angular gyrus R	surprise	0.0747724227193329
+43	Angular gyrus R	surprise	0.05303778849473154
+45	Angular gyrus R	surprise	0.09500963737567265
+46	Angular gyrus R	surprise	0.10704260988643875
+47	Angular gyrus R	surprise	-0.024497680676480133
+48	Angular gyrus R	surprise	0.1829553128875516
+49	Angular gyrus R	surprise	0.12717505512517635
+50	Angular gyrus R	surprise	0.09897933783078636
+51	Angular gyrus R	surprise	0.19336339362241603
+52	Angular gyrus R	surprise	-0.07084140988687675
+53	Angular gyrus R	surprise	0.00826174249286177
+54	Angular gyrus R	surprise	0.14003310890661347
+55	Angular gyrus R	surprise	0.10602317557290748
+56	Angular gyrus R	surprise	0.1823985224796666
+57	Angular gyrus R	surprise	0.16164521403886653
+58	Angular gyrus R	surprise	0.11326897572036143
+59	Angular gyrus R	surprise	-0.10272292490979587
+60	Angular gyrus R	surprise	-0.03307502416686879
+61	Angular gyrus R	surprise	0.12599557279436677
+62	Angular gyrus R	surprise	0.004980649329135539
+63	Angular gyrus R	surprise	0.21451415314718528
+64	Angular gyrus R	surprise	0.0088191039653288
