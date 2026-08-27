@@ -512,13 +512,22 @@ def page_maps(pdf, source, variant, info, label, mode, cuts, letter, heading):
     composite -- where the overlap actually lives -- as a single summary row."""
     rows = MAP_ROWS + [None]
     fig = plt.figure(figsize=(7.25, 9.9))
-    gs = fig.add_gridspec(len(rows), 1, left=0.208, right=0.995, top=0.878,
+    gs = fig.add_gridspec(len(rows), 1, left=0.208, right=0.995, top=0.866,
                           bottom=0.045, hspace=0.06)
     banner(fig, label, source, variant)
-    fig.text(0.005, 0.912, letter, fontsize=8, fontweight="bold", va="top",
+    # The axial and coronal pages are deliberately identical in layout, which
+    # makes them easy to mistake for the same page when scrolling. Say the
+    # orientation loudly, and give the range so the two headers never match.
+    fig.text(0.005, 0.916, letter, fontsize=8.5, fontweight="bold", va="top",
              color="0.08")
-    fig.text(0.030, 0.912, heading, fontsize=9, fontweight="bold", va="top",
-             color="0.08")
+    span = f"{'z' if mode == 'z' else 'y'} = {cuts[0]:+d} to {cuts[-1]:+d} mm"
+    fig.text(0.030, 0.917, f"{heading}   ·   {span}", fontsize=11.5,
+             fontweight="bold", va="top", color="0.08")
+    fig.text(0.030, 0.8915, "one row per map, then all of them together",
+             fontsize=7, va="top", color="0.45")
+    fig.add_artist(plt.Line2D([0.005, 0.995], [0.8845, 0.8845],
+                              color="0.80", lw=0.8,
+                              transform=fig.transFigure))
 
     ext = {(s, t): n for s, t, n, _ in map_extents(source, variant)}
     for i, row in enumerate(rows):
@@ -543,9 +552,8 @@ def page_maps(pdf, source, variant, info, label, mode, cuts, letter, heading):
                     transform=ax.transAxes, ha="right", va="center", fontsize=6.4,
                     color="0.45")
     fig.text(0.5, 0.030,
-             "Same cuts in every row, so extent can be compared straight down a "
-             "column. Rows are the six maps on their own; the last row is all of "
-             "them together.",
+             f"Same {'axial' if mode == 'z' else 'coronal'} cuts in every row, so "
+             f"extent can be compared straight down a column.",
              ha="center", va="top", fontsize=7, color="0.35")
     pdf.savefig(fig, facecolor="white")
     plt.close(fig)
@@ -602,14 +610,18 @@ def page_conjunctions(pdf, source, variant, label, cuts, top=6):
 
     fig = plt.figure(figsize=(7.25, 9.9))
     banner(fig, label, source, variant)
-    fig.text(0.005, 0.912, "d", fontsize=8, fontweight="bold", va="top", color="0.08")
-    fig.text(0.030, 0.912, "Which contrasts claim each piece of tissue",
-             fontsize=9, fontweight="bold", va="top", color="0.08")
+    fig.text(0.005, 0.916, "d", fontsize=8.5, fontweight="bold", va="top", color="0.08")
+    fig.text(0.030, 0.917, "Which contrasts claim each piece of tissue",
+             fontsize=11.5, fontweight="bold", va="top", color="0.08")
+    fig.text(0.030, 0.8915, "every combination, then the six biggest mapped",
+             fontsize=7, va="top", color="0.45")
+    fig.add_artist(plt.Line2D([0.005, 0.995], [0.8845, 0.8845], color="0.80",
+                              lw=0.8, transform=fig.transFigure))
 
     # the bar chart needs its own left margin for the combination names; the map
     # rows keep the gutter used on the other pages
-    gs_bar = fig.add_gridspec(1, 1, left=0.300, right=0.985, top=0.868,
-                              bottom=0.660)
+    gs_bar = fig.add_gridspec(1, 1, left=0.300, right=0.985, top=0.856,
+                              bottom=0.655)
     gs_map = fig.add_gridspec(len(shown), 1, left=0.208, right=0.995, top=0.612,
                               bottom=0.048, hspace=0.10)
 
