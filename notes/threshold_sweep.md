@@ -311,3 +311,66 @@ never writes it. Two workable routes:
 Cost: first level for 58 subjects × 6 runs, then a 5000-permutation second level — a few
 hours of cluster time. Everything downstream (sweep, ROIs, figures) is already parameterised
 by model source, so a `model7_noorth` would drop straight in.
+
+## Interaction and equivalence tests
+
+`SPM/code/roi_interaction_tests.py`; results in each variant directory as
+`roi_pair_tests.tsv` and `roi_crossover_tests.tsv`; rendered as the "Are they different?"
+block on page 1 of every overlap figure.
+
+Three verdicts per ROI × signal pair, so that a null is never silently read as an absence:
+
+- **different** — paired difference test significant, Holm-corrected
+- **equivalent** — BF01 > 3 (JZS, r = .707). Holm-corrected TOST is also reported, against
+  dz = 0.368, the smallest effect this design can find with 80% power — but nothing clears
+  Holm-corrected TOST, so the Bayes factor is the usable criterion.
+- **undetermined** — neither
+
+At `extent_p1e3`, model7 (14 ROIs, 42 tests): **36 different, 4 equivalent, 2 undetermined.**
+
+**The uRPE-vs-surprise dissociation is real, and it is a double dissociation.** All 14 ROIs
+differ significantly, and the sign flips exactly where it should:
+
+| ROI | Found by | dz (uRPE − surprise) | Verdict |
+|---|---|---|---|
+| dmPFC R | uRPE + | **+0.71** | different |
+| Insula R | uRPE + | **+0.78** | different |
+| Insula L | uRPE + | **+0.53** | different |
+| Inferior parietal lobule R | uRPE + | **+0.55** | different |
+| Angular gyrus R | Surprise + | **−0.64** | different |
+| Precuneus L | Surprise + | **−0.62** | different |
+| DLPFC L | Surprise + | **−0.90** | different |
+| Middle temporal gyrus L | Surprise + | **−0.85** | different |
+
+So on this specific comparison the manuscript's claim survives a proper test, and survives it
+in the strong crossover form: 179 of 273 ROI-pair crossover interactions are significant at
+FDR .05.
+
+**Where the data support equality**, they do so in exactly the places that make sense: RPE ≈
+uRPE in inferior parietal lobule R (BF01 = 6.1, the region flagged as shared in
+`learning_signal_specificity_roi.md`), and RPE ≈ surprise in dmPFC R, insula R and insula L
+(BF01 5.6–6.9) — where both are near zero, i.e. the uRPE-specific regions are specific to
+uRPE against *both* other signals.
+
+Caveats printed with the results: surprise is stimulus-locked while RPE and uRPE are
+feedback-locked, so those comparisons cross events; and every RPE-vs-uRPE comparison is
+biased in uRPE's favour until the non-orthogonalised GLM lands.
+
+## What orthogonalisation actually changes
+
+Comparing the sub-01 model7 design matrix with and without `orth`, column by column:
+
+| Modulator | Runs changed | Correlation between the two versions |
+|---|---|---|
+| uRPE (1st feedback modulator) | **0 of 6** | 1.000 |
+| Signed RPE (2nd feedback modulator) | **6 of 6** | 0.82 – 0.94 |
+| Surprise (1st choice modulator) | 5 of 6 | 0.999 in three runs, but 0.84 and 0.61 in two |
+| Value (2nd choice modulator) | 6 of 6 | 0.91 – 0.95 |
+
+Two consequences. The **uRPE map is identical either way** — the widespread negative uRPE
+effect is not an orthogonalisation artefact. The **signed-RPE map is substantially affected**,
+and so is surprise in a couple of runs (via orthogonalisation against the event's main
+regressor, which `spm_orth` also performs).
+
+Without orthogonalisation the uRPE and signed-RPE regressors correlate at **r = −0.35 to
+−0.57** across runs — real collinearity, not the "very small" correlations the Methods claims.
