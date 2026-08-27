@@ -263,3 +263,51 @@ The figure also puts the two threshold-free corrections on the same axis, which 
 compact version of the whole document: RPE + survives everything (≈ 40% of the mask under
 TFCE, ≈ 20% under voxel max-t), uRPE − survives everything (≈ 27% under TFCE), and
 surprise + survives cluster-extent inference at a permissive family and nothing else.
+
+## The non-orthogonalised GLM was never run — verified in SPM.mat
+
+Read straight out of `/shares/zne.uzh/multlearn/nipype/model7/1stLevel/sub-01/SPM.mat`:
+
+```
+model7  cond=ChoiceTactile     orth=1   pmods=['surprise', 'V']
+model7  cond=FeedbackTactile   orth=1   pmods=['urpe', 'rpe']
+model2  cond=ChoiceTactile     orth=1   pmods=['surprise', 'V']
+model2  cond=FeedbackTactile   orth=1   pmods=['rpe']
+```
+
+`SPM.Sess(k).U(j).orth = 1` in every condition of both models: SPM's serial
+orthogonalisation was applied. The design matrix confirms it — the correlation between the
+uRPE and signed-RPE modulator columns is **exactly 0.0000 in all six runs**, which is the
+signature of `spm_orth` having residualised the second modulator against the first.
+
+Why the intent was lost:
+
+- `orth=["No"] * len(conditions)` is passed in the `Bunch` for models **1, 3, 4, 5 and the
+  PPI** — but **not** for model2, model6 or model7, i.e. not for the one model where two
+  modulators share an event and it would matter.
+- Even where it is passed it is a no-op: nipype has no handling of `Bunch.orth` in
+  `nipype/algorithms/modelgen.py` (its only `orth` is an internal helper for temporal
+  derivatives) or anywhere in `nipype/interfaces/spm/`.
+
+So the Methods sentence "No orthogonalization was applied to the regressors of interest"
+(main.tex:371) is wrong, as `paper/specificity_edits.md` EDIT 5 suspected — and the run that
+would have made it true does not exist.
+
+**Why it matters here.** In model7 uRPE is entered first, so it keeps every scrap of variance
+it shares with signed RPE and the RPE map is the residual. The large negative uRPE map is
+therefore *not* an artefact of ordering — ordering biases uRPE the other way — but the
+positive uRPE effect could in principle be inflated by it. Only the non-orthogonalised run
+settles that.
+
+**How to run it.** SPM12's batch exposes `spm.stats.fmri_spec.sess.cond.orth`, but nipype
+never writes it. Two workable routes:
+
+1. Insert a MATLAB step between `Level1Design` and `EstimateModel` that loads `SPM.mat`, sets
+   `SPM.Sess(k).U(j).orth = 0` for every condition, and calls `spm_fMRI_design(SPM)` to
+   rebuild `SPM.xX.X` without orthogonalisation. Smallest change to the existing pipeline.
+2. Emit the `matlabbatch` for the design directly with `cond.orth = 0`, bypassing nipype's
+   Bunch translation for this model only.
+
+Cost: first level for 58 subjects × 6 runs, then a 5000-permutation second level — a few
+hours of cluster time. Everything downstream (sweep, ROIs, figures) is already parameterised
+by model source, so a `model7_noorth` would drop straight in.
