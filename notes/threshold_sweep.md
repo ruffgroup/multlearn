@@ -169,3 +169,30 @@ tables.
 **Pending:** the five TFCE runs (~2 h each, threshold-free, so one page not five). The TFCE
 page is the one that does not depend on the arbitrary choice everything else sweeps over, and
 is the most important single page for settling the question.
+
+## Figure: where the maps overlap
+
+`notes/figures/fig_overlap_model7.pdf` (and `_model2`), from
+`notes/figures/fig_overlap.py`. ROIs are the clusters actually found in the six
+contrasts at **one common cluster-forming threshold** (t > 3.9756, one-tailed p < 1e-4),
+so no signal gets a more permissive threshold than another; names follow the paper's own
+cluster tables, falling back to Talairach gyrus labels for territories the paper never
+reported (`SPM/code/contrast_roi_overlap.py`). AAL would have been the closer match to the
+paper's vocabulary but gin.cnrs.fr serves it over a certificate that fails verification.
+
+The organising split is the finding: **7 of 21 territories fall outside the signed-RPE map,
+14 inside.**
+
+- **Outside**: five of the six uRPE-positive clusters — dmPFC R, superior frontal sulcus R,
+  frontal middle gyrus R, insula R, insula L — plus inferior parietal lobule R (found by
+  uRPE−) and a small right insula cluster (found by RPE−). These are the regions where the
+  reported uRPE specificity holds up.
+- **Inside**: everything else. The surprise clusters are on average **75%** covered by the
+  RPE-positive map, and the uRPE-negative clusters **61%**. In every one of them the RPE
+  effect is positive and Holm-significant, and the uRPE effect is negative.
+- The one uRPE-positive cluster that lands inside the RPE map is **inferior parietal lobule R**
+  — the same region the earlier ROI analysis (`learning_signal_specificity_roi.md`) had already
+  flagged as shared rather than uRPE-specific. Two independent routes to the same exception.
+
+So the claim that survives is narrower than the paper's: a right frontal / anterior insular
+uRPE network is genuinely separable from the RPE response, and the surprise network is not.
