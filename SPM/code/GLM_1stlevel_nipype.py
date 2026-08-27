@@ -32,10 +32,31 @@ import argparse
 import nipype_helpers
 from pathlib import Path
 
+def disable_orthogonalisation(session_info):
+    """Set orth = 0 on every condition of every session.
+
+    SPM12's batch exposes `spm.stats.fmri_spec.sess.cond.orth`, but nipype never
+    writes it: the `orth` entry of a modelgen Bunch is silently dropped (there is
+    no handling of it in nipype/algorithms/modelgen.py or nipype/interfaces/spm/).
+    session_info's `cond` dicts, however, are passed through to the matlabbatch
+    verbatim, so adding the key here is enough to reach SPM.
+
+    Without this, SPM applies its default serial orthogonalisation within each
+    condition, and the second parametric modulator of an event is residualised
+    against the first -- in model7 that means signed RPE is residualised against
+    uRPE, and uRPE keeps all the variance they share.
+    """
+    info = session_info if isinstance(session_info, list) else [session_info]
+    for sess in info:
+        for cond in sess.get("cond", []):
+            cond["orth"] = 0
+    return info
+
+
 def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="/mnt/d/multlearn-sns/SPM/mask_ICV.nii",
          ppi_roi=None, ppi_variable=None,
          model="model1", bestfitting_path='/mnt/d/multlearn-sns/Modelling/Fitting/bestFittingVals/', Nslices=40, refSlice=20, mlab_path="/usr/local/MATLAB/R2022b/bin/matlab", spm_path="~/spm12",
-         subject=None,
+         subject=None, no_orth=False,
          working_dir='/tmp/workflow_folders'):
     MatlabCommand.set_default_paths(spm_path)
     MatlabCommand.set_default_matlab_cmd(mlab_path)
@@ -147,6 +168,16 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
     )
     level1conest = Node(EstimateContrast(), name="level1conest")
 
+    if no_orth:
+        setorth = Node(
+            Function(input_names=["session_info"], output_names=["session_info_out"],
+                     function=disable_orthogonalisation),
+            name="setorth",
+        )
+        orth_src, orth_in, orth_out = setorth, "session_info", "session_info_out"
+    else:
+        orth_src, orth_in, orth_out = None, None, None
+
     if model == "ROI":
         output_dir = ''.join(mask.split("/")[-1].split("_")[2])+"/"+''.join(mask.split("/")[-1].split("_")[:2])+'_'+mask.split("/")[-1].split("_")[-1].split(".")[0]
         working_dir = "workingdir_"+''.join(mask.split("/")[-1].split("_")[:3])+"_"+mask.split("_")[-1].split(".")[0]
@@ -157,7 +188,10 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
         working_dir = op.join("neurosynth",'workingdir_'+''.join(mask.split(".nii")[0].split("/")[-1].split("_")[:2]))
     else:
         output_dir = model
-    
+
+    if no_orth:
+        output_dir += "_noorth"
+
     base_dir=opj(base_dir,"nipype")
     if not os.path.exists(base_dir):
         os.makedirs(base_dir)
@@ -172,6 +206,8 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
     datasink.inputs.substitutions = substitutions
 
     wf_name = f'first_level_sub-{subject}_model-{model}'
+    if no_orth:
+        wf_name += '_noorth'
 
     if 'PPI' in model:
         wf_name += f'_roi-{ppi_roi}_variable-{ppi_variable}'
@@ -190,7 +226,10 @@ def main(data_folder="/mnt/d/data/", base_dir="/mnt/d/multlearn-sns/SPM", mask="
                     ("functional_runs", "functional_runs"),
                 ],
             ),
-            (modelspec, level1design, [("session_info", "session_info")]),
+            *([(modelspec, orth_src, [("session_info", orth_in)]),
+               (orth_src, level1design, [(orth_out, "session_info")])]
+              if no_orth else
+              [(modelspec, level1design, [("session_info", "session_info")])]),
             (
                 level1design,
                 level1estimate,
@@ -246,6 +285,9 @@ if __name__ == "__main__":
     parser.add_argument("--Nslices", type=int, default=40)
     parser.add_argument("--refSlice", type=int, default=20)
     parser.add_argument("--participant_label", type=str, default=None, help="Specific participant label to process")
+    parser.add_argument("--no-orth", dest="no_orth", action="store_true",
+                        help="Turn OFF SPM's within-condition serial orthogonalisation "
+                             "of parametric modulators; writes to <model>_noorth")
     parser.add_argument("--work_dir", default=Path('/scratch') / os.environ['USER'] / 'working_dir')
 
     args = parser.parse_args()
@@ -253,4 +295,5 @@ if __name__ == "__main__":
     main(args.data_folder, base_dir=args.base_dir, mask=args.mask, ppi_roi=args.ppi_roi,
          ppi_variable=args.ppi_variable,
          model=args.model, bestfitting_path=args.bestfitting_path, mlab_path=args.mlab_path, spm_path=args.spm_path, Nslices=args.Nslices, refSlice=args.refSlice,
-         subject=args.participant_label, working_dir=args.work_dir)
+         subject=args.participant_label, no_orth=args.no_orth,
+         working_dir=args.work_dir)
